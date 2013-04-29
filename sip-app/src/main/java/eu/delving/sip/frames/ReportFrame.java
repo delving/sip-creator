@@ -29,7 +29,6 @@ import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.ReportFileModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.HtmlPanel;
-import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -53,7 +52,6 @@ import static eu.delving.sip.base.SwingHelper.scrollV;
  */
 
 public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
-    private static Logger log = Logger.getLogger(ReportFrame.class);
     private static final int VISIBLE_JUMP = 25;
     private static final int MAX_ACTIVE_CHECKS = 3;
     private static final JLabel EMPTY_LABEL = new JLabel("No reports available", JLabel.CENTER);
@@ -103,10 +101,17 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
     private void linkFile(boolean load, Swing finished) {
         List<ReportFile> reports = sipModel.getReportFileModel().getReports();
         if (chosenReport >= reports.size()) return;
-        LinkChecker linkChecker = reports.get(chosenReport).getLinkChecker();
-        if (linkChecker == null) return;
+        ReportFile reportFile = reports.get(chosenReport);
+        LinkFile linkFile = reportFile.getLinkFile();
+        LinkChecker linkChecker = reportFile.getLinkChecker();
         Feedback feedback = sipModel.getFeedback();
-        Work work = load ? linkChecker.load(feedback, finished) : linkChecker.save(feedback, finished);
+        Work work;
+        if (load) {
+            work = linkFile.load(linkChecker.getMap(), feedback, finished);
+        }
+        else {
+            work = linkFile.save(linkChecker.getMap(), feedback, finished);
+        }
         if (work != null) sipModel.exec(work);
     }
 
@@ -114,11 +119,12 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         private HtmlPanel htmlPanel = new HtmlPanel("Record Details").addHyperlinkListener(new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) SwingHelper.launchURL(e.getURL().toString());
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
+                    SwingHelper.launchURL(e.getURL().toString());
             }
         });
         private ReportFile.Rec recShowing;
-        private List<Work> activeLinkChecks = new ArrayList<Work>();
+        private List<ReportFile.Rec> activeLinkChecks = new ArrayList<ReportFile.Rec>();
         private ReportFile report;
         private JList list;
         private JToggleButton toggle = new JToggleButton("Automatic Link Checking");
@@ -158,7 +164,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         private JPanel createStatsPanel() {
             JPanel p = new JPanel(new GridLayout(1, 0));
             p.add(new PresenceStatsPanel(report));
-            p.add(new LinkStatsPanel(report.getLinkChecker().getLinkFile()));
+            p.add(new LinkStatsPanel(report.getLinkFile()));
             return p;
         }
 
@@ -188,18 +194,17 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                     if (rec == null) return;
                     recShowing = rec;
                     if (!toggle.isSelected()) htmlPanel.setHtml(report.toHtml(rec));
-                    final Work.SwingAfter work = rec.checkLinks(sipModel.getFeedback());
-                    if (work == null) return;
-                    activeLinkChecks.add(work);
-                    work.setAfter(new Swing() {
+                    Work.DataSetPrefixWork work = rec.checkLinks(sipModel.getFeedback(), new Swing() {
                         @Override
                         public void run() {
                             if (recShowing == rec && (!toggle.isSelected())) {
                                 htmlPanel.setHtml(report.toHtml(rec));
                             }
-                            activeLinkChecks.remove(work);
+                            activeLinkChecks.remove(rec);
                         }
                     });
+                    if (work == null) return;
+                    activeLinkChecks.add(rec);
                     sipModel.exec(work);
                 }
             });

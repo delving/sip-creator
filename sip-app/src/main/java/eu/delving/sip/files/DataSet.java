@@ -27,7 +27,6 @@ import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.stats.Stats;
-import org.apache.http.client.HttpClient;
 
 import javax.xml.validation.Validator;
 import java.io.File;
@@ -108,8 +107,6 @@ public interface DataSet extends Comparable<DataSet> {
     ReportWriter openReportWriter(RecDef recDef) throws StorageException;
 
     ReportFile getReport(String prefix) throws StorageException;
-
-    LinkChecker getLinkChecker(HttpClient httpClient, String prefix) throws StorageException;
 
     void deleteSource() throws StorageException;
 

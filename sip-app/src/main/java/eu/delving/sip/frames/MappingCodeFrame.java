@@ -21,6 +21,7 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.MappingResult;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecMapping;
@@ -134,6 +135,11 @@ public class MappingCodeFrame extends FrameBase {
                     exec(new CodeUpdater(code, fieldArea));
                     break;
             }
+        }
+
+        @Override
+        public void mappingComplete(MappingResult mappingResult) {
+            // nothing
         }
 
         @Override

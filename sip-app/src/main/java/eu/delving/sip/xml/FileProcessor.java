@@ -176,7 +176,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 this.recordNumber = record.getRecordNumber();
                 try {
                     Node node = mappingRunner.runMapping(record);
-                    MappingResult result = new MappingResultImpl(serializer, node, recDefTree()).resolve();
+                    MappingResult result = new MappingResultImpl(serializer, record.getId(), node, recDefTree()).resolve();
                     try {
                         Source source = new DOMSource(node);
                         validator.validate(source);

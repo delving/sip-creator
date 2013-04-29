@@ -47,12 +47,24 @@ public class MappingResultImpl implements MappingResult {
     private Map<String, List<String>> copyFields = new TreeMap<String, List<String>>();
     private Map<String, List<String>> searchFields = new TreeMap<String, List<String>>();
     private Node root, rootAugmented;
+    private String localId;
     private RecDefTree recDefTree;
 
-    public MappingResultImpl(XmlSerializer serializer, Node root, RecDefTree recDefTree) {
+    public MappingResultImpl(XmlSerializer serializer, String localId, Node root, RecDefTree recDefTree) {
         this.serializer = serializer;
+        this.localId = localId;
         this.root = root;
         this.recDefTree = recDefTree;
+    }
+
+    @Override
+    public String getLocalId() {
+        return localId;
+    }
+
+    @Override
+    public RecDefTree getRecDefTree() {
+        return recDefTree;
     }
 
     @Override

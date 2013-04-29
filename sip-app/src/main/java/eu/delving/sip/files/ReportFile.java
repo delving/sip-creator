@@ -25,6 +25,7 @@ import eu.delving.metadata.RecDef;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.model.Feedback;
+import eu.delving.sip.xml.ResultLinkChecks;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpStatus;
@@ -37,9 +38,7 @@ import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -56,16 +55,18 @@ import static eu.delving.sip.files.ReportWriter.ReportType.VALID;
 public class ReportFile extends AbstractListModel {
     private static final long BACKTRACK = 10000;
     private static final int MAX_CACHE = 1000;
-    private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
     private final String prefix;
     private RandomAccessFile randomAccess;
     private List<Rec> recs = new ArrayList<Rec>();
     private Rec lastRec;
     private DataSet dataSet;
+    private LinkFile linkFile;
     private LinkChecker linkChecker;
+    private ResultLinkChecks resultLinkChecks;
 
-    public ReportFile(File file, DataSet dataSet, String prefix) throws IOException {
-        this.randomAccess = new RandomAccessFile(file, "r");
+    public ReportFile(File reportFile, File linkFile, DataSet dataSet, String prefix) throws IOException {
+        this.randomAccess = new RandomAccessFile(reportFile, "r");
+        this.linkFile = new LinkFile(linkFile, dataSet, prefix);
         this.dataSet = dataSet;
         this.prefix = prefix;
         long seekEnd = randomAccess.length() - BACKTRACK;
@@ -79,8 +80,13 @@ public class ReportFile extends AbstractListModel {
         }
     }
 
+    public LinkFile getLinkFile() {
+        return linkFile;
+    }
+
     public void setLinkChecker(LinkChecker linkChecker) {
         this.linkChecker = linkChecker;
+        this.resultLinkChecks = new ResultLinkChecks(dataSet, prefix, linkChecker);
     }
 
     public LinkChecker getLinkChecker() {
@@ -268,66 +274,16 @@ public class ReportFile extends AbstractListModel {
             });
         }
 
-        public Work.SwingAfter checkLinks(final Feedback feedback) {
+        public Work.DataSetPrefixWork checkLinks(final Feedback feedback, final Swing after) {
             if (reportType != VALID) return null;
             if (lines == null) return null;
-            final List<String> safeLines = new ArrayList<String>(lines);
-            return new Work.DataSetPrefixWorkSwingAfter() {
-                private Swing after;
-
-                @Override
-                public String getPrefix() {
-                    return prefix;
-                }
-
-                @Override
-                public DataSet getDataSet() {
-                    return dataSet;
-                }
-
-                @Override
-                public Job getJob() {
-                    return Job.CHECK_LINK;
-                }
-
+            return resultLinkChecks.checkLinks(localId, new ArrayList<String>(lines), feedback, new Swing() {
                 @Override
                 public void run() {
-                    try {
-                        boolean linkChecked = false;
-                        for (String line : safeLines) {
-                            Matcher matcher = ReportWriter.LINK.matcher(line);
-                            if (!matcher.matches()) continue; // RuntimeException?
-                            RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
-                            if (!check.fetch) continue;
-                            String url = matcher.group(2);
-                            if (!linkChecker.contains(url)) {
-                                linkChecker.request(url, dataSet.getSpec(), dataSet.getOrganization(), localId);
-                                linkChecked = true;
-                            }
-                        }
-                        if (linkChecked) Swing.Exec.later(new Swing() {
-                            @Override
-                            public void run() {
-                                fireContentsChanged(ReportFile.this, recordNumber, recordNumber);
-                            }
-                        });
-
-                    }
-                    catch (IOException e) {
-                        feedback.alert("Unable to check link", e);
-                    }
+                    fireContentsChanged(ReportFile.this, recordNumber, recordNumber);
+                    after.run();
                 }
-
-                @Override
-                public void setAfter(Swing after) {
-                    this.after = after;
-                }
-
-                @Override
-                public Swing getAfter() {
-                    return after;
-                }
-            };
+            });
         }
 
         public String toString() {
@@ -388,7 +344,7 @@ public class ReportFile extends AbstractListModel {
                                         out.append("? ");
                                     }
                                     else {
-                                        out.append(":").append(DATE_FORMAT.format(new Date(linkCheck.time)));
+                                        out.append(":").append(linkCheck.getTime());
                                         linkCheck.ok = linkCheck.httpStatus == HttpStatus.SC_OK;
                                         switch (check) {
                                             case DEEP_ZOOM:
@@ -423,7 +379,7 @@ public class ReportFile extends AbstractListModel {
         StringBuilder out = new StringBuilder("<html><table cellpadding=6>\n");
         switch (rec.reportType) {
             case VALID:
-                validToHtml(rec, out);
+                ResultLinkChecks.validLinesToHTML(rec.lines, linkChecker, out);
                 break;
             default:
                 out.append("<tr><td>\n");
@@ -436,72 +392,6 @@ public class ReportFile extends AbstractListModel {
         }
         out.append("</table>");
         return out.toString();
-    }
-
-    private void validToHtml(Rec rec, StringBuilder out) {
-        out.append("<table width='100%'>\n");
-        for (String line : rec.lines) {
-            Matcher matcher = ReportWriter.LINK.matcher(line);
-            if (!matcher.matches()) continue; // RuntimeException?
-            RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
-            String content = matcher.group(2);
-            out.append("<tr><td>");
-            out.append(String.format("<table width='100%%'><tr><td><h2>%s</h2></td></tr><td>", check));
-            switch (check) {
-                case LANDING_PAGE:
-                case DIGITAL_OBJECT:
-                case THUMBNAIL:
-                case DEEP_ZOOM:
-                case THESAURUS_REFERENCE:
-                case LOD_REFERENCE:
-                    out.append(String.format(
-                            "<a href=\"%s\">%s<a><br>\n",
-                            content, StringEscapeUtils.escapeHtml(content))
-                    );
-                    if (linkChecker == null || !linkChecker.contains(content)) {
-                        out.append("<ul><li>unchecked</li></ul>");
-                    }
-                    else {
-                        if (check == RecDef.Check.THUMBNAIL) {
-                            out.append(String.format(
-                                    "<table cellpadding=10><tr><td><img src=\"%s\"/></td</tr></table><br>",
-                                    content
-                            ));
-                        }
-                        LinkCheck linkCheck = linkChecker.lookup(content);
-                        out.append("<ul>\n");
-                        out.append(String.format("<li>Ok: %s</li>\n", linkCheck.ok));
-                        out.append(String.format("<li>Checked: %s</li>\n", DATE_FORMAT.format(new Date(linkCheck.time))));
-                        out.append(String.format("<li>HTTP status: %d</li>\n", linkCheck.httpStatus));
-                        out.append(String.format("<li>Status reason: %s</li>\n", linkCheck.getStatusReason()));
-                        out.append(String.format("<li>File size: %d</li>\n", linkCheck.fileSize));
-                        out.append(String.format("<li>MIME type: %s</li>\n", linkCheck.mimeType));
-                        out.append("</ul>\n");
-                    }
-                    break;
-                case GEO_COORDINATE:
-                    String thumbnail = String.format(
-                            "http://maps.google.com/maps/api/staticmap?center=%s&size=400x400&zoom=10&maptype=roadmap&format=jpg&sensor=false&markers=color:blue%%7Clabel:S%%7C%s",
-                            content, content
-                    );
-                    out.append(String.format(
-                            "<table cellpadding=10><tr><td><img src=\"%s\"/></td</tr></table><br>",
-                            thumbnail
-                    ));
-                    out.append(String.format(
-                            "<a href=\"https://maps.google.com/maps?q=%s\">%s<a><br>",
-                            content, content
-                    ));
-                    break;
-                case DATE:
-                    out.append(content);
-                    out.append("<ul><li>not checking yet</li></ul>");
-                    break;
-            }
-            out.append("</td></tr></table>");
-            out.append("</td><tr>");
-        }
-        out.append("</table>\n");
     }
 
     public interface PresenceStatsCallback {

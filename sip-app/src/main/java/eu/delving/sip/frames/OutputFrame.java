@@ -21,19 +21,32 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.sip.base.FrameBase;
+import eu.delving.MappingResult;
+import eu.delving.metadata.XPathContext;
+import eu.delving.sip.base.*;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.LinkChecker;
+import eu.delving.sip.model.MappingCompileModel;
 import eu.delving.sip.model.SipModel;
+import eu.delving.sip.panels.HtmlPanel;
+import eu.delving.sip.xml.LinkCheckExtractor;
+import eu.delving.sip.xml.ResultLinkChecks;
+import org.apache.http.client.HttpClient;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
+import javax.xml.xpath.XPathExpressionException;
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Font;
+import java.util.List;
 
 import static eu.delving.sip.base.SwingHelper.scrollVH;
 import static eu.delving.sip.base.SwingHelper.setError;
@@ -48,10 +61,51 @@ import static eu.delving.sip.base.SwingHelper.setError;
 
 public class OutputFrame extends FrameBase {
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
+    private JTabbedPane tabs = new JTabbedPane();
+    private HttpClient httpClient = HttpClientFactory.createLinkCheckClient();
+    private HtmlPanel htmlPanel;
 
     public OutputFrame(final SipModel sipModel) {
         super(Which.OUTPUT, sipModel, "Output");
         sipModel.getRecordCompileModel().setEnabled(false);
+        sipModel.getRecordCompileModel().addListener(new MappingCompileModel.Listener() {
+            @Override
+            public void stateChanged(CompileState state) {
+            }
+
+            @Override
+            public void codeCompiled(MappingCompileModel.Type type, String code) {
+            }
+
+            @Override
+            public void mappingComplete(MappingResult mappingResult) {
+                try {
+                    LinkCheckExtractor extractor = new LinkCheckExtractor(
+                            mappingResult.getRecDefTree().getRecDef().fieldMarkers,
+                            new XPathContext(mappingResult.getRecDefTree().getRecDef().namespaces)
+                    );
+                    final List<String> checkLines = extractor.getChecks(mappingResult);
+                    DataSet dataSet = sipModel.getDataSetModel().getDataSet();
+                    String prefix = sipModel.getMappingModel().getPrefix();
+                    final LinkChecker linkChecker = new LinkChecker(httpClient);
+                    ResultLinkChecks checks = new ResultLinkChecks(dataSet, prefix, linkChecker);
+                    Work.DataSetPrefixWork work = checks.checkLinks(mappingResult.getLocalId(), checkLines, sipModel.getFeedback(), new Swing() {
+                        @Override
+                        public void run() {
+                            StringBuilder out = new StringBuilder();
+                            ResultLinkChecks.validLinesToHTML(checkLines, linkChecker, out);
+                            htmlPanel.setHtml(out.toString());
+                        }
+                    });
+                    if (work != null) {
+                        sipModel.exec(work);
+                    }
+                }
+                catch (XPathExpressionException e) {
+                    sipModel.getFeedback().alert("XPath problem", e);
+                }
+            }
+        });
     }
 
     @Override
@@ -61,7 +115,20 @@ public class OutputFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(createOutputPanel(), BorderLayout.CENTER);
+        tabs.addTab("XML Output", createOutputPanel());
+        tabs.addTab("Link Check", createLinkCheckPanel());
+        content.add(tabs, BorderLayout.CENTER);
+    }
+
+    private JPanel createLinkCheckPanel() {
+        htmlPanel = new HtmlPanel("Link Checks").addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
+                    SwingHelper.launchURL(e.getURL().toString());
+            }
+        });
+        return htmlPanel;
     }
 
     private JPanel createOutputPanel() {
@@ -95,10 +162,5 @@ public class OutputFrame extends FrameBase {
         });
         p.add(scrollVH(area));
         return p;
-    }
-
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(400, 250);
     }
 }
