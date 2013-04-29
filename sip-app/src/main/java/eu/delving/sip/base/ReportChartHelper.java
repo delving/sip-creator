@@ -42,6 +42,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 import java.awt.Color;
 import java.awt.Paint;
+import java.util.Map;
 
 import static org.jfree.chart.labels.ItemLabelAnchor.INSIDE12;
 import static org.jfree.chart.labels.ItemLabelAnchor.OUTSIDE12;
@@ -56,7 +57,7 @@ import static org.jfree.ui.TextAnchor.CENTER_RIGHT;
 
 public class ReportChartHelper {
 
-    public static ChartPanel createPresenceChart(DataSet dataSet, String prefix, int [] presence, int totalRecords) {
+    public static ChartPanel createPresenceChart(DataSet dataSet, String prefix, int[] presence, int totalRecords) {
         DefaultCategoryDataset data = new DefaultCategoryDataset();
         int index = 0;
         for (RecDef.Check check : RecDef.Check.values()) {
@@ -75,21 +76,41 @@ public class ReportChartHelper {
         return finishBarChart(chart, new Color(218, 112, 214));
     }
 
-    public static ChartPanel createLinkChart(DataSet dataSet, String prefix, LinkFile.LinkStats linkStats) {
+    public static ChartPanel createLinkChart(DataSet dataSet, String prefix, Map<RecDef.Check, LinkFile.LinkStats> linkStatsMap) {
         DefaultCategoryDataset data = new DefaultCategoryDataset();
-        // todo: build data from linkStats
-        data.addValue(100, "Link", "Fake One");
-        data.addValue(120, "Link", "Fake Two");
+        for (Map.Entry<RecDef.Check, LinkFile.LinkStats> entry : linkStatsMap.entrySet()) {
+            RecDef.Check check = entry.getKey();
+            for (Map.Entry<String, LinkFile.Counter> statusEntry : entry.getValue().httpStatus.entrySet()) {
+                data.addValue(statusEntry.getValue().count, "Status:" + statusEntry.getKey(), check);
+            }
+            for (Map.Entry<String, LinkFile.Counter> mimeEntry : entry.getValue().mimeTypes.entrySet()) {
+                data.addValue(mimeEntry.getValue().count, "MIME:" + mimeEntry.getKey(), check);
+            }
+            if (entry.getKey().captureSize) {
+                for (Map.Entry<LinkFile.FileSizeCategory, LinkFile.Counter> sizeEntry : entry.getValue().fileSize.entrySet()) {
+                    data.addValue(sizeEntry.getValue().count, "Size:" + sizeEntry.getKey(), check);
+                }
+            }
+        }
         JFreeChart chart = ChartFactory.createBarChart(
-                String.format("Frequency within record in %s / %s", dataSet.getSpec(), prefix),
+                String.format("Frequency in %s / %s", dataSet.getSpec(), prefix),
                 "Link",
                 "Frequency",
                 data,
                 PlotOrientation.VERTICAL,
-                false, true, false
+                true, true, false
         );
         chart.addSubtitle(new TextTitle("Link Statistics"));
-        return finishBarChart(chart, new Color(30, 144, 225));
+        return finishBarChart(
+                chart,
+                new Color(30, 144, 225),
+                new Color(68, 206, 113),
+                new Color(206, 27, 148),
+                new Color(206, 188, 30),
+                new Color(206, 94, 6),
+                new Color(72, 206, 196),
+                new Color(95, 16, 206)
+        );
     }
 
     private static ChartPanel finishBarChart(JFreeChart chart, Color... colors) {
@@ -131,7 +152,7 @@ public class ReportChartHelper {
         }
 
         public Paint getItemPaint(int i, int j) {
-            return colors[j % colors.length];
+            return colors[i % colors.length];
         }
 
     }

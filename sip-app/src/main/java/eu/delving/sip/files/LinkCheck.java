@@ -21,6 +21,7 @@
 
 package eu.delving.sip.files;
 
+import eu.delving.metadata.RecDef;
 import org.apache.http.impl.EnglishReasonPhraseCatalog;
 
 import java.io.Serializable;
@@ -37,6 +38,7 @@ public class LinkCheck implements Serializable {
     private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
     private static EnglishReasonPhraseCatalog REASON = EnglishReasonPhraseCatalog.INSTANCE;
 
+    public RecDef.Check check;
     public String spec;
     public String orgId;
     public String localId;

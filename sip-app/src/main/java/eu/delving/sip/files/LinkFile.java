@@ -21,6 +21,7 @@
 
 package eu.delving.sip.files;
 
+import eu.delving.metadata.RecDef;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.model.Feedback;
@@ -45,7 +46,7 @@ import static eu.delving.sip.files.LinkFile.FileSizeCategory.values;
  */
 
 public class LinkFile {
-    public static final String CSV_HEADER = "\"URL\", \"OK\", \"Spec\", \"Org ID\", \"Local ID\", \"Date\", \"HTTP Status\", \"File Size\", \"MIME Type\"";
+    public static final String CSV_HEADER = "\"URL\", \"OK\", \"Check\", \"Spec\", \"Org ID\", \"Local ID\", \"Date\", \"HTTP Status\", \"File Size\", \"MIME Type\"";
     public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private Logger log = Logger.getLogger(getClass());
     private File file;
@@ -151,7 +152,7 @@ public class LinkFile {
     }
 
     public interface LinkStatsCallback {
-        void linkStatistics(LinkStats linkStats);
+        void linkStatistics(Map<RecDef.Check,LinkStats> linkStatsMap);
     }
 
     public Work gatherStats(final Feedback feedback, final LinkStatsCallback callback, final Swing finished) {
@@ -174,19 +175,24 @@ public class LinkFile {
             @Override
             public void run() {
                 try {
-                    LinkStats linkStats = new LinkStats();
+                    Map<RecDef.Check,LinkStats> linkStatsMap = new TreeMap<RecDef.Check, LinkStats>();
                     BufferedReader in = new BufferedReader(new FileReader(file));
                     String line = in.readLine();
                     if (!CSV_HEADER.equals(line)) throw new IOException("Expected CSV Header");
                     int count = 0;
                     while ((line = in.readLine()) != null) {
                         Entry entry = new Entry(line);
+                        RecDef.Check check = entry.linkCheck.check;
+                        LinkStats linkStats = linkStatsMap.get(check);
+                        if (linkStats == null) {
+                            linkStatsMap.put(check, linkStats = new LinkStats());
+                        }
                         linkStats.consume(entry);
                         count++;
                     }
                     in.close();
                     log.info("Analyzed " + count + " links");
-                    callback.linkStatistics(linkStats);
+                    callback.linkStatistics(linkStatsMap);
                 }
                 catch (IOException e) {
                     feedback.alert("Unable to analyze link stats", e);
@@ -199,7 +205,7 @@ public class LinkFile {
     }
 
     public static class Entry {
-        public static final Pattern LINK_CHECK_PATTERN = Pattern.compile("\"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", (-?\\d+), (-?\\d+), \"([^\"]*)\"");
+        public static final Pattern LINK_CHECK_PATTERN = Pattern.compile("\"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", (-?\\d+), (-?\\d+), \"([^\"]*)\"");
         public String url;
         public LinkCheck linkCheck;
 
@@ -214,24 +220,25 @@ public class LinkFile {
             url = matcher.group(1);
             linkCheck = new LinkCheck();
             linkCheck.ok = Boolean.parseBoolean(matcher.group(2));
-            linkCheck.spec = matcher.group(3);
-            linkCheck.orgId = matcher.group(4);
-            linkCheck.localId = matcher.group(5);
+            linkCheck.check = RecDef.Check.valueOf(matcher.group(3));
+            linkCheck.spec = matcher.group(4);
+            linkCheck.orgId = matcher.group(5);
+            linkCheck.localId = matcher.group(6);
             try {
-                linkCheck.time = DATE_FORMAT.parse(matcher.group(6)).getTime();
+                linkCheck.time = DATE_FORMAT.parse(matcher.group(7)).getTime();
             }
             catch (ParseException e) {
                 throw new RuntimeException("Cannot parse date");
             }
-            linkCheck.httpStatus = Integer.parseInt(matcher.group(7));
-            linkCheck.fileSize = Integer.parseInt(matcher.group(8));
-            linkCheck.mimeType = matcher.group(9);
+            linkCheck.httpStatus = Integer.parseInt(matcher.group(8));
+            linkCheck.fileSize = Integer.parseInt(matcher.group(9));
+            linkCheck.mimeType = matcher.group(10);
         }
 
         public String toLine() {
             return String.format(
-                    "\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, \"%s\"",
-                    url, linkCheck.ok, linkCheck.spec, linkCheck.orgId, linkCheck.localId,
+                    "\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, \"%s\"",
+                    url, linkCheck.ok, linkCheck.check, linkCheck.spec, linkCheck.orgId, linkCheck.localId,
                     DATE_FORMAT.format(new Date(linkCheck.time)), linkCheck.httpStatus, linkCheck.fileSize, linkCheck.mimeType
             );
         }
@@ -255,7 +262,6 @@ public class LinkFile {
     }
 
     public static class LinkStats {
-
         public final Map<String, Counter> mimeTypes = new TreeMap<String, Counter>();
         public final Map<String, Counter> httpStatus = new TreeMap<String, Counter>();
         public final Map<FileSizeCategory, Counter> fileSize = new TreeMap<FileSizeCategory, Counter>();
@@ -280,12 +286,12 @@ public class LinkFile {
         }
 
         private void captureFileSizes(LinkCheck linkCheck) {
+            if (!linkCheck.check.captureSize) return;
             int size = linkCheck.fileSize;
             FileSizeCategory foundCategory = NO_INFO;
             for (FileSizeCategory category : values()) {
-                if (size > category.maxKb * 1024) continue;
+                if (size > category.maxKb * 1024) break;
                 foundCategory = category;
-                break;
             }
             Counter counter = fileSize.get(foundCategory);
             if (counter == null) fileSize.put(foundCategory, counter = new Counter());
@@ -294,7 +300,7 @@ public class LinkFile {
     }
 
     public static class Counter {
-        int count;
+        public int count;
 
         @Override
         public String toString() {

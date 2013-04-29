@@ -84,7 +84,7 @@ public class ResultLinkChecks {
                         if (!check.fetch) continue;
                         String url = matcher.group(2);
                         if (!linkChecker.contains(url)) {
-                            linkChecker.request(url, dataSet.getSpec(), dataSet.getOrganization(), localId);
+                            linkChecker.request(url, check, dataSet.getSpec(), dataSet.getOrganization(), localId);
                             linkChecked = true;
                         }
                     }

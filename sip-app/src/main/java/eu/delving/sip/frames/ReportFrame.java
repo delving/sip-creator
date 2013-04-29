@@ -21,6 +21,7 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.metadata.RecDef;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.LinkChecker;
 import eu.delving.sip.files.LinkFile;
@@ -42,6 +43,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static eu.delving.sip.base.SwingHelper.scrollV;
 
@@ -326,12 +328,12 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         }
 
         @Override
-        public void linkStatistics(final LinkFile.LinkStats linkStats) {
+        public void linkStatistics(final Map<RecDef.Check,LinkFile.LinkStats> linkStatsMap) {
             sipModel.exec(new Swing() {
                 @Override
                 public void run() {
                     center.removeAll();
-                    center.add(ReportChartHelper.createLinkChart(linkFile.getDataSet(), linkFile.getPrefix(), linkStats));
+                    center.add(ReportChartHelper.createLinkChart(linkFile.getDataSet(), linkFile.getPrefix(), linkStatsMap));
                     center.validate();
                 }
             });

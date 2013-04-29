@@ -21,6 +21,7 @@
 
 package eu.delving.sip.files;
 
+import eu.delving.metadata.RecDef;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -63,8 +64,9 @@ public class LinkChecker {
         return map.get(url);
     }
 
-    public LinkCheck request(String url, String spec, String orgId, String localId) throws IOException {
+    public LinkCheck request(String url, RecDef.Check check, String spec, String orgId, String localId) throws IOException {
         LinkCheck linkCheck = linkCheckRequest(url);
+        linkCheck.check = check;
         linkCheck.spec = spec;
         linkCheck.orgId = orgId;
         linkCheck.localId = localId;
