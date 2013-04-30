@@ -26,6 +26,8 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.model.Feedback;
 import org.apache.log4j.Logger;
+import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.general.PieDataset;
 
 import java.io.*;
 import java.text.ParseException;
@@ -152,7 +154,7 @@ public class LinkFile {
     }
 
     public interface LinkStatsCallback {
-        void linkStatistics(Map<RecDef.Check,LinkStats> linkStatsMap);
+        void linkStatistics(Map<RecDef.Check, LinkStats> linkStatsMap);
     }
 
     public Work gatherStats(final Feedback feedback, final LinkStatsCallback callback, final Swing finished) {
@@ -175,7 +177,7 @@ public class LinkFile {
             @Override
             public void run() {
                 try {
-                    Map<RecDef.Check,LinkStats> linkStatsMap = new TreeMap<RecDef.Check, LinkStats>();
+                    Map<RecDef.Check, LinkStats> linkStatsMap = new TreeMap<RecDef.Check, LinkStats>();
                     BufferedReader in = new BufferedReader(new FileReader(file));
                     String line = in.readLine();
                     if (!CSV_HEADER.equals(line)) throw new IOException("Expected CSV Header");
@@ -296,6 +298,26 @@ public class LinkFile {
             Counter counter = fileSize.get(foundCategory);
             if (counter == null) fileSize.put(foundCategory, counter = new Counter());
             counter.count++;
+        }
+
+        public Map<String, PieDataset> createPies() {
+            DefaultPieDataset status = new DefaultPieDataset();
+            DefaultPieDataset mime = new DefaultPieDataset();
+            DefaultPieDataset size = new DefaultPieDataset();
+            for (Map.Entry<String, LinkFile.Counter> statusEntry : httpStatus.entrySet()) {
+                status.setValue(statusEntry.getKey(), statusEntry.getValue().count);
+            }
+            for (Map.Entry<String, LinkFile.Counter> mimeEntry : mimeTypes.entrySet()) {
+                mime.setValue(mimeEntry.getKey(), mimeEntry.getValue().count);
+            }
+            for (Map.Entry<LinkFile.FileSizeCategory, LinkFile.Counter> sizeEntry : fileSize.entrySet()) {
+                size.setValue(sizeEntry.getKey(), sizeEntry.getValue().count);
+            }
+            Map<String,PieDataset> pies = new TreeMap<String, PieDataset>();
+            pies.put("Status", status);
+            pies.put("MIME", mime);
+            pies.put("Size", size);
+            return pies;
         }
     }
 

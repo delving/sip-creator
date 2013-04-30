@@ -30,7 +30,6 @@ import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.ReportFileModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.HtmlPanel;
-import org.jfree.chart.ChartPanel;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -276,13 +275,13 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
     private class PresenceStatsPanel extends JPanel implements ReportFile.PresenceStatsCallback {
         private JPanel center = new JPanel(new BorderLayout());
         private ReportFile reportFile;
-        private ChartPanel presencePanel;
+        private JPanel presencePanel;
 
         private PresenceStatsPanel(ReportFile reportFile) {
             super(new BorderLayout());
             this.reportFile = reportFile;
             setBorder(BorderFactory.createTitledBorder("Presence Statistics"));
-            center.add(new JLabel("soon"));
+            center.add(new JLabel("Data not yet gathered", JLabel.CENTER));
             add(center, BorderLayout.CENTER);
             add(new JButton(new GatherAction()), BorderLayout.SOUTH);
         }
@@ -322,7 +321,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
             super(new BorderLayout());
             this.linkFile = linkFile;
             setBorder(BorderFactory.createTitledBorder("Link Statistics"));
-            center.add(new JLabel("soon"));
+            center.add(new JLabel("Data not yet gathered", JLabel.CENTER));
             add(center, BorderLayout.CENTER);
             add(new JButton(new GatherAction()), BorderLayout.SOUTH);
         }
