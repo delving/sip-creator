@@ -129,6 +129,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         private List<ReportFile.Rec> activeLinkChecks = new ArrayList<ReportFile.Rec>();
         private ReportFile report;
         private JList list;
+        private JCheckBox onlyInvalidBox = new JCheckBox("Show invalid records only");
         private JToggleButton toggle = new JToggleButton("Automatic Link Checking");
         private LoadAction loadAction = new LoadAction();
         private SaveAction saveAction = new SaveAction();
@@ -146,13 +147,13 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                 public void itemStateChanged(ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
                         currentIndex = list.getSelectedIndex();
-                        linkFileSetEnabled(false);
+                        controlsEnabled(false);
                         timer.start();
                         list.setEnabled(false);
                     }
                     else {
                         timer.stop();
-                        linkFileSetEnabled(true);
+                        controlsEnabled(true);
                         list.setEnabled(true);
                     }
                 }
@@ -185,7 +186,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         }
 
         private void createList() {
-            list = new JList(report);
+            list = new JList(report.getAll());
             list.setCellRenderer(report.getCellRenderer());
             list.setPrototypeCellValue("One single line of something or other");
             list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -210,6 +211,25 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                     sipModel.exec(work);
                 }
             });
+            onlyInvalidBox.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        controlsEnabled(false);
+                        ReportFile.OnlyInvalid onlyInvalid = report.getOnlyInvalid();
+                        list.setModel(onlyInvalid);
+                        sipModel.exec(onlyInvalid.refresh(sipModel.getFeedback(), new Swing() {
+                            @Override
+                            public void run() {
+                                controlsEnabled(true);
+                            }
+                        }));
+                    }
+                    else {
+                        list.setModel(report.getAll());
+                    }
+                }
+            });
         }
 
         private JPanel createControls() {
@@ -218,6 +238,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
             p.add(new JButton(loadAction));
             p.add(toggle);
             p.add(new JButton(saveAction));
+            p.add(onlyInvalidBox);
             return p;
         }
 
@@ -238,11 +259,11 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
 
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                linkFileSetEnabled(false);
+                controlsEnabled(false);
                 linkFile(true, new Swing() {
                     @Override
                     public void run() {
-                        linkFileSetEnabled(true);
+                        controlsEnabled(true);
                         mainPanel.repaint();
                     }
                 });
@@ -256,19 +277,20 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
 
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                linkFileSetEnabled(false);
+                controlsEnabled(false);
                 linkFile(false, new Swing() {
                     @Override
                     public void run() {
-                        linkFileSetEnabled(true);
+                        controlsEnabled(true);
                     }
                 });
             }
         }
 
-        private void linkFileSetEnabled(boolean enabled) {
+        private void controlsEnabled(boolean enabled) {
             loadAction.setEnabled(enabled);
             saveAction.setEnabled(enabled);
+            onlyInvalidBox.setEnabled(enabled);
         }
     }
 

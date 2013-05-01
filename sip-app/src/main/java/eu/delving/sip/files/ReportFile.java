@@ -32,10 +32,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpStatus;
 
-import javax.swing.AbstractListModel;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JList;
-import javax.swing.ListCellRenderer;
+import javax.swing.*;
 import java.awt.Component;
 import java.io.*;
 import java.util.ArrayList;
@@ -53,18 +50,21 @@ import static eu.delving.sip.files.ReportWriter.ReportType.VALID;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class ReportFile extends AbstractListModel {
+public class ReportFile {
     private static final long BACKTRACK = 10000;
     private static final int MAX_CACHE = 1000;
     private final DataSet dataSet;
     private final String prefix;
     private final File reportFile;
     private RandomAccessFile randomAccess;
-    private List<Rec> recs = new ArrayList<Rec>();
+    private List<Rec> recs;
     private Rec lastRec;
     private LinkFile linkFile;
     private LinkChecker linkChecker;
     private ResultLinkChecks resultLinkChecks;
+    private boolean allVisible;
+    private All all = new All();
+    private OnlyInvalid onlyInvalid = new OnlyInvalid();
 
     public ReportFile(File reportFile, File linkFile, DataSet dataSet, String prefix) throws IOException {
         this.reportFile = reportFile;
@@ -81,6 +81,19 @@ public class ReportFile extends AbstractListModel {
             if (rec.getRecordNumber() < 0) break;
             lastRec = rec;
         }
+        int recordCount = lastRec.getRecordNumber() + 1;
+        recs = new ArrayList<Rec>(recordCount);
+        while (recs.size() < recordCount) recs.add(new Rec());
+    }
+
+    public ListModel getAll() {
+        allVisible = true;
+        return all;
+    }
+
+    public OnlyInvalid getOnlyInvalid() {
+        allVisible = false;
+        return onlyInvalid;
     }
 
     public LinkFile getLinkFile() {
@@ -109,21 +122,6 @@ public class ReportFile extends AbstractListModel {
         return false;
     }
 
-    @Override
-    public int getSize() {
-        return lastRec == null ? 0 : lastRec.getRecordNumber() + 1;
-    }
-
-    @Override
-    public Object getElementAt(int index) {
-        while (index >= recs.size()) {
-            recs.add(new Rec());
-        }
-        Rec rec = recs.get(index);
-        rec.activate();
-        return rec;
-    }
-
     public void maintainCache() {
         int count = 0;
         for (Rec rec : recs) if (rec.lines != null) count++;
@@ -142,11 +140,7 @@ public class ReportFile extends AbstractListModel {
         Fetch fetch = new Fetch();
         int index = 0;
         for (Rec rec : recs) {
-            if (rec.needsReading()) {
-                fetch.recsToRead.add(rec);
-                if (fetch.firstIndex < 0) fetch.firstIndex = index;
-                fetch.lastIndex = index;
-            }
+            if (rec.needsReading()) fetch.add(index, rec);
             index++;
         }
         return fetch;
@@ -155,6 +149,12 @@ public class ReportFile extends AbstractListModel {
     public class Fetch {
         private List<Rec> recsToRead = new ArrayList<Rec>();
         private int firstIndex = -1, lastIndex;
+
+        public void add(int index, Rec rec) {
+            recsToRead.add(rec);
+            if (firstIndex < 0) firstIndex = index;
+            lastIndex = index;
+        }
     }
 
     public Work fetchRecords(final Fetch fetch, final Feedback feedback) {
@@ -230,6 +230,10 @@ public class ReportFile extends AbstractListModel {
             return recordNumber;
         }
 
+        public boolean isInvalid() {
+            return ReportWriter.ReportType.VALID != reportType;
+        }
+
         public void readIn(boolean keep) throws IOException {
             if (seekPos < 0) {
                 seekPos = randomAccess.getFilePointer();
@@ -272,7 +276,12 @@ public class ReportFile extends AbstractListModel {
                 @Override
                 public void run() {
                     lines = freshLines;
-                    fireContentsChanged(ReportFile.this, recordNumber, recordNumber);
+                    if (allVisible) {
+                        all.fireContentsChanged(recordNumber);
+                    }
+                    else {
+                        onlyInvalid.fireContentsChanged(recordNumber);
+                    }
                 }
             });
         }
@@ -283,7 +292,7 @@ public class ReportFile extends AbstractListModel {
             return resultLinkChecks.checkLinks(localId, new ArrayList<String>(lines), feedback, new Swing() {
                 @Override
                 public void run() {
-                    fireContentsChanged(ReportFile.this, recordNumber, recordNumber);
+                    all.fireContentsChanged(recordNumber);
                     after.run();
                 }
             });
@@ -301,8 +310,9 @@ public class ReportFile extends AbstractListModel {
             return lines == null && touch > 0;
         }
 
-        public void activate() {
+        public Rec activate() {
             touch = System.currentTimeMillis();
+            return this;
         }
     }
 
@@ -398,7 +408,7 @@ public class ReportFile extends AbstractListModel {
     }
 
     public interface PresenceStatsCallback {
-        void presenceCounts(int [] presence, int totalRecords);
+        void presenceCounts(int[] presence, int totalRecords);
     }
 
     public Work gatherStats(final PresenceStatsCallback callback, final Feedback feedback, final Swing finished) {
@@ -443,8 +453,8 @@ public class ReportFile extends AbstractListModel {
             try {
                 BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(reportFile), "UTF-8"));
                 boolean within = false;
-                int [] presence = new int[RecDef.Check.values().length];
-                boolean [] contains = new boolean[RecDef.Check.values().length];
+                int[] presence = new int[RecDef.Check.values().length];
+                boolean[] contains = new boolean[RecDef.Check.values().length];
                 while (true) {
                     String line = in.readLine();
                     if (line == null) break;
@@ -460,7 +470,7 @@ public class ReportFile extends AbstractListModel {
                     }
                     if (within) {
                         if (ReportWriter.END.matcher(line).matches()) {
-                            for (int walk=0; walk<contains.length; walk++) {
+                            for (int walk = 0; walk < contains.length; walk++) {
                                 if (contains[walk]) presence[walk]++;
                             }
                             continue;
@@ -471,7 +481,7 @@ public class ReportFile extends AbstractListModel {
                         contains[check.ordinal()] = true;
                     }
                 }
-                callback.presenceCounts(presence, lastRec.getRecordNumber()+1);
+                callback.presenceCounts(presence, lastRec.getRecordNumber() + 1);
             }
             catch (IOException e) {
                 feedback.alert("Unable to gather output statistics", e);
@@ -483,5 +493,96 @@ public class ReportFile extends AbstractListModel {
                 Swing.Exec.later(finished);
             }
         }
+    }
+
+    public class All extends AbstractListModel {
+        @Override
+        public int getSize() {
+            return lastRec == null ? 0 : lastRec.getRecordNumber() + 1;
+        }
+
+        @Override
+        public Object getElementAt(int index) {
+            return recs.get(index).activate();
+        }
+
+        public void fireContentsChanged(int recordNumber) {
+            fireContentsChanged(this, recordNumber, recordNumber);
+        }
+    }
+
+    public class OnlyInvalid extends AbstractListModel {
+        private List<Rec> invalidRecs = new ArrayList<Rec>();
+
+        public Work refresh(final Feedback feedback, final Swing after) {
+            return new Work.DataSetPrefixWork() {
+                @Override
+                public void run() {
+                    try {
+                    boolean missing = false;
+                    for (Rec rec : recs) if (rec.getRecordNumber() < 0) missing = true;
+                    if (missing) {
+                        try {
+                            randomAccess.seek(0);
+                            for (Rec rec : recs) rec.readIn(false);
+                        }
+                        catch (IOException e) {
+                            feedback.alert("Problem scanning report file", e);
+                        }
+                    }
+                    Swing.Exec.later(new Swing() {
+                        @Override
+                        public void run() {
+                            final int wasSize = invalidRecs.size();
+                            invalidRecs.clear();
+                            if (wasSize > 0) fireIntervalRemoved(OnlyInvalid.this, 0, wasSize - 1);
+                            for (Rec rec : recs) if (rec.isInvalid()) invalidRecs.add(rec.activate());
+                            if (!invalidRecs.isEmpty()) fireIntervalAdded(OnlyInvalid.this, 0, getSize() - 1);
+                        }
+                    });
+                    }
+                    finally {
+                        after.run();;
+                    }
+                }
+
+                @Override
+                public String getPrefix() {
+                    return prefix;
+                }
+
+                @Override
+                public DataSet getDataSet() {
+                    return dataSet;
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.LOAD_REPORT;
+                }
+            };
+        }
+
+        @Override
+        public int getSize() {
+            return invalidRecs.size();
+        }
+
+        @Override
+        public Object getElementAt(int index) {
+            return invalidRecs.get(index);
+        }
+
+        public void fireContentsChanged(int recordNumber) {
+            int index = 0;
+            for (Rec invalidRec : invalidRecs) {
+                if (invalidRec.recordNumber == recordNumber) {
+                    fireContentsChanged(OnlyInvalid.this, index, index);
+                    break;
+                }
+                index++;
+            }
+        }
+
     }
 }
