@@ -280,6 +280,7 @@ public class RecMapping {
             {"aff", "0.1.0"},
             {"itin", "1.0.0"},
             {"lido", "1.0.0"},
+            {"ead", "1.2.3"},
     };
 
 
