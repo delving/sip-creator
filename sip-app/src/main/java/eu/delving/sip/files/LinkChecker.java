@@ -21,9 +21,7 @@
 
 package eu.delving.sip.files;
 
-import eu.delving.sip.base.Swing;
-import eu.delving.sip.base.Work;
-import eu.delving.sip.model.Feedback;
+import eu.delving.metadata.RecDef;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -48,16 +46,14 @@ public class LinkChecker {
     private static Logger log = Logger.getLogger(LinkChecker.class);
     private final HttpClient httpClient;
     private HTreeMap<String, LinkCheck> map;
-    private LinkFile linkFile;
 
-    public LinkChecker(HttpClient httpClient, LinkFile linkFile) {
+    public LinkChecker(HttpClient httpClient) {
         this.httpClient = httpClient;
-        this.linkFile = linkFile;
         this.map = DBMaker.newTempHashMap();
     }
 
-    public LinkFile getLinkFile() {
-        return linkFile;
+    public HTreeMap<String, LinkCheck> getMap() {
+        return map;
     }
 
     public boolean contains(String url) {
@@ -68,22 +64,15 @@ public class LinkChecker {
         return map.get(url);
     }
 
-    public LinkCheck request(String url, String spec, String orgId, String localId) throws IOException {
+    public LinkCheck request(String url, RecDef.Check check, String spec, String orgId, String localId) throws IOException {
         LinkCheck linkCheck = linkCheckRequest(url);
+        linkCheck.check = check;
         linkCheck.spec = spec;
         linkCheck.orgId = orgId;
         linkCheck.localId = localId;
         log.info(String.format("Found %s by requesting: %s", url, linkCheck));
         map.put(url, linkCheck);
         return linkCheck;
-    }
-
-    public Work load(Feedback feedback, Swing finished) {
-        return linkFile.load(map, feedback, finished);
-    }
-
-    public Work save(Feedback feedback, Swing finished) {
-        return linkFile.save(map, feedback, finished);
     }
 
     private LinkCheck linkCheckRequest(String url) throws IOException {
@@ -105,5 +94,4 @@ public class LinkChecker {
         EntityUtils.consume(response.getEntity());
         return linkCheck;
     }
-
 }

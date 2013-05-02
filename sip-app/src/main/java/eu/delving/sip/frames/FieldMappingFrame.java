@@ -21,6 +21,7 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.MappingResult;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.*;
 import eu.delving.sip.model.*;
@@ -33,7 +34,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -243,6 +247,11 @@ public class FieldMappingFrame extends FrameBase {
 
             @Override
             public void codeCompiled(MappingCompileModel.Type type, String code) {
+                // nothing
+            }
+
+            @Override
+            public void mappingComplete(MappingResult mappingResult) {
                 // nothing
             }
         });

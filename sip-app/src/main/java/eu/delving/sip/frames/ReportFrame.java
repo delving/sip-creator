@@ -21,6 +21,7 @@
 
 package eu.delving.sip.frames;
 
+import eu.delving.metadata.RecDef;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.LinkChecker;
 import eu.delving.sip.files.LinkFile;
@@ -29,7 +30,6 @@ import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.ReportFileModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.HtmlPanel;
-import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -42,6 +42,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static eu.delving.sip.base.SwingHelper.scrollV;
 
@@ -53,7 +54,6 @@ import static eu.delving.sip.base.SwingHelper.scrollV;
  */
 
 public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
-    private static Logger log = Logger.getLogger(ReportFrame.class);
     private static final int VISIBLE_JUMP = 25;
     private static final int MAX_ACTIVE_CHECKS = 3;
     private static final JLabel EMPTY_LABEL = new JLabel("No reports available", JLabel.CENTER);
@@ -103,10 +103,17 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
     private void linkFile(boolean load, Swing finished) {
         List<ReportFile> reports = sipModel.getReportFileModel().getReports();
         if (chosenReport >= reports.size()) return;
-        LinkChecker linkChecker = reports.get(chosenReport).getLinkChecker();
-        if (linkChecker == null) return;
+        ReportFile reportFile = reports.get(chosenReport);
+        LinkFile linkFile = reportFile.getLinkFile();
+        LinkChecker linkChecker = reportFile.getLinkChecker();
         Feedback feedback = sipModel.getFeedback();
-        Work work = load ? linkChecker.load(feedback, finished) : linkChecker.save(feedback, finished);
+        Work work;
+        if (load) {
+            work = linkFile.load(linkChecker.getMap(), feedback, finished);
+        }
+        else {
+            work = linkFile.save(linkChecker.getMap(), feedback, finished);
+        }
         if (work != null) sipModel.exec(work);
     }
 
@@ -114,13 +121,15 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         private HtmlPanel htmlPanel = new HtmlPanel("Record Details").addHyperlinkListener(new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) SwingHelper.launchURL(e.getURL().toString());
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
+                    SwingHelper.launchURL(e.getURL().toString());
             }
         });
         private ReportFile.Rec recShowing;
-        private List<Work> activeLinkChecks = new ArrayList<Work>();
+        private List<ReportFile.Rec> activeLinkChecks = new ArrayList<ReportFile.Rec>();
         private ReportFile report;
         private JList list;
+        private JCheckBox onlyInvalidBox = new JCheckBox("Show invalid records only");
         private JToggleButton toggle = new JToggleButton("Automatic Link Checking");
         private LoadAction loadAction = new LoadAction();
         private SaveAction saveAction = new SaveAction();
@@ -138,13 +147,13 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                 public void itemStateChanged(ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
                         currentIndex = list.getSelectedIndex();
-                        linkFileSetEnabled(false);
+                        controlsEnabled(false);
                         timer.start();
                         list.setEnabled(false);
                     }
                     else {
                         timer.stop();
-                        linkFileSetEnabled(true);
+                        controlsEnabled(true);
                         list.setEnabled(true);
                     }
                 }
@@ -158,7 +167,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         private JPanel createStatsPanel() {
             JPanel p = new JPanel(new GridLayout(1, 0));
             p.add(new PresenceStatsPanel(report));
-            p.add(new LinkStatsPanel(report.getLinkChecker().getLinkFile()));
+            p.add(new LinkStatsPanel(report.getLinkFile()));
             return p;
         }
 
@@ -177,7 +186,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         }
 
         private void createList() {
-            list = new JList(report);
+            list = new JList(report.getAll());
             list.setCellRenderer(report.getCellRenderer());
             list.setPrototypeCellValue("One single line of something or other");
             list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -188,19 +197,37 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                     if (rec == null) return;
                     recShowing = rec;
                     if (!toggle.isSelected()) htmlPanel.setHtml(report.toHtml(rec));
-                    final Work.SwingAfter work = rec.checkLinks(sipModel.getFeedback());
-                    if (work == null) return;
-                    activeLinkChecks.add(work);
-                    work.setAfter(new Swing() {
+                    Work.DataSetPrefixWork work = rec.checkLinks(sipModel.getFeedback(), new Swing() {
                         @Override
                         public void run() {
                             if (recShowing == rec && (!toggle.isSelected())) {
                                 htmlPanel.setHtml(report.toHtml(rec));
                             }
-                            activeLinkChecks.remove(work);
+                            activeLinkChecks.remove(rec);
                         }
                     });
+                    if (work == null) return;
+                    activeLinkChecks.add(rec);
                     sipModel.exec(work);
+                }
+            });
+            onlyInvalidBox.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        controlsEnabled(false);
+                        ReportFile.OnlyInvalid onlyInvalid = report.getOnlyInvalid();
+                        list.setModel(onlyInvalid);
+                        sipModel.exec(onlyInvalid.refresh(sipModel.getFeedback(), new Swing() {
+                            @Override
+                            public void run() {
+                                controlsEnabled(true);
+                            }
+                        }));
+                    }
+                    else {
+                        list.setModel(report.getAll());
+                    }
                 }
             });
         }
@@ -211,6 +238,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
             p.add(new JButton(loadAction));
             p.add(toggle);
             p.add(new JButton(saveAction));
+            p.add(onlyInvalidBox);
             return p;
         }
 
@@ -231,11 +259,11 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
 
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                linkFileSetEnabled(false);
+                controlsEnabled(false);
                 linkFile(true, new Swing() {
                     @Override
                     public void run() {
-                        linkFileSetEnabled(true);
+                        controlsEnabled(true);
                         mainPanel.repaint();
                     }
                 });
@@ -249,33 +277,40 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
 
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                linkFileSetEnabled(false);
+                controlsEnabled(false);
                 linkFile(false, new Swing() {
                     @Override
                     public void run() {
-                        linkFileSetEnabled(true);
+                        controlsEnabled(true);
                     }
                 });
             }
         }
 
-        private void linkFileSetEnabled(boolean enabled) {
+        private void controlsEnabled(boolean enabled) {
             loadAction.setEnabled(enabled);
             saveAction.setEnabled(enabled);
+            onlyInvalidBox.setEnabled(enabled);
         }
     }
 
     private class PresenceStatsPanel extends JPanel implements ReportFile.PresenceStatsCallback {
         private JPanel center = new JPanel(new BorderLayout());
         private ReportFile reportFile;
+        private JPanel presencePanel;
 
         private PresenceStatsPanel(ReportFile reportFile) {
             super(new BorderLayout());
             this.reportFile = reportFile;
             setBorder(BorderFactory.createTitledBorder("Presence Statistics"));
-            center.add(new JLabel("soon"));
+            center.add(new JLabel("Data not yet gathered", JLabel.CENTER));
             add(center, BorderLayout.CENTER);
             add(new JButton(new GatherAction()), BorderLayout.SOUTH);
+        }
+
+        @Override
+        public void presenceCounts(int[] presence, int totalRecords) {
+            presencePanel = ReportChartHelper.createPresenceChart(reportFile.getDataSet(), reportFile.getPrefix(), presence, totalRecords);
         }
 
         private class GatherAction extends AbstractAction {
@@ -286,11 +321,11 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 setEnabled(false);
-                Work work = reportFile.gatherStats(PresenceStatsPanel.this, new Swing() {
+                Work work = reportFile.gatherStats(PresenceStatsPanel.this, sipModel.getFeedback(), new Swing() {
                     @Override
                     public void run() {
                         center.removeAll();
-                        center.add(ReportChartHelper.createPresenceChart(reportFile.getDataSet(), reportFile.getPrefix()));
+                        center.add(presencePanel);
                         center.validate();
                         setEnabled(true);
                     }
@@ -308,18 +343,18 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
             super(new BorderLayout());
             this.linkFile = linkFile;
             setBorder(BorderFactory.createTitledBorder("Link Statistics"));
-            center.add(new JLabel("soon"));
+            center.add(new JLabel("Data not yet gathered", JLabel.CENTER));
             add(center, BorderLayout.CENTER);
             add(new JButton(new GatherAction()), BorderLayout.SOUTH);
         }
 
         @Override
-        public void linkStatistics(final LinkFile.LinkStats linkStats) {
+        public void linkStatistics(final Map<RecDef.Check,LinkFile.LinkStats> linkStatsMap) {
             sipModel.exec(new Swing() {
                 @Override
                 public void run() {
                     center.removeAll();
-                    center.add(ReportChartHelper.createLinkChart(linkFile.getDataSet(), linkFile.getPrefix(), linkStats));
+                    center.add(ReportChartHelper.createLinkChart(linkFile.getDataSet(), linkFile.getPrefix(), linkStatsMap));
                     center.validate();
                 }
             });

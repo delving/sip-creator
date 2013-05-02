@@ -21,9 +21,12 @@
 
 package eu.delving.sip.files;
 
+import eu.delving.metadata.RecDef;
 import org.apache.http.impl.EnglishReasonPhraseCatalog;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Shared between LinkChecker and LinkFile
@@ -32,7 +35,10 @@ import java.io.Serializable;
  */
 
 public class LinkCheck implements Serializable {
+    private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
     private static EnglishReasonPhraseCatalog REASON = EnglishReasonPhraseCatalog.INSTANCE;
+
+    public RecDef.Check check;
     public String spec;
     public String orgId;
     public String localId;
@@ -41,6 +47,10 @@ public class LinkCheck implements Serializable {
     public int fileSize;
     public String mimeType;
     public boolean ok;
+
+    public String getTime() {
+        return DATE_FORMAT.format(new Date(time));
+    }
 
     public String getStatusReason() {
         return String.format(
@@ -53,4 +63,6 @@ public class LinkCheck implements Serializable {
     public String toString() {
         return getStatusReason();
     }
+
+
 }

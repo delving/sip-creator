@@ -232,19 +232,21 @@ public class RecDef {
     }
 
     public enum Check {
-        LANDING_PAGE(true),
-        DIGITAL_OBJECT(true),
-        THUMBNAIL(true),
-        DEEP_ZOOM(true),
-        THESAURUS_REFERENCE(true),
-        LOD_REFERENCE(true),
-        GEO_COORDINATE(false),
-        DATE(false);
+        LANDING_PAGE(true, false),
+        DIGITAL_OBJECT(true, true),
+        THUMBNAIL(true, true),
+        DEEP_ZOOM(true, false),
+        THESAURUS_REFERENCE(true, false),
+        LOD_REFERENCE(true, false),
+        GEO_COORDINATE(false, false),
+        DATE(false, false);
 
         public final boolean fetch;
+        public final boolean captureSize;
 
-        private Check(boolean fetch) {
+        private Check(boolean fetch, boolean captureSize) {
             this.fetch = fetch;
+            this.captureSize = captureSize;
         }
     }
 

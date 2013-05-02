@@ -31,7 +31,6 @@ import eu.delving.sip.files.*;
 import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.HttpClient;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -362,11 +361,6 @@ public class TestSourceConverter {
 
         @Override
         public ReportFile getReport(String prefix) throws StorageException {
-            return null;
-        }
-
-        @Override
-        public LinkChecker getLinkChecker(HttpClient httpClient, String prefix) throws StorageException {
             return null;
         }
 

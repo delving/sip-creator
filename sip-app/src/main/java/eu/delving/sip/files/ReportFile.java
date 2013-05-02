@@ -22,24 +22,21 @@
 package eu.delving.sip.files;
 
 import eu.delving.metadata.RecDef;
+import eu.delving.sip.base.CancelException;
+import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.model.Feedback;
+import eu.delving.sip.xml.ResultLinkChecks;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpStatus;
 
-import javax.swing.AbstractListModel;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JList;
-import javax.swing.ListCellRenderer;
+import javax.swing.*;
 import java.awt.Component;
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.text.SimpleDateFormat;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -53,19 +50,26 @@ import static eu.delving.sip.files.ReportWriter.ReportType.VALID;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class ReportFile extends AbstractListModel {
+public class ReportFile {
     private static final long BACKTRACK = 10000;
     private static final int MAX_CACHE = 1000;
-    private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
+    private final DataSet dataSet;
     private final String prefix;
+    private final File reportFile;
     private RandomAccessFile randomAccess;
-    private List<Rec> recs = new ArrayList<Rec>();
+    private List<Rec> recs;
     private Rec lastRec;
-    private DataSet dataSet;
+    private LinkFile linkFile;
     private LinkChecker linkChecker;
+    private ResultLinkChecks resultLinkChecks;
+    private boolean allVisible;
+    private All all = new All();
+    private OnlyInvalid onlyInvalid = new OnlyInvalid();
 
-    public ReportFile(File file, DataSet dataSet, String prefix) throws IOException {
-        this.randomAccess = new RandomAccessFile(file, "r");
+    public ReportFile(File reportFile, File linkFile, DataSet dataSet, String prefix) throws IOException {
+        this.reportFile = reportFile;
+        this.randomAccess = new RandomAccessFile(this.reportFile, "r");
+        this.linkFile = new LinkFile(linkFile, dataSet, prefix);
         this.dataSet = dataSet;
         this.prefix = prefix;
         long seekEnd = randomAccess.length() - BACKTRACK;
@@ -77,10 +81,28 @@ public class ReportFile extends AbstractListModel {
             if (rec.getRecordNumber() < 0) break;
             lastRec = rec;
         }
+        int recordCount = lastRec.getRecordNumber() + 1;
+        recs = new ArrayList<Rec>(recordCount);
+        while (recs.size() < recordCount) recs.add(new Rec());
+    }
+
+    public ListModel getAll() {
+        allVisible = true;
+        return all;
+    }
+
+    public OnlyInvalid getOnlyInvalid() {
+        allVisible = false;
+        return onlyInvalid;
+    }
+
+    public LinkFile getLinkFile() {
+        return linkFile;
     }
 
     public void setLinkChecker(LinkChecker linkChecker) {
         this.linkChecker = linkChecker;
+        this.resultLinkChecks = new ResultLinkChecks(dataSet, prefix, linkChecker);
     }
 
     public LinkChecker getLinkChecker() {
@@ -98,21 +120,6 @@ public class ReportFile extends AbstractListModel {
     public boolean needsWork() {
         for (Rec rec : recs) if (rec.needsReading()) return true;
         return false;
-    }
-
-    @Override
-    public int getSize() {
-        return lastRec == null ? 0 : lastRec.getRecordNumber() + 1;
-    }
-
-    @Override
-    public Object getElementAt(int index) {
-        while (index >= recs.size()) {
-            recs.add(new Rec());
-        }
-        Rec rec = recs.get(index);
-        rec.activate();
-        return rec;
     }
 
     public void maintainCache() {
@@ -133,11 +140,7 @@ public class ReportFile extends AbstractListModel {
         Fetch fetch = new Fetch();
         int index = 0;
         for (Rec rec : recs) {
-            if (rec.needsReading()) {
-                fetch.recsToRead.add(rec);
-                if (fetch.firstIndex < 0) fetch.firstIndex = index;
-                fetch.lastIndex = index;
-            }
+            if (rec.needsReading()) fetch.add(index, rec);
             index++;
         }
         return fetch;
@@ -146,6 +149,12 @@ public class ReportFile extends AbstractListModel {
     public class Fetch {
         private List<Rec> recsToRead = new ArrayList<Rec>();
         private int firstIndex = -1, lastIndex;
+
+        public void add(int index, Rec rec) {
+            recsToRead.add(rec);
+            if (firstIndex < 0) firstIndex = index;
+            lastIndex = index;
+        }
     }
 
     public Work fetchRecords(final Fetch fetch, final Feedback feedback) {
@@ -221,6 +230,10 @@ public class ReportFile extends AbstractListModel {
             return recordNumber;
         }
 
+        public boolean isInvalid() {
+            return ReportWriter.ReportType.VALID != reportType;
+        }
+
         public void readIn(boolean keep) throws IOException {
             if (seekPos < 0) {
                 seekPos = randomAccess.getFilePointer();
@@ -229,7 +242,7 @@ public class ReportFile extends AbstractListModel {
                 randomAccess.seek(seekPos);
             }
             final List<String> freshLines = keep ? new ArrayList<String>() : null;
-            boolean startFound = false;
+            boolean within = false;
             while (true) {
                 String line = randomAccess.readLine();
                 if (line == null) break;
@@ -253,81 +266,36 @@ public class ReportFile extends AbstractListModel {
                             error = startMatcher.group(3);
                             break;
                     }
-                    startFound = true;
+                    within = true;
                     continue;
                 }
-                if (startFound && ReportWriter.END.matcher(line).matches()) break;
-                if (startFound && freshLines != null) freshLines.add(line);
+                if (within && ReportWriter.END.matcher(line).matches()) break;
+                if (within && freshLines != null) freshLines.add(line);
             }
             if (freshLines != null) Swing.Exec.later(new Swing() {
                 @Override
                 public void run() {
                     lines = freshLines;
-                    fireContentsChanged(ReportFile.this, recordNumber, recordNumber);
+                    if (allVisible) {
+                        all.fireContentsChanged(recordNumber);
+                    }
+                    else {
+                        onlyInvalid.fireContentsChanged(recordNumber);
+                    }
                 }
             });
         }
 
-        public Work.SwingAfter checkLinks(final Feedback feedback) {
+        public Work.DataSetPrefixWork checkLinks(final Feedback feedback, final Swing after) {
             if (reportType != VALID) return null;
             if (lines == null) return null;
-            final List<String> safeLines = new ArrayList<String>(lines);
-            return new Work.DataSetPrefixWorkSwingAfter() {
-                private Swing after;
-
-                @Override
-                public String getPrefix() {
-                    return prefix;
-                }
-
-                @Override
-                public DataSet getDataSet() {
-                    return dataSet;
-                }
-
-                @Override
-                public Job getJob() {
-                    return Job.CHECK_LINK;
-                }
-
+            return resultLinkChecks.checkLinks(localId, new ArrayList<String>(lines), feedback, new Swing() {
                 @Override
                 public void run() {
-                    try {
-                        boolean linkChecked = false;
-                        for (String line : safeLines) {
-                            Matcher matcher = ReportWriter.LINK.matcher(line);
-                            if (!matcher.matches()) continue; // RuntimeException?
-                            RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
-                            if (!check.fetch) continue;
-                            String url = matcher.group(2);
-                            if (!linkChecker.contains(url)) {
-                                linkChecker.request(url, dataSet.getSpec(), dataSet.getOrganization(), localId);
-                                linkChecked = true;
-                            }
-                        }
-                        if (linkChecked) Swing.Exec.later(new Swing() {
-                            @Override
-                            public void run() {
-                                fireContentsChanged(ReportFile.this, recordNumber, recordNumber);
-                            }
-                        });
-
-                    }
-                    catch (IOException e) {
-                        feedback.alert("Unable to check link", e);
-                    }
+                    all.fireContentsChanged(recordNumber);
+                    after.run();
                 }
-
-                @Override
-                public void setAfter(Swing after) {
-                    this.after = after;
-                }
-
-                @Override
-                public Swing getAfter() {
-                    return after;
-                }
-            };
+            });
         }
 
         public String toString() {
@@ -342,8 +310,9 @@ public class ReportFile extends AbstractListModel {
             return lines == null && touch > 0;
         }
 
-        public void activate() {
+        public Rec activate() {
             touch = System.currentTimeMillis();
+            return this;
         }
     }
 
@@ -388,7 +357,7 @@ public class ReportFile extends AbstractListModel {
                                         out.append("? ");
                                     }
                                     else {
-                                        out.append(":").append(DATE_FORMAT.format(new Date(linkCheck.time)));
+                                        out.append(":").append(linkCheck.getTime());
                                         linkCheck.ok = linkCheck.httpStatus == HttpStatus.SC_OK;
                                         switch (check) {
                                             case DEEP_ZOOM:
@@ -423,7 +392,7 @@ public class ReportFile extends AbstractListModel {
         StringBuilder out = new StringBuilder("<html><table cellpadding=6>\n");
         switch (rec.reportType) {
             case VALID:
-                validToHtml(rec, out);
+                ResultLinkChecks.validLinesToHTML(rec.lines, linkChecker, out);
                 break;
             default:
                 out.append("<tr><td>\n");
@@ -438,102 +407,182 @@ public class ReportFile extends AbstractListModel {
         return out.toString();
     }
 
-    private void validToHtml(Rec rec, StringBuilder out) {
-        out.append("<table width='100%'>\n");
-        for (String line : rec.lines) {
-            Matcher matcher = ReportWriter.LINK.matcher(line);
-            if (!matcher.matches()) continue; // RuntimeException?
-            RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
-            String content = matcher.group(2);
-            out.append("<tr><td>");
-            out.append(String.format("<table width='100%%'><tr><td><h2>%s</h2></td></tr><td>", check));
-            switch (check) {
-                case LANDING_PAGE:
-                case DIGITAL_OBJECT:
-                case THUMBNAIL:
-                case DEEP_ZOOM:
-                case THESAURUS_REFERENCE:
-                case LOD_REFERENCE:
-                    out.append(String.format(
-                            "<a href=\"%s\">%s<a><br>\n",
-                            content, StringEscapeUtils.escapeHtml(content))
-                    );
-                    if (linkChecker == null || !linkChecker.contains(content)) {
-                        out.append("<ul><li>unchecked</li></ul>");
-                    }
-                    else {
-                        if (check == RecDef.Check.THUMBNAIL) {
-                            out.append(String.format(
-                                    "<table cellpadding=10><tr><td><img src=\"%s\"/></td</tr></table><br>",
-                                    content
-                            ));
-                        }
-                        LinkCheck linkCheck = linkChecker.lookup(content);
-                        out.append("<ul>\n");
-                        out.append(String.format("<li>Ok: %s</li>\n", linkCheck.ok));
-                        out.append(String.format("<li>Checked: %s</li>\n", DATE_FORMAT.format(new Date(linkCheck.time))));
-                        out.append(String.format("<li>HTTP status: %d</li>\n", linkCheck.httpStatus));
-                        out.append(String.format("<li>Status reason: %s</li>\n", linkCheck.getStatusReason()));
-                        out.append(String.format("<li>File size: %d</li>\n", linkCheck.fileSize));
-                        out.append(String.format("<li>MIME type: %s</li>\n", linkCheck.mimeType));
-                        out.append("</ul>\n");
-                    }
-                    break;
-                case GEO_COORDINATE:
-                    String thumbnail = String.format(
-                            "http://maps.google.com/maps/api/staticmap?center=%s&size=400x400&zoom=10&maptype=roadmap&format=jpg&sensor=false&markers=color:blue%%7Clabel:S%%7C%s",
-                            content, content
-                    );
-                    out.append(String.format(
-                            "<table cellpadding=10><tr><td><img src=\"%s\"/></td</tr></table><br>",
-                            thumbnail
-                    ));
-                    out.append(String.format(
-                            "<a href=\"https://maps.google.com/maps?q=%s\">%s<a><br>",
-                            content, content
-                    ));
-                    break;
-                case DATE:
-                    out.append(content);
-                    out.append("<ul><li>not checking yet</li></ul>");
-                    break;
-            }
-            out.append("</td></tr></table>");
-            out.append("</td><tr>");
-        }
-        out.append("</table>\n");
-    }
-
     public interface PresenceStatsCallback {
-
+        void presenceCounts(int[] presence, int totalRecords);
     }
 
-    public Work gatherStats(final PresenceStatsCallback callback, final Swing finished) {
-        return new Work.DataSetPrefixWork() {
-            @Override
-            public String getPrefix() {
-                return prefix;
-            }
+    public Work gatherStats(final PresenceStatsCallback callback, final Feedback feedback, final Swing finished) {
+        return new StatisicsGatherer(callback, feedback, finished);
+    }
 
-            @Override
-            public DataSet getDataSet() {
-                return dataSet;
-            }
+    private class StatisicsGatherer implements Work.DataSetPrefixWork, Work.LongTermWork {
+        private final PresenceStatsCallback callback;
+        private final Feedback feedback;
+        private final Swing finished;
+        private ProgressListener progressListener;
 
-            @Override
-            public Job getJob() {
-                return Job.GATHER_PRESENCE_STATS;
-            }
+        private StatisicsGatherer(PresenceStatsCallback callback, Feedback feedback, Swing finished) {
+            this.callback = callback;
+            this.feedback = feedback;
+            this.finished = finished;
+        }
 
-            @Override
-            public void run() {
-                try {
-                    callback.hashCode(); // todo: give something back
+        @Override
+        public String getPrefix() {
+            return prefix;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return dataSet;
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.GATHER_PRESENCE_STATS;
+        }
+
+        @Override
+        public void setProgressListener(ProgressListener progressListener) {
+            this.progressListener = progressListener;
+            this.progressListener.prepareFor(lastRec.getRecordNumber());
+        }
+
+        @Override
+        public void run() {
+            try {
+                BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(reportFile), "UTF-8"));
+                boolean within = false;
+                int[] presence = new int[RecDef.Check.values().length];
+                boolean[] contains = new boolean[RecDef.Check.values().length];
+                while (true) {
+                    String line = in.readLine();
+                    if (line == null) break;
+                    Matcher startMatcher = ReportWriter.START.matcher(line);
+                    if (startMatcher.matches()) {
+                        int recordNumber = Integer.parseInt(startMatcher.group(1));
+                        progressListener.setProgress(recordNumber);
+                        ReportWriter.ReportType reportType = ReportWriter.ReportType.valueOf(startMatcher.group(2));
+                        if (reportType != VALID) continue;
+                        within = true;
+                        Arrays.fill(contains, false);
+                        continue;
+                    }
+                    if (within) {
+                        if (ReportWriter.END.matcher(line).matches()) {
+                            for (int walk = 0; walk < contains.length; walk++) {
+                                if (contains[walk]) presence[walk]++;
+                            }
+                            continue;
+                        }
+                        Matcher matcher = ReportWriter.LINK.matcher(line);
+                        if (!matcher.matches()) continue; // RuntimeException?
+                        RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
+                        contains[check.ordinal()] = true;
+                    }
                 }
-                finally {
-                    Swing.Exec.later(finished);
-                }
+                callback.presenceCounts(presence, lastRec.getRecordNumber() + 1);
             }
-        };
+            catch (IOException e) {
+                feedback.alert("Unable to gather output statistics", e);
+            }
+            catch (CancelException e) {
+                feedback.alert("Cancelled output statistics gathering");
+            }
+            finally {
+                Swing.Exec.later(finished);
+            }
+        }
+    }
+
+    public class All extends AbstractListModel {
+        @Override
+        public int getSize() {
+            return lastRec == null ? 0 : lastRec.getRecordNumber() + 1;
+        }
+
+        @Override
+        public Object getElementAt(int index) {
+            return recs.get(index).activate();
+        }
+
+        public void fireContentsChanged(int recordNumber) {
+            fireContentsChanged(this, recordNumber, recordNumber);
+        }
+    }
+
+    public class OnlyInvalid extends AbstractListModel {
+        private List<Rec> invalidRecs = new ArrayList<Rec>();
+
+        public Work refresh(final Feedback feedback, final Swing after) {
+            return new Work.DataSetPrefixWork() {
+                @Override
+                public void run() {
+                    try {
+                    boolean missing = false;
+                    for (Rec rec : recs) if (rec.getRecordNumber() < 0) missing = true;
+                    if (missing) {
+                        try {
+                            randomAccess.seek(0);
+                            for (Rec rec : recs) rec.readIn(false);
+                        }
+                        catch (IOException e) {
+                            feedback.alert("Problem scanning report file", e);
+                        }
+                    }
+                    Swing.Exec.later(new Swing() {
+                        @Override
+                        public void run() {
+                            final int wasSize = invalidRecs.size();
+                            invalidRecs.clear();
+                            if (wasSize > 0) fireIntervalRemoved(OnlyInvalid.this, 0, wasSize - 1);
+                            for (Rec rec : recs) if (rec.isInvalid()) invalidRecs.add(rec.activate());
+                            if (!invalidRecs.isEmpty()) fireIntervalAdded(OnlyInvalid.this, 0, getSize() - 1);
+                        }
+                    });
+                    }
+                    finally {
+                        after.run();;
+                    }
+                }
+
+                @Override
+                public String getPrefix() {
+                    return prefix;
+                }
+
+                @Override
+                public DataSet getDataSet() {
+                    return dataSet;
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.LOAD_REPORT;
+                }
+            };
+        }
+
+        @Override
+        public int getSize() {
+            return invalidRecs.size();
+        }
+
+        @Override
+        public Object getElementAt(int index) {
+            return invalidRecs.get(index);
+        }
+
+        public void fireContentsChanged(int recordNumber) {
+            int index = 0;
+            for (Rec invalidRec : invalidRecs) {
+                if (invalidRec.recordNumber == recordNumber) {
+                    fireContentsChanged(OnlyInvalid.this, index, index);
+                    break;
+                }
+                index++;
+            }
+        }
+
     }
 }

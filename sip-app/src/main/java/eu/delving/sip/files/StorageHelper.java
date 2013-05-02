@@ -187,7 +187,7 @@ public class StorageHelper {
         return new File(dir, REPORT.getName(prefix));
     }
 
-    static File linkDbFile(File dir, String prefix) {
+    static File linkFile(File dir, String prefix) {
         return new File(dir, LINKS.getName(prefix));
     }
 

@@ -21,6 +21,7 @@
 
 package eu.delving.sip.base;
 
+import eu.delving.metadata.RecDef;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.LinkFile;
 import org.jfree.chart.ChartFactory;
@@ -35,12 +36,20 @@ import org.jfree.chart.labels.ItemLabelPosition;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.RingPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.general.PieDataset;
 
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 import java.awt.Color;
+import java.awt.GridLayout;
 import java.awt.Paint;
+import java.util.Locale;
+import java.util.Map;
 
 import static org.jfree.chart.labels.ItemLabelAnchor.INSIDE12;
 import static org.jfree.chart.labels.ItemLabelAnchor.OUTSIDE12;
@@ -55,15 +64,17 @@ import static org.jfree.ui.TextAnchor.CENTER_RIGHT;
 
 public class ReportChartHelper {
 
-    public static ChartPanel createPresenceChart(DataSet dataSet, String prefix) {
+    public static JPanel createPresenceChart(DataSet dataSet, String prefix, int[] presence, int totalRecords) {
         DefaultCategoryDataset data = new DefaultCategoryDataset();
-        //data.addValue(counter.count, "Count", counter.value);
-        data.addValue(100, "Presence", "Fake One");
-        data.addValue(120, "Presence", "Fake Two");
+        int index = 0;
+        for (RecDef.Check check : RecDef.Check.values()) {
+            data.addValue(presence[index], "Presence", check);
+            index++;
+        }
         JFreeChart chart = ChartFactory.createBarChart(
                 String.format("Field presence in %s / %s", dataSet.getSpec(), prefix),
                 "Field",
-                "Record count",
+                String.format("Record count of %d records", totalRecords),
                 data,
                 PlotOrientation.VERTICAL,
                 false, true, false
@@ -72,51 +83,40 @@ public class ReportChartHelper {
         return finishBarChart(chart, new Color(218, 112, 214));
     }
 
-    public static ChartPanel createLinkChart(DataSet dataSet, String prefix, LinkFile.LinkStats linkStats) {
-        DefaultCategoryDataset data = new DefaultCategoryDataset();
-        // todo: build data from linkStats
-        data.addValue(100, "Link", "Fake One");
-        data.addValue(120, "Link", "Fake Two");
-        JFreeChart chart = ChartFactory.createBarChart(
-                String.format("Frequency within record in %s / %s", dataSet.getSpec(), prefix),
-                "Link",
-                "Frequency",
-                data,
-                PlotOrientation.VERTICAL,
-                false, true, false
+    private static JPanel finishBarChart(JFreeChart chart, Color... colors) {
+        CategoryPlot plot = (CategoryPlot) chart.getPlot();
+        plot.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
+        plot.setRangePannable(true);
+        if (colors.length > 0) plot.setRenderer(new CustomRenderer(colors));
+        BarRenderer bar = (BarRenderer) plot.getRenderer();
+        bar.setItemLabelAnchorOffset(9D);
+        bar.setBaseItemLabelsVisible(true);
+        bar.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator());
+        bar.setMaximumBarWidth(0.05);
+        bar.setItemMargin(0.03D);
+        bar.setBasePositiveItemLabelPosition(new ItemLabelPosition(
+                INSIDE12,
+                CENTER_RIGHT,
+                CENTER_RIGHT,
+                -1.5707963267948966D
+        ));
+        bar.setPositiveItemLabelPositionFallback(new ItemLabelPosition(
+                OUTSIDE12,
+                CENTER_LEFT,
+                CENTER_LEFT,
+                -1.5707963267948966D
+        ));
+        CategoryAxis x = plot.getDomainAxis();
+        x.setCategoryLabelPositions(
+                CategoryLabelPositions.DOWN_90
         );
-        chart.addSubtitle(new TextTitle("Link Statistics"));
-        return finishBarChart(chart, new Color(30, 144, 225));
-    }
-
-    private static ChartPanel finishBarChart(JFreeChart chart, Color... colors) {
-        CategoryPlot categoryplot = (CategoryPlot) chart.getPlot();
-        categoryplot.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
-        categoryplot.setRangePannable(true);
-        if (colors.length > 0) categoryplot.setRenderer(new CustomRenderer(colors));
-        BarRenderer barrenderer = (BarRenderer) categoryplot.getRenderer();
-        barrenderer.setItemLabelAnchorOffset(9D);
-        barrenderer.setBaseItemLabelsVisible(true);
-        barrenderer.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator());
-        barrenderer.setMaximumBarWidth(0.05);
-        barrenderer.setItemMargin(0.03D);
-        ItemLabelPosition itemlabelposition = new ItemLabelPosition(INSIDE12, CENTER_RIGHT, CENTER_RIGHT, -1.5707963267948966D);
-        barrenderer.setBasePositiveItemLabelPosition(itemlabelposition);
-        ItemLabelPosition itemlabelposition1 = new ItemLabelPosition(OUTSIDE12, CENTER_LEFT, CENTER_LEFT, -1.5707963267948966D);
-        barrenderer.setPositiveItemLabelPositionFallback(itemlabelposition1);
-        CategoryAxis categoryaxis = categoryplot.getDomainAxis();
-        categoryaxis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
-        categoryaxis.setCategoryMargin(0.25D);
-        categoryaxis.setUpperMargin(0.02D);
-        categoryaxis.setLowerMargin(0.02D);
-        NumberAxis numberaxis = (NumberAxis) categoryplot.getRangeAxis();
-        numberaxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
-        numberaxis.setUpperMargin(0.10000000000000001D);
+        x.setCategoryMargin(0.25D);
+        x.setUpperMargin(0.02D);
+        x.setLowerMargin(0.02D);
+        NumberAxis y = (NumberAxis) plot.getRangeAxis();
+        y.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        y.setUpperMargin(0.10000000000000001D);
         ChartUtilities.applyCurrentTheme(chart);
-        return wrap(chart);
-    }
-
-    private static ChartPanel wrap(JFreeChart chart) {
         return new ChartPanel(chart);
     }
 
@@ -127,10 +127,38 @@ public class ReportChartHelper {
             this.colors = colors;
         }
 
+        @Override
         public Paint getItemPaint(int i, int j) {
-            return colors[j % colors.length];
+            return colors[i % colors.length];
         }
 
     }
+
+    public static JComponent createLinkChart(DataSet dataSet, String prefix, Map<RecDef.Check, LinkFile.LinkStats> linkStatsMap) {
+        JPanel p = new JPanel(new GridLayout(0, 1));
+        for (Map.Entry<RecDef.Check, LinkFile.LinkStats> entry : linkStatsMap.entrySet()) {
+            JPanel pp = new JPanel(new GridLayout(1, 0));
+            pp.setBorder(BorderFactory.createTitledBorder(entry.getKey().toString()));
+            for (Map.Entry<String, PieDataset> datasetEntry : entry.getValue().createPies().entrySet()) {
+                JFreeChart chart = ChartFactory.createRingChart(
+                        datasetEntry.getKey(),
+                        datasetEntry.getValue(),
+                        true,
+                        false,
+                        Locale.getDefault()
+                );
+                RingPlot plot = (RingPlot)chart.getPlot();
+                plot.setLabelGenerator(null);
+                plot.setNoDataMessage("No data available");
+                plot.setSectionDepth(0.34999999999999998D);
+                plot.setCircular(true);
+                plot.setLabelGap(0.02D);
+                pp.add(new ChartPanel(chart));
+            }
+            p.add(pp);
+        }
+        return p;
+    }
+
 
 }

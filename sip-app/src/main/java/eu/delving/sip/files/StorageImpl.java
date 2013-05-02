@@ -28,11 +28,11 @@ import eu.delving.schema.SchemaResponse;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.xml.LinkCheckExtractor;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CountingInputStream;
-import org.apache.http.client.HttpClient;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
 
@@ -486,7 +486,8 @@ public class StorageImpl implements Storage {
         public ReportWriter openReportWriter(RecDef recDef) throws StorageException {
             File file = new File(here, FileType.REPORT.getName(recDef.prefix));
             try {
-                return new ReportWriter(file, recDef.fieldMarkers, new XPathContext(recDef.namespaces));
+                LinkCheckExtractor linkCheckExtractor = new LinkCheckExtractor(recDef.fieldMarkers, new XPathContext(recDef.namespaces));
+                return new ReportWriter(file, linkCheckExtractor);
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
@@ -500,16 +501,11 @@ public class StorageImpl implements Storage {
         public ReportFile getReport(String prefix) throws StorageException {
             try {
                 File file = reportFile(here, prefix);
-                return file.exists() ? new ReportFile(file, this, prefix)  : null;
+                return file.exists() ? new ReportFile(file, linkFile(here, prefix), this, prefix)  : null;
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
             }
-        }
-
-        @Override
-        public LinkChecker getLinkChecker(HttpClient httpClient, String prefix) throws StorageException {
-            return new LinkChecker(httpClient, new LinkFile(linkDbFile(here, prefix), this, prefix));
         }
 
         @Override

@@ -25,6 +25,7 @@ import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.HttpClientFactory;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.LinkChecker;
 import eu.delving.sip.files.ReportFile;
 import eu.delving.sip.files.StorageException;
 import org.apache.http.client.HttpClient;
@@ -88,7 +89,7 @@ public class ReportFileModel {
                 ReportFile reportFile = dataSet.getReport(schemaVersion.getPrefix());
                 if (reportFile == null) continue;
                 reportFiles.add(reportFile);
-                reportFile.setLinkChecker(dataSet.getLinkChecker(getHttpClient(), schemaVersion.getPrefix()));
+                reportFile.setLinkChecker(new LinkChecker(getHttpClient()));
             }
             catch (StorageException e) {
                 sipModel.getFeedback().alert("Cannot read report file for " + schemaVersion.getPrefix());
