@@ -77,10 +77,13 @@ public class TargetFrame extends FrameBase {
         recDefTree.setDropMode(DropMode.ON);
         treePanel = new JPanel(new BorderLayout());
         treePanel.add(scrollVH("Record Definition", recDefTree));
-        JMenu expand = new JMenu("View");
-        expand.add(new ExpandRootAction());
-        expand.add(hideAttributes);
-        expand.add(autoFold);
+        JMenu view = new JMenu("View");
+        view.add(new ExpandRootAction());
+        view.add(hideAttributes);
+        view.add(autoFold);
+        JMenuBar bar = new JMenuBar();
+        bar.add(view);
+        setJMenuBar(bar);
         wireUp();
     }
 

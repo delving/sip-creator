@@ -132,6 +132,10 @@ public class Tag implements Comparable<Tag>, Serializable {
         }
     }
 
+    public Tag withoutPrefix() {
+        return prefix == null ? this : attribute ? Tag.attribute(null, localName) : Tag.element(null, localName, null);
+    }
+
     public void inContextOf(Path path) {
         if (path.isEmpty()) return;
         Tag ancestorTag = path.peek();
