@@ -21,6 +21,7 @@
 
 package eu.delving.sip;
 
+import eu.delving.metadata.RecDef;
 import eu.delving.sip.files.LinkCheck;
 import eu.delving.sip.files.LinkFile;
 import junit.framework.Assert;
@@ -34,10 +35,15 @@ public class TestLinkFile {
     @Test
     public void formatTest()  {
         LinkCheck c = new LinkCheck();
+        c.check = RecDef.Check.LANDING_PAGE;
+        c.spec = "spek";
+        c.orgId = "orgy";
+        c.localId = "here";
         c.httpStatus = 1;
         c.time = 200000000000L;
         c.fileSize = -1;
         c.mimeType = "file/text";
+        c.ok = true;
         String url = "http://whatever";
         LinkFile.Entry before = new LinkFile.Entry(url, c);
         String line = before.toLine();

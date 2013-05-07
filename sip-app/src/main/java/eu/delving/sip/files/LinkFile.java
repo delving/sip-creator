@@ -49,7 +49,9 @@ import static eu.delving.sip.files.LinkFile.FileSizeCategory.values;
 
 public class LinkFile {
     public static final String CSV_HEADER = "\"URL\", \"OK\", \"Check\", \"Spec\", \"Org ID\", \"Local ID\", \"Date\", \"HTTP Status\", \"File Size\", \"MIME Type\"";
-    public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    public static final String LINE_FORMAT = "\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, \"%s\"";
+    public static final Pattern LINK_CHECK_PATTERN = Pattern.compile("\"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", (-?\\d+), (-?\\d+), \"([^\"]*)\"");
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private Logger log = Logger.getLogger(getClass());
     private File file;
     private DataSet dataSet;
@@ -207,7 +209,6 @@ public class LinkFile {
     }
 
     public static class Entry {
-        public static final Pattern LINK_CHECK_PATTERN = Pattern.compile("\"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", (-?\\d+), (-?\\d+), \"([^\"]*)\"");
         public String url;
         public LinkCheck linkCheck;
 
@@ -239,7 +240,7 @@ public class LinkFile {
 
         public String toLine() {
             return String.format(
-                    "\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, \"%s\"",
+                    LINE_FORMAT,
                     url, linkCheck.ok, linkCheck.check, linkCheck.spec, linkCheck.orgId, linkCheck.localId,
                     DATE_FORMAT.format(new Date(linkCheck.time)), linkCheck.httpStatus, linkCheck.fileSize, linkCheck.mimeType
             );
