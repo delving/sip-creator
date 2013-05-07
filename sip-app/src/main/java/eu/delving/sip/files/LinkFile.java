@@ -37,6 +37,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import static eu.delving.sip.files.LinkFile.FileSizeCategory.NO_INFO;
 import static eu.delving.sip.files.LinkFile.FileSizeCategory.values;
@@ -92,7 +94,8 @@ public class LinkFile {
             @Override
             public void run() {
                 try {
-                    BufferedReader in = new BufferedReader(new FileReader(file));
+                    InputStream inputStream = new GZIPInputStream(new FileInputStream(file));
+                    BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
                     String line = in.readLine();
                     if (!CSV_HEADER.equals(line)) throw new IOException("Expected CSV Header");
                     while ((line = in.readLine()) != null) {
@@ -132,7 +135,8 @@ public class LinkFile {
             @Override
             public void run() {
                 try {
-                    FileWriter out = new FileWriter(file);
+                    OutputStream outputStream = new GZIPOutputStream(new FileOutputStream(file));
+                    Writer out = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
                     out.write(CSV_HEADER);
                     out.write('\n');
                     int count = 0;

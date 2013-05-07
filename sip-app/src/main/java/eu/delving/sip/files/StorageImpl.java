@@ -523,6 +523,7 @@ public class StorageImpl implements Storage {
                     files.add(findLatestHashed(here, MAPPING, prefix));
                     files.add(findLatestHashed(here, VALIDATION, prefix));
                     files.add(findLatestHashed(here, RESULT_STATS, prefix));
+                    files.add(findLatestHashed(here, LINKS, prefix));
                 }
                 files.add(Hasher.ensureFileHashed(sourceFile(here)));
                 return files;
