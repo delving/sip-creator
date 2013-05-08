@@ -309,7 +309,7 @@ public class MappingCompileModel {
                         try {
                             validator.validate(new DOMSource(node));
                             handler.checkErrors();
-                            MappingResult result = new MappingResultImpl(serializer, node, recMapping.getRecDefTree()).resolve();
+                            MappingResult result = new MappingResultImpl(serializer, metadataRecord.getId(), node, recMapping.getRecDefTree()).resolve();
                             result.checkMissingFields(); // todo: replace this kind of validation
                             StringBuilder out = new StringBuilder();
                             for (AssertionTest test : assertions) {
@@ -320,6 +320,7 @@ public class MappingCompileModel {
                                 compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
                             }
                             else {
+                                notifyMappingComplete(result);
                                 compilationComplete(Completion.JUST_FINE, node, null);
                             }
                         }
@@ -582,10 +583,17 @@ public class MappingCompileModel {
         for (Listener listener : listeners) listener.codeCompiled(type, code);
     }
 
+    private void notifyMappingComplete(MappingResult mappingResult) {
+        if (type == Type.FIELD) return;
+        for (Listener listener : listeners) listener.mappingComplete(mappingResult);
+    }
+
     public interface Listener {
         void stateChanged(CompileState state);
 
         void codeCompiled(Type type, String code);
+
+        void mappingComplete(MappingResult mappingResult);
     }
 
     public void addListener(Listener listener) {

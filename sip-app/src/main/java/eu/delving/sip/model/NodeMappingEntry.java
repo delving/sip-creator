@@ -85,6 +85,7 @@ public class NodeMappingEntry {
     }
 
     public static class CellRenderer extends DefaultListCellRenderer {
+        private static final int MAX_LENGTH = 30;
         private boolean sourceTargetOrdering = true;
 
         public void setSourceTargetOrdering(boolean sourceTargetOrdering) {
@@ -93,7 +94,7 @@ public class NodeMappingEntry {
 
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean selected, boolean cellHasFocus) {
             NodeMappingEntry entry = (NodeMappingEntry) value;
-            String string = entry.nodeMapping.getHtml(sourceTargetOrdering);
+            String string = entry.nodeMapping.getHtml(sourceTargetOrdering, MAX_LENGTH);
             JLabel label = (JLabel) super.getListCellRendererComponent(list, string, index, selected, cellHasFocus);
             if (entry.getNodeMapping().recDefNode.isAttr()) {
                 setIcon(SwingHelper.ICON_ATTRIBUTE);

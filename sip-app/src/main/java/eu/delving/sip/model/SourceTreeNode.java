@@ -27,7 +27,6 @@ import eu.delving.metadata.Tag;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.Storage;
 import eu.delving.stats.Stats;
-import org.antlr.stringtemplate.StringTemplate;
 
 import javax.swing.JTree;
 import javax.swing.Timer;
@@ -92,9 +91,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
 
     private SourceTreeNode(SourceTreeNode parent, Map.Entry<String, String> entry) {
         this(parent, Tag.create(entry.getKey()));
-        StringTemplate template = SwingHelper.getTemplate("fact-brief");
-        template.setAttribute("fact", entry);
-        this.htmlToolTip = this.htmlDetails = template.toString();
+        this.htmlToolTip = this.htmlDetails = SwingHelper.factEntryToHTML(entry);
     }
 
     private SourceTreeNode(SourceTreeNode parent, Tag tag, Stats.ValueStats valueStats) {
@@ -104,14 +101,8 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
 
     public void setStats(Stats.ValueStats valueStats) {
         this.valueStats = valueStats;
-        StringTemplate template = SwingHelper.getTemplate("stats-tooltip");
-        template.setAttribute("path", getPath(true));
-        template.setAttribute("stats", valueStats);
-        this.htmlToolTip = template.toString();
-        template = SwingHelper.getTemplate("stats-detail");
-        template.setAttribute("path", getPath(true));
-        template.setAttribute("stats", valueStats);
-        this.htmlDetails = template.toString();
+        this.htmlToolTip = SwingHelper.statsHTML(getPath(true), valueStats, false);
+        this.htmlDetails = SwingHelper.statsHTML(getPath(true), valueStats, true);
     }
 
     public List<SourceTreeNode> getChildren() {

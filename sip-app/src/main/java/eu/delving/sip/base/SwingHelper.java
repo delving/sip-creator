@@ -21,10 +21,8 @@
 
 package eu.delving.sip.base;
 
-import org.antlr.stringtemplate.AttributeRenderer;
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
-import org.apache.commons.lang.StringEscapeUtils;
+import eu.delving.metadata.*;
+import eu.delving.stats.Stats;
 
 import javax.jnlp.ServiceManager;
 import javax.jnlp.UnavailableServiceException;
@@ -32,11 +30,14 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
+import java.util.Map;
 
 /**
  * Gathering together a number of things that are done with the Swing library from many parts of the code.
@@ -54,6 +55,8 @@ public class SwingHelper {
     public static Color HILIGHTED_COLOR = new Color(255, 205, 205);
     public static Color LONG_TERM_JOB_COLOR = new Color(255, 180, 180);
     public static Color NORMAL_JOB_COLOR = new Color(200, 255, 200);
+    public static Color REPORT_OK = new Color(0, 50, 0);
+    public static Color REPORT_ERROR = new Color(50, 0, 0);
 
     public static final Icon ICON_VALUE = icon("value");
     public static final Icon ICON_COMPOSITE = icon("composite");
@@ -76,20 +79,10 @@ public class SwingHelper {
     public static final Icon ICON_EDIT = icon("edit");
 
     private static Icon icon(String resource) {
-        String name = "/icons/"+ resource + ".png";
+        String name = "/icons/" + resource + ".png";
         URL url = SwingHelper.class.getResource(name);
         if (url == null) throw new RuntimeException("Cannot find " + name);
         return new ImageIcon(url);
-    }
-
-    private static final StringTemplateGroup STRING_TEMPLATE = new StringTemplateGroup("Templates");
-
-    static {
-        STRING_TEMPLATE.registerRenderer(String.class, new HtmlEncodedRenderer());
-    }
-
-    public static StringTemplate getTemplate(String name) {
-        return STRING_TEMPLATE.getInstanceOf("st/" + name);
     }
 
     public static void setEditable(JTextComponent component, boolean editable) {
@@ -157,31 +150,6 @@ public class SwingHelper {
         }
     }
 
-    private static class HtmlEncodedRenderer implements AttributeRenderer {
-        @Override
-        public String toString(Object o) {
-            StringBuilder out = new StringBuilder();
-            for (String line : o.toString().split("\n")) {
-                line = StringEscapeUtils.escapeHtml(line);
-                boolean nonSpace = false;
-                for (char c : line.toCharArray()) {
-                    if (nonSpace) {
-                        out.append(c);
-                    }
-                    else if (c == ' ') {
-                        out.append("&nbsp;");
-                    }
-                    else {
-                        nonSpace = true;
-                        out.append(c);
-                    }
-                }
-                out.append("<br>\n");
-            }
-            return out.toString();
-        }
-    }
-
     public static class StringTransferable implements Transferable {
         private String string;
 
@@ -204,6 +172,100 @@ public class SwingHelper {
         @Override
         public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
             return string;
+        }
+    }
+
+    public static String nodeMappingToHTML(NodeMapping nodeMapping) {
+        StringBuilder out = new StringBuilder("<html><table cellpadding='10'><tr><td>");
+        out.append("<b>").append(nodeMapping.outputPath).append("</b>");
+        out.append("<br/><br/>");
+        for (Path path : nodeMapping.getInputPaths()) {
+            out.append("&nbsp;&nbsp;&larr; ").append(path).append("<br/>");
+        }
+        out.append("</td></tr></table></html>");
+        return out.toString();
+    }
+
+    public static String factEntryToHTML(Map.Entry<String, String> fact) {
+        StringBuilder out = new StringBuilder("<table><tr><td>");
+        out.append("<h3>").append(fact.getKey()).append("</h3>");
+        out.append("</td></tr>");
+        out.append("<tr><td>");
+        out.append("<h4>").append(fact.getValue()).append("</h4>");
+        out.append("</td></tr>");
+        out.append("</table>");
+        return out.toString();
+    }
+
+    public static String statsHTML(Path path, Stats.ValueStats valueStats, boolean details) {
+        StringBuilder out = new StringBuilder("<html><table><tr><td>");
+        out.append("<h3>").append(path.getTail()).append(" (").append(valueStats.total).append(")").append("</h3>");
+        out.append("</td></tr>");
+        out.append("<tr><td>");
+        out.append(valueStats.getSummary());
+        out.append("</td></tr>");
+        if (details) {
+            if (valueStats.values != null) {
+                out.append("<tr><td><h4>Histogram</h4></td></tr><table>");
+                for (Stats.Counter counter : valueStats.values.getDetails()) {
+                    out.append("<tr><td>").append(counter).append("</td></tr>");
+                }
+                out.append("</table>");
+            }
+            if (valueStats.sample != null) {
+                out.append("<tr><td><h4>Sample</h4></td></tr><table>");
+                for (String value : valueStats.sample.getDetails()) {
+                    out.append("<tr><td>").append(value).append("</td></tr>");
+                }
+                out.append("</table>");
+            }
+        }
+        out.append("</table>");
+        return out.toString();
+    }
+
+    public static String recDefNodeToHTML(RecDefNode node) {
+        StringBuilder out = new StringBuilder("<html><table cellpadding='10'>");
+        String what = node.isAttr() ? "Attribute" : "Element";
+        out.append("<tr><td>").append(what).append(" ").append(node.getTag()).append("</td></tr>");
+        for (NodeMapping nodeMapping : node.getNodeMappings().values()) {
+            out.append("<tr><td><b>&larr; ").append(nodeMapping.inputPath).append("</b></td></tr>");
+        }
+        if (node.getDoc() != null) {
+            if (node.getDoc().lines != null) {
+                for (String line : node.getDoc().lines) {
+                    out.append("<tr><td><p>").append(line).append("</p></td></tr>");
+                }
+            }
+            if (node.getDoc().paras != null) {
+                for (RecDef.DocParagraph para : node.getDoc().paras) {
+                    out.append("<tr><td><b>").append(para.name).append("</b><br><p>")
+                            .append(para.content).append("</p></td></tr>");
+                }
+            }
+        }
+        if (node.getOptList() != null) {
+            out.append("<tr><td><ul>");
+            for (OptList.Opt opt : node.getOptList().opts) {
+                out.append("<li>").append(opt.value).append("</li>");
+            }
+            out.append("</ul></td></tr>");
+        }
+        return out.toString();
+    }
+
+
+    public static boolean launchURLFromXML(String urlFromXML) {
+        return launchURL(urlFromXML.replaceAll("&amp;", "&"));
+    }
+
+    public static boolean launchURL(String urlString) {
+        try {
+            Desktop.getDesktop().browse(URI.create(urlString));
+            return true;
+        }
+        catch (IOException e) {
+            return false;
         }
     }
 

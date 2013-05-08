@@ -23,31 +23,66 @@ import static eu.delving.XStreamFactory.getStreamFor;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
+@Ignore
 public class TestTableExtractor {
 
     private Connection connection;
 
+    @Ignore
     @Before
-    public void createConnection() throws ClassNotFoundException, SQLException {
+    public void createConnectionMysql() throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.jdbc.Driver");
+        Properties props = new Properties();
+        props.setProperty("user", "gerald");
+        props.setProperty("password", "delving");
+        connection = DriverManager.getConnection("jdbc:mysql://localhost/ca", props);
+    }
+
+    @Ignore
+    @Before
+    public void createConnectionPostgres() throws ClassNotFoundException, SQLException {
         Class.forName("org.postgresql.Driver");
         Properties props = new Properties();
         props.setProperty("user", "gerald");
         connection = DriverManager.getConnection("jdbc:postgresql:gerald", props);
     }
 
-//    @Before
-//    public void createConnectionTMS() throws ClassNotFoundException, SQLException {
-//        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-//        Properties props = new Properties();
-//        props.setProperty("user", "");
-//        props.setProperty("password", "");
-//        connection = DriverManager.getConnection("jdbc:sqlserver://192.168.0.1:1433;databaseName=TMS", props);
-//    }
-//
+    @Ignore
+    @Before
+    public void createConnectionTMS() throws ClassNotFoundException, SQLException {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        Properties props = new Properties();
+        props.setProperty("user", "");
+        props.setProperty("password", "");
+        connection = DriverManager.getConnection("jdbc:sqlserver://192.168.0.1:1433;databaseName=TMS", props);
+    }
 
     @After
     public void closeConnection() throws SQLException {
         connection.close();
+    }
+
+    @Ignore
+    @Test
+    public void testIntrospectionCollectiveAccess() throws SQLException, IOException {
+        RelationalProfile profile = RelationalProfile.createProfile(connection);
+        FileWriter out = new FileWriter("/tmp/ca-rdbms-profile.xml");
+        getStreamFor(RelationalProfile.class).toXML(profile, out);
+        out.close();
+    }
+
+    @Ignore
+    @Test
+    public void testDumpCollectiveAccess() throws ClassNotFoundException, SQLException, XMLStreamException, IOException {
+        URL resource = getClass().getResource("/extractor/ca-rdbms-profile.xml");
+        RelationalProfile profile = (RelationalProfile) getStreamFor(RelationalProfile.class).fromXML(resource);
+        profile.resolve();
+        TableExtractor tableExtractor = new TableExtractor(connection, profile);
+        tableExtractor.setMaxRows(100); // todo: just for testing
+        tableExtractor.fillCaches();
+        OutputStream outputStream = new FileOutputStream(new File("/tmp/ca-dump.xml"));
+        tableExtractor.dumpTo(outputStream);
+        outputStream.close();
     }
 
     @Ignore

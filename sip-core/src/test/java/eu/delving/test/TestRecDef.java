@@ -37,14 +37,14 @@ public class TestRecDef {
 
     @Test
     public void fetchFieldType() {
-        Assert.assertEquals("special value gumby not found", "gumby", recDef().getFieldType(Path.create("/lido/objectPublishedID")));
-        Assert.assertEquals("default not returned", "text", recDef().getFieldType(Path.create("/lido/lidoRecID")));
-        Assert.assertNull("null not returned for nonexistent path", recDef().getFieldType(Path.create("/lido/someCrazyValue")));
+        Assert.assertEquals("special value gumby not found", "gumby", recDef().getFieldType(Path.create("/test/sub-one/sub-two/abc-link")));
+        Assert.assertEquals("default not returned", "text", recDef().getFieldType(Path.create("/test/sub-one/sub-two")));
+        Assert.assertNull("null not returned for nonexistent path", recDef().getFieldType(Path.create("/testes/someCrazyValue")));
     }
 
     private static RecDef recDef() {
         try {
-            URL url = TestCodeGeneration.class.getResource("/codegen/test-code-generation-recdef.xml");
+            URL url = TestCodeGeneration.class.getResource("/codegen/TestCodeGeneration-recdef.xml");
             InputStream inputStream = url.openStream();
             return RecDef.read(inputStream);
         }

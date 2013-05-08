@@ -47,12 +47,24 @@ public class MappingResultImpl implements MappingResult {
     private Map<String, List<String>> copyFields = new TreeMap<String, List<String>>();
     private Map<String, List<String>> searchFields = new TreeMap<String, List<String>>();
     private Node root, rootAugmented;
+    private String localId;
     private RecDefTree recDefTree;
 
-    public MappingResultImpl(XmlSerializer serializer, Node root, RecDefTree recDefTree) {
+    public MappingResultImpl(XmlSerializer serializer, String localId, Node root, RecDefTree recDefTree) {
         this.serializer = serializer;
+        this.localId = localId;
         this.root = root;
         this.recDefTree = recDefTree;
+    }
+
+    @Override
+    public String getLocalId() {
+        return localId;
+    }
+
+    @Override
+    public RecDefTree getRecDefTree() {
+        return recDefTree;
     }
 
     @Override
@@ -183,7 +195,7 @@ public class MappingResultImpl implements MappingResult {
                 case Node.CDATA_SECTION_NODE:
                     break;
                 case Node.ELEMENT_NODE:
-                    Path path = getPath((Element) kid, false);
+                    Path path = getPath(kid, false);
                     RecDefNode recDefNode = recDefTree.getRecDefNode(path);
                     if (recDefNode != null) {
                         String name = String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType());
@@ -210,7 +222,7 @@ public class MappingResultImpl implements MappingResult {
                 case Node.CDATA_SECTION_NODE:
                     break;
                 case Node.ELEMENT_NODE:
-                    Path path = getPath((Element) kid, true);
+                    Path path = getPath(kid, true);
                     RecDefNode recDefNode = recDefTree.getRecDefNode(path);
                     if (recDefNode != null && recDefNode.isLeafElem()) {
                         // todo: we have the recDefNode!

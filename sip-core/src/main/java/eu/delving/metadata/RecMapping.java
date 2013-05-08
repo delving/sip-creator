@@ -97,7 +97,9 @@ public class RecMapping {
     }
 
     public void setSchemaVersion(SchemaVersion schemaVersion) {
-        if (!schemaVersion.getPrefix().equals(prefix)) throw new IllegalArgumentException("Trying to set version for the wrong schema");
+        if (!schemaVersion.getPrefix().equals(prefix)) {
+            throw new IllegalArgumentException("Trying to set version for the wrong schema");
+        }
         this.schemaVersion = schemaVersion.getVersion();
     }
 
@@ -278,6 +280,7 @@ public class RecMapping {
             {"aff", "0.1.0"},
             {"itin", "1.0.0"},
             {"lido", "1.0.0"},
+            {"ead", "1.2.3"},
     };
 
 

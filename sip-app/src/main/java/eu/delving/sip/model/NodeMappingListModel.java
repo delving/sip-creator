@@ -23,7 +23,7 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.*;
 import eu.delving.sip.base.Swing;
-import org.antlr.stringtemplate.StringTemplate;
+import eu.delving.sip.base.SwingHelper;
 
 import javax.swing.AbstractListModel;
 import javax.swing.JList;
@@ -33,8 +33,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import static eu.delving.sip.base.SwingHelper.getTemplate;
 
 /**
  * A list of node mapping entries set up to change when the mapping changes, ready for placement in a JList.
@@ -53,9 +51,7 @@ public class NodeMappingListModel extends AbstractListModel {
                 int index = locationToIndex(evt.getPoint());
                 if (index < 0) return "?";
                 NodeMappingEntry entry = (NodeMappingEntry) getModel().getElementAt(index);
-                StringTemplate template = getTemplate("node-mapping");
-                template.setAttribute("nodeMapping", entry.getNodeMapping());
-                return template.toString();
+                return SwingHelper.nodeMappingToHTML(entry.getNodeMapping());
             }
         };
         list.setCellRenderer(new NodeMappingEntry.CellRenderer());

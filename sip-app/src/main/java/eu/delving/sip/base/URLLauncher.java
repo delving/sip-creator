@@ -24,10 +24,7 @@ package eu.delving.sip.base;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
 
-import javax.jnlp.BasicService;
-import javax.jnlp.ServiceManager;
-import javax.jnlp.UnavailableServiceException;
-import javax.swing.*;
+import javax.swing.JTextArea;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import java.net.MalformedURLException;
@@ -64,7 +61,7 @@ public class URLLauncher implements CaretListener {
             if (urlString.contains("\n")) return;
             if (min > 1 && text.charAt(min - 1) == '>' && max < text.length() && text.charAt(max) == '<') {
                 if (validUrl(urlString)) {
-                    showURL(urlString);
+                    SwingHelper.launchURLFromXML(urlString);
                 }
                 else {
                     outputArea.select(min, min);
@@ -82,7 +79,6 @@ public class URLLauncher implements CaretListener {
                     outputArea.select(min, max);
                 }
                 else {
-                    feedback.alert(String.format("Not a valid URL: \"%s\"", url));
                     outputArea.select(min, min);
                 }
             }
@@ -102,19 +98,4 @@ public class URLLauncher implements CaretListener {
         }
     }
 
-    boolean showURL(final String urlFromXML) {
-        final String urlString = urlFromXML.replaceAll("&amp;", "&");
-        try {
-            URL url = new URL(urlString);
-            BasicService bs = (BasicService) ServiceManager.lookup("javax.jnlp.BasicService");
-            return bs.showDocument(url);
-        }
-        catch (UnavailableServiceException ue) {
-            feedback.alert(String.format("Sorry, need Web Start to launch \"%s\"", urlString));
-            return false;
-        }
-        catch (MalformedURLException e1) {
-            return false;
-        }
-    }
 }

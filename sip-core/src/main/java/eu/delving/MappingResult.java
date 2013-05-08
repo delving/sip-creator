@@ -21,6 +21,7 @@
 
 package eu.delving;
 
+import eu.delving.metadata.RecDefTree;
 import org.w3c.dom.Node;
 
 import java.util.List;
@@ -33,6 +34,10 @@ import java.util.Map;
  */
 
 public interface MappingResult {
+
+    String getLocalId();
+
+    RecDefTree getRecDefTree();
 
     Node root();
 

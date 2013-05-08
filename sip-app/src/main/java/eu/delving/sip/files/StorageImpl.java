@@ -28,6 +28,7 @@ import eu.delving.schema.SchemaResponse;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
+import eu.delving.sip.xml.LinkCheckExtractor;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -38,6 +39,7 @@ import org.xml.sax.SAXException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -481,21 +483,25 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public PrintWriter openReportWriter(String prefix) throws StorageException {
-            File file = new File(here, FileType.REPORT.getName(prefix));
+        public ReportWriter openReportWriter(RecDef recDef) throws StorageException {
+            File file = new File(here, FileType.REPORT.getName(recDef.prefix));
             try {
-                return new PrintWriter(file);
+                LinkCheckExtractor linkCheckExtractor = new LinkCheckExtractor(recDef.fieldMarkers, new XPathContext(recDef.namespaces));
+                return new ReportWriter(file, linkCheckExtractor);
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
             }
+            catch (XPathExpressionException e) {
+                throw new StorageException("Cannot create xpath expression", e);
+            }
         }
 
         @Override
-        public List<String> getReport(String prefix) throws StorageException {
+        public ReportFile getReport(String prefix) throws StorageException {
             try {
                 File file = reportFile(here, prefix);
-                return file.exists() ? FileUtils.readLines(file, "UTF-8") : null;
+                return file.exists() ? new ReportFile(file, linkFile(here, prefix), this, prefix)  : null;
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
@@ -517,6 +523,7 @@ public class StorageImpl implements Storage {
                     files.add(findLatestHashed(here, MAPPING, prefix));
                     files.add(findLatestHashed(here, VALIDATION, prefix));
                     files.add(findLatestHashed(here, RESULT_STATS, prefix));
+                    files.add(findLatestHashed(here, LINKS, prefix));
                 }
                 files.add(Hasher.ensureFileHashed(sourceFile(here)));
                 return files;

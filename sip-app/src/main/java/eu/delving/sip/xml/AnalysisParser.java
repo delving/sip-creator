@@ -119,6 +119,11 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
                             for (int walk = 0; walk < input.getNamespaceCount(); walk++) {
                                 stats.recordNamespace(input.getNamespacePrefix(walk), input.getNamespaceURI(walk));
                             }
+                            String chunk = text.toString().trim();
+                            if (!chunk.isEmpty()) {
+                                stats.recordValue(path, chunk);
+                            }
+                            text.setLength(0);
                             path = path.child(Tag.element(input.getName()));
                             if (input.getAttributeCount() > 0) {
                                 for (int walk = 0; walk < input.getAttributeCount(); walk++) {

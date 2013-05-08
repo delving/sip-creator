@@ -90,7 +90,7 @@ public class Path implements Comparable<Path>, Serializable {
 
     public Path descendant(Path path) {
         Path extended = this;
-        for (int walk = 0; walk<path.size(); walk++) {
+        for (int walk = 0; walk < path.size(); walk++) {
             Tag tag = path.getTag(walk);
             extended = extended.child(tag);
         }
@@ -107,6 +107,15 @@ public class Path implements Comparable<Path>, Serializable {
         }
         else {
             return parent.withDefaultPrefix(prefix).child(tag.defaultPrefix(prefix));
+        }
+    }
+
+    public Path withoutPrefixes() {
+        if (parent.isEmpty()) {
+            return parent.child(tag.withoutPrefix());
+        }
+        else {
+            return parent.withoutPrefixes().child(tag.withoutPrefix());
         }
     }
 
@@ -204,6 +213,19 @@ public class Path implements Comparable<Path>, Serializable {
 
     public String getTail() {
         return peek().toString();
+    }
+
+    public String getTail(int maxLength) {
+        String tail = toString();
+        if (tail.length() > maxLength) {
+            tail = tail.substring(tail.length() - maxLength, tail.length());
+            int firstSlash = tail.indexOf('/');
+            if (firstSlash > 0) {
+                tail = tail.substring(firstSlash, tail.length());
+            }
+            tail = "-" + tail;
+        }
+        return tail;
     }
 
     public boolean isEmpty() {

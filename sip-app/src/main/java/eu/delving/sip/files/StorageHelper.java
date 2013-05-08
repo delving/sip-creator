@@ -187,6 +187,10 @@ public class StorageHelper {
         return new File(dir, REPORT.getName(prefix));
     }
 
+    static File linkFile(File dir, String prefix) {
+        return new File(dir, LINKS.getName(prefix));
+    }
+
     public static File statsFile(File dir, boolean sourceFormat, String prefix) {
         if (prefix == null) {
             return new File(dir, sourceFormat ? SOURCE_STATS.getName() : IMPORT_STATS.getName());

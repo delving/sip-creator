@@ -137,7 +137,7 @@ public class RecMappingFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(SwingHelper.scrollV("Node Mappings", nodeMappingList), BorderLayout.CENTER);
+        content.add(SwingHelper.scrollVH("Node Mappings", nodeMappingList), BorderLayout.CENTER);
         content.add(new JButton(removeAction), BorderLayout.SOUTH);
     }
 

@@ -56,11 +56,11 @@ public class MappingEngineImpl implements MappingEngine {
     public MappingResult execute(String id, String recordXML) throws XMLStreamException, MappingException, IOException, SAXException {
         if (mappingRunner != null) {
             MetadataRecord metadataRecord = metadataRecordFactory.metadataRecordFrom(id, recordXML);
-            return new MappingResultImpl(serializer, mappingRunner.runMapping(metadataRecord), mappingRunner.getRecDefTree()).resolve();
+            return new MappingResultImpl(serializer, id, mappingRunner.runMapping(metadataRecord), mappingRunner.getRecDefTree()).resolve();
         }
         else {
             Node root = metadataRecordFactory.nodeFromXml(id, recordXML);
-            return new MappingResultImpl(serializer, root, null).resolve();
+            return new MappingResultImpl(serializer, id, root, null).resolve();
         }
     }
 

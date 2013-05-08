@@ -377,7 +377,7 @@ public class WorkModel {
                 progress += String.format("/%d (%s)", maximum, timeEstimator.getMessage(current));
             }
             if (progressMessage != null) {
-                progress += " "+progressMessage;
+                progress += " " + progressMessage;
             }
             return progress;
         }

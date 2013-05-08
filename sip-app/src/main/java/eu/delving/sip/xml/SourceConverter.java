@@ -44,9 +44,8 @@ import java.security.DigestOutputStream;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static eu.delving.sip.files.Storage.ENVELOPE_TAG;
+import static eu.delving.sip.files.Storage.*;
 import static eu.delving.sip.files.Storage.FileType.SOURCE;
-import static eu.delving.sip.files.Storage.RECORD_TAG;
 import static eu.delving.sip.files.StorageHelper.*;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.FileUtils.moveFile;
@@ -182,6 +181,21 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
                     case XMLEvent.START_ELEMENT:
                         boolean followsStart = start != null;
                         start = event.asStartElement();
+                        if (linesAvailable()) {
+                            eventBuffer.add(eventFactory.createCharacters("\n"));
+                            eventBuffer.add(eventFactory.createStartElement("", "", TEXT_TAG, null, null));
+                            Iterator<String> walk = lines.iterator();
+                            while (walk.hasNext()) {
+                                eventBuffer.add(eventFactory.createCharacters(walk.next()));
+                                if (walk.hasNext()) {
+                                    eventBuffer.add(eventFactory.createEndElement("", "", TEXT_TAG));
+                                    eventBuffer.add(eventFactory.createCharacters("\n"));
+                                    eventBuffer.add(eventFactory.createStartElement("", "", TEXT_TAG, null, null));
+                                }
+                            }
+                            eventBuffer.add(eventFactory.createEndElement("", "", TEXT_TAG));
+                            lines.clear();
+                        }
                         path = path.child(Tag.element(start.getName()));
                         handleStartElement(path, followsStart);
                         progressListener.setProgress(recordCount);
@@ -202,36 +216,25 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
                                 if (!uniqueElementPath.peek().isAttribute() && path.equals(uniqueElementPath)) {
                                     unique = StringUtils.join(lines, "");
                                 }
-                                Iterator<String> iterator = lines.iterator();
-                                while (iterator.hasNext()) {
-                                    String line = iterator.next();
-                                    if (line.trim().isEmpty()) iterator.remove();
-                                }
                                 boolean addEndTag = true;
-                                switch (lines.size()) {
-                                    case 0:
-                                        if (eventBuffer.get(eventBuffer.size() - 1).isStartElement()) {
-                                            eventBuffer.remove(eventBuffer.size() - 1); // remove the start event
-                                            addEndTag = false;
+                                if (linesAvailable()) {
+                                    Iterator<String> walk = lines.iterator();
+                                    while (walk.hasNext()) {
+                                        eventBuffer.add(eventFactory.createCharacters(walk.next()));
+                                        if (walk.hasNext()) {
+                                            eventBuffer.add(end);
+                                            eventBuffer.add(eventFactory.createCharacters("\n"));
+                                            handleStartElement(path, false);
                                         }
-                                        break;
-                                    case 1:
-                                        eventBuffer.add(eventFactory.createCharacters(lines.get(0)));
-                                        lines.clear();
-                                        break;
-                                    default:
-                                        Iterator<String> walk = lines.iterator();
-                                        while (walk.hasNext()) {
-                                            eventBuffer.add(eventFactory.createCharacters(walk.next()));
-                                            if (walk.hasNext()) {
-                                                eventBuffer.add(end);
-                                                eventBuffer.add(eventFactory.createCharacters("\n"));
-                                                handleStartElement(path, false);
-                                            }
-                                        }
-                                        lines.clear();
-                                        break;
+                                    }
                                 }
+                                else {
+                                    if (eventBuffer.get(eventBuffer.size() - 1).isStartElement()) {
+                                        eventBuffer.remove(eventBuffer.size() - 1); // remove the start event
+                                        addEndTag = false;
+                                    }
+                                }
+                                lines.clear();
                                 if (addEndTag) {
                                     eventBuffer.add(end);
                                     eventBuffer.add(eventFactory.createCharacters("\n"));
@@ -270,6 +273,15 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
         }
+    }
+
+    private boolean linesAvailable() {
+        Iterator<String> iterator = lines.iterator();
+        while (iterator.hasNext()) {
+            String line = iterator.next();
+            if (line.trim().isEmpty()) iterator.remove();
+        }
+        return !lines.isEmpty();
     }
 
     private void outputRecord(XMLEventWriter out) throws StorageException {

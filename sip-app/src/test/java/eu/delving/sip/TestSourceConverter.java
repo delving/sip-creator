@@ -27,9 +27,7 @@ import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.DataSetState;
-import eu.delving.sip.files.StorageException;
+import eu.delving.sip.files.*;
 import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.commons.lang.StringUtils;
@@ -64,6 +62,8 @@ public class TestSourceConverter {
             "<we-are-in-record>",
             "<a:boo>&amp;three > two &gt; 1</a:boo>",
             "<a:wrapper>",
+            "in between text",
+            "and a second annoying line",
             "<a:middle>",
             "<a:inside>yolk</a:inside>",
             "</a:middle>",
@@ -120,15 +120,14 @@ public class TestSourceConverter {
         converter.parse(in, out, namespaces);
         String outputString = out.toString("UTF-8");
         String[] lines = outputString.split("\n");
-        for (String line : lines) {
-            System.out.println("\"" + line.replaceAll("\"", "\\\\\"") + "\",");
-        }
         String[] expect = {
                 "<?xml version='1.0' encoding='UTF-8'?>",
                 "<delving-sip-source xmlns:a=\"http://a\" xmlns:b=\"http://b\" xmlns:c=\"http://c\">",
                 "<input id=\"before_3030030_after\">",
                 "<a:boo>&amp;three > two > 1</a:boo>",
                 "<a:wrapper>",
+                "<text_chunk>in between text</text_chunk>",
+                "<text_chunk>and a second annoying line</text_chunk>",
                 "<a:middle>",
                 "<a:inside>yolk</a:inside>",
                 "</a:middle>",
@@ -159,9 +158,6 @@ public class TestSourceConverter {
         converter.parse(in, out, namespaces);
         String outputString = out.toString("UTF-8");
         String[] lines = outputString.split("\n");
-        for (String line : lines) {
-            System.out.println("\"" + line.replaceAll("\"", "\\\\\"") + "\",");
-        }
         String[] expect = {
                 "<?xml version='1.0' encoding='UTF-8'?>",
                 "<delving-sip-source xmlns:a=\"http://a\" xmlns:b=\"http://b\" xmlns:c=\"http://c\">",
@@ -363,12 +359,12 @@ public class TestSourceConverter {
         }
 
         @Override
-        public PrintWriter openReportWriter(String prefix) throws StorageException {
+        public ReportWriter openReportWriter(RecDef recDef) throws StorageException {
             return null;
         }
 
         @Override
-        public List<String> getReport(String prefix) throws StorageException {
+        public ReportFile getReport(String prefix) throws StorageException {
             return null;
         }
 

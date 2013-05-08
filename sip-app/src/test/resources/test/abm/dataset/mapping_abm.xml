@@ -66,7 +66,7 @@
         <string>return new uk.me.jstott.jcoord.UTMRef(split.head().toDouble(), split.last().toDouble(), &quot;V&quot; as char, 33).toLatLng()</string>
       </groovy-code>
     </mapping-function>
-    <mapping-function name="gumby">
+    <mapping-function name="convertLatLngToUTM">
       <sample-input>
         <string>59.926690377311154, 10.871213013807207</string>
       </sample-input>
@@ -79,6 +79,11 @@
   </functions>
   <node-mappings>
     <node-mapping inputPath="/input/abm:contentProvider" outputPath="/abm:record/abm:contentProvider"/>
+    <node-mapping inputPath="/constant" outputPath="/abm:record/abm:collectionType">
+      <groovy-code>
+        <string>&apos;kn-reise&apos;</string>
+      </groovy-code>
+    </node-mapping>
     <node-mapping inputPath="/constant" outputPath="/abm:record/abm:category">
       <groovy-code>
         <string>&apos;Plant&apos;</string>

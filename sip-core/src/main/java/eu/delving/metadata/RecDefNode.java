@@ -23,7 +23,8 @@ package eu.delving.metadata;
 
 import java.util.*;
 
-import static eu.delving.metadata.OptRole.*;
+import static eu.delving.metadata.OptRole.CHILD;
+import static eu.delving.metadata.OptRole.ROOT;
 
 /**
  * The RecDefNode is the node element of a RecDefTree which stores the whole
@@ -48,6 +49,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
     private RecDef.Elem elem;
     private RecDef.Attr attr;
     private OptBox optBox;
+    private DynOpt dynOpt;
     private String defaultPrefix;
     private List<RecDef.FieldMarker> fieldMarkers = new ArrayList<RecDef.FieldMarker>();
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
@@ -61,73 +63,32 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public static RecDefNode create(RecDefNodeListener listener, RecDef recDef) {
-        return new RecDefNode(listener, null, recDef.root, null, recDef.prefix, null); // only root element
+        return new RecDefNode(listener, null, recDef.root, null, recDef.prefix, null, null); // only root element
     }
 
-    private RecDefNode(RecDefNodeListener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, String defaultPrefix, OptBox optBox) {
+    private RecDefNode(RecDefNodeListener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, String defaultPrefix, OptBox optBox, DynOpt dynOpt) {
         this.listener = listener;
         this.parent = parent;
         this.elem = elem;
         this.attr = attr;
         this.defaultPrefix = defaultPrefix;
-        OptRole optRole = ABSENT;
-        if (optBox != null) {
-            optRole = optBox.role;
-            switch (optBox.role) {
-                case ROOT:
-                case DYNAMIC:
-                    this.optBox = optBox;
-                    break;
-                case UNASSIGNED_CHILD:
-                    this.optBox = optBox.inRoleFor(getPath());
-                    if (this.optBox != null) optRole = this.optBox.role;
-                    break;
-            }
-        }
+        this.dynOpt = dynOpt;
+        boolean childOpt = optBox != null && optBox.role == CHILD;
+        this.optBox = childOpt ? optBox.inRoleFor(getPath()) : optBox;
         if (elem != null) {
+            boolean rootOpt = optBox != null && optBox.role == ROOT;
             for (RecDef.Attr attribute : elem.attrList) {
-                switch (optRole) {
-                    case ROOT:
-                        if (optBox != null) addSubNode(attribute, optBox.createDescendant());
-                        break;
-                    case DYNAMIC:
-                        addSubNode(attribute, null);
-                        break;
-                    case UNASSIGNED_CHILD:
-                        addSubNode(attribute, optBox); // percolate deeper
-                        break;
-                    default:
-                        addSubNode(attribute, null);
-                        break;
-                }
+                addSubNode(attribute, rootOpt ? optBox.createDescendant() : optBox);
             }
             for (RecDef.Elem element : elem.elemList) {
-                if (element.optList == null) {
-                    switch (optRole) {
-                        case ROOT:
-                            if (optBox == null) {
-                                throw new RuntimeException("No OptBox");
-                            }
-                            addSubNode(element, optBox.createDescendant());
-                            break;
-                        case UNASSIGNED_CHILD:
-                            addSubNode(element, optBox); // percolate deeper
-                            break;
-                        default:
-                            addSubNode(element, null);
-                            break;
-                    }
-                }
-                else if (element.optList.dictionary != null) {
-                    addSubNode(element, OptBox.asRoot(element.optList));
+                if (element.optList != null) {
+                    addSubNode(element, OptBox.forList(element.optList)); // introducing ROOT opt with list
                 }
                 else {
-                    for (OptList.Opt opt : element.optList.opts) { // a child for each option (introducing the OptBox instances)
-                        addSubNode(element, OptBox.asRoot(opt));
-                    }
+                    addSubNode(element, rootOpt ? optBox.createDescendant() : optBox);
                 }
             }
-            if (elem.nodeMapping != null) {
+            if (elem.nodeMapping != null) { // a default node mapping inside of an element
                 nodeMappings.put(elem.nodeMapping.inputPath, elem.nodeMapping);
                 elem.nodeMapping.recDefNode = this;
                 elem.nodeMapping.outputPath = getPath();
@@ -136,17 +97,17 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     private void addSubNode(RecDef.Attr attr, OptBox box) {
-        RecDefNode node = new RecDefNode(listener, this, null, attr, defaultPrefix, box);
+        RecDefNode node = new RecDefNode(listener, this, null, attr, defaultPrefix, box, null);
         children.add(node);
     }
 
     private void addSubNode(RecDef.Elem elem, OptBox box) {
-        RecDefNode node = new RecDefNode(listener, this, elem, null, defaultPrefix, box);
+        RecDefNode node = new RecDefNode(listener, this, elem, null, defaultPrefix, box, null);
         children.add(node);
     }
 
-    private RecDefNode addSubNodeAfter(RecDefNode child, RecDef.Elem elem, OptBox box) {
-        RecDefNode node = new RecDefNode(listener, this, elem, null, defaultPrefix, box);
+    private RecDefNode addSubNodeAfter(RecDefNode child, RecDef.Elem elem, DynOpt dynOpt) {
+        RecDefNode node = new RecDefNode(listener, this, elem, null, defaultPrefix, null, dynOpt);
         if (child != null) {
             int before = children.indexOf(child);
             if (before < 0) throw new RuntimeException("Cannot find child");
@@ -160,7 +121,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public RecDefNode addSibling(DynOpt dynOpt) {
         RecDefNode before = optBox != null && optBox.role == ROOT ? null : this;
-        return parent.addSubNodeAfter(before, elem, OptBox.asDynamic(dynOpt));
+        return parent.addSubNodeAfter(before, elem, dynOpt);
     }
 
     public boolean isPopulated() {
@@ -168,15 +129,15 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public boolean checkPopulated() {
-        boolean populatedNow = (!nodeMappings.isEmpty() || isDynOpt());
+        boolean populatedNow = (!nodeMappings.isEmpty() || dynOpt != null);
         if (!populatedNow && isChildOpt()) {
             RecDefNode ancestor = this;
             while (ancestor.parent != null) {
-                if (optBox.opt != null) {
-                    Path optListRoot = optBox.opt.parent.path;
+                if (optBox.optList != null) { // todo: maybe make sure it's a child!
+                    Path optListRoot = optBox.optList.path;
                     Path cleanPath = ancestor.getPath().withoutOpts();
                     if (cleanPath.equals(optListRoot)) {
-                        if (!ancestor.nodeMappings.isEmpty()) return true;
+                        if (!ancestor.nodeMappings.isEmpty()) populatedNow = true;
                         break;
                     }
                 }
@@ -193,20 +154,12 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return true;
     }
 
-    public OptBox getDictionaryOptBox() {
-        return optBox != null && optBox.isDictionary() ? optBox : null;
-    }
-
-    public boolean isDuplicatePossible() {
-        return parent != null && !isAttr() && (optBox == null || optBox.role == DYNAMIC || optBox.role == ROOT);
-    }
-
-    public boolean isHiddenOpt(OptList.Opt shownOpt) {
-        return isRootOpt() && optBox.opt != shownOpt && optBox.opt.hidden;
+    public boolean isDuplicatePossible() { // todo: check for singular
+        return parent != null && !isAttr() && (optBox == null || optBox.role == ROOT);
     }
 
     public DynOpt getDynOpt() {
-        return optBox == null ? null : optBox.dynOpt == null ? null : optBox.dynOpt;
+        return dynOpt;
     }
 
     public String getFieldType() {
@@ -237,10 +190,6 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return !isAttr() && elem.unmappable;
     }
 
-//    public boolean isSingular() { todo: use it
-//        return !isAttr() && elem.singular;
-//    }
-
     public RecDefNode getParent() {
         return parent;
     }
@@ -251,11 +200,8 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public Tag getTag() {
         Tag tag = isAttr() ? attr.tag : elem.tag;
-        if (isRootOpt()) {
-            return tag.withOpt(optBox.opt.key);
-        }
-        else if (isDynOpt()) {
-            return tag.withOpt(optBox.dynOpt.value);
+        if (dynOpt != null) {
+            return tag.withOpt(dynOpt.value);
         }
         else {
             return tag;
@@ -318,12 +264,12 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public void collectDynOpts(List<DynOpt> dynOpts) {
-        if (optBox != null && optBox.dynOpt != null) {
+        if (dynOpt != null) {
             boolean childrenPopulated = false;
             for (RecDefNode sub : children) {
                 if (sub.populated) childrenPopulated = true;
             }
-            if (nodeMappings.size() > 1 || childrenPopulated) dynOpts.add(optBox.dynOpt);
+            if (nodeMappings.size() > 1 || childrenPopulated) dynOpts.add(dynOpt);
         }
         for (RecDefNode sub : children) sub.collectDynOpts(dynOpts);
     }
@@ -369,22 +315,11 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public boolean isChildOpt() {
-        if (optBox == null) return false;
-        switch (optBox.role) {
-            case ROOT:
-            case DYNAMIC:
-                return false;
-            default:
-                return true;
-        }
-    }
-
-    public boolean isDynOpt() {
-        return optBox != null && optBox.role == DYNAMIC;
+        return optBox != null && optBox.role != ROOT;
     }
 
     public boolean hasActiveAttributes() {
-        if (isDynOpt()) return true;
+        if (dynOpt != null) return true;
         for (RecDefNode sub : children) {
             if (sub.isAttr() && (!sub.nodeMappings.isEmpty() || sub.isChildOpt())) return true;
         }
@@ -393,7 +328,10 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public String toString() {
         String name = isAttr() ? attr.tag.toString(defaultPrefix) : elem.tag.toString(defaultPrefix);
-        if (isRootOpt() || isDynOpt()) {
+        if (dynOpt != null) {
+            name += String.format("[%s]", dynOpt);
+        }
+        if (isRootOpt()) {
             name += String.format("[%s]", optBox);
         }
         else if (isChildOpt()) {
