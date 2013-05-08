@@ -32,7 +32,6 @@ import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
@@ -105,9 +104,9 @@ public interface DataSet extends Comparable<DataSet> {
 
     void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws StorageException;
 
-    PrintWriter openReportWriter(String prefix) throws StorageException;
+    ReportWriter openReportWriter(RecDef recDef) throws StorageException;
 
-    List<String> getReport(String prefix) throws StorageException;
+    ReportFile getReport(String prefix) throws StorageException;
 
     void deleteSource() throws StorageException;
 

@@ -22,9 +22,9 @@
 package eu.delving.sip;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.apache.lucene.spatial.DistanceUtils;
 import org.apache.lucene.spatial.tier.InvalidGeoException;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
@@ -38,8 +38,6 @@ import java.util.List;
 
 public class TestLuceneSpatial {
 
-    private Logger log = Logger.getLogger(getClass());
-
     @Test
     public void validateList() throws IOException {
         URL url = getClass().getResource("/geo/latlong.txt");
@@ -49,7 +47,7 @@ public class TestLuceneSpatial {
                 DistanceUtils.parseLatitudeLongitude(latlong);
             }
             catch (InvalidGeoException e) {
-                log.warn(String.format("Invalid [%s]", latlong), e);
+                Assert.assertEquals("Unexpected exception", "624.3020535333326,76.0872380450499", latlong);
             }
         }
     }

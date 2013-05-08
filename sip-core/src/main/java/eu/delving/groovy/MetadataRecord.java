@@ -47,6 +47,10 @@ public class MetadataRecord {
         return rootNode;
     }
 
+    public String getId() {
+        return rootNode.attributes().get("id");
+    }
+
     public boolean contains(Pattern pattern) {
         return checkFor(rootNode, pattern);
     }
@@ -76,4 +80,5 @@ public class MetadataRecord {
     public String toString() {
         return String.format("MetadataRecord(%d / %d)", recordNumber, recordCount);
     }
+
 }

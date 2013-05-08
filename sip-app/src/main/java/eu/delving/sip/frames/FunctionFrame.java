@@ -42,10 +42,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 import java.util.List;
-import java.util.SortedSet;
 import java.util.regex.Pattern;
 
 import static eu.delving.sip.base.KeystrokeHelper.*;
@@ -92,7 +90,9 @@ public class FunctionFrame extends FrameBase {
         factsList.setFont(MONOSPACED);
         libraryList.setFont(MONOSPACED);
         libraryList.setBackground(UNEDITABLE_BG);
-        libraryList.setPrototypeCellValue("thisIsAVeryLongFunctionNameIndeed()");
+        MappingFunction function = new MappingFunction("thisIsAVeryLongFunctionNameIndeed()");
+        FunctionEntry entry = new FunctionEntry(function, false);
+        libraryList.setPrototypeCellValue(entry);
         functionList.setFont(MONOSPACED);
         wireUp();
         attachAccelerator(UNDO_ACTION, codeArea);
@@ -269,14 +269,24 @@ public class FunctionFrame extends FrameBase {
 
     private void fetchFunctionList() {
         try {
+            final List<FunctionEntry> entries = new ArrayList<FunctionEntry>();
             URL functionFile = getClass().getResource("/templates/global-mapping-functions.xml");
             final MappingFunction.FunctionList functionList = MappingFunction.read(functionFile.openStream());
+            for (MappingFunction function : functionList.functions) entries.add(new FunctionEntry(function, false));
             SortedSet<MappingFunction> hintFunctions = sipModel.getMappingHintsModel().getFunctions();
-            if (hintFunctions != null) functionList.functions.addAll(hintFunctions);
+            if (hintFunctions != null) {
+                for (MappingFunction function : hintFunctions) entries.add(new FunctionEntry(function, false));
+            }
+            if (sipModel.getMappingModel().hasRecMapping()) {
+                List<MappingFunction> recDefFunctions = sipModel.getMappingModel().getRecMapping().getRecDefTree().getRecDef().functions;
+                if (recDefFunctions != null) {
+                    for (MappingFunction function : recDefFunctions) entries.add(new FunctionEntry(function, true));
+                }
+            }
             exec(new Swing() {
                 @Override
                 public void run() {
-                    libraryListModel.setList(functionList.functions);
+                    libraryListModel.setList(entries);
                 }
             });
         }
@@ -303,11 +313,11 @@ public class FunctionFrame extends FrameBase {
         @Override
         public void valueChanged(final ListSelectionEvent listSelectionEvent) {
             if (listSelectionEvent.getValueIsAdjusting()) return;
-            final MappingFunction function = (MappingFunction) list.getSelectedValue();
-            if (function == null) return;
+            final FunctionEntry entry = (FunctionEntry) list.getSelectedValue();
+            if (entry == null) return;
             if (library) {
                 functionList.clearSelection();
-                final int index = functionModel.indexOf(function.name);
+                final int index = functionModel.indexOf(entry.mappingFunction.name);
                 if (index >= 0) {
                     functionList.setSelectedIndex(index);
                     libraryList.clearSelection();
@@ -324,7 +334,7 @@ public class FunctionFrame extends FrameBase {
             exec(new Work() {
                 @Override
                 public void run() {
-                    sipModel.getFunctionCompileModel().setFunction(function);
+                    sipModel.getFunctionCompileModel().setFunction(entry.mappingFunction);
                     exec(new Swing() {
                         @Override
                         public void run() {
@@ -409,20 +419,25 @@ public class FunctionFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            final MappingFunction selected = (MappingFunction) libraryList.getSelectedValue();
+            final FunctionEntry selected = (FunctionEntry) libraryList.getSelectedValue();
             if (selected != null) {
-                exec(new Work() {
-                    @Override
-                    public void run() {
-                        sipModel.getMappingModel().getRecMapping().addFunction(selected);
-                        sipModel.getMappingModel().notifyFunctionChanged(selected);
-                    }
+                if (selected.fromRecDef) {
+                    sipModel.getFeedback().alert("Functions from the record definition need not be copied");
+                }
+                else {
+                    exec(new Work() {
+                        @Override
+                        public void run() {
+                            sipModel.getMappingModel().getRecMapping().addFunction(selected.mappingFunction);
+                            sipModel.getMappingModel().notifyFunctionChanged(selected.mappingFunction);
+                        }
 
-                    @Override
-                    public Job getJob() {
-                        return Job.FUNCTION_COPY_FROM_LIBRARY;
-                    }
-                });
+                        @Override
+                        public Job getJob() {
+                            return Job.FUNCTION_COPY_FROM_LIBRARY;
+                        }
+                    });
+                }
             }
         }
     }
@@ -450,36 +465,74 @@ public class FunctionFrame extends FrameBase {
     }
 
     private class FunctionListModel extends AbstractListModel {
-        private List<MappingFunction> functions = new ArrayList<MappingFunction>();
+        private List<FunctionEntry> entries = new ArrayList<FunctionEntry>();
 
-        public void setList(Collection<MappingFunction> functions) {
-            if (!this.functions.isEmpty()) {
+        public void setList(List<FunctionEntry> functions) {
+            if (!this.entries.isEmpty()) {
                 int size = getSize();
-                this.functions.clear();
+                this.entries.clear();
                 fireIntervalRemoved(this, 0, size);
             }
-            if (functions != null) this.functions.addAll(functions);
-            if (!this.functions.isEmpty()) fireIntervalAdded(this, 0, getSize());
+            if (functions != null) {
+                Collections.sort(functions);
+                this.entries.addAll(functions);
+            }
+            if (!this.entries.isEmpty()) fireIntervalAdded(this, 0, getSize());
+        }
+
+        public void setList(Collection<MappingFunction> functions) {
+            List<FunctionEntry> fresh = new ArrayList<FunctionEntry>();
+            for (MappingFunction function : functions) fresh.add(new FunctionEntry(function, false));
+            setList(fresh);
         }
 
         @Override
         public int getSize() {
-            return functions.size();
+            return entries.size();
         }
 
         @Override
         public Object getElementAt(int i) {
             if (i < 0) return null;
-            return functions.get(i);
+            return entries.get(i);
         }
 
         public int indexOf(String name) {
             int index = 0;
-            for (MappingFunction function : functions) {
-                if (function.name.equals(name)) return index;
+            for (FunctionEntry entry : entries) {
+                if (entry.mappingFunction.name.equals(name)) return index;
                 index++;
             }
             return -1;
+        }
+    }
+
+    private class FunctionEntry implements Comparable<FunctionEntry> {
+        final MappingFunction mappingFunction;
+        final boolean fromRecDef;
+
+        private FunctionEntry(MappingFunction mappingFunction, boolean fromRecDef) {
+            this.mappingFunction = mappingFunction;
+            this.fromRecDef = fromRecDef;
+        }
+
+        public String toString() {
+            return mappingFunction.toString();
+        }
+
+        @Override
+        public int compareTo(FunctionEntry o) {
+            return mappingFunction.name.compareTo(o.mappingFunction.name);
+        }
+    }
+
+    private class FunctionCellRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            FunctionEntry functionEntry = (FunctionEntry) value;
+            Component component = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            component.setForeground(functionEntry.fromRecDef ? Color.GRAY : Color.BLACK);
+            return component;
         }
     }
 
@@ -487,13 +540,14 @@ public class FunctionFrame extends FrameBase {
 
         private MappingFunctionJList(FunctionListModel functionListModel) {
             super(functionListModel);
+            setCellRenderer(new FunctionCellRenderer());
         }
 
         @Override
         public String getToolTipText(MouseEvent evt) {
             int index = this.locationToIndex(evt.getPoint());
-            MappingFunction mappingFunction = (MappingFunction) getModel().getElementAt(index);
-            return mappingFunction == null ? "" : mappingFunction.getDocumentation();
+            FunctionEntry entry = (FunctionEntry) getModel().getElementAt(index);
+            return entry == null ? "" : entry.fromRecDef ? "Built in to Record Definition" : entry.mappingFunction.getDocumentation();
         }
     }
 

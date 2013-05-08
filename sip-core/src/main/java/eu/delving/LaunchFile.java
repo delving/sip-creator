@@ -89,8 +89,12 @@ public class LaunchFile {
     private static final String[] POST_DEPENDENCIES = {
             "</resources>",
             "<application-desc main-class=\"eu.delving.sip.Application\">",
-            "  <argument>" + USER + "</argument>",
+            "<argument>" + USER + "</argument>",
             "</application-desc>",
             "</jnlp>",
     };
+
+    public static void main(String[] args) {
+        System.out.println(createJNLP("http://home.com", "http://codebase.home.com", "user"));
+    }
 }

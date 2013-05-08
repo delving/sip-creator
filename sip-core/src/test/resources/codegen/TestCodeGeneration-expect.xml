@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<test:test xmlns:test="http://www.testicles.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" test:sortorder="thisaway" xsi:schemaLocation="http://www.testicles.org http://www.testicles.org/hang.xsd">
+    <test:id>thisaway</test:id>
+    <test:sub-one>
+        <test:sub-two>
+            <test:abc-link test:a="fw">forward forward</test:abc-link>
+        </test:sub-two>
+        <test:events>
+            <test:event test:thekey="man" test:theschema="http://gumby-and-pokey.com/definitions" test:thevalue="Clay Man">
+                <test:abc-link test:a="23"/>
+                <test:actor>Gumby</test:actor>
+                <test:actor>Dammit</test:actor>
+                <test:combo>right left</test:combo>
+                <test:do-the>
+                    <test:limbo>two two</test:limbo>
+                </test:do-the>
+            </test:event>
+            <test:event test:thekey="horse" test:theschema="http://gumby-and-pokey.com/definitions" test:thevalue="Clay Horse">
+                <test:abc-link test:a="45"/>
+                <test:actor><![CDATA[<]]>O'Po<![CDATA[k]]>ey<![CDATA[>]]></test:actor>
+                <test:actor>McPokey</test:actor>
+                <test:combo>bottom top</test:combo>
+                <test:do-the>
+                    <test:limbo>none four</test:limbo>
+                </test:do-the>
+            </test:event>
+        </test:events>
+    </test:sub-one>
+</test:test>

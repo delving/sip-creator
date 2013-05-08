@@ -86,23 +86,23 @@ public class TestSchemaRepository {
                 if (schema.prefix.equals("facts")) {
                     String content = repo.getSchema(schemaVersion, FACT_DEFINITIONS).getSchemaText();
                     Assert.assertTrue(content != null);
-                    System.out.println(schemaVersion.getFullFileName(FACT_DEFINITIONS) + ": " + lineCount(content) + " lines");
+//                    System.out.println(schemaVersion.getFullFileName(FACT_DEFINITIONS) + ": " + lineCount(content) + " lines");
                 }
                 else {
                     String content = repo.getSchema(schemaVersion, RECORD_DEFINITION).getSchemaText();
                     Assert.assertTrue(content != null);
-                    System.out.println(schemaVersion.getFullFileName(RECORD_DEFINITION) + ": " + lineCount(content) + " lines");
+//                    System.out.println(schemaVersion.getFullFileName(RECORD_DEFINITION) + ": " + lineCount(content) + " lines");
                     content = repo.getSchema(schemaVersion, VALIDATION_SCHEMA).getSchemaText();
                     Assert.assertTrue(content != null);
-                    System.out.println(schemaVersion.getFullFileName(VALIDATION_SCHEMA) + ": " + lineCount(content) + " lines");
+//                    System.out.println(schemaVersion.getFullFileName(VALIDATION_SCHEMA) + ": " + lineCount(content) + " lines");
                 }
             }
         }
     }
 
-    private int lineCount(String content) {
-        return content.split("\\n").length;
-    }
+//    private int lineCount(String content) {
+//        return content.split("\\n").length;
+//    }
 
     private class HTTPFetcher implements Fetcher {
         private HttpClient httpClient = new DefaultHttpClient();

@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<rec-mapping prefix="ead">
+
+    <!--Copying node mappings to this list will make them appear as candidate mappings when-->
+    <!--the prefix corresponds to the target format and the inputPath matches one of the-->
+    <!--input paths in the source analysis.-->
+    <functions>
+    </functions>
+
+    <node-mappings>
+      <node-mapping inputPath="/input/eadheader/@langencoding" outputPath="/ead:ead/ead:eadheader/@ead:langencoding"/>
+      <node-mapping inputPath="/input/eadheader/@scriptencoding" outputPath="/ead:ead/ead:eadheader/@ead:scriptencoding"/>
+      <node-mapping inputPath="/input/eadheader/@dateencoding" outputPath="/ead:ead/ead:eadheader/@ead:dateencoding"/>
+      <node-mapping inputPath="/input/eadheader/@countryencoding" outputPath="/ead:ead/ead:eadheader/@ead:countryencoding"/>
+      <node-mapping inputPath="/input/eadheader/@repositoryencoding" outputPath="/ead:ead/ead:eadheader/@ead:repositoryencoding"/>
+      <node-mapping inputPath="/input/eadheader/@relatedencoding" outputPath="/ead:ead/ead:eadheader/@ead:relatedencoding"/>
+      <node-mapping inputPath="/input/eadheader/eadid" outputPath="/ead:ead/ead:eadheader/ead:eadid"/>
+      <node-mapping inputPath="/input/eadheader/eadid/@countrycode" outputPath="/ead:ead/ead:eadheader/ead:eadid/@ead:countrycode"/>
+      <node-mapping inputPath="/input/eadheader/eadid/@mainagencycode" outputPath="/ead:ead/ead:eadheader/ead:eadid/@ead:mainagencycode"/>
+      <node-mapping inputPath="/input/eadheader/eadid/@identifier" outputPath="/ead:ead/ead:eadheader/ead:eadid/@ead:identifier"/>
+      <node-mapping inputPath="/input/eadheader/filedesc/titlestmt/titleproper" outputPath="/ead:ead/ead:eadheader/ead:filedesc/ead:titlestmt/ead:titleproper"/>
+      <node-mapping inputPath="/input/eadheader/filedesc/titlestmt/titleproper/@encodinganalog" outputPath="/ead:ead/ead:eadheader/ead:filedesc/ead:titlestmt/ead:titleproper/@ead:encodinganalog"/>
+      <node-mapping inputPath="/input/eadheader/filedesc/titlestmt/author" outputPath="/ead:ead/ead:eadheader/ead:filedesc/ead:titlestmt/ead:author"/>
+      <node-mapping inputPath="/input/eadheader/filedesc/titlestmt/author/@encodinganalog" outputPath="/ead:ead/ead:eadheader/ead:filedesc/ead:titlestmt/ead:author/@ead:encodinganalog"/>
+      <node-mapping inputPath="/input/eadheader/revisiondesc/change" outputPath="/ead:ead/ead:eadheader/ead:revisiondesc/ead:change"/>
+      <node-mapping inputPath="/input/eadheader/revisiondesc/change/date" outputPath="/ead:ead/ead:eadheader/ead:revisiondesc/ead:change/ead:date"/>
+      <node-mapping inputPath="/input/eadheader/revisiondesc/change/date/@era" outputPath="/ead:ead/ead:eadheader/ead:revisiondesc/ead:change/ead:date/@ead:era"/>
+      <node-mapping inputPath="/input/eadheader/revisiondesc/change/date/@calendar" outputPath="/ead:ead/ead:eadheader/ead:revisiondesc/ead:change/ead:date/@ead:calendar"/>
+      <node-mapping inputPath="/input/eadheader/revisiondesc/change/item" outputPath="/ead:ead/ead:eadheader/ead:revisiondesc/ead:change/ead:item"/>
+      <node-mapping inputPath="/input/archdesc/@level" outputPath="/ead:ead/ead:archdesc/@ead:level"/>
+      <node-mapping inputPath="/input/archdesc/@type" outputPath="/ead:ead/ead:archdesc/@ead:type"/>
+      <node-mapping inputPath="/input/archdesc/@encodinganalog" outputPath="/ead:ead/ead:archdesc/@ead:encodinganalog"/>
+      <node-mapping inputPath="/input/archdesc/@relatedencoding" outputPath="/ead:ead/ead:archdesc/@ead:relatedencoding"/>
+      <node-mapping inputPath="/input/archdesc/did/origination/@encodinganalog" outputPath="/ead:ead/ead:archdesc/ead:did/ead:origination/@ead:encodinganalog"/>
+      <node-mapping inputPath="/input/archdesc/did/origination/corpname" outputPath="/ead:ead/ead:archdesc/ead:did/ead:origination/ead:corpname"/>
+      <node-mapping inputPath="/input/archdesc/did/origination/corpname/@authfilenumber" outputPath="/ead:ead/ead:archdesc/ead:did/ead:origination/ead:corpname/@ead:authfilenumber"/>
+      <node-mapping inputPath="/input/archdesc/did/unitid/@encodinganalog" outputPath="/ead:ead/ead:archdesc/ead:did/ead:unitid/@ead:encodinganalog"/>
+      <node-mapping inputPath="/input/archdesc/did/unittitle" outputPath="/ead:ead/ead:archdesc/ead:did/ead:unittitle"/>
+      <node-mapping inputPath="/input/archdesc/did/unittitle/@encodinganalog" outputPath="/ead:ead/ead:archdesc/ead:did/ead:unittitle/@ead:encodinganalog"/>
+      <node-mapping inputPath="/input/archdesc/otherfindaid/@encodinganalog" outputPath="/ead:ead/ead:archdesc/ead:otherfindaid/@ead:encodinganalog"/>
+      <node-mapping inputPath="/input/archdesc/otherfindaid/p" outputPath="/ead:ead/ead:archdesc/ead:otherfindaid/ead:p"/>
+      <node-mapping inputPath="/input/archdesc/otherfindaid/p/extref" outputPath="/ead:ead/ead:archdesc/ead:otherfindaid/ead:p/ead:extref"/>
+      <node-mapping inputPath="/input/archdesc/otherfindaid/p/extref/@xlink:href" outputPath="/ead:ead/ead:archdesc/ead:otherfindaid/ead:p/ead:extref/@xlink:href"/>
+      <node-mapping inputPath="/input/archdesc/dsc/@type" outputPath="/ead:ead/ead:archdesc/ead:dsc/@ead:type"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/@level" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/@ead:level"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/@encodinganalog" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/@ead:encodinganalog"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/@id" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/@ead:id"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/did/unitid" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:did/ead:unitid"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/did/unitid/@encodinganalog" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:did/ead:unitid/@ead:encodinganalog"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/did/unitid/@type" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:did/ead:unitid/@ead:type"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/did/unittitle" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:did/ead:unittitle"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/did/unittitle/@encodinganalog" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:did/ead:unittitle/@ead:encodinganalog"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/otherfindaid/@encodinganalog" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:otherfindaid/@ead:encodinganalog"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/otherfindaid/p/extref" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:otherfindaid/ead:p/ead:extref"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/otherfindaid/p/extref/@xlink:href" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:otherfindaid/ead:p/ead:extref/@xlink:href"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/scopecontent/@encodinganalog" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:scopecontent/@ead:encodinganalog"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/scopecontent/p" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:scopecontent/ead:p"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/c" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:c"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/c/@level" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:c/@ead:level"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/c/@encodinganalog" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:c/@ead:encodinganalog"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/c/did/unitdate" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:c/ead:did/ead:unitdate">
+        <groovy-code>
+          <string>&quot;${_unitdate.substring(0,4)}&quot;</string>
+        </groovy-code>
+      </node-mapping>
+      <node-mapping inputPath="/input/archdesc/dsc/c/c/did/unitdate/@calendar" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:c/ead:did/ead:unitdate/@ead:calendar"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/c/did/unitdate/@era" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:c/ead:did/ead:unitdate/@ead:era"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/c/did/unitdate/@normal" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:c/ead:did/ead:unitdate/@ead:normal"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/c/did/unitdate/@encodinganalog" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:c/ead:did/ead:unitdate/@ead:encodinganalog"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/c/did/unitid" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:c/ead:did/ead:unitid"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/c/did/unitid/@encodinganalog" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:c/ead:did/ead:unitid/@ead:encodinganalog"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/c/did/unitid/@type" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:c/ead:did/ead:unitid/@ead:type"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/c/otherfindaid/@encodinganalog" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:c/ead:otherfindaid/@ead:encodinganalog"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/c/otherfindaid/p/extref" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:c/ead:otherfindaid/ead:p/ead:extref"/>
+      <node-mapping inputPath="/input/archdesc/dsc/c/c/otherfindaid/p/extref/@xlink:href" outputPath="/ead:ead/ead:archdesc/ead:dsc/ead:c/ead:c/ead:otherfindaid/ead:p/ead:extref/@xlink:href"/>
+    </node-mappings>
+  </rec-mapping>

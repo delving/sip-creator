@@ -384,7 +384,9 @@ public class DOMBuilder extends BuilderSupport {
             if (colon > 0) {
                 this.prefix = name.substring(0, colon);
                 RecDef.Namespace namespace = namespaces.get(this.prefix);
-                if (namespace == null) throw new RuntimeException("No namespace for " + prefix);
+                if (namespace == null) {
+                    throw new RuntimeException("No namespace for " + prefix);
+                }
                 this.uri = namespace.uri;
                 this.localPart = name.substring(colon + 1);
             }

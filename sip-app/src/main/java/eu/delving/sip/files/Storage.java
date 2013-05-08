@@ -54,7 +54,8 @@ public interface Storage {
         MAPPING(null, "mapping_", ".xml", "mapping_%s.xml", 30),
         VALIDATION(null, "validation_", ".int", "validation_%s.int", 1),
         RESULT_STATS(null, "stats-result_", ".xml.gz", "stats-result_%s.xml.gz", 1),
-        REPORT(null, null, null, "report_%s.txt", 1);
+        REPORT(null, null, null, "report_%s.txt", 1),
+        LINKS(null, null, null, "links_%s.csv.gz", 1);
 
         private String name, prefix, suffix, pattern;
         private int historySize = 1;
@@ -95,6 +96,7 @@ public interface Storage {
 
     String HARVEST_TAG = "delving-harvest";
     String ENVELOPE_TAG = "delving-sip-source";
+    String TEXT_TAG = "text_chunk";
     String OUTPUT_TAG = "delving-output";
     String FACTS_TAG = "facts";
     String CONSTANT_TAG = "constant";

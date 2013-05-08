@@ -45,6 +45,12 @@ import static eu.delving.sip.files.StorageFinder.getHostPort;
 
 public class HttpClientFactory {
 
+    public static HttpClient createLinkCheckClient() {
+        HttpParams httpParams = createConnectionParams();
+        ThreadSafeClientConnManager threaded = new ThreadSafeClientConnManager();
+        return new DefaultHttpClient(threaded, httpParams);
+    }
+
     public static HttpClient createHttpClient(File storageDirectory) {
         HttpParams httpParams = createConnectionParams();
         if (!StorageFinder.isStandalone(storageDirectory)) {
