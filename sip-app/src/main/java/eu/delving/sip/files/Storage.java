@@ -96,6 +96,7 @@ public interface Storage {
 
     String HARVEST_TAG = "delving-harvest";
     String ENVELOPE_TAG = "delving-sip-source";
+    String TEXT_TAG = "text_chunk";
     String OUTPUT_TAG = "delving-output";
     String FACTS_TAG = "facts";
     String CONSTANT_TAG = "constant";
