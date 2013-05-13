@@ -310,8 +310,8 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return optBox;
     }
 
-    public boolean isRootOpt() {
-        return elem != null && optBox != null && optBox.role == OptRole.ROOT && !optBox.isDictionary();
+    public boolean isRootOptNoOptList() {
+        return elem != null && optBox != null && optBox.role == OptRole.ROOT && optBox.optList == null;
     }
 
     public boolean isChildOpt() {
@@ -331,7 +331,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
         if (dynOpt != null) {
             name += String.format("[%s]", dynOpt);
         }
-        if (isRootOpt()) {
+        if (isRootOptNoOptList()) {
             name += String.format("[%s]", optBox);
         }
         else if (isChildOpt()) {

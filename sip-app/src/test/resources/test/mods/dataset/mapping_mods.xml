@@ -54,30 +54,29 @@
       <node-mapping inputPath="/input/dc:contributor" outputPath="/mods/name[contributor]/namePart"/>
       <node-mapping inputPath="/constant" outputPath="/mods/mods:typeOfResource">
           <groovy-code>
-              <string>&apos;text&apos;</string>
+              <string>text</string>
           </groovy-code>
       </node-mapping>
       <node-mapping inputPath="/input/dc:language" outputPath="/mods/language"/>
-      <node-mapping inputPath="/input/dc:identifier" outputPath="/mods/location/url"/>
-      <node-mapping inputPath="/constant" outputPath="/mods/location/url/@access">
-          <groovy-code>
-              <string>&apos;raw object&apos;</string>
-          </groovy-code>
-      </node-mapping>
       <node-mapping inputPath="/input/dc:description" outputPath="/mods/note"/>
       <node-mapping inputPath="/input/dc:type" outputPath="/mods/subject/topic"/>
       <node-mapping inputPath="/constant" outputPath="/mods/mods:subject/@authority">
           <groovy-code>
-              <string>&apos;dubious&apos;</string>
+              <string>dubious</string>
           </groovy-code>
       </node-mapping>
       <node-mapping inputPath="/input/dc:subject" outputPath="/mods/subject[gumby]/topic"/>
       <node-mapping inputPath="/constant" outputPath="/mods/mods:subject[gumby]/@authority">
           <groovy-code>
-              <string>&apos;divine&apos;</string>
+              <string>divine</string>
           </groovy-code>
       </node-mapping>
       <node-mapping inputPath="/input/europeana:object" outputPath="/mods:mods/mods:location/mods:url[preview]"/>
+      <node-mapping inputPath="/constant" outputPath="/mods/location/url[preview]/@access">
+          <groovy-code>
+              <string>raw object</string>
+          </groovy-code>
+      </node-mapping>
       <node-mapping inputPath="/input/europeana:isShownBy" outputPath="/mods:mods/mods:location/mods:url[raw object]"/>
       <node-mapping inputPath="/input/europeana:isShownAt" outputPath="/mods:mods/mods:location/mods:url[object in context]"/>
   </node-mappings>

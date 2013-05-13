@@ -67,6 +67,13 @@ public class OutputFrame extends FrameBase {
 
     public OutputFrame(final SipModel sipModel) {
         super(Which.OUTPUT, sipModel, "Output");
+        htmlPanel = new HtmlPanel("Link Checks").addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
+                    SwingHelper.launchURL(e.getURL().toString());
+            }
+        });
         sipModel.getRecordCompileModel().setEnabled(false);
         sipModel.getRecordCompileModel().addListener(new MappingCompileModel.Listener() {
             @Override
@@ -116,19 +123,8 @@ public class OutputFrame extends FrameBase {
     @Override
     protected void buildContent(Container content) {
         tabs.addTab("XML Output", createOutputPanel());
-        tabs.addTab("Link Check", createLinkCheckPanel());
+        tabs.addTab("Link Check", htmlPanel);
         content.add(tabs, BorderLayout.CENTER);
-    }
-
-    private JPanel createLinkCheckPanel() {
-        htmlPanel = new HtmlPanel("Link Checks").addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
-                    SwingHelper.launchURL(e.getURL().toString());
-            }
-        });
-        return htmlPanel;
     }
 
     private JPanel createOutputPanel() {

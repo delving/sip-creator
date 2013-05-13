@@ -86,7 +86,7 @@
     </node-mapping>
     <node-mapping inputPath="/constant" outputPath="/abm:record/abm:category">
       <groovy-code>
-        <string>&apos;Plant&apos;</string>
+          <string>&quot;Planteliv&quot;</string>
       </groovy-code>
     </node-mapping>
     <node-mapping inputPath="/input/dc:contributor" outputPath="/abm:record/dc:contributor"/>

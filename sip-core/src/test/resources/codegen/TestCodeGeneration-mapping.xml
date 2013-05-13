@@ -65,5 +65,7 @@
                 <path>/input/leadup/record/list/member/body/parts/limbs/legs</path>
             </siblings>
         </node-mapping>
+        <node-mapping inputPath="/input/leadup/record/list/member/number-a" outputPath="/test/sub-one/sub-two/ab">
+        </node-mapping>
     </node-mappings>
 </rec-mapping>

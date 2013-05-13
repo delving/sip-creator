@@ -79,11 +79,14 @@
   </functions>
   <node-mappings>
     <node-mapping inputPath="/input/abm:contentProvider" outputPath="/abm:record/abm:contentProvider"/>
+
+      <!--mapping constant to this dictionary-less field with lookup doesn't work -->
     <node-mapping inputPath="/constant" outputPath="/abm:record/abm:category">
-      <groovy-code>
-        <string>&apos;Plant&apos;</string>
-      </groovy-code>
+        <groovy-code>
+            <string>Arkitektur</string>
+        </groovy-code>
     </node-mapping>
+
     <node-mapping inputPath="/input/dc:contributor" outputPath="/abm:record/dc:contributor"/>
     <node-mapping inputPath="/input/dc:creator" outputPath="/abm:record/dc:creator"/>
     <node-mapping inputPath="/input/dc:description" outputPath="/abm:record/dc:description"/>

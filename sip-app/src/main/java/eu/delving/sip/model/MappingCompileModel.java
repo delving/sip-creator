@@ -358,7 +358,7 @@ public class MappingCompileModel {
                 String editedCode = documentToString(codeDocument);
                 CodeGenerator codeGenerator = new CodeGenerator(recMapping).withEditPath(new EditPath(nodeMapping, null));
                 String generatedCode = codeGenerator.toNodeMappingCode();
-                if (isSimilarCode(editedCode, generatedCode)) {
+                if (isSimilarCode(editedCode, generatedCode) && !nodeMapping.isConstant()) {
                     nodeMapping.setGroovyCode(null);
                     notifyStateChange(CompileState.ORIGINAL);
                 }

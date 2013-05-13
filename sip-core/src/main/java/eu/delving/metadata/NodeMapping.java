@@ -87,6 +87,15 @@ public class NodeMapping {
         return inputPath.hashCode() + outputPath.hashCode();
     }
 
+    public boolean isConstant() {
+        return inputPath != null && "/constant".equals(inputPath.toString());
+    }
+
+    public String getConstantValue() {
+        if (groovyCode == null || groovyCode.isEmpty()) return "CONSTANT";
+        return getConstantFromGroovyCode(groovyCode);
+    }
+
     public int getIndexWithinNode() {
         int index = 0;
         for (NodeMapping nodeMapping : recDefNode.getNodeMappings().values()) {

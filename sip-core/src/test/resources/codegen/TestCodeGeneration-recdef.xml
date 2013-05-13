@@ -63,5 +63,10 @@
             <opt key="fw" value="forward forward"/>
             <opt key="pause" value="Pause Pause!"/>
         </opt-list>
+        <opt-list dictionary="NUMBER" path="/test/sub-one/sub-two/ab">
+            <opt value="one"/>
+            <opt value="two"/>
+            <opt value="three"/>
+        </opt-list>
     </opts>
 </record-definition>
