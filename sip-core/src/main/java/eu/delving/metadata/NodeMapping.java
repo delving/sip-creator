@@ -148,6 +148,16 @@ public class NodeMapping {
         return dictionary != null;
     }
 
+    public boolean hasOptList() {
+        return recDefNode.getOptList() != null;
+    }
+
+    public List<String> getOptListValues() {
+        List<String> values = new ArrayList<String>();
+        for (OptList.Opt opt : recDefNode.getOptList().opts) values.add(opt.value);
+        return values;
+    }
+
     public SortedSet getSourceTreeNodes() {
         return sourceTreeNodes;
     }
