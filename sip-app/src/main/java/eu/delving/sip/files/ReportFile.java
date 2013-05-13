@@ -30,7 +30,6 @@ import eu.delving.sip.model.Feedback;
 import eu.delving.sip.xml.ResultLinkChecks;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.http.HttpStatus;
 
 import javax.swing.*;
 import java.awt.Component;
@@ -358,14 +357,6 @@ public class ReportFile {
                                     }
                                     else {
                                         out.append(":").append(linkCheck.getTime());
-                                        linkCheck.ok = linkCheck.httpStatus == HttpStatus.SC_OK;
-                                        switch (check) {
-                                            case DEEP_ZOOM:
-                                                if (linkCheck.ok) {
-                                                    linkCheck.ok = "application/xml".equals(linkCheck.mimeType);
-                                                }
-                                                break;
-                                        }
                                         out.append(linkCheck.ok ? "\u2714 " : "\u2716 ");
                                     }
                                 }
