@@ -22,6 +22,7 @@
 package eu.delving.sip;
 
 import com.mysql.jdbc.StringUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 import javax.crypto.*;
@@ -35,17 +36,26 @@ import java.security.NoSuchAlgorithmException;
  */
 
 public class TestEncryption {
-    private static final String PLAINTEXT = "Here is something that we need to encrypt so that it cannot be read";
+    private static final byte[] key = {
+            (byte) 0x28, (byte) 0x2c, (byte) 0xe6, (byte) 0xf2, (byte) 0x15, (byte) 0x6c, (byte) 0x8f, (byte) 0x2e,
+            (byte) 0x02, (byte) 0xe7, (byte) 0x55, (byte) 0x8f, (byte) 0x94, (byte) 0xa2, (byte) 0x0b, (byte) 0x32
+    };
     public static final String AES = "AES";
 
     @Test
-    public void encryptDecrypt() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+    public void generate() throws NoSuchAlgorithmException {
         KeyGenerator keyGen = KeyGenerator.getInstance(AES);
         keyGen.init(128);
         SecretKey sk = keyGen.generateKey();
         byte[] key = sk.getEncoded();
         System.out.println(StringUtils.dumpAsHex(key, key.length));
-        SecretKeySpec sks = new SecretKeySpec(sk.getEncoded(), AES);
+    }
+
+    @Test
+    public void encryptDecryptString() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        String PLAINTEXT = "Here is something that we need to encrypt so that it cannot be read";
+        System.out.println(StringUtils.dumpAsHex(key, key.length));
+        SecretKeySpec sks = new SecretKeySpec(key, AES);
         Cipher cipher = Cipher.getInstance(AES);
         cipher.init(Cipher.ENCRYPT_MODE, sks, cipher.getParameters());
         byte[] encrypted = cipher.doFinal(PLAINTEXT.getBytes());
@@ -54,5 +64,6 @@ public class TestEncryption {
         cipher.init(Cipher.DECRYPT_MODE, sks, cipher.getParameters());
         byte[] decrypted = cipher.doFinal(encrypted);
         System.out.println(new String(decrypted));
+        Assert.assertEquals("Mismatch", PLAINTEXT, new String(decrypted));
     }
 }
