@@ -199,8 +199,14 @@ public class NodeMappingListModel extends AbstractListModel {
 
         @Override
         public int compare(NodeMappingEntry entry1, NodeMappingEntry entry2) {
-            return entry1.getNodeMapping().toSortString(sourceTargetOrder)
-                    .compareTo(entry2.getNodeMapping().toSortString(sourceTargetOrder));
+            NodeMapping nodeMapping1 = entry1.getNodeMapping();
+            NodeMapping nodeMapping2 = entry2.getNodeMapping();
+            int compare = nodeMapping1.toSortString(sourceTargetOrder)
+                    .compareTo(nodeMapping2.toSortString(sourceTargetOrder));
+            if (compare != 0) return compare;
+            String string1 = nodeMapping1.recDefNode.getPath().toString();
+            String string2 = nodeMapping2.recDefNode.getPath().toString();
+            return string1.compareTo(string2);
         }
     }
 }
