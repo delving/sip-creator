@@ -242,28 +242,6 @@ public class NodeMapping {
         return recDefNode.isAttr() || recDefNode.isLeafElem();
     }
 
-    public String getHtml(boolean sourceTargetOrdering, int maxLength) {
-        if (recDefNode == null) return "No RecDefNode";
-        String input = inputPath.getTail(maxLength);
-        if (hasMap()) {
-            StringBuilder out = new StringBuilder();
-            Iterator<Path> walk = getInputPaths().iterator();
-            while (walk.hasNext()) {
-                out.append(walk.next().getTail(maxLength));
-                if (walk.hasNext()) out.append(", ");
-            }
-            input = out.toString();
-        }
-        String wrap = groovyCode == null ? "p" : "b";
-        String targetTail = recDefNode.getPath().withoutPrefixes().getTail(maxLength);
-        if (sourceTargetOrdering) {
-            return String.format("<html><%s>%s &rarr; %s</%s>", wrap, input, targetTail, wrap);
-        }
-        else {
-            return String.format("<html><%s>%s &larr; %s</%s>", wrap, targetTail, input, wrap);
-        }
-    }
-
     public String toString() {
         if (recDefNode == null) return "No RecDefNode";
         return recDefNode.toString();

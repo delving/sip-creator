@@ -212,20 +212,7 @@ public class Path implements Comparable<Path>, Serializable {
     }
 
     public String getTail() {
-        return peek().toString();
-    }
-
-    public String getTail(int maxLength) {
-        String tail = toString();
-        if (tail.length() > maxLength) {
-            tail = tail.substring(tail.length() - maxLength, tail.length());
-            int firstSlash = tail.indexOf('/');
-            if (firstSlash > 0) {
-                tail = tail.substring(firstSlash, tail.length());
-            }
-            tail = "-" + tail;
-        }
-        return tail;
+        return peek().withoutPrefix().toString();
     }
 
     public boolean isEmpty() {
