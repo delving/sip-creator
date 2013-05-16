@@ -128,7 +128,7 @@ public class NodeMappingEntry {
             html.append("<table border=0 cellpadding=0>");
             html.append("<tr><td width=30></td><td><i>");
             for (Path path : nodeMapping.getInputPaths()) html.append(path).append("<br>");
-            html.append("&rarr; ").append(nodeMapping.outputPath.withoutPrefixes());
+            html.append("&rarr; ").append(nodeMapping.outputPath);
             if (nodeMapping.groovyCode != null) html.append("</b>");
             html.append("</i></td><tr>");
             html.append("</table>");
