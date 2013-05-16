@@ -242,6 +242,34 @@ public class NodeMapping {
         return recDefNode.isAttr() || recDefNode.isLeafElem();
     }
 
+    public String toSortString(boolean sourceTargetOrdering) {
+        String input = createInputString();
+        String targetTail = recDefNode.getPath().getTail();
+        if (input.equals(targetTail)) {
+            return input;
+        }
+        else if (sourceTargetOrdering) {
+            return String.format("%s >> %s", input, targetTail);
+        }
+        else {
+            return String.format("%s << %s", targetTail, input);
+        }
+    }
+
+    public String createInputString() {
+        String input = inputPath.getTail();
+        if (hasMap()) {
+            StringBuilder out = new StringBuilder();
+            Iterator<Path> walk = getInputPaths().iterator();
+            while (walk.hasNext()) {
+                out.append(walk.next().getTail());
+                if (walk.hasNext()) out.append(", ");
+            }
+            input = out.toString();
+        }
+        return input;
+    }
+
     public String toString() {
         if (recDefNode == null) return "No RecDefNode";
         return recDefNode.toString();

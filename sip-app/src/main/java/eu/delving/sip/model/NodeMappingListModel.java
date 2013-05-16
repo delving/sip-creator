@@ -21,7 +21,10 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.*;
+import eu.delving.metadata.MappingFunction;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.NodeMappingChange;
+import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 
@@ -196,17 +199,8 @@ public class NodeMappingListModel extends AbstractListModel {
 
         @Override
         public int compare(NodeMappingEntry entry1, NodeMappingEntry entry2) {
-            NodeMapping nodeMapping1 = entry1.getNodeMapping();
-            NodeMapping nodeMapping2 = entry2.getNodeMapping();
-            if (sourceTargetOrder) {
-                Path path1 = nodeMapping1.inputPath;
-                Path path2 = nodeMapping2.inputPath;
-                int compare = path1.getTail().toUpperCase().compareTo(path2.getTail().toUpperCase());
-                if (compare != 0) return compare;
-                compare = path1.toString().toUpperCase().compareTo(path2.toString().toUpperCase());
-                if (compare != 0) return compare;
-            }
-            return nodeMapping1.outputPath.toString().toUpperCase().compareTo(nodeMapping2.outputPath.toString().toUpperCase());
+            return entry1.getNodeMapping().toSortString(sourceTargetOrder)
+                    .compareTo(entry2.getNodeMapping().toSortString(sourceTargetOrder));
         }
     }
 }

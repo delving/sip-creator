@@ -29,7 +29,6 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import java.awt.Component;
-import java.util.Iterator;
 
 /**
  * An entry in the NodeMappingListModel, with its associated cell renderer.
@@ -111,7 +110,7 @@ public class NodeMappingEntry {
             if (nodeMapping.recDefNode == null) return "No RecDefNode";
             StringBuilder html = new StringBuilder("<html><font size=+1>");
             html.append(nodeMapping.groovyCode == null ? "<p>" : "<b>");
-            String input = createInputString(nodeMapping);
+            String input = nodeMapping.createInputString();
             String targetTail = nodeMapping.recDefNode.getPath().getTail();
             if (input.equals(targetTail)) {
                 html.append(input);
@@ -135,18 +134,5 @@ public class NodeMappingEntry {
             return html.toString();
         }
 
-        private String createInputString(NodeMapping nodeMapping) {
-            String input = nodeMapping.inputPath.getTail();
-            if (nodeMapping.hasMap()) {
-                StringBuilder out = new StringBuilder();
-                Iterator<Path> walk = nodeMapping.getInputPaths().iterator();
-                while (walk.hasNext()) {
-                    out.append(walk.next().getTail());
-                    if (walk.hasNext()) out.append(", ");
-                }
-                input = out.toString();
-            }
-            return input;
-        }
     }
 }
