@@ -484,10 +484,11 @@ public class StorageImpl implements Storage {
 
         @Override
         public ReportWriter openReportWriter(RecDef recDef) throws StorageException {
-            File file = new File(here, FileType.REPORT.getName(recDef.prefix));
+            File reportFile = new File(here, FileType.REPORT.getName(recDef.prefix));
+            File reportIndexFile = new File(here, FileType.REPORT_INDEX.getName(recDef.prefix));
             try {
                 LinkCheckExtractor linkCheckExtractor = new LinkCheckExtractor(recDef.fieldMarkers, new XPathContext(recDef.namespaces));
-                return new ReportWriter(file, linkCheckExtractor);
+                return new ReportWriter(reportFile, reportIndexFile, linkCheckExtractor);
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
@@ -500,8 +501,9 @@ public class StorageImpl implements Storage {
         @Override
         public ReportFile getReport(String prefix) throws StorageException {
             try {
-                File file = reportFile(here, prefix);
-                return file.exists() ? new ReportFile(file, linkFile(here, prefix), this, prefix)  : null;
+                File reportFile = reportFile(here, prefix);
+                File reportIndexFile = reportIndexFile(here, prefix);
+                return reportFile.exists() ? new ReportFile(reportFile, reportIndexFile, linkFile(here, prefix), this, prefix)  : null;
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
