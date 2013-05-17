@@ -59,13 +59,14 @@ public class ReportFile {
     private RandomAccessFile reportAccess;
     private RandomAccessFile reportIndexAccess;
     private List<Rec> recs;
+    private List<Rec> invalidRecs;
     private LinkChecker linkChecker;
     private ResultLinkChecks resultLinkChecks;
     private boolean allVisible;
     private All all = new All();
     private OnlyInvalid onlyInvalid = new OnlyInvalid();
 
-    public ReportFile(File reportFile, File reportIndexFile, File linkFile, DataSet dataSet, String prefix) throws IOException {
+    public ReportFile(File reportFile, File reportIndexFile, File invalidFile, File linkFile, DataSet dataSet, String prefix) throws IOException {
         this.reportFile = reportFile;
         this.reportAccess = new RandomAccessFile(this.reportFile, "r");
         this.reportIndexAccess = new RandomAccessFile(reportIndexFile, "r");
@@ -75,6 +76,14 @@ public class ReportFile {
         int recordCount = (int) (reportIndexAccess.length() / LONG_SIZE);
         recs = new ArrayList<Rec>(recordCount);
         for (int walk = 0; walk < recordCount; walk++) recs.add(new Rec(walk));
+        DataInputStream invalidIn = new DataInputStream(new FileInputStream(invalidFile));
+        int invalidCount = invalidIn.readInt();
+        invalidRecs = new ArrayList<Rec>(invalidCount);
+        for (int walk = 0; walk < invalidCount; walk++) {
+            int recordNumber = invalidIn.readInt();
+            invalidRecs.add(recs.get(recordNumber));
+        }
+        invalidIn.close();
     }
 
     public ListModel getAll() {
@@ -459,57 +468,6 @@ public class ReportFile {
     }
 
     public class OnlyInvalid extends AbstractListModel {
-        private List<Rec> invalidRecs = new ArrayList<Rec>();
-
-        public Work refresh(final Feedback feedback, final Swing after) {
-            return new Work.DataSetPrefixWork() {
-                @Override
-                public void run() {
-                    try {
-                        boolean missing = false;
-                        for (Rec rec : recs) if (rec.getRecordNumber() < 0) missing = true;
-                        if (missing) {
-                            try {
-                                reportAccess.seek(0);
-                                for (Rec rec : recs) rec.readIn();
-                            }
-                            catch (IOException e) {
-                                feedback.alert("Problem scanning report file", e);
-                            }
-                        }
-                        Swing.Exec.later(new Swing() {
-                            @Override
-                            public void run() {
-                                final int wasSize = invalidRecs.size();
-                                invalidRecs.clear();
-                                if (wasSize > 0) fireIntervalRemoved(OnlyInvalid.this, 0, wasSize - 1);
-                                for (Rec rec : recs) if (rec.isInvalid()) invalidRecs.add(rec.activate());
-                                if (!invalidRecs.isEmpty()) fireIntervalAdded(OnlyInvalid.this, 0, getSize() - 1);
-                            }
-                        });
-                    }
-                    finally {
-                        after.run();
-                    }
-                }
-
-                @Override
-                public String getPrefix() {
-                    return prefix;
-                }
-
-                @Override
-                public DataSet getDataSet() {
-                    return dataSet;
-                }
-
-                @Override
-                public Job getJob() {
-                    return Job.LOAD_REPORT;
-                }
-            };
-        }
-
         @Override
         public int getSize() {
             return invalidRecs.size();
@@ -517,7 +475,7 @@ public class ReportFile {
 
         @Override
         public Object getElementAt(int index) {
-            return invalidRecs.get(index);
+            return invalidRecs.get(index).activate();
         }
 
         public void fireContentsChanged(int recordNumber) {

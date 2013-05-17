@@ -503,7 +503,8 @@ public class StorageImpl implements Storage {
             try {
                 File reportFile = reportFile(here, prefix);
                 File reportIndexFile = reportIndexFile(here, prefix);
-                return reportFile.exists() ? new ReportFile(reportFile, reportIndexFile, linkFile(here, prefix), this, prefix)  : null;
+                File invalidFile = new File(here, FileType.VALIDATION.getName(prefix));
+                return reportFile.exists() ? new ReportFile(reportFile, reportIndexFile, invalidFile, linkFile(here, prefix), this, prefix)  : null;
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);

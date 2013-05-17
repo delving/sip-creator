@@ -215,15 +215,8 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
-                        controlsEnabled(false);
                         ReportFile.OnlyInvalid onlyInvalid = report.getOnlyInvalid();
                         list.setModel(onlyInvalid);
-                        sipModel.exec(onlyInvalid.refresh(sipModel.getFeedback(), new Swing() {
-                            @Override
-                            public void run() {
-                                controlsEnabled(true);
-                            }
-                        }));
                     }
                     else {
                         list.setModel(report.getAll());
