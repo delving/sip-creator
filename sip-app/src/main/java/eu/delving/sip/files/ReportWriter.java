@@ -32,7 +32,6 @@ import org.apache.commons.io.output.CountingOutputStream;
 
 import javax.xml.xpath.XPathExpressionException;
 import java.io.*;
-import java.util.regex.Pattern;
 
 /**
  * Describes how a report is written during dataset processing
@@ -42,9 +41,6 @@ import java.util.regex.Pattern;
 
 public class ReportWriter {
     public static final String DIVIDER = "::::";
-    public static Pattern START = Pattern.compile("<<(\\d+),([^>]+)>>(.*)");
-    public static Pattern END = Pattern.compile("<<>>");
-    public static Pattern LINK = Pattern.compile("<<<([^>]+)>>>(.*)");
     private XmlSerializer serializer = new XmlSerializer();
     private File reportFile;
     private File reportIndexFile;

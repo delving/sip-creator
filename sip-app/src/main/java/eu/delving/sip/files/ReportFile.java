@@ -37,7 +37,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import static eu.delving.sip.base.SwingHelper.REPORT_ERROR;
 import static eu.delving.sip.base.SwingHelper.REPORT_OK;
@@ -197,20 +196,14 @@ public class ReportFile {
             return recordNumber;
         }
 
-        public boolean isInvalid() {
-            return ReportWriter.ReportType.VALID != reportType;
-        }
-
         public void readIn() throws IOException {
-            if (reportAccess.getFilePointer() != seekPos) {
-                reportAccess.seek(seekPos);
-            }
+            reportAccess.seek(seekPos);
             final List<String> freshLines = new ArrayList<String>();
             boolean within = false;
             while (true) {
                 String line = reportAccess.readLine();
                 if (line == null) break;
-                Matcher startMatcher = ReportWriter.START.matcher(line);
+                ReportStrings.Match startMatcher = ReportStrings.START.matcher(line);
                 if (startMatcher.matches()) {
                     int startRecordNumber = Integer.parseInt(startMatcher.group(1));
                     if (recordNumber < 0) {
@@ -233,7 +226,7 @@ public class ReportFile {
                     within = true;
                     continue;
                 }
-                if (within && ReportWriter.END.matcher(line).matches()) break;
+                if (within && ReportStrings.END.matcher(line).matches()) break;
                 if (within) freshLines.add(line);
             }
             Swing.Exec.later(new Swing() {
@@ -275,7 +268,9 @@ public class ReportFile {
         }
 
         public Rec activate() {
-            touch = System.currentTimeMillis();
+            if (lines == null) {
+                touch = System.currentTimeMillis();
+            }
             return this;
         }
     }
@@ -306,7 +301,7 @@ public class ReportFile {
                     case VALID:
                         out.append(rec.lines.size()).append(" links ");
                         for (String line : rec.lines) {
-                            Matcher matcher = ReportWriter.LINK.matcher(line);
+                            ReportStrings.Match matcher = ReportStrings.LINK.matcher(line);
                             if (!matcher.matches()) continue; // RuntimeException?
                             RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
                             out.append(check);
@@ -414,7 +409,7 @@ public class ReportFile {
                 while (true) {
                     String line = in.readLine();
                     if (line == null) break;
-                    Matcher startMatcher = ReportWriter.START.matcher(line);
+                    ReportStrings.Match startMatcher = ReportStrings.START.matcher(line);
                     if (startMatcher.matches()) {
                         int recordNumber = Integer.parseInt(startMatcher.group(1));
                         progressListener.setProgress(recordNumber);
@@ -425,13 +420,13 @@ public class ReportFile {
                         continue;
                     }
                     if (within) {
-                        if (ReportWriter.END.matcher(line).matches()) {
+                        if (ReportStrings.END.matcher(line).matches()) {
                             for (int walk = 0; walk < contains.length; walk++) {
                                 if (contains[walk]) presence[walk]++;
                             }
                             continue;
                         }
-                        Matcher matcher = ReportWriter.LINK.matcher(line);
+                        ReportStrings.Match matcher = ReportStrings.LINK.matcher(line);
                         if (!matcher.matches()) continue; // RuntimeException?
                         RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
                         contains[check.ordinal()] = true;
