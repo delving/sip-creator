@@ -60,8 +60,9 @@ public class ReportFileModel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (ReportFile reportFile : reportFiles) {
-                    if (reportFile.needsWork()) {
-                        sipModel.exec(reportFile.fetchRecords(reportFile.prepareFetch(), sipModel.getFeedback()));
+                    List<ReportFile.Rec> fetch = reportFile.prepareFetch();
+                    if (!fetch.isEmpty()) {
+                        sipModel.exec(reportFile.fetchRecords(fetch, sipModel.getFeedback()));
                     }
                     reportFile.maintainCache();
                 }

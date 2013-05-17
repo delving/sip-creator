@@ -4,6 +4,7 @@
     <test:sub-one>
         <test:sub-two>
             <test:abc-link test:a="fw">forward forward</test:abc-link>
+            <test:ab>one</test:ab>
         </test:sub-two>
         <test:events>
             <test:event test:thekey="man" test:theschema="http://gumby-and-pokey.com/definitions" test:thevalue="Clay Man">

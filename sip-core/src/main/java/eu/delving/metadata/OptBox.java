@@ -64,10 +64,6 @@ class OptBox {
         return new OptBox(CHILD, optList);
     }
 
-    public boolean isDictionary() {
-        return optList != null && optList.dictionary != null;
-    }
-
     public String getDictionaryName() {
         return optList.dictionary;
     }

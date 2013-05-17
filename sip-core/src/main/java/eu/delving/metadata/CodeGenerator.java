@@ -94,7 +94,7 @@ public class CodeGenerator {
             }
         }
         codeOut.line("// Dictionaries:");
-        for (NodeMapping nodeMapping : recDefTree.getNodeMappings()) toDictionaryCode(nodeMapping);
+        for (NodeMapping nodeMapping : recDefTree.getNodeMappings()) toLookupCode(nodeMapping);
         codeOut.line("// DSL Category wraps Builder call:");
         codeOut.line("boolean _absent_");
         codeOut.line("org.w3c.dom.Node outputNode");
@@ -119,7 +119,7 @@ public class CodeGenerator {
         if (recDefNode.isAttr() || !recDefNode.isPopulated()) return;
         if (editPath != null && !recDefNode.getPath().isFamilyOf(editPath.getNodeMapping().outputPath)) return;
         if (recDefNode.getNodeMappings().isEmpty()) {
-            if (recDefNode.isRootOpt()) {
+            if (recDefNode.isRootOptNoOptList()) {
                 Set<Path> siblingPaths = getSiblingInputPathsOfChildren(recDefNode);
                 if (siblingPaths != null && !siblingPaths.isEmpty()) {
                     NodeMapping nodeMapping = new NodeMapping().setOutputPath(recDefNode.getPath()).setInputPaths(siblingPaths);
@@ -185,7 +185,14 @@ public class CodeGenerator {
         if (path.isEmpty()) throw new RuntimeException("Empty path");
         if (path.size() == 1) {
             if (recDefNode.isLeafElem()) {
-                toLeafCode(recDefNode, nodeMapping, groovyParams);
+                if (recDefNode.getOptList() == null) {
+                    toLeafCode(recDefNode, nodeMapping, groovyParams);
+                }
+                else {
+                    boolean lookup = toLookupStatement(recDefNode, nodeMapping);
+                    toLeafCode(recDefNode, nodeMapping, groovyParams);
+                    if (lookup) codeOut._line("}");
+                }
             }
             else {
                 boolean lookup = toLookupStatement(recDefNode, nodeMapping);
@@ -234,14 +241,23 @@ public class CodeGenerator {
         OptBox optBox = recDefNode.getOptBox();
         if (optBox == null || optBox.role != ROOT) return false;
         NodeMapping valueNodeMapping = null;
-        for (RecDefNode candidate : recDefNode.getChildren()) {
-            if (candidate.getTag().equals(optBox.optList.value)) {
-                if (candidate.getNodeMappings().size() == 1) {
-                    valueNodeMapping = candidate.getNodeMappings().values().iterator().next();
+        if (optBox.optList.valuePresent) {
+            for (RecDefNode candidate : recDefNode.getChildren()) {
+                if (candidate.getTag().equals(optBox.optList.value)) {
+                    if (candidate.getNodeMappings().size() == 1) {
+                        valueNodeMapping = candidate.getNodeMappings().values().iterator().next();
+                    }
                 }
             }
         }
-        if (valueNodeMapping == null) {
+        if (nodeMapping.isConstant()) {
+            codeOut.line(
+                    "%s = lookup%s('%s')",
+                    optBox.getOptReference(), optBox.getDictionaryName(nodeMapping.getIndexWithinNode()),
+                    nodeMapping.getConstantValue()
+            );
+        }
+        else if (valueNodeMapping == null) {
             codeOut.line(
                     "%s = lookup%s(%s)",
                     optBox.getOptReference(), optBox.getDictionaryName(nodeMapping.getIndexWithinNode()),
@@ -345,15 +361,31 @@ public class CodeGenerator {
         if (editPath != null) {
             if (!editPath.isGeneratedCode()) {
                 String editedCode = editPath.getEditedCode(nodeMapping.recDefNode.getPath());
-                if (editedCode != null) {
-                    indentCode(editedCode, codeOut);
-                    return;
+                if (nodeMapping.isConstant()) {
+                    if (editedCode != null) {
+                        codeOut.line("'%s'", getConstantFromGroovyCode(stringToLines(editedCode)));
+                        return;
+                    }
+                    else if (nodeMapping.groovyCode != null) {
+                        codeOut.line("'%s'", nodeMapping.getConstantValue());
+                        return;
+                    }
                 }
-                else if (nodeMapping.groovyCode != null) {
-                    indentCode(nodeMapping.groovyCode, codeOut);
-                    return;
+                else {
+                    if (editedCode != null) {
+                        indentCode(editedCode, codeOut);
+                        return;
+                    }
+                    else if (nodeMapping.groovyCode != null) {
+                        indentCode(nodeMapping.groovyCode, codeOut);
+                        return;
+                    }
                 }
             }
+        }
+        else if (nodeMapping.isConstant()) {
+            codeOut.line("'%s'", nodeMapping.getConstantValue());
+            return;
         }
         else if (nodeMapping.groovyCode != null) {
             indentCode(nodeMapping.groovyCode, codeOut);
@@ -371,12 +403,12 @@ public class CodeGenerator {
         else if (path.size() == 1) {
             if (nodeMapping.hasMap()) {
                 String mapUsage = getMapUsage(nodeMapping);
-                codeOut.line(recDefNode.hasFunction()? String.format("%s(%s.toString())", recDefNode.getFunction(), mapUsage) : mapUsage);
+                codeOut.line(recDefNode.hasFunction() ? String.format("%s(%s.toString())", recDefNode.getFunction(), mapUsage) : mapUsage);
             }
             else {
                 String sanitize = recDefNode.getFieldType().equalsIgnoreCase("link") ? ".sanitizeURI()" : "";
-                if (path.peek().getLocalName().equals("constant")) {
-                    codeOut.line("'CONSTANT'");
+                if (nodeMapping.isConstant()) {
+                    codeOut.line("'%s'", nodeMapping.getConstantValue());
                 }
                 else if (recDefNode.hasFunction()) {
                     codeOut.line("\"${%s(%s)%s}\"", recDefNode.getFunction(), toLeafGroovyParam(path), sanitize);
@@ -472,28 +504,36 @@ public class CodeGenerator {
         return new NodeMapping().setInputPath(Path.create("input")).setOutputPath(nodeMapping.outputPath.takeFirst());
     }
 
-    private void toDictionaryCode(NodeMapping nodeMapping) {
-        if (!nodeMapping.hasDictionary()) return;
+    private void toLookupCode(NodeMapping nodeMapping) {
         OptBox optBox = nodeMapping.recDefNode.getOptBox();
-        if (optBox == null || optBox.role == CHILD) return;
         int index = nodeMapping.getIndexWithinNode();
-        codeOut.line_(String.format("def Dictionary%s = [", optBox.getDictionaryName(index)));
-        Iterator<Map.Entry<String, String>> walk = nodeMapping.dictionary.entrySet().iterator();
-        while (walk.hasNext()) {
-            Map.Entry<String, String> entry = walk.next();
-            codeOut.line(String.format("'''%s''':'''%s'''%s",
-                    sanitizeGroovy(entry.getKey()),
-                    sanitizeGroovy(entry.getValue()),
-                    walk.hasNext() ? "," : ""
-            ));
+        if (nodeMapping.hasDictionary()) {
+            if (optBox == null || optBox.role == CHILD) return;
+            codeOut.line_(String.format("def Dictionary%s = [", optBox.getDictionaryName(index)));
+            Iterator<Map.Entry<String, String>> walk = nodeMapping.dictionary.entrySet().iterator();
+            while (walk.hasNext()) {
+                Map.Entry<String, String> entry = walk.next();
+                codeOut.line(String.format("'''%s''':'''%s'''%s",
+                        sanitizeGroovy(entry.getKey()),
+                        sanitizeGroovy(entry.getValue()),
+                        walk.hasNext() ? "," : ""
+                ));
+            }
+            codeOut._line("]");
+            codeOut.line_("def lookup%s = { value ->", optBox.getDictionaryName(index));
+            codeOut.line("   if (!value) return null");
+            codeOut.line("   String optKey = Dictionary%s[value.sanitize()]", optBox.getDictionaryName(index));
+            codeOut.line("   if (!optKey) optKey = value");
+            codeOut.line("   _optLookup['%s'][optKey]", optBox.getDictionaryName());
+            codeOut._line("}");
         }
-        codeOut._line("]");
-        codeOut.line_("def lookup%s = { value ->", optBox.getDictionaryName(index));
-        codeOut.line("   if (!value) return null");
-        codeOut.line("   String optKey = Dictionary%s[value.sanitize()]", optBox.getDictionaryName(index));
-        codeOut.line("   if (!optKey) optKey = value");
-        codeOut.line("   _optLookup['%s'][optKey]", optBox.getDictionaryName());
-        codeOut._line("}");
+        else {
+            if (optBox == null || optBox.optList == null || optBox.optList.valuePresent) return;
+            codeOut.line_("def lookup%s = { value ->", optBox.getDictionaryName(index));
+            codeOut.line("   if (!value) return null");
+            codeOut.line("   _optLookup['%s'][value.toString()]", optBox.getDictionaryName());
+            codeOut._line("}");
+        }
     }
 
     private String toLoopGroovyParam(Path path) {

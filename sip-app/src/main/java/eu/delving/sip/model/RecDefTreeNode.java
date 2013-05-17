@@ -156,6 +156,10 @@ public class RecDefTreeNode extends FilterNode {
         this.recDefNode.addNodeMapping(nodeMapping);
     }
 
+    public void removeNodeMapping(NodeMapping nodeMapping) {
+        this.recDefNode.removeNodeMapping(nodeMapping.inputPath);
+    }
+
     public RecDefTreeNode getRecDefTreeNode(RecDefNode node) {
         if (recDefNode == node) return this;
         for (RecDefTreeNode child : children) {

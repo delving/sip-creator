@@ -22,6 +22,7 @@
 package eu.delving.sip.model;
 
 import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.Path;
 import eu.delving.sip.base.SwingHelper;
 
 import javax.swing.DefaultListCellRenderer;
@@ -94,17 +95,8 @@ public class NodeMappingEntry {
 
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean selected, boolean cellHasFocus) {
             NodeMappingEntry entry = (NodeMappingEntry) value;
-            String string = entry.nodeMapping.getHtml(sourceTargetOrdering, MAX_LENGTH);
+            String string = getHtml(entry.nodeMapping);
             JLabel label = (JLabel) super.getListCellRendererComponent(list, string, index, selected, cellHasFocus);
-            if (entry.getNodeMapping().recDefNode.isAttr()) {
-                setIcon(SwingHelper.ICON_ATTRIBUTE);
-            }
-            else if (entry.getNodeMapping().recDefNode.isLeafElem()) {
-                setIcon(SwingHelper.ICON_VALUE);
-            }
-            else {
-                setIcon(SwingHelper.ICON_COMPOSITE);
-            }
             if (entry.isHighlighted()) {
                 setBackground(SwingHelper.HILIGHTED_COLOR);
             }
@@ -112,6 +104,34 @@ public class NodeMappingEntry {
                 setBackground(selected ? list.getSelectionBackground() : list.getBackground());
             }
             return label;
+        }
+
+        public String getHtml(NodeMapping nodeMapping) {
+            if (nodeMapping.recDefNode == null) return "No RecDefNode";
+            StringBuilder html = new StringBuilder("<html><font size=+1>");
+            html.append(nodeMapping.groovyCode == null ? "<p>" : "<b>");
+            String input = nodeMapping.createInputString();
+            String targetTail = nodeMapping.recDefNode.getPath().getTail();
+            if (input.equals(targetTail)) {
+                html.append(input);
+            }
+            else if (sourceTargetOrdering) {
+                html.append(String.format("%s &rarr; %s", input, targetTail));
+            }
+            else {
+                html.append(String.format("%s &larr; %s", targetTail, input));
+            }
+            html.append(nodeMapping.groovyCode == null ? "</p>" : "</b>");
+            html.append("</font>");
+            html.append("<hr>");
+            html.append("<table border=0 cellpadding=0>");
+            html.append("<tr><td width=30></td><td><i>");
+            for (Path path : nodeMapping.getInputPaths()) html.append(path).append("<br>");
+            html.append("&rarr; ").append(nodeMapping.outputPath);
+            if (nodeMapping.groovyCode != null) html.append("</b>");
+            html.append("</i></td><tr>");
+            html.append("</table>");
+            return html.toString();
         }
 
     }

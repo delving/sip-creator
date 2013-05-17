@@ -142,16 +142,6 @@ public class TestMappingValidation {
     }
 
     @Test
-    public void testAff() throws Exception {
-        mock.prepareDataset(
-                "aff",
-                "/recordList/record",
-                "/recordList/record/object_number"
-        );
-        runFullCycle(4);
-    }
-
-    @Test
     public void testAbm() throws Exception {
         mock.prepareDataset(
                 "abm",

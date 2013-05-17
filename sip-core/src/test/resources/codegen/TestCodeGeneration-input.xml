@@ -4,7 +4,7 @@
              <member index="23">
                  <name>Gumby Dammit</name>
                  <concept>superhero</concept>
-                 <concept>ssavior</concept>
+                 <concept>savior</concept>
                  <zig>left</zig>
                  <zag>right</zag>
                  <body>
@@ -15,6 +15,7 @@
                          </limbs>
                      </parts>
                  </body>
+                 <number-a>one</number-a>
              </member>
              <member index="45">
                  <name><![CDATA[<]]>O'Po<![CDATA[k]]>ey<![CDATA[>]]></name>
@@ -30,6 +31,8 @@
                          </limbs>
                      </parts>
                  </body>
+                 <!--the value four is not in the opt values so it vanishes-->
+                 <number-a>four</number-a>
              </member>
         </list>
         <fromOne>look this up</fromOne>

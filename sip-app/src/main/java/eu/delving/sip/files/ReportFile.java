@@ -30,7 +30,6 @@ import eu.delving.sip.model.Feedback;
 import eu.delving.sip.xml.ResultLinkChecks;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.http.HttpStatus;
 
 import javax.swing.*;
 import java.awt.Component;
@@ -38,7 +37,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import static eu.delving.sip.base.SwingHelper.REPORT_ERROR;
 import static eu.delving.sip.base.SwingHelper.REPORT_OK;
@@ -51,39 +49,40 @@ import static eu.delving.sip.files.ReportWriter.ReportType.VALID;
  */
 
 public class ReportFile {
-    private static final long BACKTRACK = 10000;
+    private static final long LONG_SIZE = 8;
     private static final int MAX_CACHE = 1000;
     private final DataSet dataSet;
     private final String prefix;
     private final File reportFile;
-    private RandomAccessFile randomAccess;
+    private final LinkFile linkFile;
+    private RandomAccessFile reportAccess;
+    private RandomAccessFile reportIndexAccess;
     private List<Rec> recs;
-    private Rec lastRec;
-    private LinkFile linkFile;
+    private List<Rec> invalidRecs;
     private LinkChecker linkChecker;
     private ResultLinkChecks resultLinkChecks;
     private boolean allVisible;
     private All all = new All();
     private OnlyInvalid onlyInvalid = new OnlyInvalid();
 
-    public ReportFile(File reportFile, File linkFile, DataSet dataSet, String prefix) throws IOException {
+    public ReportFile(File reportFile, File reportIndexFile, File invalidFile, File linkFile, DataSet dataSet, String prefix) throws IOException {
         this.reportFile = reportFile;
-        this.randomAccess = new RandomAccessFile(this.reportFile, "r");
+        this.reportAccess = new RandomAccessFile(this.reportFile, "r");
+        this.reportIndexAccess = new RandomAccessFile(reportIndexFile, "r");
         this.linkFile = new LinkFile(linkFile, dataSet, prefix);
         this.dataSet = dataSet;
         this.prefix = prefix;
-        long seekEnd = randomAccess.length() - BACKTRACK;
-        if (seekEnd < 0) seekEnd = 0;
-        randomAccess.seek(seekEnd);
-        while (true) {
-            Rec rec = new Rec();
-            rec.readIn(false);
-            if (rec.getRecordNumber() < 0) break;
-            lastRec = rec;
-        }
-        int recordCount = lastRec.getRecordNumber() + 1;
+        int recordCount = (int) (reportIndexAccess.length() / LONG_SIZE);
         recs = new ArrayList<Rec>(recordCount);
-        while (recs.size() < recordCount) recs.add(new Rec());
+        for (int walk = 0; walk < recordCount; walk++) recs.add(new Rec(walk));
+        DataInputStream invalidIn = new DataInputStream(new FileInputStream(invalidFile));
+        int invalidCount = invalidIn.readInt();
+        invalidRecs = new ArrayList<Rec>(invalidCount);
+        for (int walk = 0; walk < invalidCount; walk++) {
+            int recordNumber = invalidIn.readInt();
+            invalidRecs.add(recs.get(recordNumber));
+        }
+        invalidIn.close();
     }
 
     public ListModel getAll() {
@@ -117,11 +116,6 @@ public class ReportFile {
         return prefix;
     }
 
-    public boolean needsWork() {
-        for (Rec rec : recs) if (rec.needsReading()) return true;
-        return false;
-    }
-
     public void maintainCache() {
         int count = 0;
         for (Rec rec : recs) if (rec.lines != null) count++;
@@ -136,28 +130,15 @@ public class ReportFile {
         }
     }
 
-    public Fetch prepareFetch() {
-        Fetch fetch = new Fetch();
-        int index = 0;
+    public List<Rec> prepareFetch() {
+        List<Rec> recsToRead = new ArrayList<Rec>();
         for (Rec rec : recs) {
-            if (rec.needsReading()) fetch.add(index, rec);
-            index++;
+            if (rec.needsReading()) recsToRead.add(rec);
         }
-        return fetch;
+        return recsToRead;
     }
 
-    public class Fetch {
-        private List<Rec> recsToRead = new ArrayList<Rec>();
-        private int firstIndex = -1, lastIndex;
-
-        public void add(int index, Rec rec) {
-            recsToRead.add(rec);
-            if (firstIndex < 0) firstIndex = index;
-            lastIndex = index;
-        }
-    }
-
-    public Work fetchRecords(final Fetch fetch, final Feedback feedback) {
+    public Work fetchRecords(final List<Rec> recsToRead, final Feedback feedback) {
         return new Work.DataSetPrefixWork() {
             @Override
             public Job getJob() {
@@ -166,34 +147,14 @@ public class ReportFile {
 
             @Override
             public void run() {
-                if (fetch.recsToRead.isEmpty()) return;
-                List<Rec> safeRecs = new ArrayList<Rec>(recs);
-                Rec lastReadRec = null;
-                boolean anyUnread = false;
-                for (Rec rec : safeRecs) {
-                    if (rec.getRecordNumber() >= 0) {
-                        lastReadRec = rec;
-                    }
-                    else {
-                        anyUnread = true;
-                    }
-                }
                 try {
-                    int from = 0;
-                    if (lastReadRec == null) {
-                        randomAccess.seek(0);
-                    }
-                    else if (anyUnread) {
-                        lastReadRec.lines = null;
-                        lastReadRec.readIn(true); // re-read
-                        from = lastReadRec.getRecordNumber();
-                    }
-                    else {
-                        from = fetch.firstIndex;
-                    }
-                    for (int walk = from; walk <= fetch.lastIndex; walk++) {
-                        Rec rec = safeRecs.get(walk);
-                        rec.readIn(fetch.recsToRead.contains(rec));
+                    for (Rec rec : recsToRead) {
+                        if (rec.seekPos < 0) {
+                            int recordNumber = rec.getRecordNumber();
+                            reportIndexAccess.seek(recordNumber * LONG_SIZE);
+                            rec.seekPos = reportIndexAccess.readLong();
+                        }
+                        rec.readIn();
                     }
                 }
                 catch (IOException e) {
@@ -214,46 +175,42 @@ public class ReportFile {
     }
 
     public void close() {
-        IOUtils.closeQuietly(randomAccess);
+        IOUtils.closeQuietly(reportIndexAccess);
+        IOUtils.closeQuietly(reportAccess);
     }
 
     public class Rec {
-        private int recordNumber = -1;
+        private int recordNumber;
         private long seekPos = -1;
         private long touch;
-        private ReportWriter.ReportType reportType;
+        private ReportWriter.ReportType reportType = ReportWriter.ReportType.UNEXPECTED;
         private String localId;
         private String error;
         private List<String> lines;
+
+        public Rec(int recordNumber) {
+            this.recordNumber = recordNumber;
+        }
 
         public int getRecordNumber() {
             return recordNumber;
         }
 
-        public boolean isInvalid() {
-            return ReportWriter.ReportType.VALID != reportType;
-        }
-
-        public void readIn(boolean keep) throws IOException {
-            if (seekPos < 0) {
-                seekPos = randomAccess.getFilePointer();
-            }
-            else if (randomAccess.getFilePointer() != seekPos) {
-                randomAccess.seek(seekPos);
-            }
-            final List<String> freshLines = keep ? new ArrayList<String>() : null;
+        public void readIn() throws IOException {
+            reportAccess.seek(seekPos);
+            final List<String> freshLines = new ArrayList<String>();
             boolean within = false;
             while (true) {
-                String line = randomAccess.readLine();
+                String line = reportAccess.readLine();
                 if (line == null) break;
-                Matcher startMatcher = ReportWriter.START.matcher(line);
+                ReportStrings.Match startMatcher = ReportStrings.START.matcher(line);
                 if (startMatcher.matches()) {
                     int startRecordNumber = Integer.parseInt(startMatcher.group(1));
                     if (recordNumber < 0) {
                         recordNumber = startRecordNumber;
                     }
-                    else if (recordNumber != startRecordNumber) {
-                        throw new RuntimeException("What??" + recordNumber + "," + startRecordNumber);
+                    else if (startRecordNumber != recordNumber) {
+                        throw new RuntimeException("Record number discrepancy: " + startRecordNumber + "vs" + recordNumber);
                     }
                     reportType = ReportWriter.ReportType.valueOf(startMatcher.group(2));
                     switch (reportType) {
@@ -269,10 +226,10 @@ public class ReportFile {
                     within = true;
                     continue;
                 }
-                if (within && ReportWriter.END.matcher(line).matches()) break;
-                if (within && freshLines != null) freshLines.add(line);
+                if (within && ReportStrings.END.matcher(line).matches()) break;
+                if (within) freshLines.add(line);
             }
-            if (freshLines != null) Swing.Exec.later(new Swing() {
+            Swing.Exec.later(new Swing() {
                 @Override
                 public void run() {
                     lines = freshLines;
@@ -311,7 +268,9 @@ public class ReportFile {
         }
 
         public Rec activate() {
-            touch = System.currentTimeMillis();
+            if (lines == null) {
+                touch = System.currentTimeMillis();
+            }
             return this;
         }
     }
@@ -342,7 +301,7 @@ public class ReportFile {
                     case VALID:
                         out.append(rec.lines.size()).append(" links ");
                         for (String line : rec.lines) {
-                            Matcher matcher = ReportWriter.LINK.matcher(line);
+                            ReportStrings.Match matcher = ReportStrings.LINK.matcher(line);
                             if (!matcher.matches()) continue; // RuntimeException?
                             RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
                             out.append(check);
@@ -358,14 +317,6 @@ public class ReportFile {
                                     }
                                     else {
                                         out.append(":").append(linkCheck.getTime());
-                                        linkCheck.ok = linkCheck.httpStatus == HttpStatus.SC_OK;
-                                        switch (check) {
-                                            case DEEP_ZOOM:
-                                                if (linkCheck.ok) {
-                                                    linkCheck.ok = "application/xml".equals(linkCheck.mimeType);
-                                                }
-                                                break;
-                                        }
                                         out.append(linkCheck.ok ? "\u2714 " : "\u2716 ");
                                     }
                                 }
@@ -445,7 +396,7 @@ public class ReportFile {
         @Override
         public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
-            this.progressListener.prepareFor(lastRec.getRecordNumber());
+            this.progressListener.prepareFor(recs.size());
         }
 
         @Override
@@ -458,7 +409,7 @@ public class ReportFile {
                 while (true) {
                     String line = in.readLine();
                     if (line == null) break;
-                    Matcher startMatcher = ReportWriter.START.matcher(line);
+                    ReportStrings.Match startMatcher = ReportStrings.START.matcher(line);
                     if (startMatcher.matches()) {
                         int recordNumber = Integer.parseInt(startMatcher.group(1));
                         progressListener.setProgress(recordNumber);
@@ -469,19 +420,19 @@ public class ReportFile {
                         continue;
                     }
                     if (within) {
-                        if (ReportWriter.END.matcher(line).matches()) {
+                        if (ReportStrings.END.matcher(line).matches()) {
                             for (int walk = 0; walk < contains.length; walk++) {
                                 if (contains[walk]) presence[walk]++;
                             }
                             continue;
                         }
-                        Matcher matcher = ReportWriter.LINK.matcher(line);
+                        ReportStrings.Match matcher = ReportStrings.LINK.matcher(line);
                         if (!matcher.matches()) continue; // RuntimeException?
                         RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
                         contains[check.ordinal()] = true;
                     }
                 }
-                callback.presenceCounts(presence, lastRec.getRecordNumber() + 1);
+                callback.presenceCounts(presence, recs.size());
             }
             catch (IOException e) {
                 feedback.alert("Unable to gather output statistics", e);
@@ -498,7 +449,7 @@ public class ReportFile {
     public class All extends AbstractListModel {
         @Override
         public int getSize() {
-            return lastRec == null ? 0 : lastRec.getRecordNumber() + 1;
+            return recs.size();
         }
 
         @Override
@@ -512,57 +463,6 @@ public class ReportFile {
     }
 
     public class OnlyInvalid extends AbstractListModel {
-        private List<Rec> invalidRecs = new ArrayList<Rec>();
-
-        public Work refresh(final Feedback feedback, final Swing after) {
-            return new Work.DataSetPrefixWork() {
-                @Override
-                public void run() {
-                    try {
-                    boolean missing = false;
-                    for (Rec rec : recs) if (rec.getRecordNumber() < 0) missing = true;
-                    if (missing) {
-                        try {
-                            randomAccess.seek(0);
-                            for (Rec rec : recs) rec.readIn(false);
-                        }
-                        catch (IOException e) {
-                            feedback.alert("Problem scanning report file", e);
-                        }
-                    }
-                    Swing.Exec.later(new Swing() {
-                        @Override
-                        public void run() {
-                            final int wasSize = invalidRecs.size();
-                            invalidRecs.clear();
-                            if (wasSize > 0) fireIntervalRemoved(OnlyInvalid.this, 0, wasSize - 1);
-                            for (Rec rec : recs) if (rec.isInvalid()) invalidRecs.add(rec.activate());
-                            if (!invalidRecs.isEmpty()) fireIntervalAdded(OnlyInvalid.this, 0, getSize() - 1);
-                        }
-                    });
-                    }
-                    finally {
-                        after.run();;
-                    }
-                }
-
-                @Override
-                public String getPrefix() {
-                    return prefix;
-                }
-
-                @Override
-                public DataSet getDataSet() {
-                    return dataSet;
-                }
-
-                @Override
-                public Job getJob() {
-                    return Job.LOAD_REPORT;
-                }
-            };
-        }
-
         @Override
         public int getSize() {
             return invalidRecs.size();
@@ -570,7 +470,7 @@ public class ReportFile {
 
         @Override
         public Object getElementAt(int index) {
-            return invalidRecs.get(index);
+            return invalidRecs.get(index).activate();
         }
 
         public void fireContentsChanged(int recordNumber) {

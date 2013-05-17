@@ -27,14 +27,13 @@ import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.LinkCheck;
 import eu.delving.sip.files.LinkChecker;
-import eu.delving.sip.files.ReportWriter;
+import eu.delving.sip.files.ReportStrings;
 import eu.delving.sip.model.Feedback;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 
 /**
  * Gather the link checks from valid records coming from the MappingResultImpl
@@ -78,7 +77,7 @@ public class ResultLinkChecks {
                 try {
                     boolean linkChecked = false;
                     for (String line : safeLines) {
-                        Matcher matcher = ReportWriter.LINK.matcher(line);
+                        ReportStrings.Match matcher = ReportStrings.LINK.matcher(line);
                         if (!matcher.matches()) continue; // RuntimeException?
                         RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
                         if (!check.fetch) continue;
@@ -102,7 +101,7 @@ public class ResultLinkChecks {
     public static void validLinesToHTML(List<String> lines, LinkChecker linkChecker, StringBuilder out) {
         out.append("<table width='100%'>\n");
         for (String line : lines) {
-            Matcher matcher = ReportWriter.LINK.matcher(line);
+            ReportStrings.Match matcher = ReportStrings.LINK.matcher(line);
             if (!matcher.matches()) continue; // RuntimeException?
             RecDef.Check check = RecDef.Check.valueOf(matcher.group(1));
             String content = matcher.group(2);

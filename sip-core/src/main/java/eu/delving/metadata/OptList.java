@@ -62,22 +62,30 @@ public class OptList {
     @XStreamImplicit
     public List<Opt> opts;
 
+    @XStreamOmitField
+    public boolean valuePresent;
+
     public void resolve(RecDef recDef) {
         for (Opt opt : opts) opt.parent = this;
-        if (path == null) throw new RuntimeException("No path for OptList: " + opts);
-        if (path.peek().isAttribute()) throw new RuntimeException("No option list on an attribute: " + path);
+        if (path == null) throw new RuntimeException("No path for opt-list: " + opts);
+        if (dictionary == null) throw new RuntimeException("An opt-list must have a dictionary: " + opts);
+        if (path.peek().isAttribute()) throw new RuntimeException("No opt-list allowed on an attribute: " + path);
         path = path.withDefaultPrefix(recDef.prefix);
-        value = value == null ? path.peek() : value.defaultPrefix(recDef.prefix);
+        if (value == null) {
+            value = path.peek();
+        }
+        else {
+            value = value.defaultPrefix(recDef.prefix);
+            valuePresent = true;
+        }
         key = resolveTag(path, key, recDef);
         schema = resolveTag(path, schema, recDef);
         schemaUri = resolveTag(path, schemaUri, recDef);
         RecDef.Elem elem = recDef.findElem(path);
         elem.optList = this;
-        if (dictionary != null) {
-            Map<String, Opt> valueLookup = new TreeMap<String, Opt>();
-            for (Opt opt : opts) valueLookup.put(opt.value, opt);
-            recDef.valueOptLookup.put(dictionary, valueLookup);
-        }
+        Map<String, Opt> valueLookup = new TreeMap<String, Opt>();
+        for (Opt opt : opts) valueLookup.put(opt.value, opt);
+        recDef.valueOptLookup.put(dictionary, valueLookup);
     }
 
     private Path resolveTag(Path path, Path pathX, RecDef recDef) {

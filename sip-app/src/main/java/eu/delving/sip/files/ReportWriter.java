@@ -28,12 +28,10 @@ import eu.delving.groovy.XmlNodePrinter;
 import eu.delving.groovy.XmlSerializer;
 import eu.delving.sip.xml.LinkCheckExtractor;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.output.CountingOutputStream;
 
 import javax.xml.xpath.XPathExpressionException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.regex.Pattern;
+import java.io.*;
 
 /**
  * Describes how a report is written during dataset processing
@@ -42,14 +40,14 @@ import java.util.regex.Pattern;
  */
 
 public class ReportWriter {
-    public static final String DIVIDER = "::::::::::::::::::::::::::::::::::::::::";
-    public static Pattern START = Pattern.compile("<<(\\d+),([^>]+)>>(.*)");
-    public static Pattern END = Pattern.compile("<<>>");
-    public static Pattern LINK = Pattern.compile("<<<([^>]+)>>>(.*)");
+    public static final String DIVIDER = "::::";
     private XmlSerializer serializer = new XmlSerializer();
-    private File file;
+    private File reportFile;
+    private File reportIndexFile;
     private LinkCheckExtractor linkCheckExtractor;
-    private PrintWriter out;
+    private CountingOutputStream count;
+    private Writer out;
+    private DataOutputStream indexOut;
     private int recordNumber;
 
     public enum ReportType {
@@ -59,59 +57,82 @@ public class ReportWriter {
         UNEXPECTED
     }
 
-    public ReportWriter(File file, LinkCheckExtractor linkCheckExtractor) throws FileNotFoundException, XPathExpressionException {
-        this.file = file;
+    public ReportWriter(File reportFile, File reportIndexFile, LinkCheckExtractor linkCheckExtractor) throws FileNotFoundException, XPathExpressionException, UnsupportedEncodingException {
+        this.reportFile = reportFile;
+        this.reportIndexFile = reportIndexFile;
         this.linkCheckExtractor = linkCheckExtractor;
-        this.out = new PrintWriter(file);
+        this.indexOut = new DataOutputStream(new FileOutputStream(reportIndexFile));
+        this.count = new CountingOutputStream(new FileOutputStream(reportFile));
+        this.out = new OutputStreamWriter(count, "UTF-8");
     }
 
-    public void valid(String id, MappingResult mappingResult) throws XPathExpressionException {
+    public void valid(String id, MappingResult mappingResult) throws XPathExpressionException, IOException {
         report(ReportType.VALID, id);
         for (String line : linkCheckExtractor.getChecks(mappingResult)) {
-            out.println(line);
+            out.write(line);
+            out.write("\n");
         }
         terminate();
     }
 
-    public void invalid(MappingResult mappingResult, Exception e) {
+    public void invalid(MappingResult mappingResult, Exception e) throws IOException {
         report(ReportType.INVALID, e.getMessage());
-        out.print(serializer.toXml(mappingResult.root(), true));
+        out.write(serializer.toXml(mappingResult.root(), true));
         terminate();
     }
 
-    public void discarded(MetadataRecord inputRecord, String discardMessage) {
+    public void discarded(MetadataRecord inputRecord, String discardMessage) throws IOException {
         report(ReportType.DISCARDED, discardMessage);
-        out.println("Reason: " + discardMessage);
-        out.print(XmlNodePrinter.toXml(inputRecord.getRootNode()));
+        out.write("Reason: ");
+        out.write(discardMessage);
+        out.write("\n");
+        out.write(XmlNodePrinter.toXml(inputRecord.getRootNode()));
         terminate();
     }
 
-    public void unexpected(MetadataRecord inputRecord, MappingException exception) {
+    public void unexpected(MetadataRecord inputRecord, MappingException exception) throws IOException {
         report(ReportType.UNEXPECTED, exception.getMessage());
-        exception.printStackTrace(out);
-        out.print(XmlNodePrinter.toXml(inputRecord.getRootNode()));
+        exception.printStackTrace(new PrintWriter(out));
+        out.write(XmlNodePrinter.toXml(inputRecord.getRootNode()));
         terminate();
     }
 
     public void abort() {
-        out.close();
-        FileUtils.deleteQuietly(file);
+        try {
+            out.close();
+            indexOut.close();
+        }
+        catch (IOException e) {
+            throw new RuntimeException("Unable to close", e);
+        }
+        FileUtils.deleteQuietly(reportFile);
+        FileUtils.deleteQuietly(reportIndexFile);
     }
 
     public void finish(int validCount, int invalidCount) {
-        out.println(DIVIDER);
-        out.println("Validation was completed:");
-        out.println("Total Valid Records: " + validCount);
-        out.println("Total Invalid Records: " + invalidCount);
-        out.println("Total Records: " + (validCount + invalidCount));
-        out.close();
+        try {
+            indexOut.close();
+            out.flush();
+            out.write(DIVIDER);
+            out.write("\n");
+            out.write(String.format("total=%d\n", validCount + invalidCount));
+            out.write(String.format("valid=%d\n", validCount));
+            out.write(String.format("invalid=%d\n", invalidCount));
+            out.close();
+        }
+        catch (IOException e) {
+            throw new RuntimeException("Unable to finish report", e);
+        }
+
     }
 
-    private void report(ReportType type, String message) {
-        out.printf("<<%d,%s>>%s\n", recordNumber++, type, message);
+    private void report(ReportType type, String message) throws IOException {
+        out.flush();
+        indexOut.writeLong(count.getByteCount());
+        out.write(String.format("<<%d,%s>>%s\n", recordNumber++, type, message));
     }
 
-    private void terminate() {
-        out.println("<<>>");
+    private void terminate() throws IOException {
+        out.write("<<>>\n");
     }
 }
