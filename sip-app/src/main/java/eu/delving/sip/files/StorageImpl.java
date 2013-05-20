@@ -503,8 +503,8 @@ public class StorageImpl implements Storage {
             try {
                 File reportFile = reportFile(here, prefix);
                 File reportIndexFile = reportIndexFile(here, prefix);
-                File invalidFile = new File(here, FileType.VALIDATION.getName(prefix));
-                return reportFile.exists() ? new ReportFile(reportFile, reportIndexFile, invalidFile, linkFile(here, prefix), this, prefix)  : null;
+                File validationFile = validationFile(here, prefix);
+                return reportFile.exists() ? new ReportFile(reportFile, reportIndexFile, validationFile, linkFile(here, prefix), this, prefix)  : null;
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
@@ -523,10 +523,10 @@ public class StorageImpl implements Storage {
                 files.add(Hasher.ensureFileHashed(hintsFile(here)));
                 for (SchemaVersion schemaVersion : getSchemaVersions()) {
                     String prefix = schemaVersion.getPrefix();
-                    files.add(findLatestHashed(here, MAPPING, prefix));
-                    files.add(findLatestHashed(here, VALIDATION, prefix));
-                    files.add(findLatestHashed(here, RESULT_STATS, prefix));
-                    files.add(findLatestHashed(here, LINKS, prefix));
+                    addLatestHashed(here, MAPPING, prefix, files);
+                    addLatestHashed(here, VALIDATION, prefix, files);
+                    addLatestHashed(here, RESULT_STATS, prefix, files);
+                    addLatestHashed(here, LINKS, prefix, files);
                 }
                 files.add(Hasher.ensureFileHashed(sourceFile(here)));
                 return files;
