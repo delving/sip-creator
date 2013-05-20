@@ -70,6 +70,9 @@ public class LinkChecker {
         linkCheck.spec = spec;
         linkCheck.orgId = orgId;
         linkCheck.localId = localId;
+        if (check == RecDef.Check.DEEP_ZOOM && linkCheck.ok) {
+            linkCheck.ok = "application/xml".equals(linkCheck.mimeType);
+        }
         log.info(String.format("Found %s by requesting: %s", url, linkCheck));
         map.put(url, linkCheck);
         return linkCheck;
@@ -91,6 +94,7 @@ public class LinkChecker {
         linkCheck.mimeType = contentType == null ? null : contentType.getValue();
         Header contentLength = response.getLastHeader("Content-Length");
         linkCheck.fileSize = contentLength == null ? -1 : Integer.parseInt(contentLength.getValue());
+        linkCheck.ok = linkCheck.httpStatus == HttpStatus.SC_OK;
         EntityUtils.consume(response.getEntity());
         return linkCheck;
     }

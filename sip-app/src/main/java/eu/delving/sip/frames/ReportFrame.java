@@ -215,15 +215,8 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
-                        controlsEnabled(false);
                         ReportFile.OnlyInvalid onlyInvalid = report.getOnlyInvalid();
                         list.setModel(onlyInvalid);
-                        sipModel.exec(onlyInvalid.refresh(sipModel.getFeedback(), new Swing() {
-                            @Override
-                            public void run() {
-                                controlsEnabled(true);
-                            }
-                        }));
                     }
                     else {
                         list.setModel(report.getAll());
@@ -244,12 +237,16 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (activeLinkChecks.size() >= MAX_ACTIVE_CHECKS) return;
-            int visible = Math.min(currentIndex + VISIBLE_JUMP, list.getModel().getSize() - 1);
-            if (list.getLastVisibleIndex() < currentIndex + VISIBLE_JUMP / 2) list.ensureIndexIsVisible(visible);
-            list.setSelectedIndex(currentIndex);
-            currentIndex++;
-            if (currentIndex == list.getModel().getSize()) toggle.setSelected(false);
+            while (activeLinkChecks.size() < MAX_ACTIVE_CHECKS) {
+                int visible = Math.min(currentIndex + VISIBLE_JUMP, list.getModel().getSize() - 1);
+                if (list.getLastVisibleIndex() < currentIndex + VISIBLE_JUMP / 2) list.ensureIndexIsVisible(visible);
+                list.setSelectedIndex(currentIndex);
+                currentIndex++;
+                if (currentIndex == list.getModel().getSize()) {
+                    toggle.setSelected(false);
+                    break;
+                }
+            }
         }
 
         private class LoadAction extends AbstractAction {
@@ -349,7 +346,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         }
 
         @Override
-        public void linkStatistics(final Map<RecDef.Check,LinkFile.LinkStats> linkStatsMap) {
+        public void linkStatistics(final Map<RecDef.Check, LinkFile.LinkStats> linkStatsMap) {
             sipModel.exec(new Swing() {
                 @Override
                 public void run() {

@@ -87,6 +87,15 @@ public class NodeMapping {
         return inputPath.hashCode() + outputPath.hashCode();
     }
 
+    public boolean isConstant() {
+        return inputPath != null && "/constant".equals(inputPath.toString());
+    }
+
+    public String getConstantValue() {
+        if (groovyCode == null || groovyCode.isEmpty()) return "CONSTANT";
+        return getConstantFromGroovyCode(groovyCode);
+    }
+
     public int getIndexWithinNode() {
         int index = 0;
         for (NodeMapping nodeMapping : recDefNode.getNodeMappings().values()) {
@@ -137,6 +146,16 @@ public class NodeMapping {
 
     public boolean hasDictionary() {
         return dictionary != null;
+    }
+
+    public boolean hasOptList() {
+        return recDefNode.getOptList() != null;
+    }
+
+    public List<String> getOptListValues() {
+        List<String> values = new ArrayList<String>();
+        for (OptList.Opt opt : recDefNode.getOptList().opts) values.add(opt.value);
+        return values;
     }
 
     public SortedSet getSourceTreeNodes() {
@@ -223,26 +242,32 @@ public class NodeMapping {
         return recDefNode.isAttr() || recDefNode.isLeafElem();
     }
 
-    public String getHtml(boolean sourceTargetOrdering, int maxLength) {
-        if (recDefNode == null) return "No RecDefNode";
-        String input = inputPath.getTail(maxLength);
+    public String toSortString(boolean sourceTargetOrdering) {
+        String input = createInputString();
+        String targetTail = recDefNode.getPath().getTail();
+        if (input.equals(targetTail)) {
+            return input;
+        }
+        else if (sourceTargetOrdering) {
+            return String.format("%s >> %s", input, targetTail);
+        }
+        else {
+            return String.format("%s << %s", targetTail, input);
+        }
+    }
+
+    public String createInputString() {
+        String input = inputPath.getTail();
         if (hasMap()) {
             StringBuilder out = new StringBuilder();
             Iterator<Path> walk = getInputPaths().iterator();
             while (walk.hasNext()) {
-                out.append(walk.next().getTail(maxLength));
+                out.append(walk.next().getTail());
                 if (walk.hasNext()) out.append(", ");
             }
             input = out.toString();
         }
-        String wrap = groovyCode == null ? "p" : "b";
-        String targetTail = recDefNode.getPath().withoutPrefixes().getTail(maxLength);
-        if (sourceTargetOrdering) {
-            return String.format("<html><%s>%s &rarr; %s</%s>", wrap, input, targetTail, wrap);
-        }
-        else {
-            return String.format("<html><%s>%s &larr; %s</%s>", wrap, targetTail, input, wrap);
-        }
+        return input;
     }
 
     public String toString() {

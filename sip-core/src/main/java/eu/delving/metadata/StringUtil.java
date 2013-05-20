@@ -166,6 +166,15 @@ public class StringUtil {
         return lines.isEmpty() ? null : lines;
     }
 
+    public static String getConstantFromGroovyCode(List<String> groovyCode) {
+        String constant = groovyCode.get(0);
+        if ((constant.startsWith("'") && constant.endsWith("'")) ||
+                (constant.startsWith("\"") && constant.endsWith("\""))) {
+            constant = constant.substring(1, constant.length()-1);
+        }
+        return constant;
+    }
+
     public static void indentCode(String code, CodeOut out) {
         indentCode(Arrays.asList(code.split("\n")), out);
     }

@@ -26,8 +26,8 @@ import eu.delving.metadata.Path;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSetState;
-import eu.delving.sip.files.Storage;
 
+import javax.swing.JComboBox;
 import javax.swing.tree.TreePath;
 import java.util.Iterator;
 import java.util.List;
@@ -115,9 +115,26 @@ public class CreateModel {
         created.recDefNode = recDefTreeNode.getRecDefNode();
         SourceTreeNode.setStatsTreeNodes(sourceTreeNodes, created);
         recDefTreeNode.addNodeMapping(created);
-        if (created.hasOneSourceTreeNode() && created.inputPath.equals(Storage.CONSTANT_PATH)) {
-            String answer = sipModel.getFeedback().ask("Please enter the constant value");
-            created.setGroovyCode(String.format("'%s'", answer));
+        if (created.isConstant()) {
+            if (created.hasOptList()) {
+                JComboBox box = new JComboBox(created.getOptListValues().toArray());
+                while (true) {
+                    boolean ok = sipModel.getFeedback().form("Please choose the constant value", box);
+                    if (!ok) {
+                        SourceTreeNode.removeStatsTreeNodes(created);
+                        recDefTreeNode.removeNodeMapping(created); // remove it again
+                        return;
+                    }
+                    String selected = (String) box.getSelectedItem();
+                    if (selected != null) {
+                        created.setGroovyCode(selected);
+                        break;
+                    }
+                }
+            }
+            else {
+                created.setGroovyCode(sipModel.getFeedback().ask("Please enter the constant value"));
+            }
         }
         setNodeMappingInternal(created);
         adjustHighlights();
