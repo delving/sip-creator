@@ -93,7 +93,7 @@ public class ReportFileModel {
                 reportFile.setLinkChecker(new LinkChecker(getHttpClient()));
             }
             catch (StorageException e) {
-                sipModel.getFeedback().alert("Cannot read report file for " + schemaVersion.getPrefix());
+                sipModel.getFeedback().alert("Cannot read report file for " + schemaVersion.getPrefix(), e);
             }
         }
         sipModel.exec(new Swing() {
