@@ -191,6 +191,10 @@ public class StorageHelper {
         return new File(dir, REPORT_INDEX.getName(prefix));
     }
 
+    static File validationFile(File dir, String prefix) {
+        return findLatestFile(dir, VALIDATION, prefix);
+    }
+
     static File linkFile(File dir, String prefix) {
         return new File(dir, LINKS.getName(prefix));
     }
@@ -235,11 +239,11 @@ public class StorageHelper {
         return getRecent(files, which, fileType);
     }
 
-    static File findLatestHashed(File dir, FileType fileType, String prefix) throws StorageException {
+    static void addLatestHashed(File dir, FileType fileType, String prefix, List<File> list) throws StorageException {
         File latestFile = findLatestFile(dir, fileType, prefix);
-        if (!latestFile.exists()) throw new StorageException("Missing file " + latestFile.getAbsolutePath());
+        if (!latestFile.exists()) return;
         try {
-            return Hasher.ensureFileHashed(latestFile);
+            list.add(Hasher.ensureFileHashed(latestFile));
         }
         catch (IOException e) {
             throw new StorageException("Unable to hash file " + latestFile);
