@@ -504,7 +504,8 @@ public class StorageImpl implements Storage {
                 File reportFile = reportFile(here, prefix);
                 File reportIndexFile = reportIndexFile(here, prefix);
                 File validationFile = validationFile(here, prefix);
-                return reportFile.exists() ? new ReportFile(reportFile, reportIndexFile, validationFile, linkFile(here, prefix), this, prefix)  : null;
+                if (!(reportFile.exists() && reportIndexFile.exists() && validationFile.exists())) return null;
+                return new ReportFile(reportFile, reportIndexFile, validationFile, linkFile(here, prefix), this, prefix);
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);

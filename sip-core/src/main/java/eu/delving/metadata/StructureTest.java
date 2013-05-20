@@ -43,7 +43,7 @@ public class StructureTest {
     private XPathExpression parent;
     private XPathExpression test;
 
-    public static List<StructureTest> listFrom(RecDef recDef) throws XPathFactoryConfigurationException, XPathExpressionException {
+    public static List<StructureTest> listFrom(RecDef recDef) throws XPathFactoryConfigurationException {
         StructureTest.Factory factory = new StructureTest.Factory(XMLToolFactory.xpathFactory(), new XPathContext(recDef.namespaces));
         List<StructureTest> tests = new ArrayList<StructureTest>();
         collectStructureTests(recDef.root, Path.create(), tests, factory);
@@ -127,16 +127,33 @@ public class StructureTest {
         }
     }
 
-    private static void collectStructureTests(RecDef.Attr attr, Path path, List<StructureTest> tests, StructureTest.Factory factory) throws XPathExpressionException {
-        path = path.child(attr.tag);
-        if (attr.required) tests.add(factory.create(path, attr.required, false));
+    private static void collectStructureTests(RecDef.Attr attr, Path path, List<StructureTest> tests, StructureTest.Factory factory) {
+        try {
+            path = path.child(attr.tag);
+            if (attr.required) tests.add(factory.create(path, attr.required, false));
+        }
+        catch (XPathExpressionException e) {
+            throw new RuntimeException("XPath problem: " + path);
+        }
     }
 
-    private static void collectStructureTests(RecDef.Elem elem, Path path, List<StructureTest> tests, StructureTest.Factory factory) throws XPathExpressionException {
+    private static void collectStructureTests(RecDef.Elem elem, Path path, List<StructureTest> tests, StructureTest.Factory factory) {
         path = path.child(elem.tag);
-        if (elem.required || elem.singular) tests.add(factory.create(path, elem.required, elem.singular));
-        for (RecDef.Attr sub : elem.attrList) collectStructureTests(sub, path, tests, factory);
-        for (RecDef.Elem sub : elem.elemList) collectStructureTests(sub, path, tests, factory);
+        if (path.size() > 1 && elem.required || elem.singular) {
+            try {
+                tests.add(factory.create(path, elem.required, elem.singular));
+            }
+            catch (XPathExpressionException e) {
+                throw new RuntimeException("XPath problem: " + path);
+            }
+        }
+        for (RecDef.Attr sub : elem.attrList) {
+            collectStructureTests(sub, path, tests, factory);
+        }
+        for (RecDef.Elem sub : elem.elemList) {
+            collectStructureTests(sub, path, tests, factory);
+        }
+
     }
 
 }
