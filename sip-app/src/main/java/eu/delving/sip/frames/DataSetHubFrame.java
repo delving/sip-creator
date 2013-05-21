@@ -687,7 +687,7 @@ public class DataSetHubFrame extends FrameBase {
         BUSY(false, false, "busy", SwingHelper.ICON_BUSY),
         ORPHAN_TAKEN(true, false, "taken but present locally", ICON_HUH),
         ORPHAN_LONELY(true, false, "only present locally", ICON_HUH),
-        ORPHAN_UPDATE(false, true, "yours but absent locally)", ICON_HUH),
+        ORPHAN_UPDATE(false, true, "yours but absent locally", ICON_HUH),
         ORPHAN_ARCHIVE(true, true, "free but present locally", ICON_HUH),
         NEEDS_FETCH(true, false, "refresh to fetch culture hub info", ICON_OWNED);
 
