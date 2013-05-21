@@ -38,6 +38,8 @@ public class KeystrokeHelper {
     public static final KeyStroke SPACE = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0);
     public static final KeyStroke UP = KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0);
     public static final KeyStroke DOWN = KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0);
+    public static final KeyStroke LEFT = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0);
+    public static final KeyStroke RIGHT = KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0);
     public static final KeyStroke MENU_G = menuKeystroke(KeyEvent.VK_G);
     public static final KeyStroke MENU_E = menuKeystroke(KeyEvent.VK_E);
     public static final KeyStroke MENU_H = menuKeystroke(KeyEvent.VK_H);
