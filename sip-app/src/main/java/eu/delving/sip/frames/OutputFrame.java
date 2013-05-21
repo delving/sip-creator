@@ -146,7 +146,12 @@ public class OutputFrame extends FrameBase {
                     String first = documentEvent.getDocument().getText(0, 1);
                     final boolean error = first.startsWith("#");
                     setError(outputArea, error);
-                    outputArea.setCaretPosition(0);
+                    sipModel.exec(new Swing() {
+                        @Override
+                        public void run() {
+                            outputArea.setCaretPosition(0);
+                        }
+                    });
                 }
                 catch (BadLocationException e) {
                     // who cares
