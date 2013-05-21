@@ -294,6 +294,7 @@ public class RecDef {
         @XStreamImplicit
         public List<String> lines;
 
+        @XStreamImplicit
         public List<DocParagraph> paras;
 
         public void resolve(RecDef recDef) {
