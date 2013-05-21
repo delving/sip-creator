@@ -33,10 +33,7 @@ import eu.delving.sip.xml.LinkCheckExtractor;
 import eu.delving.sip.xml.ResultLinkChecks;
 import org.apache.http.client.HttpClient;
 
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
@@ -46,6 +43,10 @@ import javax.xml.xpath.XPathExpressionException;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Font;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import static eu.delving.sip.base.SwingHelper.scrollVH;
@@ -63,7 +64,11 @@ public class OutputFrame extends FrameBase {
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
     private JTabbedPane tabs = new JTabbedPane();
     private HttpClient httpClient = HttpClientFactory.createLinkCheckClient();
+    private JTextField searchField = new JTextField(25);
+    private JTextArea outputArea;
     private HtmlPanel htmlPanel;
+    private List<Integer> found = new ArrayList<Integer>();
+    private int foundSelected;
 
     public OutputFrame(final SipModel sipModel) {
         super(Which.OUTPUT, sipModel, "Output");
@@ -130,18 +135,23 @@ public class OutputFrame extends FrameBase {
     private JPanel createOutputPanel() {
         final JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Output record"));
-        final JTextArea area = new JTextArea(sipModel.getRecordCompileModel().getOutputDocument());
-        area.setLineWrap(true);
-        area.setFont(MONOSPACED);
-        area.setWrapStyleWord(true);
-        area.getDocument().addDocumentListener(new DocumentListener() {
+        outputArea = new JTextArea(sipModel.getRecordCompileModel().getOutputDocument());
+        outputArea.setLineWrap(true);
+        outputArea.setFont(MONOSPACED);
+        outputArea.setWrapStyleWord(true);
+        outputArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
                 try {
                     String first = documentEvent.getDocument().getText(0, 1);
                     final boolean error = first.startsWith("#");
-                    setError(area, error);
-                    area.setCaretPosition(0);
+                    setError(outputArea, error);
+                    sipModel.exec(new Swing() {
+                        @Override
+                        public void run() {
+                            outputArea.setCaretPosition(0);
+                        }
+                    });
                 }
                 catch (BadLocationException e) {
                     // who cares
@@ -156,7 +166,82 @@ public class OutputFrame extends FrameBase {
             public void changedUpdate(DocumentEvent documentEvent) {
             }
         });
-        p.add(scrollVH(area));
+        outputArea.getInputMap().put(KeystrokeHelper.DOWN, "next");
+        outputArea.getInputMap().put(KeystrokeHelper.RIGHT, "next");
+        outputArea.getInputMap().put(KeystrokeHelper.UP, "prev");
+        outputArea.getInputMap().put(KeystrokeHelper.LEFT, "prev");
+        outputArea.getActionMap().put("next", new NextAction());
+        outputArea.getActionMap().put("prev", new PrevAction());
+        searchField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                found.clear();
+                foundSelected = 0;
+                String xml = outputArea.getText().toLowerCase();
+                String sought = searchField.getText().toLowerCase();
+                if (!sought.isEmpty()) {
+                    int start = 0;
+                    while (found.size() < 30) {
+                        int pos = xml.indexOf(sought, start);
+                        if (pos < 0) break;
+                        found.add(pos);
+                        start = pos + sought.length();
+                    }
+                }
+                selectFound();
+            }
+        });
+        JPanel sp = new JPanel();
+        JLabel label = new JLabel("Search:", JLabel.RIGHT);
+        label.setLabelFor(searchField);
+        sp.add(label);
+        sp.add(searchField);
+        sp.add(new JLabel("Press ENTER, then use arrow keys"));
+        p.add(scrollVH(outputArea), BorderLayout.CENTER);
+        p.add(sp, BorderLayout.SOUTH);
         return p;
+    }
+
+    private class PrevAction extends AbstractAction {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            foundSelected--;
+            selectFound();
+        }
+    }
+
+    private class NextAction extends AbstractAction {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            foundSelected++;
+            selectFound();
+        }
+    }
+
+    private void selectFound() {
+        if (found.isEmpty()) {
+            outputArea.select(0, 0);
+        }
+        else {
+            foundSelected = (foundSelected + found.size()) % found.size();
+            final Integer pos = found.get(foundSelected);
+            final int findLength = searchField.getText().length();
+            if (findLength == 0) return;
+            outputArea.requestFocus();
+            sipModel.exec(new Swing() {
+                @Override
+                public void run() {
+                    try {
+                        Rectangle viewRect = outputArea.modelToView(pos);
+                        outputArea.scrollRectToVisible(viewRect);
+                        outputArea.setCaretPosition(pos);
+                        outputArea.moveCaretPosition(pos + findLength);
+                    }
+                    catch (BadLocationException e) {
+                        throw new RuntimeException("Location bad", e);
+                    }
+                }
+            });
+        }
     }
 }
