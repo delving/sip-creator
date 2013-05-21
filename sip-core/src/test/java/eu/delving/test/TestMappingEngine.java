@@ -108,10 +108,17 @@ public class TestMappingEngine {
         );
         MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("abm"));
         MappingResult result = mappingEngine.execute("validateABMNode", input("abm"));
+
 //        System.out.println(result.toXml());
+
         Source source = new DOMSource(result.root());
-        Validator validator = validator(new SchemaVersion("abm", "1.0.5"));
+        Validator validator = validator(new SchemaVersion("abm", "1.0.7"));
         validator.validate(source);
+
+        System.out.println("Fields:");
+        for (Map.Entry<String, List<String>> entry : result.fields().entrySet()) {
+            System.out.println(entry.getKey()+":"+entry.getValue());
+        }
 //        System.out.println("SystemFields:");
 //        System.out.println(result.copyFields());
     }
