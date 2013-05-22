@@ -65,7 +65,7 @@ public class TestCodeGeneration {
     public void cornucopia() throws IOException, XMLStreamException, MappingException {
         GroovyCodeResource resource = new GroovyCodeResource(getClass().getClassLoader());
         MappingRunner mappingRunner = new MappingRunner(resource, recMapping, null, true);
-        printWithLineNumbers(mappingRunner.getCode());
+//        printWithLineNumbers(mappingRunner.getCode());
         MetadataRecord inputRecord = createInputRecord();
         Node node = mappingRunner.runMapping(inputRecord);
         String xml = new XmlSerializer().toXml(node, true);

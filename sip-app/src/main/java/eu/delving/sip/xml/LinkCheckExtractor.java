@@ -23,7 +23,6 @@ package eu.delving.sip.xml;
 
 import eu.delving.MappingResult;
 import eu.delving.XMLToolFactory;
-import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.XPathContext;
 import net.sf.saxon.dom.DOMNodeList;
@@ -43,7 +42,7 @@ import java.util.Map;
 
 public class LinkCheckExtractor {
     private XPathFactory pathFactory = XMLToolFactory.xpathFactory();
-    private Map<Path, XPathExpression> expressionMap = new HashMap<Path, XPathExpression>();
+    private Map<String, XPathExpression> expressionMap = new HashMap<String, XPathExpression>();
     private List<RecDef.FieldMarker> fieldMarkers;
     private XPathContext pathContext;
 
@@ -51,16 +50,16 @@ public class LinkCheckExtractor {
         this.fieldMarkers = fieldMarkers;
         this.pathContext = pathContext;
         for (RecDef.FieldMarker fieldMarker : fieldMarkers) {
-            if (fieldMarker.check == null || fieldMarker.path == null) continue;
-            expressionMap.put(fieldMarker.path, createPath().compile(fieldMarker.path.toString()));
+            if (fieldMarker.check == null || !fieldMarker.hasPath()) continue;
+            expressionMap.put(fieldMarker.getXPath(), createPath().compile(fieldMarker.getXPath()));
         }
     }
 
     public List<String> getChecks(MappingResult mappingResult) throws XPathExpressionException {
         List<String> checks = new ArrayList<String>();
         for (RecDef.FieldMarker fieldMarker : fieldMarkers) {
-            if (fieldMarker.check == null || fieldMarker.path == null) continue;
-            XPathExpression expression = expressionMap.get(fieldMarker.path);
+            if (fieldMarker.check == null || !fieldMarker.hasPath()) continue;
+            XPathExpression expression = expressionMap.get(fieldMarker.getXPath());
             DOMNodeList nodeList = (DOMNodeList) expression.evaluate(mappingResult.root(), XPathConstants.NODESET);
             for (int walk = 0; walk < nodeList.getLength(); walk++) {
                 Node node = nodeList.item(walk);

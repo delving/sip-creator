@@ -48,7 +48,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -78,8 +77,13 @@ public class TestMappingEngine {
 //        System.out.println(mappingEngine);
         MappingResult result = mappingEngine.execute("validateTreeNode", input("lido"));
 //        System.out.println(result);
+//        System.out.println("Fields:");
+//        for (Map.Entry<String, List<String>> entry : result.copyFields().entrySet()) {
+//            System.out.println(entry.getKey()+":"+entry.getValue());
+//        }
+        Assert.assertEquals("Should be two copy fields", 2, result.copyFields().size());
         Source source = new DOMSource(result.root());
-        validator(new SchemaVersion("lido", "1.0.0")).validate(source);
+        validator(new SchemaVersion("lido", "1.0.2")).validate(source);
     }
 
     @Test
@@ -108,21 +112,20 @@ public class TestMappingEngine {
         );
         MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("abm"));
         MappingResult result = mappingEngine.execute("validateABMNode", input("abm"));
-
 //        System.out.println(result.toXml());
-
         Source source = new DOMSource(result.root());
         Validator validator = validator(new SchemaVersion("abm", "1.0.7"));
         validator.validate(source);
-
-        System.out.println("Fields:");
-        for (Map.Entry<String, List<String>> entry : result.fields().entrySet()) {
-            System.out.println(entry.getKey()+":"+entry.getValue());
-        }
+//        System.out.println("Fields:");
+//        for (Map.Entry<String, List<String>> entry : result.fields().entrySet()) {
+//            System.out.println(entry.getKey()+":"+entry.getValue());
+//        }
+        Assert.assertEquals("Number of fields unexpected", 24, result.fields().size());
 //        System.out.println("SystemFields:");
 //        System.out.println(result.copyFields());
     }
 
+    @Ignore
     @Test
     public void rawNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
         Map<String, String> namespaces = createNamespaces(
@@ -130,7 +133,7 @@ public class TestMappingEngine {
         );
         MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces);
         MappingResult result = mappingEngine.execute("rawNode", input("raw"));
-//        System.out.println(result.toXmlAugmented());
+        System.out.println(result.toXmlAugmented());
     }
 
     @Test
@@ -151,39 +154,6 @@ public class TestMappingEngine {
 //        System.out.println(augmented);
         Source source = new DOMSource(result.root());
         validator(new SchemaVersion("tib", "1.0.0")).validate(source);
-    }
-
-    @Ignore
-    @Test
-    public void tryAff() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        Map<String, String> namespaces = createNamespaces(
-                "lido", "http://www.lido-schema.org"
-        );
-        MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("aff"));
-//        System.out.println(mappingEngine);
-        MappingResult result = mappingEngine.execute("tryAff", input("aff"));
-//        System.out.println(serializer.toXml(result.root()));
-    }
-
-    @Ignore
-    @Test
-    public void indexDocumentFromAFF() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
-        Map<String, String> namespaces = createNamespaces(
-                "lido", "http://www.lido-schema.org"
-        );
-        MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, new MockRecDefModel(), mapping("aff"));
-//        System.out.println(mappingEngine);
-        MappingResult result = mappingEngine.execute("indexDocumentFromAFF", input("aff"));
-//        System.out.println(serializer.toXml(result.root()));
-        Map<String, List<String>> allFields = result.fields();
-        for (Map.Entry<String, List<String>> entry : allFields.entrySet()) {
-            System.out.println(entry.getKey());
-            for (String value : entry.getValue()) {
-                System.out.println("    "+value);
-            }
-        }
-        System.out.println(result.toXml());
-        Assert.assertFalse(allFields.isEmpty());
     }
 
     private Map<String, String> createNamespaces(String... arg) {
