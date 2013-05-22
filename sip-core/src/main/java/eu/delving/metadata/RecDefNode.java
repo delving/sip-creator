@@ -51,7 +51,6 @@ public class RecDefNode implements Comparable<RecDefNode> {
     private OptBox optBox;
     private DynOpt dynOpt;
     private String defaultPrefix;
-    private List<RecDef.FieldMarker> fieldMarkers = new ArrayList<RecDef.FieldMarker>();
     private List<RecDefNode> children = new ArrayList<RecDefNode>();
     private SortedMap<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
     private boolean populated;
@@ -172,14 +171,6 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public boolean isLeafElem() {
         return elem != null && elem.elemList.isEmpty();
-    }
-
-    public void addFieldMarker(RecDef.FieldMarker fieldMarker) {
-        this.fieldMarkers.add(fieldMarker);
-    }
-
-    public List<RecDef.FieldMarker> getFieldMarkers() {
-        return fieldMarkers;
     }
 
     public boolean isHidden() {

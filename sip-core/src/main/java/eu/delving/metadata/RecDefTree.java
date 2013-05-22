@@ -21,8 +21,16 @@
 
 package eu.delving.metadata;
 
+import eu.delving.XMLToolFactory;
+
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import static eu.delving.metadata.RecDef.REQUIRED_FIELDS;
 
@@ -45,19 +53,28 @@ import static eu.delving.metadata.RecDef.REQUIRED_FIELDS;
  */
 
 public class RecDefTree implements RecDefNodeListener {
+    private XPathFactory pathFactory = XMLToolFactory.xpathFactory();
+    private XPathContext pathContext;
     private RecDef recDef;
     private RecDefNode root;
     private RecDefNodeListener listener;
+    private Map<String, XPathExpression> expressionMap = new TreeMap<String, XPathExpression>();
 
     public static RecDefTree create(RecDef recDef) {
         RecDefTree tree = new RecDefTree(recDef);
-        tree.resolve();
+        try {
+            tree.resolve();
+        }
+        catch (XPathExpressionException e) {
+            throw new RuntimeException("XPath problem");
+        }
         return tree;
     }
 
     private RecDefTree(RecDef recDef) {
         this.recDef = recDef;
         this.root = RecDefNode.create(this, recDef);
+        this.pathContext = new XPathContext(recDef.namespaces);
     }
 
     public void setListener(RecDefNodeListener listener) {
@@ -134,11 +151,14 @@ public class RecDefTree implements RecDefNodeListener {
         for (RecDefNode child : node.getChildren()) collectPaths(child, path, paths);
     }
 
-    private void resolve() {
+    private void resolve() throws XPathExpressionException {
         if (recDef.fieldMarkers == null) throw new IllegalStateException("Record definition must have field markers");
+        for (RecDef.FieldMarker fieldMarker : recDef.fieldMarkers) {
+            if (!fieldMarker.hasPath()) continue;
+            expressionMap.put(fieldMarker.getXPath(), createPath().compile(fieldMarker.getXPath()));
+        }
         boolean[] present = new boolean[REQUIRED_FIELDS.length];
         for (RecDef.FieldMarker marker : recDef.fieldMarkers) {
-            if (marker.path == null) continue;
             marker.resolve(this);
             if (marker.name != null && marker.type == null) {
                 for (int index = 0; index < REQUIRED_FIELDS.length; index++) {
@@ -153,5 +173,15 @@ public class RecDefTree implements RecDefNodeListener {
             ));
         }
         root.checkPopulated();
+    }
+
+    public Map<String, XPathExpression> getExpressionMap() {
+        return expressionMap;
+    }
+
+    private XPath createPath() {
+        XPath path = pathFactory.newXPath();
+        path.setNamespaceContext(pathContext);
+        return path;
     }
 }
