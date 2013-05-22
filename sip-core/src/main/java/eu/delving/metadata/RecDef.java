@@ -263,13 +263,14 @@ public class RecDef {
         public Path path;
 
         @XStreamAsAttribute
+        public String xpath;
+
+        @XStreamAsAttribute
         public Check check;
 
         public void resolve(RecDefTree recDefTree) {
-            path = path.withDefaultPrefix(recDefTree.getRecDef().prefix);
-            RecDefNode node = recDefTree.getRecDefNode(path);
-            if (node == null) {
-                throw new RuntimeException("Cannot find path " + path);
+            if (path != null) {
+                path = path.withDefaultPrefix(recDefTree.getRecDef().prefix);
             }
             if (name != null) {
                 for (String[] translation : BACKWARDS_COMPATIBILITY_REFRERENCE) {
@@ -278,7 +279,14 @@ public class RecDef {
                     }
                 }
             }
-            node.addFieldMarker(this);
+        }
+
+        public String getXPath() {
+            return xpath != null ? xpath : path.toString();
+        }
+
+        public boolean hasPath() {
+            return xpath != null || path != null;
         }
     }
 

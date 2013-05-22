@@ -23,12 +23,16 @@ package eu.delving.metadata;
 
 import eu.delving.MappingResult;
 import eu.delving.groovy.XmlSerializer;
+import net.sf.saxon.dom.DOMNodeList;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 import java.util.*;
 
 import static eu.delving.metadata.RecDef.*;
@@ -106,7 +110,7 @@ public class MappingResultImpl implements MappingResult {
         }
         Map<String, Path> missingMap = new TreeMap<String, Path>();
         for (RecDef.FieldMarker fieldMarker : recDefTree.getRecDef().fieldMarkers) {
-            if (fieldMarker.name == null || fieldMarker.type != null) continue;
+            if (fieldMarker.name == null || fieldMarker.type != null || fieldMarker.path == null) continue;
             if (missing.contains(fieldMarker.name)) missingMap.put(fieldMarker.name, fieldMarker.path);
         }
         StringBuilder out = new StringBuilder("Required fields missing: ");
@@ -131,8 +135,8 @@ public class MappingResultImpl implements MappingResult {
             if (recDefTree.getRecDef().flat) {
                 resolveFlatRecord();
             }
-            else if (recDefTree.getRecDef().prefix.equals("aff")) {
-                resolveAFFRecord();
+            else {
+                resolveHierarchicalRecord();
             }
         }
         if (isRecDefDelvingAware()) {
@@ -179,10 +183,6 @@ public class MappingResultImpl implements MappingResult {
         return recDefTree != null && recDefTree.getRecDef().getNamespaceMap().containsKey(DELVING_PREFIX);
     }
 
-    private void resolveAFFRecord() {
-        resolveAFFRecord((Element) root);
-    }
-
     private void resolveFlatRecord() {
         NodeList kids = root.getChildNodes();
         for (int walk = 0; walk < kids.getLength(); walk++) {
@@ -195,13 +195,21 @@ public class MappingResultImpl implements MappingResult {
                 case Node.CDATA_SECTION_NODE:
                     break;
                 case Node.ELEMENT_NODE:
-                    Path path = getPath(kid, false);
+                    Path path = getPath(kid);
                     RecDefNode recDefNode = recDefTree.getRecDefNode(path);
                     if (recDefNode != null) {
                         String name = String.format("%s_%s_%s", kid.getPrefix(), kid.getLocalName(), recDefNode.getFieldType());
                         String value = getTextFromChildren(kid);
                         put(name, value);
-                        handleMarkedField(recDefNode, value);
+                        for (RecDef.FieldMarker fieldMarker : recDefTree.getRecDef().fieldMarkers) {
+                            if (!recDefNode.getPath().equals(fieldMarker.path)) continue;
+                            if (fieldMarker.name != null && fieldMarker.name.startsWith(DELVING_PREFIX)) {
+                                putCopyField(fieldMarker.name, value);
+                            }
+                            else if ("search".equals(fieldMarker.type)) {
+                                putSearchField(fieldMarker.name, value);
+                            }
+                        }
                     }
                     break;
                 default:
@@ -210,46 +218,26 @@ public class MappingResultImpl implements MappingResult {
         }
     }
 
-    private void resolveAFFRecord(Element element) {
-        NodeList kids = element.getChildNodes();
-        for (int walk = 0; walk < kids.getLength(); walk++) {
-            Node kid = kids.item(walk);
-            switch (kid.getNodeType()) {
-                case Node.ATTRIBUTE_NODE:
-                    logger.warn("Attribute node appeared while resolving AFF: " + kid.getNodeName());
-                    break;
-                case Node.TEXT_NODE:
-                case Node.CDATA_SECTION_NODE:
-                    break;
-                case Node.ELEMENT_NODE:
-                    Path path = getPath(kid, true);
-                    RecDefNode recDefNode = recDefTree.getRecDefNode(path);
-                    if (recDefNode != null && recDefNode.isLeafElem()) {
-                        // todo: we have the recDefNode!
-//                        0/event/PRODUCTION
-//                        1/event/PRODUCTION/date/earliestDate/1978
-                        String value = getTextFromChildren(kid);
-                        put("facet_category_string", String.format("%s=%s", path.toIndexString(), value));
-                        handleMarkedField(recDefNode, value);
+    private void resolveHierarchicalRecord() {
+        try {
+            for (RecDef.FieldMarker fieldMarker : recDefTree.getRecDef().fieldMarkers) {
+                if (!fieldMarker.hasPath()) continue;
+                XPathExpression expression = recDefTree.getExpressionMap().get(fieldMarker.getXPath());
+                DOMNodeList nodeList = (DOMNodeList) expression.evaluate(root, XPathConstants.NODESET);
+                for (int walk = 0; walk < nodeList.getLength(); walk++) {
+                    Node node = nodeList.item(walk);
+                    String value = node.getTextContent().trim();
+                    if (fieldMarker.name != null && fieldMarker.name.startsWith(DELVING_PREFIX)) {
+                        putCopyField(fieldMarker.name, value);
                     }
-                    else {
-                        resolveAFFRecord((Element) kid);
+                    else if ("search".equals(fieldMarker.type)) {
+                        putSearchField(fieldMarker.name, value);
                     }
-                    break;
-                default:
-                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
+                }
             }
         }
-    }
-
-    private void handleMarkedField(RecDefNode recDefNode, String value) {
-        for (RecDef.FieldMarker fieldMarker : recDefNode.getFieldMarkers()) {
-            if (fieldMarker.name != null && fieldMarker.name.startsWith(DELVING_PREFIX)) {
-                putCopyField(fieldMarker.name, value);
-            }
-            else if ("search".equals(fieldMarker.type)) {
-                putSearchField(fieldMarker.name, value);
-            }
+        catch (XPathExpressionException e) {
+            throw new RuntimeException("XPath problem", e);
         }
     }
 
@@ -273,7 +261,7 @@ public class MappingResultImpl implements MappingResult {
         list.add(value);
     }
 
-    private Path getPath(Node node, boolean includeAFFKeys) {
+    private Path getPath(Node node) {
         List<Element> elements = new ArrayList<Element>();
         while (node.getParentNode() != null) {
             elements.add((Element) node);
@@ -282,9 +270,8 @@ public class MappingResultImpl implements MappingResult {
         Path path = Path.create();
         Collections.reverse(elements);
         for (Element el : elements) {
-            String key = includeAFFKeys ? el.getAttribute("aff:key") : null;
             if (el.getLocalName() == null) break;
-            path = path.child(Tag.element(el.getPrefix(), el.getLocalName(), key));
+            path = path.child(Tag.element(el.getPrefix(), el.getLocalName(), null));
         }
         return path;
     }
