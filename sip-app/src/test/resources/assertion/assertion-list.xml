@@ -21,5 +21,8 @@
         <condition>it == 'divine'</condition>
         <on-fail>Authority '$it' is not divine!</on-fail>
     </assert>
+    <assert xpath="/mods:mods/mods:typeOfResource/text()">
+        <on-fail>Type of resource is empty!</on-fail>
+    </assert>
 </assertion-list>
 

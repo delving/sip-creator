@@ -64,21 +64,40 @@ public class AssertionTest {
 
     public String getViolation(Node root) throws XPathExpressionException {
         DOMNodeList nodeList = (DOMNodeList) path.evaluate(root, XPathConstants.NODESET);
-        for (int walk = 0; walk < nodeList.getLength(); walk++) {
-            Node node = nodeList.item(walk);
-            switch (node.getNodeType()) {
-                case Node.ATTRIBUTE_NODE:
-                case Node.CDATA_SECTION_NODE:
-                case Node.TEXT_NODE:
-                    binding.setProperty("it", node.getNodeValue());
-                    break;
-                default:
-                    throw new RuntimeException("Node type not handled: " + node.getNodeType());
+        if (assertion.hasCondition()) {
+            for (int walk = 0; walk < nodeList.getLength(); walk++) {
+                Node node = nodeList.item(walk);
+                switch (node.getNodeType()) {
+                    case Node.ATTRIBUTE_NODE:
+                    case Node.CDATA_SECTION_NODE:
+                    case Node.TEXT_NODE:
+                        binding.setProperty("it", node.getNodeValue());
+                        break;
+                    default:
+                        throw new RuntimeException("Node type not handled: " + node.getNodeType());
+                }
+                Object result = script.run();
+                if (result != null) {
+                    String string = result.toString().trim();
+                    if (!string.isEmpty()) return string;
+                }
             }
-            Object result = script.run();
-            if (result != null) {
-                String string = result.toString().trim();
-                if (!string.isEmpty()) return string;
+        }
+        else {
+            if (nodeList.getLength() == 0) return assertion.onFail;
+            for (int walk = 0; walk < nodeList.getLength(); walk++) {
+                Node node = nodeList.item(walk);
+                switch (node.getNodeType()) {
+                    case Node.ATTRIBUTE_NODE:
+                    case Node.CDATA_SECTION_NODE:
+                    case Node.TEXT_NODE:
+                        if (node.getNodeValue().trim().isEmpty()) {
+                            return assertion.onFail;
+                        }
+                        break;
+                    default:
+                        throw new RuntimeException("Node type not handled: " + node.getNodeType());
+                }
             }
         }
         return null;

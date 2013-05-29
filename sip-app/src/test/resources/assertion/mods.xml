@@ -13,7 +13,10 @@
     <mods:name>
         <mods:namePart>University of Florida Engineering and Industrial Experiment Station</mods:namePart>
     </mods:name>
-    <mods:typeOfResource>text</mods:typeOfResource>
+    <mods:typeOfResource>
+
+
+    </mods:typeOfResource>
     <mods:note>Florida Environments Online contains both digital full text materials and research bibliographies about the ecology and environment of Florida. Digitized materials include more than 200 seminal texts on species and ecosystems selected by scientific experts throughout the state of Florida and digitized specifically for the Linking Florida's Natural Heritage project. They also include the publications of the Florida Geological Society, and agricultural documents created by the Agricultural Experiment Station/Extension Service (IFAS) and the Florida Department of Agriculture and Consumer Affairs, as well as engineering documents created by the UF Engineering and Industrial Experiment Station.</mods:note>
     <mods:subject authority="dubious">
         <mods:topic>Collection</mods:topic>
