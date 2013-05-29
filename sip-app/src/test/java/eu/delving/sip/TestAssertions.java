@@ -134,6 +134,7 @@ public class TestAssertions {
         Assert.assertTrue(tests.get(1).getViolation(modsDoc).contains("No florida found in Agricultural"));
         Assert.assertTrue(tests.get(2).getViolation(modsDoc).contains("Improper value: Collection"));
         Assert.assertTrue(tests.get(3).getViolation(modsDoc).contains("Authority 'dubious' is not divine!"));
+        Assert.assertTrue(tests.get(4).getViolation(modsDoc).contains("empty!"));
     }
 
     private static XStream getStream() {

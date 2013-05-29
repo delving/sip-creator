@@ -44,6 +44,10 @@ public class Assertion {
 
     public String code;
 
+    public boolean hasCondition() {
+        return code != null || condition != null || allowed != null;
+    }
+
     @XStreamAlias("on-fail")
     public String onFail;
 
@@ -68,7 +72,7 @@ public class Assertion {
             return out.toString();
         }
         else {
-            throw new RuntimeException("Cannot create script from assertion " + xpath);
+            return "";
         }
     }
 
