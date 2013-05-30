@@ -21,12 +21,15 @@
 
 package eu.delving.rdf;
 
+import junit.framework.Assert;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 /**
  * @author Gerald de Jong <gerald@delving.eu>
@@ -39,17 +42,17 @@ public class TestLIDOToCRM {
         URL mappingFile = getClass().getResource("/rdf/lido-to-crm.xml");
         LIDO2CRM.Mappings mappings = LIDO2CRM.readForthMapping(mappingFile.openStream());
         String xml = LIDO2CRM.toString(mappings);
-        System.out.println(xml);
+//        System.out.println(xml);
 
-//        String[] fresh = xml.split("\n");
-//        List<String> original = IOUtils.readLines(mappingFile.openStream());
-//        int index = 0;
-//        for (String originalLine : original) {
-//            originalLine = originalLine.trim();
-//            String freshLine = fresh[index].trim();
-//            Assert.assertEquals("Line " + index, originalLine, freshLine);
-//            index++;
-//        }
+        String[] fresh = xml.split("\n");
+        List<String> original = IOUtils.readLines(mappingFile.openStream());
+        int index = 0;
+        for (String originalLine : original) {
+            originalLine = originalLine.trim();
+            String freshLine = fresh[index].trim();
+            Assert.assertEquals("Line " + index, originalLine, freshLine);
+            index++;
+        }
 
 //        URL lidoFile = getClass().getResource("/rdf/LIDOExample.xml");
 //        Document lidoDoc = XMLToolFactory.documentBuilderFactory().newDocumentBuilder().parse(lidoFile.openStream());

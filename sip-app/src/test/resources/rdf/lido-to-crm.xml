@@ -139,7 +139,7 @@
             <path>
                 <source>repositoryName/legalBodyID</source>
                 <property tag="P50_has_current_keeper"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E39_Actor">
                         <uri_function name="Actors">
                             <arg name="">@lido:source</arg>
@@ -149,7 +149,7 @@
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:repositoryName/lido:legalBodyID</source>
@@ -164,7 +164,7 @@
             <path>
                 <source>repositoryName/legalBodyName/appellationValue</source>
                 <property tag="P50_has_current_keeper"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E39_Actor">
                         <uri_function name="uriForActors">
                             <arg name="">//lido:lido/nothing</arg>
@@ -174,7 +174,7 @@
                         </uri_function>
                     </entity>
                     <property tag="P131_is_identified_by"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:repositoryName/lido:legalBodyName/lido:appellationValue</source>
@@ -189,7 +189,7 @@
             <path>
                 <source>repositoryLocation/placeID</source>
                 <property tag="P55_has_current_location"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E53_Place">
                         <uri_function name="uriForPlaces">
                             <arg name="">../lido:namePlaceSet/lido:appellationValue/text()</arg>
@@ -200,7 +200,7 @@
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:repositoryLocation/lido:placeID</source>
@@ -215,7 +215,7 @@
             <path>
                 <source>repositoryLocation/namePlaceSet/appellationValue</source>
                 <property tag="P55_has_current_location"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E53_Place">
                         <uri_function name="uriForPlaces">
                             <arg name="">text()</arg>
@@ -226,7 +226,7 @@
                         </uri_function>
                     </entity>
                     <property tag="P87_is_identified_by"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:repositoryLocation/lido:namePlaceSet/lido:appellationValue</source>
@@ -252,6 +252,10 @@
             </range>
         </link>
         <link>
+            <path>
+                <source>displayState</source>
+                <property tag="P3_has_note"/>
+            </path>
             <range>
                 <source>lido:displayState</source>
                 <entity tag="E62_String">
@@ -260,10 +264,6 @@
                     </uri_function>
                 </entity>
             </range>
-            <path>
-                <source>displayState</source>
-                <property tag="P3_has_note"/>
-            </path>
         </link>
         <link>
             <path>
@@ -322,6 +322,10 @@
             </range>
         </link>
         <link>
+            <path>
+                <source>displayObjectMeasurements</source>
+                <property tag="P3_has_note"/>
+            </path>
             <range>
                 <source>lido:displayObjectMeasurements</source>
                 <entity tag="E62_String">
@@ -330,10 +334,6 @@
                     </uri_function>
                 </entity>
             </range>
-            <path>
-                <source>displayObjectMeasurements</source>
-                <property tag="P3_has_note"/>
-            </path>
         </link>
         <link>
             <path>
@@ -395,7 +395,7 @@
             <path>
                 <source>eventID</source>
                 <property tag="P12B_was_present_at"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E5_Event">
                         <uri_function name="uriEvents">
                             <arg name="">@lido:source</arg>
@@ -403,7 +403,7 @@
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:eventID</source>
@@ -418,7 +418,7 @@
             <path>
                 <source>eventType/term</source>
                 <property tag="P12B_was_present_at"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E5_Event">
                         <uri_function name="uriEvents">
                             <arg name="">../../lido:eventID/@lido:source</arg>
@@ -426,7 +426,7 @@
                         </uri_function>
                     </entity>
                     <property tag="P2_has_type"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:eventType/lido:term</source>
@@ -564,14 +564,14 @@
             <path>
                 <source>subjectActor/displayActor</source>
                 <property tag="P67_refers_to"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E73_Information_Object">
                         <uri_function name="uriConceptual">
                             <arg name="">text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P129_is_about"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:subjectActor/lido:displayActor</source>
@@ -589,14 +589,14 @@
             <path>
                 <source>subjectDate/displayDate</source>
                 <property tag="P67_refers_to"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E73_Information_Object">
                         <uri_function name="uriConceptual">
                             <arg name="">text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P129_is_about"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:subjectDate/lido:displayDate</source>
@@ -611,14 +611,14 @@
             <path>
                 <source>subjectEvent/displayEvent</source>
                 <property tag="P67_refers_to"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E73_Information_Object">
                         <uri_function name="uriConceptual">
                             <arg name="">text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P129_is_about"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:subjectEvent/lido:displayEvent</source>
@@ -634,14 +634,14 @@
             <path>
                 <source>subjectPlace/displayPlace</source>
                 <property tag="P67_refers_to"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E73_Information_Object">
                         <uri_function name="uriConceptual">
                             <arg name="">text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P129_is_about"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:subjectPlace/lido:displayPlace</source>
@@ -674,14 +674,14 @@
             <path>
                 <source>subjectObject/object/objectWebResource</source>
                 <property tag="P67_is_referred_to_by"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E73_Information_Object">
                         <uri_function name="uriConceptual">
                             <arg name="">text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:subjectObject/lido:object/lido:objectWebResource</source>
@@ -696,14 +696,14 @@
             <path>
                 <source>subjectObject/object/objectID</source>
                 <property tag="P67_refers_to"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E18_Physical_Thing">
                         <uri_function name="uriPhysThing">
                             <arg name="">/text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:subjectObject/lido:object/lido:objectID</source>
@@ -718,14 +718,14 @@
             <path>
                 <source>relatedWorkRelType</source>
                 <property tag="P46_forms_part_of"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E18_Physical_Thing">
                         <uri_function name="uriPhysThing">
                             <arg name="">text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P3_has_note"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:relatedWorkRelType</source>
@@ -740,14 +740,14 @@
             <path>
                 <source>rightsType</source>
                 <property tag="P104_is_subject_to"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E30_Right">
                         <uri_function name="uriConceptual">
                             <arg name="">text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P2_has_type"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:rightsType</source>
@@ -762,14 +762,14 @@
             <path>
                 <source>recordID</source>
                 <property tag="P70B_is_documented_in"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E31_Document">
                         <uri_function name="uriPhysThing">
                             <arg name="">text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:recordID</source>
@@ -805,15 +805,14 @@
                         <arg name="">text()</arg>
                     </uri_function>
                 </entity>
-                <extra_link>
+                <extend_range>
                     <property tag="P2_has_type"/>
-                    <!--value_binding="web resource"-->
-                    <entity tag="E55_Type">
+                    <entity tag="E55_Type" binding="web_resource">
                         <uri_function name="uriType">
                             <arg name="">text()</arg>
                         </uri_function>
                     </entity>
-                </extra_link>
+                </extend_range>
             </range>
         </link>
     </mapping>
@@ -834,7 +833,7 @@
             <path>
                 <source>repositoryLocation/partOfPlace/placeID</source>
                 <property tag="P88_consists_of"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E53_Place">
                         <uri_function name="uriForPlaces">
                             <arg name="">../../lido:namePlaceSet/lido:appellationValue/text()</arg>
@@ -845,7 +844,7 @@
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:repositoryLocation/lido:partOfPlace/lido:placeID</source>
@@ -892,15 +891,14 @@
                         <arg name="">text()</arg>
                     </uri_function>
                 </entity>
-                <extra_link>
+                <extend_range>
                     <property tag="P2_has_type"/>
-                    <!--value_binding="Format"-->
-                    <entity tag="E55_Type">
+                    <entity tag="E55_Type" binding="Format">
                         <uri_function name="uriType">
                             <arg name="">@lido:type</arg>
                         </uri_function>
                     </entity>
-                </extra_link>
+                </extend_range>
             </range>
         </link>
         <link>
@@ -915,15 +913,14 @@
                         <arg name="">text()</arg>
                     </uri_function>
                 </entity>
-                <extra_link>
+                <extend_range>
                     <property tag="P2_has_type"/>
-                    <!--value_binding="Shape"-->
-                    <entity tag="E55_Type">
+                    <entity tag="E55_Type" binding="Shape">
                         <uri_function name="uriType">
                             <arg name="">text()</arg>
                         </uri_function>
                     </entity>
-                </extra_link>
+                </extend_range>
             </range>
         </link>
         <link>
@@ -938,23 +935,21 @@
                         <arg name="">text()</arg>
                     </uri_function>
                 </entity>
-                <extra_link>
+                <extend_range>
                     <property tag="P2_has_type"/>
-                    <!--value_binding="Scale"-->
-                    <entity tag="E55_Type">
+                    <entity tag="E55_Type" binding="Scale">
                         <uri_function name="uriType">
                             <arg name="">text()</arg>
                         </uri_function>
                     </entity>
-                </extra_link>
+                </extend_range>
             </range>
         </link>
     </mapping>
     <mapping>
         <domain>
             <source>lido/event</source>
-            <!--todo: what about this?-->
-            <entity tag="*"/>
+            <entity/>
         </domain>
         <link>
             <path>
@@ -1030,18 +1025,18 @@
             <path>
                 <source>actorID</source>
                 <property tag="P11_had_participant"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E39_Actor">
                         <uri_function name="uriForActors">
                             <arg name="">@lido:source</arg>
                             <arg name="">text()</arg>
-                            <arg name="">../lido:nameActorSet/lido:appellationValue[@lido:pref = "preferred"]/text()
+                            <arg name="">../lido:nameActorSet/lido:appellationValue[@lido:pref = &quot;preferred&quot;]/text()
                             </arg>
                             <arg name="">../lido:vitalDatesActor/text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:actorID</source>
@@ -1056,23 +1051,23 @@
             <path>
                 <source>nameActorSet/appellationValue</source>
                 <property tag="P11_had_participant"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E39_Actor">
                         <uri_function name="uriForActors">
                             <arg name="">../../lido:actorID/@lido:source</arg>
                             <arg name="">../../lido:actorID/text()</arg>
-                            <arg name="">../lido:appellationValue[@lido:pref = "preferred"]/text()</arg>
+                            <arg name="">../lido:appellationValue[@lido:pref = &quot;preferred&quot;]/text()</arg>
                             <arg name="">../../lido:vitalDatesActor/text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P131_is_identified_by"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:nameActorSet/lido:appellationValue</source>
                 <entity tag="E82_Actor_Appellation">
                     <uri_function name="appellationURI">
-                        <arg name="">../lido:appellationValue[@lido:pref = "preferred"]/text()</arg>
+                        <arg name="">../lido:appellationValue[@lido:pref = &quot;preferred&quot;]/text()</arg>
                     </uri_function>
                 </entity>
             </range>
@@ -1165,14 +1160,14 @@
             <path>
                 <source>eventDate/date/earliestDate</source>
                 <property tag="P4_has_time_span"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E52_Time_Span">
                         <uri_function name="uriTimeSpan">
                             <arg name="">text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P79_beginning_is_qualified_by"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:eventDate/lido:date/lido:earliestDate</source>
@@ -1187,14 +1182,14 @@
             <path>
                 <source>eventDate/date/latestDate</source>
                 <property tag="P4_has_time_span"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E52_Time_Span">
                         <uri_function name="uriTimeSpan">
                             <arg name="">text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P80_end_is_qualified_by"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:eventDate/lido:date/lido:latestDate</source>
@@ -1223,7 +1218,7 @@
             <path>
                 <source>eventPlace/place/placeID</source>
                 <property tag="P7_took_place_at"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E53_Place">
                         <uri_function name="uriForPlaces">
                             <arg name="">../lido:namePlaceSet/lido:appellationValue/text()</arg>
@@ -1234,7 +1229,7 @@
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:eventPlace/lido:place/lido:placeID</source>
@@ -1249,7 +1244,7 @@
             <path>
                 <source>eventPlace/place/namePlaceSet/appellationValue</source>
                 <property tag="P7_took_place_at"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E53_Place">
                         <uri_function name="uriForPlaces">
                             <arg name="">text()</arg>
@@ -1260,7 +1255,7 @@
                         </uri_function>
                     </entity>
                     <property tag="P87_is_identified_by"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:eventPlace/lido:place/lido:namePlaceSet/lido:appellationValue</source>
@@ -1363,8 +1358,7 @@
                 <uri_function name="uriForActors">
                     <arg name="">lido:actorInRole/lido:actor/lido:actorID/@lido:source</arg>
                     <arg name="">lido:actorInRole/lido:actor/lido:actorID/text()</arg>
-                    <arg name="">lido:actorInRole/lido:actor/lido:nameActorSet/lido:appellationValue[@lido:pref
-                        ="preferred"]/text()
+                    <arg name="">lido:actorInRole/lido:actor/lido:nameActorSet/lido:appellationValue[@lido:pref=&quot;preferred&quot;]/text()
                     </arg>
                     <arg name="">lido:actorInRole/lido:actor/lido:vitalDatesActor/text()</arg>
                 </uri_function>
@@ -1388,6 +1382,10 @@
             </range>
         </link>
         <link>
+            <path>
+                <source>nationalityActor/conceptID</source>
+                <property tag="P48_has_preferred_identifier"/>
+            </path>
             <range>
                 <source>lido:nationalityActor/lido:conceptID</source>
                 <entity tag="E42_Identifier">
@@ -1396,25 +1394,11 @@
                     </uri_function>
                 </entity>
             </range>
-            <path>
-                <source>nationalityActor/conceptID</source>
-                <property tag="P48_has_preferred_identifier"/>
-            </path>
         </link>
         <link>
             <path>
                 <source>vitalDatesActor</source>
                 <property tag="P11_participated_in"/>
-                <!--review:-->
-                <!--<extra_link>-->
-                <!--<entity tag="E5_Event">-->
-                <!--<uri_function name="uriEvents">-->
-                <!--<arg name="">../../../../lido:eventID/@lido:source</arg>-->
-                <!--<arg name="">../../../../lido:eventID/text()</arg>-->
-                <!--</uri_function>-->
-                <!--</entity>-->
-                <!--<property tag="P4_has_time_span"/>-->
-                <!--</extra_link>-->
             </path>
             <range>
                 <source>lido:vitalDatesActor</source>
@@ -1468,7 +1452,7 @@
         <domain>
             <source>lido/eventPlace</source>
             <entity tag="E53_Place">
-                <uri_function name="uriForPlaces"><!--Here.... -->
+                <uri_function name="uriForPlaces">
                     <arg name="">lido:place/lido:namePlaceSet/lido:appellationValue/text()</arg>
                     <arg name="">lido:place/lido:placeID/@lido:source</arg>
                     <arg name="">lido:place/lido:placeID/text()</arg>
@@ -1481,7 +1465,7 @@
             <path>
                 <source>eventPlace/place/partOfPlace/placeID</source>
                 <property tag="P88_consists_of"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E53_Place">
                         <uri_function name="uriForPlaces">
                             <arg name="">../lido:namePlaceSet/lido:appellationValue/text()</arg>
@@ -1492,7 +1476,7 @@
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:eventPlace/lido:place/lido:partOfPlace/lido:placeID</source>
@@ -1589,7 +1573,7 @@
                 </entity>
             </range>
         </link>
-        <link> <!-- Rights Date/latest date -->
+        <link>
             <path>
                 <source>rightsDate/latestDate</source>
                 <property tag="P3_has_note"/>
@@ -1621,7 +1605,7 @@
             <path>
                 <source>rightsHolder/legalBodyID</source>
                 <property tag="P75B_is_possessed_by"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E39_Actor">
                         <uri_function name="uriForActors">
                             <arg name="">@lido:source</arg>
@@ -1631,7 +1615,7 @@
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:rightsHolder/lido:legalBodyID</source>
@@ -1646,7 +1630,7 @@
             <path>
                 <source>rightsHolder/legalBodyName/appellationValue</source>
                 <property tag="P75B_is_possessed_by"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E39_Actor">
                         <uri_function name="uriForActors">
                             <arg name="">../../lido:legalBodyID/@lido:source</arg>
@@ -1656,7 +1640,7 @@
                         </uri_function>
                     </entity>
                     <property tag="P131_is_identified_by"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:rightsHolder/lido:legalBodyName/lido:appellationValue</source>
@@ -1706,15 +1690,14 @@
                         <arg name="">text()</arg>
                     </uri_function>
                 </entity>
-                <extra_link>
+                <extend_range>
                     <property tag="P2_has_type"/>
-                    <!--value_binding="Web_resource"-->
-                    <entity tag="E55_Type">
+                    <entity tag="E55_Type" binding="Web_resource">
                         <uri_function name="uriType">
                             <arg name="">@lido:formatResource</arg>
                         </uri_function>
                     </entity>
-                </extra_link>
+                </extend_range>
             </range>
         </link>
     </mapping>
@@ -1741,11 +1724,11 @@
                 </entity>
             </range>
         </link>
-        <link> <!-- Record Source/Legal Body ID -->
+        <link>
             <path>
                 <source>recordSource/legalBodyID</source>
                 <property tag="P67_refers_to"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E39_Actor">
                         <uri_function name="uriForActors">
                             <arg name="">@lido:source</arg>
@@ -1755,7 +1738,7 @@
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:recordSource/lido:legalBodyID</source>
@@ -1770,7 +1753,7 @@
             <path>
                 <source>recordSource/legalBodyName/appellationValue</source>
                 <property tag="P67_refers_to"/>
-                <extra_link>
+                <extend_path>
                     <entity tag="E39_Actor">
                         <uri_function name="uriForActors">
                             <arg name="">../../lido:legalBodyID/@lido:source</arg>
@@ -1780,7 +1763,7 @@
                         </uri_function>
                     </entity>
                     <property tag="P131_is_identified_by"/>
-                </extra_link>
+                </extend_path>
             </path>
             <range>
                 <source>lido:recordSource/lido:legalBodyName/lido:appellationValue</source>
@@ -1816,15 +1799,14 @@
                         <arg name="">text()</arg>
                     </uri_function>
                 </entity>
-                <extra_link>
+                <extend_range>
                     <property tag="P2_has_type"/>
-                    <!--value_binding="Web_resource"-->
-                    <entity tag="E55_Type">
+                    <entity tag="E55_Type" binding="Web_resource">
                         <uri_function name="uriType">
                             <arg name="">@lido:formatResource</arg>
                         </uri_function>
                     </entity>
-                </extra_link>
+                </extend_range>
             </range>
         </link>
     </mapping>

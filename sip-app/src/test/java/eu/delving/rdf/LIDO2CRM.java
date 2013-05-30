@@ -106,11 +106,14 @@ public class LIDO2CRM {
         @XStreamAsAttribute
         public String tag;
 
-        @XStreamAlias("uri_function")
-        public URIFunction uriFunction;
+        @XStreamAsAttribute
+        public String binding;
 
         @XStreamAlias("exists")
         public Exists exists;
+
+        @XStreamAlias("uri_function")
+        public URIFunction uriFunction;
     }
 
     @XStreamAlias("property")
@@ -135,8 +138,8 @@ public class LIDO2CRM {
 
         public Entity entity;
 
-        @XStreamAlias("extra_link")
-        public ExtraLink extraLink;
+        @XStreamAlias("extend_range")
+        public ExtendRange extendRange;
     }
 
     @XStreamAlias("path")
@@ -145,14 +148,19 @@ public class LIDO2CRM {
 
         public Property property;
 
-        @XStreamAlias("extra_link")
-        public ExtraLink extraLink;
+        @XStreamAlias("extend_path")
+        public ExtendPath extendPath;
     }
 
-    @XStreamAlias("extra_link")
-    public static class ExtraLink {
+    @XStreamAlias("extend_range")
+    public static class ExtendRange {
+        public Property property;
         public Entity entity;
+    }
 
+    @XStreamAlias("extend_path")
+    public static class ExtendPath {
+        public Entity entity;
         public Property property;
     }
 
