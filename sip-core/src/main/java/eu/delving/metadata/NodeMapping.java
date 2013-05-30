@@ -144,12 +144,36 @@ public class NodeMapping {
         return walk.hasNext() ? walk.next() : null;
     }
 
+    public boolean valueHasDictionary() {
+        if (hasOptList()) {
+            OptList optList = recDefNode.getOptList();
+            if (optList.valuePresent) {
+                for (RecDefNode kid : recDefNode.getChildren()) {
+                    if (!kid.getTag().equals(optList.value)) continue;
+                    for (NodeMapping kidNodeMapping : kid.getNodeMappings().values()) {
+                        if (kidNodeMapping.hasDictionary()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            else {
+                return hasDictionary();
+            }
+        }
+        return false;
+    }
+
     public boolean hasDictionary() {
         return dictionary != null;
     }
 
     public boolean hasOptList() {
         return recDefNode.getOptList() != null;
+    }
+
+    public OptList getOptList() {
+        return recDefNode.getOptList();
     }
 
     public List<String> getOptListValues() {

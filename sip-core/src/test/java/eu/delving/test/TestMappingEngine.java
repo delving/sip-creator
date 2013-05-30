@@ -48,6 +48,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -77,11 +78,11 @@ public class TestMappingEngine {
 //        System.out.println(mappingEngine);
         MappingResult result = mappingEngine.execute("validateTreeNode", input("lido"));
 //        System.out.println(result);
-//        System.out.println("Fields:");
-//        for (Map.Entry<String, List<String>> entry : result.copyFields().entrySet()) {
-//            System.out.println(entry.getKey()+":"+entry.getValue());
-//        }
-//        Assert.assertEquals("Should be two copy fields", 2, result.copyFields().size());
+        System.out.println("Fields:");
+        for (Map.Entry<String, List<String>> entry : result.copyFields().entrySet()) {
+            System.out.println(entry.getKey()+":"+entry.getValue());
+        }
+        Assert.assertEquals("Should be two copy fields", 3, result.copyFields().size());
         Source source = new DOMSource(result.root());
         validator(new SchemaVersion("lido", "1.0.2")).validate(source);
     }

@@ -195,7 +195,7 @@ public class CodeGenerator {
                 }
             }
             else {
-                boolean lookup = toLookupStatement(recDefNode, nodeMapping);
+                boolean lookup = nodeMapping.valueHasDictionary() && toLookupStatement(recDefNode, nodeMapping);
                 toBranchCode(recDefNode, groovyParams);
                 if (lookup) codeOut._line("}");
             }
@@ -397,7 +397,7 @@ public class CodeGenerator {
     private void toInnerLoop(NodeMapping nodeMapping, Path path, Stack<String> groovyParams) {
         RecDefNode recDefNode = nodeMapping.recDefNode;
         if (path.isEmpty()) throw new RuntimeException();
-        if (recDefNode.isChildOpt()) {
+        if (recDefNode.isChildOpt() && nodeMapping.hasDictionary()) {
             codeOut.line(recDefNode.getOptBox().getOptReference());
         }
         else if (path.size() == 1) {
