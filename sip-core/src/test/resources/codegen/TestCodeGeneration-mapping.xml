@@ -47,7 +47,8 @@
                 <string>}</string>
             </groovy-code>
         </node-mapping>
-        <node-mapping inputPath="/input/leadup/record/fromOne" outputPath="/test/sub-one/sub-two">
+        <node-mapping inputPath="/input/leadup/record/fromOne" outputPath="/test/sub-one/sub-two"/>
+        <node-mapping inputPath="/input/leadup/record/fromOne" outputPath="/test/sub-one/sub-two/abc-link">
             <dictionary>
                 <entry>
                     <string>look this up</string>
