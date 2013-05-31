@@ -38,10 +38,10 @@ import java.util.List;
 public class TestLIDOToCRM {
 
     @Test
-    public void readForthMapping() throws IOException, ParserConfigurationException, SAXException {
+    public void lidoToCRM() throws IOException, ParserConfigurationException, SAXException {
         URL mappingFile = getClass().getResource("/rdf/lido-to-crm.xml");
-        LIDO2CRM.Mappings mappings = LIDO2CRM.readForthMapping(mappingFile.openStream());
-        String xml = LIDO2CRM.toString(mappings);
+        MapToCRM.Mappings mappings = MapToCRM.readForthMapping(mappingFile.openStream());
+        String xml = MapToCRM.toString(mappings);
 //        System.out.println(xml);
 
         String[] fresh = xml.split("\n");

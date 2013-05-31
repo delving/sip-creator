@@ -47,8 +47,8 @@ import java.util.*;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class LIDO2CRM {
-    private static Logger LOG = Logger.getLogger(LIDO2CRM.class);
+public class MapToCRM {
+    private static Logger LOG = Logger.getLogger(MapToCRM.class);
     private static final URIPolicies POLICIES = new URIPolicies();
     private static final XPathFactory PATH_FACTORY = XMLToolFactory.xpathFactory();
     private static final NamespaceContext NAMESPACE_CONTEXT = new XPathContext(new String[][]{
@@ -138,8 +138,8 @@ public class LIDO2CRM {
 
         public Entity entity;
 
-        @XStreamAlias("extend_range")
-        public ExtendRange extendRange;
+        @XStreamAlias("additional_node")
+        public AdditionalNode additionalNode;
     }
 
     @XStreamAlias("path")
@@ -148,18 +148,18 @@ public class LIDO2CRM {
 
         public Property property;
 
-        @XStreamAlias("extend_path")
-        public ExtendPath extendPath;
+        @XStreamAlias("internal_node")
+        public InternalNode internalNode;
     }
 
-    @XStreamAlias("extend_range")
-    public static class ExtendRange {
+    @XStreamAlias("additional_node")
+    public static class AdditionalNode {
         public Property property;
         public Entity entity;
     }
 
-    @XStreamAlias("extend_path")
-    public static class ExtendPath {
+    @XStreamAlias("internal_node")
+    public static class InternalNode {
         public Entity entity;
         public Property property;
     }
