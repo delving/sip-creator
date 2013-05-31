@@ -33,6 +33,8 @@ import eu.delving.sip.menus.RevertMappingMenu;
 import eu.delving.sip.model.*;
 
 import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
@@ -59,6 +61,32 @@ public class RecMappingFrame extends FrameBase {
         revertMappingMenu = new RevertMappingMenu(sipModel);
         setJMenuBar(createMenuBar());
         nodeMappingList = sipModel.getMappingModel().getNodeMappingListModel().createJList();
+        nodeMappingList.getModel().addListDataListener(new ListDataListener() {
+            @Override
+            public void intervalAdded(ListDataEvent e) {
+            }
+
+            @Override
+            public void intervalRemoved(ListDataEvent e) {
+            }
+
+            @Override
+            public void contentsChanged(final ListDataEvent e) {
+                ListModel listModel = (ListModel) e.getSource();
+                int index = e.getIndex0();
+                if (index <= listModel.getSize()) {
+                    NodeMappingEntry entry = (NodeMappingEntry) listModel.getElementAt(index);
+                    if (entry.isHighlighted()) {
+                        sipModel.exec(new Swing() {
+                            @Override
+                            public void run() {
+                                nodeMappingList.ensureIndexIsVisible(e.getIndex0());
+                            }
+                        });
+                    }
+                }
+            }
+        });
         nodeMappingList.addListSelectionListener(new NodeMappingSelection());
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
