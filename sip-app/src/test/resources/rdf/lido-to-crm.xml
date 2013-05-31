@@ -3,7 +3,7 @@
         <domain>
             <source>lido</source>
             <entity tag="E19_Physical_Object">
-                <uri_function name="uriForPhysicalObjects">
+                <uri_function name="PhysicalObject">
                     <arg name="nameOfMuseum">//lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:repositoryWrap/lido:repositorySet/lido:repositoryName/lido:legalBodyName/lido:appellationValue/text()</arg>
                     <arg name="entry">//lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:repositoryWrap/lido:repositorySet/lido:workID/text()</arg>
                 </uri_function>
@@ -17,9 +17,7 @@
             <range>
                 <source>lido:lidoRecID</source>
                 <entity tag="E31_Document">
-                    <uri_function name="PhysicalThing">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="PhysicalThing"/>
                 </entity>
             </range>
         </link>
@@ -31,9 +29,7 @@
             <range>
                 <source>lido:category</source>
                 <entity tag="E55_Type">
-                    <uri_function name="Type">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Type"/>
                 </entity>
             </range>
         </link>
@@ -45,9 +41,7 @@
             <range>
                 <source>lido:objectWorkType/lido:term</source>
                 <entity tag="E55_Type">
-                    <uri_function name="Type">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Type"/>
                 </entity>
             </range>
         </link>
@@ -59,9 +53,7 @@
             <range>
                 <source>lido:objectWorkType/lido:conceptID</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="Appellation">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -73,9 +65,7 @@
             <range>
                 <source>lido:classification/lido:term</source>
                 <entity tag="E55_Type">
-                    <uri_function name="uriType">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Type"/>
                 </entity>
             </range>
         </link>
@@ -87,9 +77,7 @@
             <range>
                 <source>lido:classification/lido:conceptID</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="Appellation">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -101,9 +89,7 @@
             <range>
                 <source>lido:titleSet/lido:appellationValue</source>
                 <entity tag="E41_Appellation">
-                    <uri_function name="Appellation">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -115,9 +101,7 @@
             <range>
                 <source>lido:titleSet/lido:sourceAppellation</source>
                 <entity tag="E41_Appellation">
-                    <uri_function name="Appellation">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -129,9 +113,7 @@
             <range>
                 <source>lido:inscriptions</source>
                 <entity tag="E36_Visual_Item">
-                    <uri_function name="Literal">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Literal"/>
                 </entity>
             </range>
         </link>
@@ -142,10 +124,10 @@
                 <internal_node>
                     <entity tag="E39_Actor">
                         <uri_function name="Actors">
-                            <arg name="">@lido:source</arg>
-                            <arg name="">text()</arg>
-                            <arg name="">../lido:legalBodyName/lido:appellationValue/text()</arg>
-                            <arg name="">//lido:lido/nothing</arg>
+                            <arg name="authority">@lido:source</arg>
+                            <arg name="identifier">text()</arg>
+                            <arg name="name">../lido:legalBodyName/lido:appellationValue/text()</arg>
+                            <arg name="birthDate">//lido:lido/nothing</arg>
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
@@ -154,9 +136,7 @@
             <range>
                 <source>lido:repositoryName/lido:legalBodyID</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -167,10 +147,10 @@
                 <internal_node>
                     <entity tag="E39_Actor">
                         <uri_function name="uriForActors">
-                            <arg name="">//lido:lido/nothing</arg>
-                            <arg name="">../lido:legalBodyID/text()</arg>
-                            <arg name="">text()</arg>
-                            <arg name="">//lido:lido/nothing</arg>
+                            <arg name="authority">//lido:lido/nothing</arg>
+                            <arg name="identifier">../lido:legalBodyID/text()</arg>
+                            <arg name="name">text()</arg>
+                            <arg name="birthDate">//lido:lido/nothing</arg>
                         </uri_function>
                     </entity>
                     <property tag="P131_is_identified_by"/>
@@ -179,9 +159,7 @@
             <range>
                 <source>lido:repositoryName/lido:legalBodyName/lido:appellationValue</source>
                 <entity tag="E82_Actor_Appellation">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -191,12 +169,12 @@
                 <property tag="P55_has_current_location"/>
                 <internal_node>
                     <entity tag="E53_Place">
-                        <uri_function name="uriForPlaces">
-                            <arg name="">../lido:namePlaceSet/lido:appellationValue/text()</arg>
-                            <arg name="">@lido:source</arg>
-                            <arg name="">text()</arg>
-                            <arg name="">//lido:lido/nothing</arg>
-                            <arg name="">../lido:partOfPlace</arg>
+                        <uri_function name="Place">
+                            <arg name="placeName">../lido:namePlaceSet/lido:appellationValue/text()</arg>
+                            <arg name="authority">@lido:source</arg>
+                            <arg name="placeId">text()</arg>
+                            <arg name="coordinates">//lido:lido/nothing</arg>
+                            <arg name="spaces">../lido:partOfPlace</arg>
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
@@ -205,9 +183,7 @@
             <range>
                 <source>lido:repositoryLocation/lido:placeID</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -217,12 +193,12 @@
                 <property tag="P55_has_current_location"/>
                 <internal_node>
                     <entity tag="E53_Place">
-                        <uri_function name="uriForPlaces">
-                            <arg name="">text()</arg>
-                            <arg name="">../../lido:placeID/@lido:source</arg>
-                            <arg name="">../../lido:placeID/text()</arg>
-                            <arg name="">//lido:lido/nothing</arg>
-                            <arg name="">../../lido:partOfPlace</arg>
+                        <uri_function name="Place">
+                            <arg name="placeName">text()</arg>
+                            <arg name="authority">../../lido:placeID/@lido:source</arg>
+                            <arg name="placeId">../../lido:placeID/text()</arg>
+                            <arg name="coordinates">//lido:lido/nothing</arg>
+                            <arg name="spaces">../../lido:partOfPlace</arg>
                         </uri_function>
                     </entity>
                     <property tag="P87_is_identified_by"/>
@@ -231,9 +207,7 @@
             <range>
                 <source>lido:repositoryLocation/lido:namePlaceSet/lido:appellationValue</source>
                 <entity tag="E44_Place_Appellation">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -245,9 +219,7 @@
             <range>
                 <source>lido:repositoryLocation/lido:namePlaceSet/lido:sourceAppellation</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -259,9 +231,7 @@
             <range>
                 <source>lido:displayState</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -273,9 +243,7 @@
             <range>
                 <source>lido:displayEdition</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -287,9 +255,7 @@
             <range>
                 <source>lido:sourceStateEdition</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -301,9 +267,7 @@
             <range>
                 <source>lido:objectDescriptionSet/lido:descriptiveNoteValue</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -315,9 +279,7 @@
             <range>
                 <source>lido:objectDescriptionSet/lido:sourceDescriptiveNote</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -329,9 +291,7 @@
             <range>
                 <source>lido:displayObjectMeasurements</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -344,7 +304,7 @@
                 <source>lido:measurementsSet</source>
                 <entity tag="E54_Dimension">
                     <uri_function name="dimensionURI">
-                        <arg name="">@lido:value</arg>
+                        <arg>@lido:value</arg>
                     </uri_function>
                 </entity>
             </range>
@@ -357,9 +317,7 @@
             <range>
                 <source>lido:extentMeasurements</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -371,9 +329,7 @@
             <range>
                 <source>lido:qualifierMeasurements</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -385,9 +341,7 @@
             <range>
                 <source>lido:displayEvent</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -398,8 +352,8 @@
                 <internal_node>
                     <entity tag="E5_Event">
                         <uri_function name="uriEvents">
-                            <arg name="">@lido:source</arg>
-                            <arg name="">text()</arg>
+                            <arg name="authority">@lido:source</arg>
+                            <arg name="identifier">text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
@@ -408,9 +362,7 @@
             <range>
                 <source>lido:eventID</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -421,8 +373,8 @@
                 <internal_node>
                     <entity tag="E5_Event">
                         <uri_function name="uriEvents">
-                            <arg name="">../../lido:eventID/@lido:source</arg>
-                            <arg name="">../../lido:eventID/text()</arg>
+                            <arg name="authority">../../lido:eventID/@lido:source</arg>
+                            <arg name="identifier">../../lido:eventID/text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P2_has_type"/>
@@ -431,9 +383,7 @@
             <range>
                 <source>lido:eventType/lido:term</source>
                 <entity tag="E55_Type">
-                    <uri_function name="uriType">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Type"/>
                 </entity>
             </range>
         </link>
@@ -448,8 +398,8 @@
                 <source>lido:eventType/lido:term</source>
                 <entity tag="E12_Production">
                     <uri_function name="uriEvents">
-                        <arg name="">../../lido:eventID/@lido:source</arg>
-                        <arg name="">../../lido:eventID/text()</arg>
+                        <arg name="authority">../../lido:eventID/@lido:source</arg>
+                        <arg name="identifier">../../lido:eventID/text()</arg>
                     </uri_function>
                 </entity>
             </range>
@@ -465,8 +415,8 @@
                 <source>lido:eventType/lido:term</source>
                 <entity tag="E65_Creation">
                     <uri_function name="uriEvents">
-                        <arg name="">../../lido:eventID/@lido:source</arg>
-                        <arg name="">../../lido:eventID/text()</arg>
+                        <arg name="authority">../../lido:eventID/@lido:source</arg>
+                        <arg name="identifier">../../lido:eventID/text()</arg>
                     </uri_function>
                 </entity>
             </range>
@@ -482,8 +432,8 @@
                 <source>lido:eventType/lido:term</source>
                 <entity tag="E7_Activity">
                     <uri_function name="uriEvents">
-                        <arg name="">../../lido:eventID/@lido:source</arg>
-                        <arg name="">../../lido:eventID/text()</arg>
+                        <arg name="authority">../../lido:eventID/@lido:source</arg>
+                        <arg name="identifier">../../lido:eventID/text()</arg>
                     </uri_function>
                 </entity>
             </range>
@@ -498,8 +448,8 @@
                 <entity tag="E12_Production">
                     <exists value="Herstellung">text()</exists>
                     <uri_function name="uriEvents">
-                        <arg name="">../../lido:eventID/@lido:source</arg>
-                        <arg name="">../../lido:eventID/text()</arg>
+                        <arg name="authority">../../lido:eventID/@lido:source</arg>
+                        <arg name="identifier">../../lido:eventID/text()</arg>
                     </uri_function>
                 </entity>
             </range>
@@ -512,9 +462,7 @@
             <range>
                 <source>lido:displaySubject</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -526,9 +474,7 @@
             <range>
                 <source>lido:extentSubject</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -540,9 +486,7 @@
             <range>
                 <source>lido:subjectConcept/lido:conceptID</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -554,9 +498,7 @@
             <range>
                 <source>lido:subjectConcept/lido:term</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -566,9 +508,7 @@
                 <property tag="P67_refers_to"/>
                 <internal_node>
                     <entity tag="E73_Information_Object">
-                        <uri_function name="uriConceptual">
-                            <arg name="">text()</arg>
-                        </uri_function>
+                        <uri_function name="uriConceptual"/>
                     </entity>
                     <property tag="P129_is_about"/>
                 </internal_node>
@@ -577,10 +517,10 @@
                 <source>lido:subjectActor/lido:displayActor</source>
                 <entity tag="E39_Actor">
                     <uri_function name="uriForActors">
-                        <arg name="">../lido:actor/lido:actorID/@lido:source</arg>
-                        <arg name="">../lido:actor/lido:actorID/text()</arg>
-                        <arg name="">../lido:actor/lido:nameActorSet/lido:appellationValue/text()</arg>
-                        <arg name="">../lido:actor/lido:vitalDatesActor/@lido:birthDate</arg>
+                        <arg name="authority">../lido:actor/lido:actorID/@lido:source</arg>
+                        <arg name="identifier">../lido:actor/lido:actorID/text()</arg>
+                        <arg name="name">../lido:actor/lido:nameActorSet/lido:appellationValue/text()</arg>
+                        <arg name="birthDate">../lido:actor/lido:vitalDatesActor/@lido:birthDate</arg>
                     </uri_function>
                 </entity>
             </range>
@@ -591,9 +531,7 @@
                 <property tag="P67_refers_to"/>
                 <internal_node>
                     <entity tag="E73_Information_Object">
-                        <uri_function name="uriConceptual">
-                            <arg name="">text()</arg>
-                        </uri_function>
+                        <uri_function name="uriConceptual"/>
                     </entity>
                     <property tag="P129_is_about"/>
                 </internal_node>
@@ -601,9 +539,7 @@
             <range>
                 <source>lido:subjectDate/lido:displayDate</source>
                 <entity tag="E50_Date">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -613,9 +549,7 @@
                 <property tag="P67_refers_to"/>
                 <internal_node>
                     <entity tag="E73_Information_Object">
-                        <uri_function name="uriConceptual">
-                            <arg name="">text()</arg>
-                        </uri_function>
+                        <uri_function name="uriConceptual"/>
                     </entity>
                     <property tag="P129_is_about"/>
                 </internal_node>
@@ -624,8 +558,8 @@
                 <source>lido:subjectEvent/lido:displayEvent</source>
                 <entity tag="E5_Event">
                     <uri_function name="uriEvents">
-                        <arg name="">../lido:event/lido:eventID/@lido:source</arg>
-                        <arg name="">../lido:event/lido:eventID/text()</arg>
+                        <arg name="authority">../lido:event/lido:eventID/@lido:source</arg>
+                        <arg name="identifier">../lido:event/lido:eventID/text()</arg>
                     </uri_function>
                 </entity>
             </range>
@@ -636,9 +570,7 @@
                 <property tag="P67_refers_to"/>
                 <internal_node>
                     <entity tag="E73_Information_Object">
-                        <uri_function name="uriConceptual">
-                            <arg name="">text()</arg>
-                        </uri_function>
+                        <uri_function name="uriConceptual"/>
                     </entity>
                     <property tag="P129_is_about"/>
                 </internal_node>
@@ -646,12 +578,12 @@
             <range>
                 <source>lido:subjectPlace/lido:displayPlace</source>
                 <entity tag="E53_Place">
-                    <uri_function name="uriForPlaces">
-                        <arg name="">text()</arg>
-                        <arg name="">..//lido:placeID/@lido:source</arg>
-                        <arg name="">..//lido:placeID/text()</arg>
-                        <arg name="">//lido:lido/nothing</arg>
-                        <arg name="">../lido:place/lido:partOfPlace</arg>
+                    <uri_function name="Place">
+                        <arg name="placeName">text()</arg>
+                        <arg name="authority">..//lido:placeID/@lido:source</arg>
+                        <arg name="placeId">..//lido:placeID/text()</arg>
+                        <arg name="coordinates">//lido:lido/nothing</arg>
+                        <arg name="spaces">../lido:place/lido:partOfPlace</arg>
                     </uri_function>
                 </entity>
             </range>
@@ -664,9 +596,7 @@
             <range>
                 <source>lido:subjectObject/lido:displayObject</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -676,9 +606,7 @@
                 <property tag="P67_is_referred_to_by"/>
                 <internal_node>
                     <entity tag="E73_Information_Object">
-                        <uri_function name="uriConceptual">
-                            <arg name="">text()</arg>
-                        </uri_function>
+                        <uri_function name="uriConceptual"/>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
                 </internal_node>
@@ -686,9 +614,7 @@
             <range>
                 <source>lido:subjectObject/lido:object/lido:objectWebResource</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -699,7 +625,7 @@
                 <internal_node>
                     <entity tag="E18_Physical_Thing">
                         <uri_function name="uriPhysThing">
-                            <arg name="">/text()</arg>
+                            <arg>/text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
@@ -708,9 +634,7 @@
             <range>
                 <source>lido:subjectObject/lido:object/lido:objectID</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -720,9 +644,7 @@
                 <property tag="P46_forms_part_of"/>
                 <internal_node>
                     <entity tag="E18_Physical_Thing">
-                        <uri_function name="uriPhysThing">
-                            <arg name="">text()</arg>
-                        </uri_function>
+                        <uri_function name="uriPhysThing"/>
                     </entity>
                     <property tag="P3_has_note"/>
                 </internal_node>
@@ -730,9 +652,7 @@
             <range>
                 <source>lido:relatedWorkRelType</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -742,9 +662,7 @@
                 <property tag="P104_is_subject_to"/>
                 <internal_node>
                     <entity tag="E30_Right">
-                        <uri_function name="uriConceptual">
-                            <arg name="">text()</arg>
-                        </uri_function>
+                        <uri_function name="uriConceptual"/>
                     </entity>
                     <property tag="P2_has_type"/>
                 </internal_node>
@@ -752,9 +670,7 @@
             <range>
                 <source>lido:rightsType</source>
                 <entity tag="E55_Type">
-                    <uri_function name="uriType">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Type"/>
                 </entity>
             </range>
         </link>
@@ -764,9 +680,7 @@
                 <property tag="P70B_is_documented_in"/>
                 <internal_node>
                     <entity tag="E31_Document">
-                        <uri_function name="uriPhysThing">
-                            <arg name="">text()</arg>
-                        </uri_function>
+                        <uri_function name="uriPhysThing"/>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
                 </internal_node>
@@ -774,9 +688,7 @@
             <range>
                 <source>lido:recordID</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -786,10 +698,10 @@
             <source>lido/repositoryName/legalBodyName</source>
             <entity tag="E39_Actor">
                 <uri_function name="uriForActors">
-                    <arg name="">../lido:legalBodyID/@lido:source</arg>
-                    <arg name="">../lido:legalBodyID/text()</arg>
-                    <arg name="">lido:appellationValue/text()</arg>
-                    <arg name="">//lido:lido/nothing</arg>
+                    <arg name="authority">../lido:legalBodyID/@lido:source</arg>
+                    <arg name="identifier">../lido:legalBodyID/text()</arg>
+                    <arg name="name">lido:appellationValue/text()</arg>
+                    <arg name="birthDate">//lido:lido/nothing</arg>
                 </uri_function>
             </entity>
         </domain>
@@ -801,16 +713,12 @@
             <range>
                 <source>lido:repositoryName/lido:legalBodyWeblink</source>
                 <entity tag="E73_Information_Object">
-                    <uri_function name="uriConceptual">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="uriConceptual"/>
                 </entity>
                 <additional_node>
                     <property tag="P2_has_type"/>
                     <entity tag="E55_Type" binding="web_resource">
-                        <uri_function name="uriType">
-                            <arg name="">text()</arg>
-                        </uri_function>
+                        <uri_function name="Type"/>
                     </entity>
                 </additional_node>
             </range>
@@ -820,12 +728,12 @@
         <domain>
             <source>lido:repositoryLocation</source>
             <entity tag="E53_Place">
-                <uri_function name="uriForPlaces">
-                    <arg name="">lido:place/lido:namePlaceSet/lido:appellationValue/text()</arg>
-                    <arg name="">lido:place/lido:placeID/@lido:source</arg>
-                    <arg name="">lido:place/lido:placeID/text()</arg>
-                    <arg name="">//lido:lido/nothing</arg>
-                    <arg name="">lido:place/lido:partOfPlace</arg>
+                <uri_function name="Place">
+                    <arg name="placeName">lido:place/lido:namePlaceSet/lido:appellationValue/text()</arg>
+                    <arg name="authority">lido:place/lido:placeID/@lido:source</arg>
+                    <arg name="placeId">lido:place/lido:placeID/text()</arg>
+                    <arg name="coordinates">//lido:lido/nothing</arg>
+                    <arg name="spaces">lido:place/lido:partOfPlace</arg>
                 </uri_function>
             </entity>
         </domain>
@@ -835,12 +743,12 @@
                 <property tag="P88_consists_of"/>
                 <internal_node>
                     <entity tag="E53_Place">
-                        <uri_function name="uriForPlaces">
-                            <arg name="">../../lido:namePlaceSet/lido:appellationValue/text()</arg>
-                            <arg name="">../../lido:placeID/@lido:source</arg>
-                            <arg name="">../../lido:placeID/text()</arg>
-                            <arg name="">//lido:lido/nothing</arg>
-                            <arg name="">../lido:partOfPlace</arg>
+                        <uri_function name="Place">
+                            <arg name="placeName">../../lido:namePlaceSet/lido:appellationValue/text()</arg>
+                            <arg name="authority">../../lido:placeID/@lido:source</arg>
+                            <arg name="placeId">../../lido:placeID/text()</arg>
+                            <arg name="coordinates">//lido:lido/nothing</arg>
+                            <arg name="spaces">../lido:partOfPlace</arg>
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
@@ -849,9 +757,7 @@
             <range>
                 <source>lido:repositoryLocation/lido:partOfPlace/lido:placeID</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -863,9 +769,7 @@
             <range>
                 <source>lido:repositoryLocation/lido:placeClassification/lido:term</source>
                 <entity tag="E55_Type">
-                    <uri_function name="uriType">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Type"/>
                 </entity>
             </range>
         </link>
@@ -875,7 +779,7 @@
             <source>lido/measurementsSet</source>
             <entity tag="E54_Dimension">
                 <uri_function name="dimensionURI">
-                    <arg name="">@lido:value</arg>
+                    <arg>@lido:value</arg>
                 </uri_function>
             </entity>
         </domain>
@@ -887,15 +791,13 @@
             <range>
                 <source>lido:formatMeasurements</source>
                 <entity tag="E55_Type">
-                    <uri_function name="uriType">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Type"/>
                 </entity>
                 <additional_node>
                     <property tag="P2_has_type"/>
                     <entity tag="E55_Type" binding="Format">
-                        <uri_function name="uriType">
-                            <arg name="">@lido:type</arg>
+                        <uri_function name="Type">
+                            <arg>@lido:type</arg>
                         </uri_function>
                     </entity>
                 </additional_node>
@@ -909,16 +811,12 @@
             <range>
                 <source>lido:shapeMeasurements</source>
                 <entity tag="E55_Type">
-                    <uri_function name="uriType">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Type"/>
                 </entity>
                 <additional_node>
                     <property tag="P2_has_type"/>
                     <entity tag="E55_Type" binding="Shape">
-                        <uri_function name="uriType">
-                            <arg name="">text()</arg>
-                        </uri_function>
+                        <uri_function name="Type"/>
                     </entity>
                 </additional_node>
             </range>
@@ -931,16 +829,12 @@
             <range>
                 <source>lido:scaleMeasurements</source>
                 <entity tag="E55_Type">
-                    <uri_function name="uriType">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Type"/>
                 </entity>
                 <additional_node>
                     <property tag="P2_has_type"/>
                     <entity tag="E55_Type" binding="Scale">
-                        <uri_function name="uriType">
-                            <arg name="">text()</arg>
-                        </uri_function>
+                        <uri_function name="Type"/>
                     </entity>
                 </additional_node>
             </range>
@@ -959,9 +853,7 @@
             <range>
                 <source>lido:roleInEvent/lido:term</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -973,9 +865,7 @@
             <range>
                 <source>lido:roleInEvent/lido:term</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -987,9 +877,7 @@
             <range>
                 <source>lido:eventName/lido:appellationValue</source>
                 <entity tag="E41_Appellation">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -1001,9 +889,7 @@
             <range>
                 <source>lido:eventName/lido:sourceAppellation</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1015,9 +901,7 @@
             <range>
                 <source>lido:displayActorInRole</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1028,11 +912,10 @@
                 <internal_node>
                     <entity tag="E39_Actor">
                         <uri_function name="uriForActors">
-                            <arg name="">@lido:source</arg>
-                            <arg name="">text()</arg>
-                            <arg name="">../lido:nameActorSet/lido:appellationValue[@lido:pref = &quot;preferred&quot;]/text()
-                            </arg>
-                            <arg name="">../lido:vitalDatesActor/text()</arg>
+                            <arg name="authority">@lido:source</arg>
+                            <arg name="identifier">text()</arg>
+                            <arg name="name">../lido:nameActorSet/lido:appellationValue[@lido:pref = &quot;preferred&quot;]/text()</arg>
+                            <arg name="birthDate">../lido:vitalDatesActor/text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
@@ -1041,9 +924,7 @@
             <range>
                 <source>lido:actorID</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -1054,10 +935,10 @@
                 <internal_node>
                     <entity tag="E39_Actor">
                         <uri_function name="uriForActors">
-                            <arg name="">../../lido:actorID/@lido:source</arg>
-                            <arg name="">../../lido:actorID/text()</arg>
-                            <arg name="">../lido:appellationValue[@lido:pref = &quot;preferred&quot;]/text()</arg>
-                            <arg name="">../../lido:vitalDatesActor/text()</arg>
+                            <arg name="authority">../../lido:actorID/@lido:source</arg>
+                            <arg name="identifier">../../lido:actorID/text()</arg>
+                            <arg name="name">../lido:appellationValue[@lido:pref = &quot;preferred&quot;]/text()</arg>
+                            <arg name="birthDate">../../lido:vitalDatesActor/text()</arg>
                         </uri_function>
                     </entity>
                     <property tag="P131_is_identified_by"/>
@@ -1066,8 +947,8 @@
             <range>
                 <source>lido:nameActorSet/lido:appellationValue</source>
                 <entity tag="E82_Actor_Appellation">
-                    <uri_function name="appellationURI">
-                        <arg name="">../lido:appellationValue[@lido:pref = &quot;preferred&quot;]/text()</arg>
+                    <uri_function name="Appellation">
+                        <arg>../lido:appellationValue[@lido:pref = &quot;preferred&quot;]/text()</arg>
                     </uri_function>
                 </entity>
             </range>
@@ -1080,9 +961,7 @@
             <range>
                 <source>lido:nameActorSet/lido:sourceAppellation</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1094,9 +973,7 @@
             <range>
                 <source>lido:roleActor/lido:term</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1108,9 +985,7 @@
             <range>
                 <source>lido:attributionQualifierActor</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1122,9 +997,7 @@
             <range>
                 <source>lido:extentActor</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1136,9 +1009,7 @@
             <range>
                 <source>lido:culture/lido:term</source>
                 <entity tag="E4_Period">
-                    <uri_function name="uriType">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Type"/>
                 </entity>
             </range>
         </link>
@@ -1150,9 +1021,7 @@
             <range>
                 <source>lido:displayDate</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1162,9 +1031,7 @@
                 <property tag="P4_has_time_span"/>
                 <internal_node>
                     <entity tag="E52_Time_Span">
-                        <uri_function name="uriTimeSpan">
-                            <arg name="">text()</arg>
-                        </uri_function>
+                        <uri_function name="uriTimeSpan"/>
                     </entity>
                     <property tag="P79_beginning_is_qualified_by"/>
                 </internal_node>
@@ -1172,9 +1039,7 @@
             <range>
                 <source>lido:eventDate/lido:date/lido:earliestDate</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1184,9 +1049,7 @@
                 <property tag="P4_has_time_span"/>
                 <internal_node>
                     <entity tag="E52_Time_Span">
-                        <uri_function name="uriTimeSpan">
-                            <arg name="">text()</arg>
-                        </uri_function>
+                        <uri_function name="uriTimeSpan"/>
                     </entity>
                     <property tag="P80_end_is_qualified_by"/>
                 </internal_node>
@@ -1194,9 +1057,7 @@
             <range>
                 <source>lido:eventDate/lido:date/lido:latestDate</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1208,9 +1069,7 @@
             <range>
                 <source>lido:eventPlace/lido:displayPlace</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1220,12 +1079,12 @@
                 <property tag="P7_took_place_at"/>
                 <internal_node>
                     <entity tag="E53_Place">
-                        <uri_function name="uriForPlaces">
-                            <arg name="">../lido:namePlaceSet/lido:appellationValue/text()</arg>
-                            <arg name="">@lido:source</arg>
-                            <arg name="">text()</arg>
-                            <arg name="">//lido:lido/nothing</arg>
-                            <arg name="">../lido:partOfPlace</arg>
+                        <uri_function name="Place">
+                            <arg name="placeName">../lido:namePlaceSet/lido:appellationValue/text()</arg>
+                            <arg name="authority">@lido:source</arg>
+                            <arg name="placeId">text()</arg>
+                            <arg name="coordinates">//lido:lido/nothing</arg>
+                            <arg name="spaces">../lido:partOfPlace</arg>
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
@@ -1234,9 +1093,7 @@
             <range>
                 <source>lido:eventPlace/lido:place/lido:placeID</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -1246,12 +1103,12 @@
                 <property tag="P7_took_place_at"/>
                 <internal_node>
                     <entity tag="E53_Place">
-                        <uri_function name="uriForPlaces">
-                            <arg name="">text()</arg>
-                            <arg name="">../../lido:placeID/@lido:source</arg>
-                            <arg name="">../../lido:placeID/text()</arg>
-                            <arg name="">//lido:lido/nothing</arg>
-                            <arg name="">../../lido:partOfPlace</arg>
+                        <uri_function name="Place">
+                            <arg name="placeName">text()</arg>
+                            <arg name="authority">../../lido:placeID/@lido:source</arg>
+                            <arg name="placeId">../../lido:placeID/text()</arg>
+                            <arg name="coordinates">//lido:lido/nothing</arg>
+                            <arg name="spaces">../../lido:partOfPlace</arg>
                         </uri_function>
                     </entity>
                     <property tag="P87_is_identified_by"/>
@@ -1260,9 +1117,7 @@
             <range>
                 <source>lido:eventPlace/lido:place/lido:namePlaceSet/lido:appellationValue</source>
                 <entity tag="E44_Place_Appellation">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -1274,9 +1129,7 @@
             <range>
                 <source>lido:eventMethod/lido:term</source>
                 <entity tag="E55_Type">
-                    <uri_function name="uriType">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Type"/>
                 </entity>
             </range>
         </link>
@@ -1288,9 +1141,7 @@
             <range>
                 <source>lido:displayMaterialsTech</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1302,9 +1153,7 @@
             <range>
                 <source>lido:termMaterialsTech/lido:term</source>
                 <entity tag="E55_Type">
-                    <uri_function name="uriType">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Type"/>
                 </entity>
             </range>
         </link>
@@ -1316,9 +1165,7 @@
             <range>
                 <source>lido:extentMaterialsTech</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1330,9 +1177,7 @@
             <range>
                 <source>lido:eventDescriptionSet/lido:descriptiveNoteValue</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1344,9 +1189,7 @@
             <range>
                 <source>lido:eventDescriptionSet/lido:sourceDescriptiveNote</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1356,11 +1199,10 @@
             <source>lido/eventActor</source>
             <entity tag="E39_Actor">
                 <uri_function name="uriForActors">
-                    <arg name="">lido:actorInRole/lido:actor/lido:actorID/@lido:source</arg>
-                    <arg name="">lido:actorInRole/lido:actor/lido:actorID/text()</arg>
-                    <arg name="">lido:actorInRole/lido:actor/lido:nameActorSet/lido:appellationValue[@lido:pref=&quot;preferred&quot;]/text()
-                    </arg>
-                    <arg name="">lido:actorInRole/lido:actor/lido:vitalDatesActor/text()</arg>
+                    <arg name="authority">lido:actorInRole/lido:actor/lido:actorID/@lido:source</arg>
+                    <arg name="identifier">lido:actorInRole/lido:actor/lido:actorID/text()</arg>
+                    <arg name="name">lido:actorInRole/lido:actor/lido:nameActorSet/lido:appellationValue[@lido:pref=&quot;preferred&quot;]/text()</arg>
+                    <arg name="birthDate">lido:actorInRole/lido:actor/lido:vitalDatesActor/text()</arg>
                 </uri_function>
             </entity>
         </domain>
@@ -1373,10 +1215,10 @@
                 <source>lido:nationalityActor/lido:term</source>
                 <entity tag="E74_Group">
                     <uri_function name="uriForActors">
-                        <arg name="">../lido:nationalityActor/lido:concept/lido:conceptID/@lido:source</arg>
-                        <arg name="">../lido:nationalityActor/lido:concept/lido:conceptID/text()</arg>
-                        <arg name="">../lido:nationalityActor/lido:concept/lido:term/text()</arg>
-                        <arg name="">//lido:lido/nothing</arg>
+                        <arg name="authority">../lido:nationalityActor/lido:concept/lido:conceptID/@lido:source</arg>
+                        <arg name="identifier">../lido:nationalityActor/lido:concept/lido:conceptID/text()</arg>
+                        <arg name="name">../lido:nationalityActor/lido:concept/lido:term/text()</arg>
+                        <arg name="birthDate">//lido:lido/nothing</arg>
                     </uri_function>
                 </entity>
             </range>
@@ -1389,9 +1231,7 @@
             <range>
                 <source>lido:nationalityActor/lido:conceptID</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -1403,9 +1243,7 @@
             <range>
                 <source>lido:vitalDatesActor</source>
                 <entity tag="E52_Time_Span">
-                    <uri_function name="uriTimeSpan">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="uriTimeSpan"/>
                 </entity>
             </range>
         </link>
@@ -1417,9 +1255,7 @@
             <range>
                 <source>lido:genderActor</source>
                 <entity tag="E55_Type">
-                    <uri_function name="uriType">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Type"/>
                 </entity>
             </range>
         </link>
@@ -1429,7 +1265,7 @@
             <source>lido/periodName</source>
             <entity tag="E52_Time_Span">
                 <uri_function name="uriTimeSpan">
-                    <arg name="">lido:concept/lido:term/text()</arg>
+                    <arg>lido:concept/lido:term/text()</arg>
                 </uri_function>
             </entity>
         </domain>
@@ -1441,9 +1277,7 @@
             <range>
                 <source>lido:eventDate/lido:date/lido:periodName/lido:term</source>
                 <entity tag="E4_Period">
-                    <uri_function name="uriType">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Type"/>
                 </entity>
             </range>
         </link>
@@ -1452,12 +1286,12 @@
         <domain>
             <source>lido/eventPlace</source>
             <entity tag="E53_Place">
-                <uri_function name="uriForPlaces">
-                    <arg name="">lido:place/lido:namePlaceSet/lido:appellationValue/text()</arg>
-                    <arg name="">lido:place/lido:placeID/@lido:source</arg>
-                    <arg name="">lido:place/lido:placeID/text()</arg>
-                    <arg name="">//lido:lido/nothing</arg>
-                    <arg name="">lido:place/lido:partOfPlace</arg>
+                <uri_function name="Place">
+                    <arg name="placeName">lido:place/lido:namePlaceSet/lido:appellationValue/text()</arg>
+                    <arg name="authority">lido:place/lido:placeID/@lido:source</arg>
+                    <arg name="placeId">lido:place/lido:placeID/text()</arg>
+                    <arg name="coordinates">//lido:lido/nothing</arg>
+                    <arg name="spaces">lido:place/lido:partOfPlace</arg>
                 </uri_function>
             </entity>
         </domain>
@@ -1467,12 +1301,12 @@
                 <property tag="P88_consists_of"/>
                 <internal_node>
                     <entity tag="E53_Place">
-                        <uri_function name="uriForPlaces">
-                            <arg name="">../lido:namePlaceSet/lido:appellationValue/text()</arg>
-                            <arg name="">../lido:placeID/@lido:source</arg>
-                            <arg name="">../lido:placeID/text()</arg>
-                            <arg name="">//lido:lido/nothing</arg>
-                            <arg name="">../lido:partOfPlace</arg>
+                        <uri_function name="Place">
+                            <arg name="placeName">../lido:namePlaceSet/lido:appellationValue/text()</arg>
+                            <arg name="authority">../lido:placeID/@lido:source</arg>
+                            <arg name="placeId">../lido:placeID/text()</arg>
+                            <arg name="coordinates">//lido:lido/nothing</arg>
+                            <arg name="spaces">../lido:partOfPlace</arg>
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
@@ -1481,9 +1315,7 @@
             <range>
                 <source>lido:eventPlace/lido:place/lido:partOfPlace/lido:placeID</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -1495,9 +1327,7 @@
             <range>
                 <source>lido:eventPlace/lido:place/lido:placeClassification/lido:term</source>
                 <entity tag="E55_Type">
-                    <uri_function name="uriType">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Type"/>
                 </entity>
             </range>
         </link>
@@ -1506,9 +1336,7 @@
         <domain>
             <source>lido/termMaterialsTech</source>
             <entity tag="E55_Type">
-                <uri_function name="uriType">
-                    <arg name="">text()</arg>
-                </uri_function>
+                <uri_function name="Type"/>
             </entity>
         </domain>
         <link>
@@ -1519,9 +1347,7 @@
             <range>
                 <source>lido:sourceMaterialsTech</source>
                 <entity tag="E32_Authority_Document">
-                    <uri_function name="uriPhysThing">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="uriPhysThing"/>
                 </entity>
             </range>
         </link>
@@ -1530,9 +1356,7 @@
         <domain>
             <source>lido/object</source>
             <entity tag="E18_Physical_Thing">
-                <uri_function name="uriPhysThing">
-                    <arg name="">text()</arg>
-                </uri_function>
+                <uri_function name="uriPhysThing"/>
             </entity>
         </domain>
         <link>
@@ -1543,9 +1367,7 @@
             <range>
                 <source>lido:subjectObject/lido:object/lido:objectNote</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1555,7 +1377,7 @@
             <source>lido/rights</source>
             <entity tag="E30_Right">
                 <uri_function name="uriConceptual">
-                    <arg name="">lido:rightsType/text()</arg>
+                    <arg>lido:rightsType/text()</arg>
                 </uri_function>
             </entity>
         </domain>
@@ -1567,9 +1389,7 @@
             <range>
                 <source>lido:rightsDate/lido:earliestDate</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1581,9 +1401,7 @@
             <range>
                 <source>lido:rightsDate/lido:latestDate</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1595,9 +1413,7 @@
             <range>
                 <source>lido:rightsDate/lido:periodName/lido:term</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1620,9 +1436,7 @@
             <range>
                 <source>lido:rightsHolder/lido:legalBodyID</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -1633,10 +1447,10 @@
                 <internal_node>
                     <entity tag="E39_Actor">
                         <uri_function name="uriForActors">
-                            <arg name="">../../lido:legalBodyID/@lido:source</arg>
-                            <arg name="">../../lido:legalBodyID/text()</arg>
-                            <arg name="">text()</arg>
-                            <arg name="">//lido:lido/nothing</arg>
+                            <arg name="authority">../../lido:legalBodyID/@lido:source</arg>
+                            <arg name="identifier">../../lido:legalBodyID/text()</arg>
+                            <arg name="name">text()</arg>
+                            <arg name="birthDate">//lido:lido/nothing</arg>
                         </uri_function>
                     </entity>
                     <property tag="P131_is_identified_by"/>
@@ -1645,9 +1459,7 @@
             <range>
                 <source>lido:rightsHolder/lido:legalBodyName/lido:appellationValue</source>
                 <entity tag="E82_Actor_Appellation">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -1659,9 +1471,7 @@
             <range>
                 <source>lido:creditLine</source>
                 <entity tag="E62_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1671,10 +1481,10 @@
             <source>lido/rightsHolder</source>
             <entity tag="39_Actor">
                 <uri_function name="uriForActors">
-                    <arg name="">lido:legalBodyID/@lido:source</arg>
-                    <arg name="">lido:legalBodyID/text()</arg>
-                    <arg name="">lido:legalBodyName/lido:appellationValue/text()</arg>
-                    <arg name="">//lido:lido/nothing</arg>
+                    <arg name="authority">lido:legalBodyID/@lido:source</arg>
+                    <arg name="identifier">lido:legalBodyID/text()</arg>
+                    <arg name="name">lido:legalBodyName/lido:appellationValue/text()</arg>
+                    <arg name="birthDate">//lido:lido/nothing</arg>
                 </uri_function>
             </entity>
         </domain>
@@ -1686,15 +1496,13 @@
             <range>
                 <source>lido:rightsHolder/lido:legalBodyWeblink</source>
                 <entity tag="E73_Information_Object">
-                    <uri_function name="uriConceptual">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="uriConceptual"/>
                 </entity>
                 <additional_node>
                     <property tag="P2_has_type"/>
                     <entity tag="E55_Type" binding="Web_resource">
-                        <uri_function name="uriType">
-                            <arg name="">@lido:formatResource</arg>
+                        <uri_function name="Type">
+                            <arg>@lido:formatResource</arg>
                         </uri_function>
                     </entity>
                 </additional_node>
@@ -1706,7 +1514,7 @@
             <source>lido/recordWrap</source>
             <entity tag="E31_Document">
                 <uri_function name="uriPhysThing">
-                    <arg name="">lido:recordID/text()</arg>
+                    <arg>lido:recordID/text()</arg>
                 </uri_function>
             </entity>
         </domain>
@@ -1718,9 +1526,7 @@
             <range>
                 <source>lido:recordType</source>
                 <entity tag="E55_String">
-                    <uri_function name="createLiteral">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="createLiteral"/>
                 </entity>
             </range>
         </link>
@@ -1731,10 +1537,10 @@
                 <internal_node>
                     <entity tag="E39_Actor">
                         <uri_function name="uriForActors">
-                            <arg name="">@lido:source</arg>
-                            <arg name="">text()</arg>
-                            <arg name="">../lido:legalBodyName/lido:appellationValue/text()</arg>
-                            <arg name="">//lido:lido/nothing</arg>
+                            <arg name="authority">@lido:source</arg>
+                            <arg name="identifier">text()</arg>
+                            <arg name="name">../lido:legalBodyName/lido:appellationValue/text()</arg>
+                            <arg name="birthDate">//lido:lido/nothing</arg>
                         </uri_function>
                     </entity>
                     <property tag="P48_has_preferred_identifier"/>
@@ -1743,9 +1549,7 @@
             <range>
                 <source>lido:recordSource/lido:legalBodyID</source>
                 <entity tag="E42_Identifier">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -1756,10 +1560,10 @@
                 <internal_node>
                     <entity tag="E39_Actor">
                         <uri_function name="uriForActors">
-                            <arg name="">../../lido:legalBodyID/@lido:source</arg>
-                            <arg name="">../../lido:legalBodyID/text()</arg>
-                            <arg name="">text()</arg>
-                            <arg name="">//lido:lido/nothing</arg>
+                            <arg name="authority">../../lido:legalBodyID/@lido:source</arg>
+                            <arg name="identifier">../../lido:legalBodyID/text()</arg>
+                            <arg name="name">text()</arg>
+                            <arg name="birthDate">//lido:lido/nothing</arg>
                         </uri_function>
                     </entity>
                     <property tag="P131_is_identified_by"/>
@@ -1768,9 +1572,7 @@
             <range>
                 <source>lido:recordSource/lido:legalBodyName/lido:appellationValue</source>
                 <entity tag="E82_Actor_Appellation">
-                    <uri_function name="appellationURI">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="Appellation"/>
                 </entity>
             </range>
         </link>
@@ -1780,10 +1582,10 @@
             <source>lido/recordSource</source>
             <entity tag="39_Actor">
                 <uri_function name="uriForActors">
-                    <arg name="">lido:legalBodyID/@lido:source</arg>
-                    <arg name="">lido:legalBodyID/text()</arg>
-                    <arg name="">lido:legalBodyName/lido:appellationValue/text()</arg>
-                    <arg name="">//lido:lido/nothing</arg>
+                    <arg name="authority">lido:legalBodyID/@lido:source</arg>
+                    <arg name="identifier">lido:legalBodyID/text()</arg>
+                    <arg name="name">lido:legalBodyName/lido:appellationValue/text()</arg>
+                    <arg name="birthDate">//lido:lido/nothing</arg>
                 </uri_function>
             </entity>
         </domain>
@@ -1795,15 +1597,13 @@
             <range>
                 <source>lido:recordSource/lido:legalBodyWeblink</source>
                 <entity tag="E73_Information_Object">
-                    <uri_function name="uriConceptual">
-                        <arg name="">text()</arg>
-                    </uri_function>
+                    <uri_function name="uriConceptual"/>
                 </entity>
                 <additional_node>
                     <property tag="P2_has_type"/>
                     <entity tag="E55_Type" binding="Web_resource">
-                        <uri_function name="uriType">
-                            <arg name="">@lido:formatResource</arg>
+                        <uri_function name="Type">
+                            <arg>@lido:formatResource</arg>
                         </uri_function>
                     </entity>
                 </additional_node>

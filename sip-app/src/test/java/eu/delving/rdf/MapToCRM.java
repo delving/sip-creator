@@ -186,7 +186,7 @@ public class MapToCRM {
 
         public String apply(Node node, String className) {
             try {
-                if ("appellationURI".equals(name)) {
+                if ("Appellation".equals(name)) {
                     // appellationURI(String className, String subjUri, String appellation)
                     argList.add(className);
 //                    argList.add(domainMapResult.uri);
@@ -220,12 +220,12 @@ public class MapToCRM {
                     argList.add(className);
                     fetchArgs(node);
                 }
-                else if ("uriForPhysicalObjects".equals(name)) {
+                else if ("PhysicalObject".equals(name)) {
                     // uriForPhysicalObjects(String className, String nameOfMuseum, String entry)
                     argList.add(UNUSED_CLASS_NAME);
                     fetchArgs(node);
                 }
-                else if ("uriForPlaces".equals(name)) {
+                else if ("Place".equals(name)) {
                     // uriForPlaces(String className, String placeName, String authority, String placeID,
                     //              Stribng coordinates, String spaces)
                     argList.add(UNUSED_CLASS_NAME);
@@ -235,7 +235,7 @@ public class MapToCRM {
                     fetchArg(node, 3); // coordinates never really used
                     argList.add(getPartOfPlaceHack(node));
                 }
-                else if ("uriPhysThing".equals(name)) {
+                else if ("PhysicalThing".equals(name)) {
                     // uriPhysThing(String className, String thing)
                     argList.add(className);
                     fetchArgs(node);
@@ -245,7 +245,7 @@ public class MapToCRM {
                     argList.add(UNUSED_CLASS_NAME);
                     fetchArgs(node);
                 }
-                else if ("uriType".equals(name)) {
+                else if ("Type".equals(name)) {
                     // uriType(String className, String type)
                     argList.add(className);
                     fetchArgs(node);
@@ -270,12 +270,12 @@ public class MapToCRM {
 
         private void fetchArgs(Node node) {
             for (Arg a : args) {
-                argList.add(valueAt(node, a.xpath));
+                argList.add(valueAt(node, a.content));
             }
         }
 
         private void fetchArg(Node node, int index) {
-            argList.add(valueAt(node, args.get(index).xpath));
+            argList.add(valueAt(node, args.get(index).content));
         }
 
         private String getPartOfPlaceHack(Node node) {
@@ -297,15 +297,15 @@ public class MapToCRM {
     }
 
     @XStreamAlias("arg")
-    @XStreamConverter(value = ToAttributedValueConverter.class, strings = {"xpath"})
+    @XStreamConverter(value = ToAttributedValueConverter.class, strings = {"content"})
     public static class Arg {
         @XStreamAsAttribute
         public String name;
 
-        public String xpath;
+        public String content;
 
         public String toString() {
-            return xpath;
+            return content;
         }
     }
 
