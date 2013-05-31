@@ -309,8 +309,9 @@ public class RecDef {
             if (recDef.prefix == null) throw new RuntimeException("No prefix found");
             if (path != null) {
                 path = path.withDefaultPrefix(recDef.prefix);
-                Elem elem = recDef.root.findElem(path, 0);
-                Attr attr = recDef.root.findAttr(path, 0);
+                boolean isAttr = path.peek().isAttribute();
+                Elem elem = isAttr ? null : recDef.root.findElem(path, 0);
+                Attr attr = isAttr ? recDef.root.findAttr(path, 0) : null;
                 if (elem == null && attr == null) throw new RuntimeException("Cannot find path " + path);
                 if (elem != null) elem.doc = this;
                 if (attr != null) attr.doc = this;
@@ -521,6 +522,7 @@ public class RecDef {
         public Attr findAttr(Path path, int level) {
             if (!path.getTag(level).equals(tag)) return null;
             Tag nextTag = path.getTag(level + 1);
+            if (nextTag == null) return null;
             for (Attr attr : attrList) if (attr.tag.equals(nextTag)) return attr;
             for (Elem sub : elemList) {
                 Attr found = sub.findAttr(path, level + 1);
