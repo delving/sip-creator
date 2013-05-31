@@ -26,12 +26,10 @@ import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Swing;
-import eu.delving.sip.base.SwingHelper;
 
 import javax.swing.AbstractListModel;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -48,15 +46,7 @@ public class NodeMappingListModel extends AbstractListModel {
     private EntrySorting entrySorting = new EntrySorting(true);
 
     public JList createJList() {
-        JList list = new JList(this) {
-            @Override
-            public String getToolTipText(MouseEvent evt) {
-                int index = locationToIndex(evt.getPoint());
-                if (index < 0) return "?";
-                NodeMappingEntry entry = (NodeMappingEntry) getModel().getElementAt(index);
-                return SwingHelper.nodeMappingToHTML(entry.getNodeMapping());
-            }
-        };
+        JList list = new JList(this);
         list.setCellRenderer(new NodeMappingEntry.CellRenderer());
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         return list;
