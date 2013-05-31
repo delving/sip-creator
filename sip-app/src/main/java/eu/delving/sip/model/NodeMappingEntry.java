@@ -123,7 +123,6 @@ public class NodeMappingEntry {
             }
             html.append(nodeMapping.groovyCode == null ? "</p>" : "</b>");
             html.append("</font>");
-            html.append("<hr>");
             html.append("<table border=0 cellpadding=0>");
             html.append("<tr><td width=30></td><td><i>");
             for (Path path : nodeMapping.getInputPaths()) html.append(path).append("<br>");
