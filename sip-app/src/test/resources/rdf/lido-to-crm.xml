@@ -84,7 +84,7 @@
         <link>
             <path>
                 <source>titleSet/appellationValue</source>
-                <property tag="P1_identified_by"/>
+                <property tag="P1_is_identified_by"/>
             </path>
             <range>
                 <source>lido:titleSet/lido:appellationValue</source>
@@ -96,7 +96,7 @@
         <link>
             <path>
                 <source>titleSet/sourceAppellation</source>
-                <property tag="P1_identified_by"/>
+                <property tag="P1_is_identified_by"/>
             </path>
             <range>
                 <source>lido:titleSet/lido:sourceAppellation</source>
@@ -348,7 +348,7 @@
         <link>
             <path>
                 <source>eventID</source>
-                <property tag="P12B_was_present_at"/>
+                <property tag="P12i_was_present_at"/>
                 <internal_node>
                     <entity tag="E5_Event">
                         <uri_function name="uriEvents">
@@ -369,7 +369,7 @@
         <link>
             <path>
                 <source>eventType/term</source>
-                <property tag="P12B_was_present_at"/>
+                <property tag="P12i_was_present_at"/>
                 <internal_node>
                     <entity tag="E5_Event">
                         <uri_function name="uriEvents">
@@ -407,7 +407,7 @@
         <link>
             <path>
                 <source>eventType/term</source>
-                <property tag="P94_was_created_by">
+                <property tag="P94i_was_created_by">
                     <exists value="created_by">../../lido:roleInEvent/lido:term/text()</exists>
                 </property>
             </path>
@@ -424,7 +424,7 @@
         <link>
             <path>
                 <source>eventType/term</source>
-                <property tag="P16_was_used_for">
+                <property tag="P16i_was_used_for">
                     <exists value="used_for">../../lido:roleInEvent/lido:term/text()</exists>
                 </property>
             </path>
@@ -441,7 +441,7 @@
         <link>
             <path>
                 <source>eventType/term</source>
-                <property tag="P12B_was_present_at"/>
+                <property tag="P12i_was_present_at"/>
             </path>
             <range>
                 <source>lido:eventType/lido:term</source>
@@ -603,7 +603,7 @@
         <link>
             <path>
                 <source>subjectObject/object/objectWebResource</source>
-                <property tag="P67_is_referred_to_by"/>
+                <property tag="P67i_is_referred_to_by"/>
                 <internal_node>
                     <entity tag="E73_Information_Object">
                         <uri_function name="uriConceptual"/>
@@ -641,7 +641,7 @@
         <link>
             <path>
                 <source>relatedWorkRelType</source>
-                <property tag="P46_forms_part_of"/>
+                <property tag="P46i_forms_part_of"/>
                 <internal_node>
                     <entity tag="E18_Physical_Thing">
                         <uri_function name="uriPhysThing"/>
@@ -677,7 +677,7 @@
         <link>
             <path>
                 <source>recordID</source>
-                <property tag="P70B_is_documented_in"/>
+                <property tag="P70_is_documented_in"/>
                 <internal_node>
                     <entity tag="E31_Document">
                         <uri_function name="uriPhysThing"/>
@@ -708,7 +708,7 @@
         <link>
             <path>
                 <source>repositoryName/legalBodyWeblink</source>
-                <property tag="P129_is_subject_of"/>
+                <property tag="P129i_is_subject_of"/>
             </path>
             <range>
                 <source>lido:repositoryName/lido:legalBodyWeblink</source>
@@ -1342,7 +1342,7 @@
         <link>
             <path>
                 <source>sourceMaterialsTech</source>
-                <property tag="P71_is_listed_in"/>
+                <property tag="P71i_is_listed_in"/>
             </path>
             <range>
                 <source>lido:sourceMaterialsTech</source>
@@ -1420,7 +1420,7 @@
         <link>
             <path>
                 <source>rightsHolder/legalBodyID</source>
-                <property tag="P75B_is_possessed_by"/>
+                <property tag="P75i_is_possessed_by"/>
                 <internal_node>
                     <entity tag="E39_Actor">
                         <uri_function name="uriForActors">
@@ -1443,7 +1443,7 @@
         <link>
             <path>
                 <source>rightsHolder/legalBodyName/appellationValue</source>
-                <property tag="P75B_is_possessed_by"/>
+                <property tag="P75i_is_possessed_by"/>
                 <internal_node>
                     <entity tag="E39_Actor">
                         <uri_function name="uriForActors">
@@ -1479,7 +1479,7 @@
     <mapping>
         <domain>
             <source>lido/rightsHolder</source>
-            <entity tag="39_Actor">
+            <entity tag="E39_Actor">
                 <uri_function name="uriForActors">
                     <arg name="authority">lido:legalBodyID/@lido:source</arg>
                     <arg name="identifier">lido:legalBodyID/text()</arg>
@@ -1491,7 +1491,7 @@
         <link>
             <path>
                 <source>rightsHolder/legalBodyWeblink</source>
-                <property tag="P129B_is_subject_of"/>
+                <property tag="P129i_is_subject_of"/>
             </path>
             <range>
                 <source>lido:rightsHolder/lido:legalBodyWeblink</source>
@@ -1525,7 +1525,7 @@
             </path>
             <range>
                 <source>lido:recordType</source>
-                <entity tag="E55_String">
+                <entity tag="E55_Type">
                     <uri_function name="createLiteral"/>
                 </entity>
             </range>
@@ -1580,7 +1580,7 @@
     <mapping>
         <domain>
             <source>lido/recordSource</source>
-            <entity tag="39_Actor">
+            <entity tag="E39_Actor">
                 <uri_function name="uriForActors">
                     <arg name="authority">lido:legalBodyID/@lido:source</arg>
                     <arg name="identifier">lido:legalBodyID/text()</arg>
@@ -1592,7 +1592,7 @@
         <link>
             <path>
                 <source>recordSource/legalBodyWeblink</source>
-                <property tag="P129B_is_subject_of"/>
+                <property tag="P129i_is_subject_of"/>
             </path>
             <range>
                 <source>lido:recordSource/lido:legalBodyWeblink</source>

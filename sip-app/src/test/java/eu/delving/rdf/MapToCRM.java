@@ -104,7 +104,7 @@ public class MapToCRM {
     @XStreamAlias("entity")
     public static class Entity {
         @XStreamAsAttribute
-        public String tag;
+        public CRMEntity tag;
 
         @XStreamAsAttribute
         public String binding;
@@ -119,7 +119,7 @@ public class MapToCRM {
     @XStreamAlias("property")
     public static class Property {
         @XStreamAsAttribute
-        public String tag;
+        public CRMProperty tag;
 
         @XStreamAlias("exists")
         public Exists exists;
