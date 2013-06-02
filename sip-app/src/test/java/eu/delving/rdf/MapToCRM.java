@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, 2012 Delving BV
+ * Copyright 2013 Delving BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
