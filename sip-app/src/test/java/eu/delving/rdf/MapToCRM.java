@@ -50,7 +50,7 @@ public class MapToCRM {
             {"lido", "http://www.lido-schema.org"}
     });
 
-    public static Mappings readForthMapping(InputStream inputStream) throws IOException, ParserConfigurationException, SAXException {
+    public static Mappings readMappings(InputStream inputStream) throws IOException, ParserConfigurationException, SAXException {
         return (Mappings) stream().fromXML(inputStream);
     }
 

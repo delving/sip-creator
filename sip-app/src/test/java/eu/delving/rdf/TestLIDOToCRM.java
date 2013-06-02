@@ -40,10 +40,8 @@ public class TestLIDOToCRM {
     @Test
     public void lidoToCRM() throws IOException, ParserConfigurationException, SAXException {
         URL mappingFile = getClass().getResource("/rdf/lido-to-crm.xml");
-        MapToCRM.Mappings mappings = MapToCRM.readForthMapping(mappingFile.openStream());
+        MapToCRM.Mappings mappings = MapToCRM.readMappings(mappingFile.openStream());
         String xml = MapToCRM.toString(mappings);
-//        System.out.println(xml);
-
         String[] fresh = xml.split("\n");
         List<String> original = IOUtils.readLines(mappingFile.openStream());
         int index = 0;
