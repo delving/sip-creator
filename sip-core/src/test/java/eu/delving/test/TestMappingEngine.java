@@ -24,6 +24,7 @@ package eu.delving.test;
 import eu.delving.MappingEngine;
 import eu.delving.MappingEngineFactory;
 import eu.delving.MappingResult;
+import eu.delving.XMLToolFactory;
 import eu.delving.groovy.MappingException;
 import eu.delving.metadata.*;
 import eu.delving.schema.SchemaRepository;
@@ -187,7 +188,7 @@ public class TestMappingEngine {
 
     private Validator validator(SchemaVersion schemaVersion) {
         try {
-            SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+            SchemaFactory factory = XMLToolFactory.schemaFactory();
             factory.setResourceResolver(new CachedResourceResolver());
             String validationXsd = schemaRepo.getSchema(schemaVersion, SchemaType.VALIDATION_SCHEMA).getSchemaText();
             if (validationXsd == null) throw new RuntimeException("Unable to find validation schema "+schemaVersion);

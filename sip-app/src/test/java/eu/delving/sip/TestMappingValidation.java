@@ -73,10 +73,10 @@ public class TestMappingValidation {
     public void testEad() throws Exception {
         mock.prepareDataset(
                 "ead",
-                "/sample/eag",
-                "/sample/eag/eagheader/eagid"
+                "/delving-sip-source/input",
+                "/delving-sip-source/input/@id"
         );
-        runFullCycle(1);
+        runFullCycle(4);
     }
 
     @Test
