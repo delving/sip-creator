@@ -29,12 +29,14 @@ import com.thoughtworks.xstream.io.naming.NoNameCoder;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 import eu.delving.XMLToolFactory;
 import org.apache.log4j.Logger;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -76,8 +78,19 @@ public class MapToCRM {
         @XStreamAsAttribute
         public String version;
 
+        @XStreamAsAttribute
+        public String uriPolicyClass;
+
         @XStreamImplicit
         public List<Mapping> mappings;
+
+        public Graph toGraph(Element element, Func func) {
+            Graph graph = new Graph();
+            for (Mapping mapping : mappings) {
+                mapping.apply(graph, element, func);
+            }
+            return graph;
+        }
     }
 
     @XStreamAlias("mapping")
@@ -86,6 +99,14 @@ public class MapToCRM {
 
         @XStreamImplicit
         public List<Link> links;
+
+        public void apply(Graph graph, Element element, Func func) {
+            domain.entity.resolveAt(element, func);
+            LOG.info("Domain: " + domain.entity);
+            for (Link link : links) {
+                link.apply(graph, element, domain, func);
+            }
+        }
     }
 
     @XStreamAlias("domain")
@@ -108,6 +129,15 @@ public class MapToCRM {
 
         @XStreamAlias("uri_function")
         public URIFunction uriFunction;
+
+        @XStreamOmitField
+        public String uri;
+
+        public boolean resolveAt(Element element, Func func) {
+            if (exists != null && !exists.resolveAt(element)) return false;
+            uri = uriFunction.executeAt(element, func);
+            return true;
+        }
     }
 
     @XStreamAlias("property")
@@ -117,6 +147,10 @@ public class MapToCRM {
 
         @XStreamAlias("exists")
         public Exists exists;
+
+        public boolean resolveAt(Element element) {
+            return exists == null || exists.resolveAt(element);
+        }
     }
 
     @XStreamAlias("link")
@@ -124,6 +158,11 @@ public class MapToCRM {
         public Path path;
 
         public Range range;
+
+        public void apply(Graph graph, Element element, Domain domain, Func func) {
+            path.apply(graph, element, domain, func);
+            range.apply(graph, element, path, domain, func);
+        }
     }
 
     @XStreamAlias("range")
@@ -134,6 +173,16 @@ public class MapToCRM {
 
         @XStreamAlias("additional_node")
         public AdditionalNode additionalNode;
+
+        public void apply(Graph graph, Element element, Path path, Domain domain, Func func) {
+            // todo: stick source on top of domain source, for a new element, not this one
+            entity.resolveAt(element, func);
+            if (entity.uri == null) return;
+            // todo: domain-path-range is a triple!
+            if (additionalNode != null) {
+                additionalNode.apply(graph, element, entity, func);
+            }
+        }
     }
 
     @XStreamAlias("path")
@@ -144,18 +193,40 @@ public class MapToCRM {
 
         @XStreamAlias("internal_node")
         public InternalNode internalNode;
+
+        public void apply(Graph graph, Element element, Domain domain, Func func) {
+            if (!property.resolveAt(element)) return;
+            LOG.info(property);
+            if (internalNode != null) {
+                internalNode.apply(graph, element, domain, property, func);
+            }
+            // todo: implement
+        }
     }
 
     @XStreamAlias("additional_node")
     public static class AdditionalNode {
         public Property property;
         public Entity entity;
+
+        public void apply(Graph graph, Element element, Entity rangeEntity, Func func) {
+            entity.resolveAt(element, func);
+            if (entity.uri == null) return;
+            //todo: rangeEntity-property-entity is a triple!
+        }
     }
 
     @XStreamAlias("internal_node")
     public static class InternalNode {
         public Entity entity;
         public Property property;
+
+        public void apply(Graph graph, Element element, Domain domain, Property pathProperty, Func func) {
+            entity.resolveAt(element, func);
+            LOG.info("InternalNode: "+entity);
+            if (!property.resolveAt(element)) return;
+            // todo: domain-pathProperty-entity is a triple!
+        }
     }
 
     @XStreamConverter(value = ToAttributedValueConverter.class, strings = {"xpath"})
@@ -165,6 +236,12 @@ public class MapToCRM {
         public String value;
 
         public String xpath;
+
+        public boolean resolveAt(Element element) {
+            // todo: evaluate the xpath
+            // todo: compare if value != null
+            return false;
+        }
     }
 
     @XStreamAlias("uri_function")
@@ -176,7 +253,16 @@ public class MapToCRM {
         public List<Arg> args;
 
         @XStreamOmitField
-        private List<String> argList = new ArrayList<String>();
+        public Map<String, String> argMap = new TreeMap<String, String>();
+
+        public String executeAt(Element element, Func func) {
+            if (args != null) {
+                for (Arg arg : args) {
+                    argMap.put(arg.name == null ? "" : arg.name, arg.resolveAt(element));
+                }
+            }
+            return func.execute(name, argMap);
+        }
     }
 
     @XStreamAlias("arg")
@@ -190,9 +276,17 @@ public class MapToCRM {
         public String toString() {
             return content;
         }
+
+        public String resolveAt(Element element) {
+            return valueAt(element, content);
+        }
     }
 
-// =======================================================================
+    public interface Func {
+        String execute(String name, Map<String, String> argMap);
+    }
+
+    // =======================================================================
 // Legacy work-around efforts to study:
 //    public String apply(Node node, String className) {
 //        try {
@@ -305,27 +399,27 @@ public class MapToCRM {
 //        }
 //    }
 //
-//    private static String valueAt(Node context, String expressionString) {
-//        List<Node> nodes = nodeList(context, expressionString);
-//        if (nodes.isEmpty()) return "";
-//        String value = nodes.get(0).getNodeValue();
-//        if (value == null) return "";
-//        return value.trim();
-//    }
-//
-//    private static List<Node> nodeList(Node context, String expressionString) {
-//        try {
-//            XPathExpression expression = path().compile(expressionString);
-//            NodeList nodeList = (NodeList) expression.evaluate(context, XPathConstants.NODESET);
-//            List<Node> list = new ArrayList<Node>(nodeList.getLength());
-//            for (int index = 0; index < nodeList.getLength(); index++) list.add(nodeList.item(index));
-//            return list;
-//        }
-//        catch (XPathExpressionException e) {
-//            throw new RuntimeException("XPath Problem", e);
-//        }
-//    }
-//
+    private static String valueAt(Node context, String expressionString) {
+        List<Node> nodes = nodeList(context, expressionString);
+        if (nodes.isEmpty()) return "";
+        String value = nodes.get(0).getNodeValue();
+        if (value == null) return "";
+        return value.trim();
+    }
+
+    private static List<Node> nodeList(Node context, String expressionString) {
+        try {
+            XPathExpression expression = path().compile(expressionString);
+            NodeList nodeList = (NodeList) expression.evaluate(context, XPathConstants.NODESET);
+            List<Node> list = new ArrayList<Node>(nodeList.getLength());
+            for (int index = 0; index < nodeList.getLength(); index++) list.add(nodeList.item(index));
+            return list;
+        }
+        catch (XPathExpressionException e) {
+            throw new RuntimeException("XPath Problem", e);
+        }
+    }
+
     private static class XPathContext implements NamespaceContext {
         private Map<String, String> prefixUri = new TreeMap<String, String>();
         private Map<String, String> uriPrefix = new TreeMap<String, String>();
