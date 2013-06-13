@@ -2,6 +2,7 @@ package eu.delving;
 
 import com.ctc.wstx.stax.WstxInputFactory;
 import com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl;
+import org.apache.xerces.impl.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
@@ -51,7 +52,14 @@ public class XMLToolFactory {
 
     public static SchemaFactory schemaFactory() {
         System.setProperty("javax.xml.validation.SchemaFactory:http://www.w3.org/XML/XMLSchema/v1.1", "org.apache.xerces.jaxp.validation.XMLSchema11Factory");
-        return SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1");
+        SchemaFactory schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1");
+        try {
+            schemaFactory.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.CTA_FULL_XPATH_CHECKING_FEATURE, true);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Configuring schema factory", e);
+        }
+        return schemaFactory;
     }
 
     public static String serialize(Document document) {
