@@ -17,12 +17,12 @@
       <string>EAD</string>
     </entry>
     <entry>
-      <string>rights</string>
-      <string>http://creativecommons.org/publicdomain/mark/1.0/</string>
-    </entry>
-    <entry>
       <string>owner</string>
       <string>Princessehof</string>
+    </entry>
+    <entry>
+      <string>rights</string>
+      <string>http://creativecommons.org/publicdomain/mark/1.0/</string>
     </entry>
     <entry>
       <string>provider</string>
@@ -88,7 +88,7 @@
     <node-mapping inputPath="/input/archdesc/did/unittitle" outputPath="/ead:ead/ead:archdesc/ead:did/ead:unittitle"/>
     <node-mapping inputPath="/input/archdesc/did/unittitle/@encodinganalog" outputPath="/ead:ead/ead:archdesc/ead:did/ead:unittitle/@ead:encodinganalog"/>
     <node-mapping inputPath="/input/archdesc/otherfindaid/@encodinganalog" outputPath="/ead:ead/ead:archdesc/ead:otherfindaid/@ead:encodinganalog"/>
-    <node-mapping inputPath="/input/archdesc/otherfindaid/ead:p" outputPath="/ead:ead/ead:archdesc/ead:otherfindaid/ead:p"/>
+    <node-mapping inputPath="/input/archdesc/otherfindaid/p/extref" outputPath="/ead:ead/ead:archdesc/ead:otherfindaid/ead:p/ead:extref"/>
     <node-mapping inputPath="/input/archdesc/arrangement/@encodinganalog" outputPath="/ead:ead/ead:archdesc/ead:arrangement/@ead:encodinganalog"/>
     <node-mapping inputPath="/input/archdesc/arrangement/p" outputPath="/ead:ead/ead:archdesc/ead:arrangement/ead:p"/>
     <node-mapping inputPath="/input/archdesc/dsc/@type" outputPath="/ead:ead/ead:archdesc/ead:dsc/@ead:type"/>
