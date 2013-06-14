@@ -19,7 +19,7 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.rdf;
+package eu.delving.crm;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.*;

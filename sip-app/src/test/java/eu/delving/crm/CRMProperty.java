@@ -1,4 +1,4 @@
-package eu.delving.rdf;
+package eu.delving.crm;
 
 /**
  * Enumerating the CRM Properties

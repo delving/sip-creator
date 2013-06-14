@@ -1,4 +1,4 @@
-package eu.delving.rdf;
+package eu.delving.crm;
 
 import java.util.ArrayList;
 import java.util.HashMap;

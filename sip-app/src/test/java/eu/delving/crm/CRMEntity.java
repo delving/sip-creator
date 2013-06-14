@@ -1,4 +1,4 @@
-package eu.delving.rdf;
+package eu.delving.crm;
 
 /**
  * An enumeration of all the CRM Entities

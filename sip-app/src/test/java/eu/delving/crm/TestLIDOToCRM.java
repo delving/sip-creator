@@ -19,7 +19,7 @@
  *  permissions and limitations under the Licence.
  */
 
-package eu.delving.rdf;
+package eu.delving.crm;
 
 import eu.delving.XMLToolFactory;
 import junit.framework.Assert;
