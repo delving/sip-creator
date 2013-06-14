@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author Gerald de Jong <gerald@delving.eu>
@@ -64,10 +66,15 @@ public class TestLIDOToCRM {
         System.out.println(graph);
     }
 
-    private class FunctionExecutor implements MapToCRM.Func {
+    private class FunctionExecutor implements MapToCRM.URIGenerator {
 
         @Override
-        public String execute(String name, Map<String, String> argMap) {
+        public Set<String> getArgNames(String name) {
+            return new TreeSet<String>();
+        }
+
+        @Override
+        public String createURI(String name, Map<String, String> argMap) {
             StringBuilder out = new StringBuilder(name);
             out.append("(");
             int left = argMap.size();

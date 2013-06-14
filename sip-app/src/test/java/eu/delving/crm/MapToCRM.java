@@ -84,10 +84,10 @@ public class MapToCRM {
         @XStreamImplicit
         public List<Mapping> mappings;
 
-        public Graph toGraph(Element element, Func func) {
+        public Graph toGraph(Element element, URIGenerator generator) {
             Graph graph = new Graph();
             for (Mapping mapping : mappings) {
-                mapping.apply(graph, element, func);
+                mapping.apply(graph, element, generator);
             }
             return graph;
         }
@@ -100,11 +100,11 @@ public class MapToCRM {
         @XStreamImplicit
         public List<Link> links;
 
-        public void apply(Graph graph, Element element, Func func) {
-            domain.entity.resolveAt(element, func);
+        public void apply(Graph graph, Element element, URIGenerator generator) {
+            domain.entity.resolveAt(element, generator);
             LOG.info("Domain: " + domain.entity);
             for (Link link : links) {
-                link.apply(graph, element, domain, func);
+                link.apply(graph, element, domain, generator);
             }
         }
     }
@@ -133,9 +133,9 @@ public class MapToCRM {
         @XStreamOmitField
         public String uri;
 
-        public boolean resolveAt(Element element, Func func) {
+        public boolean resolveAt(Element element, URIGenerator generator) {
             if (exists != null && !exists.resolveAt(element)) return false;
-            uri = uriFunction.executeAt(element, func);
+            uri = uriFunction.executeAt(element, generator);
             return true;
         }
     }
@@ -159,9 +159,9 @@ public class MapToCRM {
 
         public Range range;
 
-        public void apply(Graph graph, Element element, Domain domain, Func func) {
-            path.apply(graph, element, domain, func);
-            range.apply(graph, element, path, domain, func);
+        public void apply(Graph graph, Element element, Domain domain, URIGenerator generator) {
+            path.apply(graph, element, domain, generator);
+            range.apply(graph, element, path, domain, generator);
         }
     }
 
@@ -174,13 +174,13 @@ public class MapToCRM {
         @XStreamAlias("additional_node")
         public AdditionalNode additionalNode;
 
-        public void apply(Graph graph, Element element, Path path, Domain domain, Func func) {
+        public void apply(Graph graph, Element element, Path path, Domain domain, URIGenerator generator) {
             // todo: stick source on top of domain source, for a new element, not this one
-            entity.resolveAt(element, func);
+            entity.resolveAt(element, generator);
             if (entity.uri == null) return;
             // todo: domain-path-range is a triple!
             if (additionalNode != null) {
-                additionalNode.apply(graph, element, entity, func);
+                additionalNode.apply(graph, element, entity, generator);
             }
         }
     }
@@ -194,11 +194,11 @@ public class MapToCRM {
         @XStreamAlias("internal_node")
         public InternalNode internalNode;
 
-        public void apply(Graph graph, Element element, Domain domain, Func func) {
+        public void apply(Graph graph, Element element, Domain domain, URIGenerator generator) {
             if (!property.resolveAt(element)) return;
             LOG.info(property);
             if (internalNode != null) {
-                internalNode.apply(graph, element, domain, property, func);
+                internalNode.apply(graph, element, domain, property, generator);
             }
             // todo: implement
         }
@@ -209,8 +209,8 @@ public class MapToCRM {
         public Property property;
         public Entity entity;
 
-        public void apply(Graph graph, Element element, Entity rangeEntity, Func func) {
-            entity.resolveAt(element, func);
+        public void apply(Graph graph, Element element, Entity rangeEntity, URIGenerator generator) {
+            entity.resolveAt(element, generator);
             if (entity.uri == null) return;
             //todo: rangeEntity-property-entity is a triple!
         }
@@ -221,9 +221,9 @@ public class MapToCRM {
         public Entity entity;
         public Property property;
 
-        public void apply(Graph graph, Element element, Domain domain, Property pathProperty, Func func) {
-            entity.resolveAt(element, func);
-            LOG.info("InternalNode: "+entity);
+        public void apply(Graph graph, Element element, Domain domain, Property pathProperty, URIGenerator generator) {
+            entity.resolveAt(element, generator);
+            LOG.info("InternalNode: " + entity);
             if (!property.resolveAt(element)) return;
             // todo: domain-pathProperty-entity is a triple!
         }
@@ -255,13 +255,34 @@ public class MapToCRM {
         @XStreamOmitField
         public Map<String, String> argMap = new TreeMap<String, String>();
 
-        public String executeAt(Element element, Func func) {
-            if (args != null) {
-                for (Arg arg : args) {
-                    argMap.put(arg.name == null ? "" : arg.name, arg.resolveAt(element));
-                }
+        public String executeAt(Element element, URIGenerator generator) {
+            Set<String> argNames = generator.getArgNames(name);
+            switch (argNames.size()) {
+                case 0:
+                    throw new RuntimeException("Lack of args");
+                case 1:
+                    String singleArg = argNames.iterator().next();
+                    if (args == null) {
+                        argMap.put(singleArg, "text()");
+                    }
+                    else if (args.size() == 1) {
+                        argMap.put(singleArg, args.get(0).resolveAt(element));
+                    }
+                    else {
+                        throw new RuntimeException("Arg mismatch");
+                    }
+                    break;
+                default:
+                    if (args != null) {
+                        for (Arg arg : args) {
+                            if (arg.name == null) throw new RuntimeException("Arg lacks name");
+                            if (!argNames.contains(arg.name)) throw new RuntimeException("Arg not found: " + arg.name);
+                            argMap.put(arg.name, arg.resolveAt(element));
+                        }
+                    }
+                    break;
             }
-            return func.execute(name, argMap);
+            return generator.createURI(name, argMap);
         }
     }
 
@@ -282,8 +303,10 @@ public class MapToCRM {
         }
     }
 
-    public interface Func {
-        String execute(String name, Map<String, String> argMap);
+    public interface URIGenerator {
+        Set<String> getArgNames(String name);
+
+        String createURI(String name, Map<String, String> argMap);
     }
 
     // =======================================================================
