@@ -1,4 +1,4 @@
-    <jar href="sip-app-1.1.5.jar" main="true"/>
+    <jar href="sip-app-1.1.6-SNAPSHOT.jar" main="true"/>
     <jar href="oauth2-client-0.2-SNAPSHOT.jar"/>
     <jar href="oauth2-common-0.2-SNAPSHOT.jar"/>
     <jar href="jettison-1.2.jar"/>
@@ -7,8 +7,8 @@
     <jar href="httpcore-4.1.2.jar"/>
     <jar href="commons-logging-1.1.1.jar"/>
     <jar href="commons-codec-1.4.jar"/>
-    <jar href="sip-core-1.1.5.jar"/>
-    <jar href="schema-repo-1.1.5.jar"/>
+    <jar href="sip-core-1.1.6-SNAPSHOT.jar"/>
+    <jar href="schema-repo-1.1.6-SNAPSHOT.jar"/>
     <jar href="log4j-1.2.16.jar"/>
     <jar href="commons-lang-2.3.jar"/>
     <jar href="commons-io-2.0.jar"/>
@@ -24,7 +24,11 @@
     <jar href="jcommon-1.0.16.jar"/>
     <jar href="jcoord-1.0.jar"/>
     <jar href="proj4j-0.1.0.jar"/>
-    <jar href="Saxon-HE-9.4.0.6.jar"/>
+    <jar href="xml-apis-2.11.0-xsd1.1.jar"/>
+    <jar href="xercesImpl-2.11.0-xsd1.1.jar"/>
+    <jar href="cup-runtime-10k.jar"/>
+    <jar href="xpath2-1.2.0.jar"/>
+    <jar href="xerces-resolver-2.11.0.jar"/>
     <jar href="lucene-spatial-3.1.0.jar"/>
     <jar href="lucene-queries-3.1.0.jar"/>
     <jar href="jakarta-regexp-1.4.jar"/>
