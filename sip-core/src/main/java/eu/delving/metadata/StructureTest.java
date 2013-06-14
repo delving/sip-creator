@@ -22,8 +22,8 @@
 package eu.delving.metadata;
 
 import eu.delving.XMLToolFactory;
-import net.sf.saxon.dom.DOMNodeList;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.*;
@@ -67,10 +67,10 @@ public class StructureTest {
     }
 
     public Violation getViolation(Node root) throws XPathExpressionException {
-        DOMNodeList parentList = (DOMNodeList) parent.evaluate(root, XPathConstants.NODESET);
+        NodeList parentList = (NodeList) parent.evaluate(root, XPathConstants.NODESET);
         for (int walk = 0; walk < parentList.getLength(); walk++) {
             Node node = parentList.item(walk);
-            DOMNodeList testList = (DOMNodeList) test.evaluate(node, XPathConstants.NODESET);
+            NodeList testList = (NodeList) test.evaluate(node, XPathConstants.NODESET);
             if (required && testList.getLength() == 0) {
                 return Violation.REQUIRED;
             }

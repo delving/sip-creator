@@ -25,8 +25,8 @@ import eu.delving.XMLToolFactory;
 import eu.delving.groovy.GroovyCodeResource;
 import groovy.lang.Binding;
 import groovy.lang.Script;
-import net.sf.saxon.dom.DOMNodeList;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.*;
@@ -63,7 +63,7 @@ public class AssertionTest {
     }
 
     public String getViolation(Node root) throws XPathExpressionException {
-        DOMNodeList nodeList = (DOMNodeList) path.evaluate(root, XPathConstants.NODESET);
+        NodeList nodeList = (NodeList) path.evaluate(root, XPathConstants.NODESET);
         if (assertion.hasCondition()) {
             for (int walk = 0; walk < nodeList.getLength(); walk++) {
                 Node node = nodeList.item(walk);
