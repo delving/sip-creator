@@ -188,7 +188,7 @@ public class TestMappingEngine {
 
     private Validator validator(SchemaVersion schemaVersion) {
         try {
-            SchemaFactory factory = XMLToolFactory.schemaFactory();
+            SchemaFactory factory = XMLToolFactory.schemaFactory(schemaVersion.getPrefix());
             factory.setResourceResolver(new CachedResourceResolver());
             String validationXsd = schemaRepo.getSchema(schemaVersion, SchemaType.VALIDATION_SCHEMA).getSchemaText();
             if (validationXsd == null) throw new RuntimeException("Unable to find validation schema "+schemaVersion);

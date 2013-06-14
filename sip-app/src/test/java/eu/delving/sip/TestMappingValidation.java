@@ -70,6 +70,16 @@ public class TestMappingValidation {
     }
 
     @Test
+    public void testEDM() throws Exception {
+        mock.prepareDataset(
+                "edm",
+                "/delving-sip-source/input",
+                "/delving-sip-source/input/@id"
+        );
+        mock.validator();
+    }
+
+    @Test
     public void testEad() throws Exception {
         mock.prepareDataset(
                 "ead",
