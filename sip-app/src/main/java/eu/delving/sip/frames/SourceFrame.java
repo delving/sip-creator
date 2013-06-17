@@ -34,13 +34,16 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import static eu.delving.sip.base.SwingHelper.UNCONVERTED;
 import static eu.delving.sip.base.SwingHelper.scrollVH;
 
 /**
@@ -90,8 +93,10 @@ public class SourceFrame extends FrameBase {
         timer.setRepeats(false);
         treePanel.add(scrollVH(sourceTree), BorderLayout.CENTER);
         recordRootButton.setEnabled(false);
+        recordRootButton.setOpaque(true);
         selectButtonPanel.add(recordRootButton);
         uniqueElementButton.setEnabled(false);
+        uniqueElementButton.setOpaque(true);
         selectButtonPanel.add(uniqueElementButton);
         filterPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
         filterPanel.add(new JLabel("Filter:", JLabel.RIGHT), BorderLayout.WEST);
@@ -115,7 +120,17 @@ public class SourceFrame extends FrameBase {
     protected void buildContent(Container content) {
         content.add(filterPanel, BorderLayout.NORTH);
         content.add(treePanel, BorderLayout.CENTER);
-        if (!delimited) content.add(selectButtonPanel, BorderLayout.SOUTH);
+        if (!delimited) {
+            treePanel.setBackground(UNCONVERTED);
+            recordRootButton.setBackground(UNCONVERTED);
+            uniqueElementButton.setBackground(UNCONVERTED);
+            content.add(selectButtonPanel, BorderLayout.SOUTH);
+        }
+        else {
+            treePanel.setBackground(filterPanel.getBackground());
+            recordRootButton.setBackground(autoFoldBox.getBackground());
+            uniqueElementButton.setBackground(autoFoldBox.getBackground());
+        }
     }
 
     private void wireUp() {
