@@ -29,7 +29,7 @@ import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.stats.Stats;
 
-import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
@@ -202,7 +202,6 @@ public class StatsModel {
     }
 
     public interface Listener {
-        void mappingHints(List<NodeMapping> mappings);
 
         void recordRootSet(Path recordRootPath);
 

@@ -29,8 +29,10 @@ import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,6 +129,14 @@ public class StatusPanel extends JPanel {
 
         public void setAction(Action action) {
             this.action = action;
+            action.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if (Action.NAME.equals(evt.getPropertyName())) {
+                        putValue(Action.NAME, state.toHtml(evt.getNewValue()));
+                    }
+                }
+            });
         }
 
         @Override

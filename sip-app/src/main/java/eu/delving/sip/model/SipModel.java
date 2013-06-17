@@ -145,9 +145,6 @@ public class SipModel {
 
         statsModel = new StatsModel(this);
         statsModel.addListener(new StatsModel.Listener() {
-            @Override
-            public void mappingHints(List<NodeMapping> mappings) {
-            }
 
             @Override
             public void recordRootSet(Path recordRootPath) {

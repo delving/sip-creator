@@ -26,13 +26,17 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
+import eu.delving.sip.model.FactModel;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import java.awt.event.ActionEvent;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Upload what is necessary to the culture hub
@@ -41,14 +45,49 @@ import java.util.List;
  */
 
 public class UploadAction extends AbstractAction {
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    private static final String UPLOAD = "Upload";
+    private static final String UPLOAD_LAST_PATTERN = "Upload (Last time: %s)";
     private SipModel sipModel;
     private CultureHubClient cultureHubClient;
 
     public UploadAction(SipModel sipModel, CultureHubClient cultureHubClient) {
-        super("Upload");
-        putValue(Action.SMALL_ICON, SwingHelper.ICON_UPLOAD);
+        super(UPLOAD);
+        putValue(SMALL_ICON, SwingHelper.ICON_UPLOAD);
         this.sipModel = sipModel;
         this.cultureHubClient = cultureHubClient;
+        this.sipModel.getStatsModel().getHintsModel().addListener(new FactModel.Listener() {
+            @Override
+            public void factUpdated(String name, String value) {
+                if (Storage.LAST_UPLOAD.equals(name)) {
+                    showLastUpload(Long.parseLong(value));
+                }
+            }
+
+            @Override
+            public void allFactsUpdated(Map<String, String> map) {
+                if (map.containsKey(Storage.LAST_UPLOAD)) {
+                    showLastUpload(Long.parseLong(map.get(Storage.LAST_UPLOAD)));
+                }
+                else {
+                    showLastUpload(-1);
+                }
+            }
+        });
+    }
+
+    private void showLastUpload(final long lastUploadTime) {
+        sipModel.exec(new Swing() {
+            @Override
+            public void run() {
+                if (lastUploadTime < 0) {
+                    putValue(NAME, UPLOAD);
+                }
+                else {
+                    putValue(NAME, String.format(UPLOAD_LAST_PATTERN, DATE_FORMAT.format(new Date(lastUploadTime))));
+                }
+            }
+        });
     }
 
     @Override
@@ -65,6 +104,10 @@ public class UploadAction extends AbstractAction {
                             @Override
                             public void run() {
                                 setEnabled(true);
+                                sipModel.getStatsModel().getHintsModel().set(
+                                        Storage.LAST_UPLOAD,
+                                        String.valueOf(System.currentTimeMillis())
+                                );
                             }
                         });
                     }

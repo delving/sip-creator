@@ -109,6 +109,7 @@ public interface Storage {
     String MAX_UNIQUE_VALUE_LENGTH = "maxUniqueValueLength";
     String UNIQUE_VALUE_CONVERTER = "uniqueValueConverter";
     String SCHEMA_VERSIONS = "schemaVersions";
+    String LAST_UPLOAD = "lastUpload";
     String HARVEST_URL = "harvestUrl";
     String HARVEST_PREFIX = "harvestPrefix";
     String HARVEST_SPEC = "harvestSpec";

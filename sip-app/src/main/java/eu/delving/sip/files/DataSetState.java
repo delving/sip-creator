@@ -56,4 +56,13 @@ public enum DataSetState {
                 description[0], description[1], description[2]
         );
     }
+
+    public String toHtml(Object name) {
+        return String.format(
+                "<html><center><b>&quot;%s&quot;</b><br>" +
+                        "Status is now : %s<br>" +
+                        "Click here to : %s<br>",
+                name, description[1], description[2]
+        );
+    }
 }
