@@ -21,10 +21,13 @@
 
 package eu.delving.crm;
 
+import eu.delving.XMLToolFactory;
+import eu.delving.groovy.XmlSerializer;
 import junit.framework.Assert;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -53,12 +56,12 @@ public class TestLIDOToCRM {
             Assert.assertEquals("Line " + index, originalLine, freshLine);
             index++;
         }
-//        URL lidoFile = getClass().getResource("/crm/LIDOExample.xml");
-//        Document lidoDoc = XMLToolFactory.documentBuilderFactory().newDocumentBuilder().parse(lidoFile.openStream());
-//        Strinxg lidoXML = new XmlSerializer().toXml(lidoDoc.getDocumentElement(), false);
-//        System.out.println(lidoXML);
-//        Graph graph = mappings.toGraph(lidoDoc.getDocumentElement(), new FunctionExecutor());
-//        System.out.println(graph);
+        URL lidoFile = getClass().getResource("/crm/LIDOExample.xml");
+        Document lidoDoc = XMLToolFactory.documentBuilderFactory().newDocumentBuilder().parse(lidoFile.openStream());
+        String lidoXML = new XmlSerializer().toXml(lidoDoc.getDocumentElement(), false);
+//        log.info(lidoXML);
+        Graph graph = mappings.toGraph(lidoDoc.getDocumentElement(), new FunctionExecutor());
+        log.info(graph);
     }
 
 }

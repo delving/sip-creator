@@ -36,9 +36,17 @@ public class FunctionExecutor implements MapToCRM.URIGenerator {
     private static final String CLASS_NAME = "className";
     private static final String DOMAIN_URI = "domainURI";
     private static final String MUSEUM_NAME = "museumName";
+    private static final String ACTOR_NAME = "actorName";
+    private static final String AUTHORITY = "authority";
     private static final String IDENTIFIER = "identifier";
     private static final String TYPE = "type";
     private static final String NOTE = "note";
+    private static final String BIRTH_DATE = "birthDate";
+    private static final String PLACE_NAME = "placeName";
+    private static final String COORDINATES = "coordinates";
+    private static final String DIMENSIONS = "spaces";
+    private static final String SPACES = "spaces";
+    private static final String TIME_SPAN = "timeSpan";
 
     @Override
     public Set<String> getArgNames(String name) {
@@ -193,9 +201,188 @@ public class FunctionExecutor implements MapToCRM.URIGenerator {
         public String generateURI(String name, Map<String, String> argMap) {
             String type = argMap.get(TYPE);
             String note = argMap.get(NOTE);
-            return "literal:"+type+":"+note;
+            return "literal:" + type + ":" + note;
         }
     }
+
+    private static class Actor implements URIGeneratorFunction {
+
+        @Override
+        public String getName() {
+            return "Actor";
+        }
+
+        @Override
+        public String[] getArgNames() {
+            return new String[]{AUTHORITY, IDENTIFIER, ACTOR_NAME, BIRTH_DATE};
+        }
+
+        @Override
+        public String generateURI(String name, Map<String, String> argMap) {
+            String className = argMap.get(CLASS_NAME);
+            String authority = argMap.get(AUTHORITY);
+            String identifier = argMap.get(IDENTIFIER);
+            String actorName = argMap.get(ACTOR_NAME);
+            String birthDate = argMap.get(BIRTH_DATE);
+            if (authority != null && identifier != null) {
+                return encode(PRE + ":(Actor" + dashClassName(className, "Actor") + ")" + authority + ":" + identifier);
+            }
+            if (name != null && birthDate != null) {
+                return encode(PRE + ":(Actor" + dashClassName(className, "Actor") + ")" + actorName + ",b." + birthDate);
+            }
+            return uuid();
+        }
+    }
+
+    private static class Place implements URIGeneratorFunction {
+
+        @Override
+        public String getName() {
+            return "Place";
+        }
+
+        @Override
+        public String[] getArgNames() {
+            return new String[]{PLACE_NAME, AUTHORITY, IDENTIFIER, COORDINATES, SPACES};
+        }
+
+        @Override
+        public String generateURI(String name, Map<String, String> argMap) {
+            String authority = argMap.get(AUTHORITY);
+            String identifier = argMap.get(IDENTIFIER);
+            String placeName = argMap.get(PLACE_NAME);
+            String coordinates = argMap.get(COORDINATES);
+            String spaces = argMap.get(SPACES);
+            if (identifier != null) {
+                return encode(PRE + "(Place)" + placeName + "," + (authority == null ? "" : authority + ":") + identifier);
+            }
+            if (coordinates != null) {
+                return encode(PRE + "(Place)" + placeName + "," + coordinates);
+            }
+            if (spaces != null) {
+                return encode(PRE + "(Place)" + spaces);
+            }
+            return uuid();
+        }
+    }
+
+    private static class Dimension implements URIGeneratorFunction {
+
+        @Override
+        public String getName() {
+            return "Dimensions";
+        }
+
+        @Override
+        public String[] getArgNames() {
+            return new String[]{DIMENSIONS};
+        }
+
+        @Override
+        public String generateURI(String name, Map<String, String> argMap) {
+            String domainURI = argMap.get(DOMAIN_URI);
+            String dimensions = argMap.get(DIMENSIONS);
+            return encode(PRE + ":(Dimensions)@" + domainURI + "@" + dimensions);
+        }
+    }
+
+    private static class Event implements URIGeneratorFunction {
+
+        @Override
+        public String getName() {
+            return "Event";
+        }
+
+        @Override
+        public String[] getArgNames() {
+            return new String[]{AUTHORITY, IDENTIFIER};
+        }
+
+        @Override
+        public String generateURI(String name, Map<String, String> argMap) {
+            String className = argMap.get(CLASS_NAME);
+            String identifier = argMap.get(IDENTIFIER);
+            String domainURI = argMap.get(DOMAIN_URI);
+            String authority = argMap.get(AUTHORITY);
+            if (identifier != null) {
+                return PRE + ":(Event)" + authority + ":" + identifier;
+            }
+            if (domainURI != null) { // todo: some test regarding unique event
+                return PRE + ":(Event)@" + domainURI + "@" + className;
+            }
+            return uuid();
+        }
+    }
+
+    private static class Conceptual implements URIGeneratorFunction {
+
+        @Override
+        public String getName() {
+            return "Conceptual";
+        }
+
+        @Override
+        public String[] getArgNames() {
+            return new String[]{IDENTIFIER};
+        }
+
+        @Override
+        public String generateURI(String name, Map<String, String> argMap) {
+            String className = argMap.get(CLASS_NAME);
+            String identifier = argMap.get(IDENTIFIER);
+            if (identifier != null) {
+                return encode(PRE + ":(Conceptual" + dashClassName(className, "Conceptual") + ")" + identifier);
+            }
+            return uuid();
+        }
+    }
+
+    private static class TimeSpan implements URIGeneratorFunction {
+
+        @Override
+        public String getName() {
+            return "TimeSpan";
+        }
+
+        @Override
+        public String[] getArgNames() {
+            return new String[]{TIME_SPAN};
+        }
+
+        @Override
+        public String generateURI(String name, Map<String, String> argMap) {
+            String className = argMap.get(CLASS_NAME);
+            String timeSpan = argMap.get(TIME_SPAN);
+            if (timeSpan != null) {
+                return PRE + ":(TimeSpan)" + timeSpan;
+            }
+            return uuid();
+        }
+    }
+
+//            else if ("uriTimeSpan".equals(name)) {
+//                // uriTimeSpan(String className, String timespan)
+//                argList.add(UNUSED_CLASS_NAME);
+//                fetchArgs(node);
+//            }
+//
+//    private String getPartOfPlaceHack(Node node) {
+//        try { // iterate into partOfPlace fetching names and then join them with dash
+//            List<String> places = new ArrayList<String>();
+//            while (node != null) {
+//                XPathExpression expr = path().compile("lido:namePlaceSet/lido:appellationValue/text()");
+//                String placeName = (String) expr.evaluate(node, XPathConstants.STRING);
+//                places.add(placeName);
+//                expr = path().compile("lido:partOfPlace");
+//                node = (Node) expr.evaluate(node, XPathConstants.NODE);
+//            }
+//            return StringUtils.join(places, '-');
+//        }
+//        catch (XPathExpressionException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+//
 
     private static String dashClassName(String className, String defaultName) {
         return (className.equals(defaultName) ? "" : "-" + className);
@@ -219,6 +406,12 @@ public class FunctionExecutor implements MapToCRM.URIGenerator {
         register(new Type());
         register(new Appellation());
         register(new Literal());
+        register(new Actor());
+        register(new Place());
+        register(new Dimension());
+        register(new Event());
+        register(new Conceptual());
+        register(new TimeSpan());
     }
 
     private static String encode(String s) {
