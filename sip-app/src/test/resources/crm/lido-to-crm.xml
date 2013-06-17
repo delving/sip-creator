@@ -4,8 +4,8 @@
             <source>lido</source>
             <entity tag="E19_Physical_Object">
                 <uri_function name="PhysicalObject">
-                    <arg name="nameOfMuseum">//lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:repositoryWrap/lido:repositorySet/lido:repositoryName/lido:legalBodyName/lido:appellationValue/text()</arg>
-                    <arg name="entry">//lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:repositoryWrap/lido:repositorySet/lido:workID/text()</arg>
+                    <arg name="museumName">//lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:repositoryWrap/lido:repositorySet/lido:repositoryName/lido:legalBodyName/lido:appellationValue/text()</arg>
+                    <arg name="identifier">//lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:repositoryWrap/lido:repositorySet/lido:workID/text()</arg>
                 </uri_function>
             </entity>
         </domain>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, 2012 Delving BV
+ * Copyright 2013x Delving BV
  *
  *  Licensed under the EUPL, Version 1.0 or? as soon they
  *  will be approved by the European Commission - subsequent
@@ -21,21 +21,16 @@
 
 package eu.delving.crm;
 
-import eu.delving.XMLToolFactory;
 import junit.framework.Assert;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * @author Gerald de Jong <gerald@delving.eu>
@@ -46,7 +41,7 @@ public class TestLIDOToCRM {
 
     @Test
     public void lidoToCRM() throws IOException, ParserConfigurationException, SAXException {
-        URL mappingFile = getClass().getResource("/rdf/lido-to-crm.xml");
+        URL mappingFile = getClass().getResource("/crm/lido-to-crm.xml");
         MapToCRM.Mappings mappings = MapToCRM.readMappings(mappingFile.openStream());
         String xml = MapToCRM.toString(mappings);
         String[] fresh = xml.split("\n");
@@ -58,33 +53,12 @@ public class TestLIDOToCRM {
             Assert.assertEquals("Line " + index, originalLine, freshLine);
             index++;
         }
-        URL lidoFile = getClass().getResource("/rdf/LIDOExample.xml");
-        Document lidoDoc = XMLToolFactory.documentBuilderFactory().newDocumentBuilder().parse(lidoFile.openStream());
-//        String lidoXML = new XmlSerializer().toXml(lidoDoc.getDocumentElement(), false);
+//        URL lidoFile = getClass().getResource("/crm/LIDOExample.xml");
+//        Document lidoDoc = XMLToolFactory.documentBuilderFactory().newDocumentBuilder().parse(lidoFile.openStream());
+//        Strinxg lidoXML = new XmlSerializer().toXml(lidoDoc.getDocumentElement(), false);
 //        System.out.println(lidoXML);
-        Graph graph = mappings.toGraph(lidoDoc.getDocumentElement(), new FunctionExecutor());
-        System.out.println(graph);
+//        Graph graph = mappings.toGraph(lidoDoc.getDocumentElement(), new FunctionExecutor());
+//        System.out.println(graph);
     }
 
-    private class FunctionExecutor implements MapToCRM.URIGenerator {
-
-        @Override
-        public Set<String> getArgNames(String name) {
-            return new TreeSet<String>();
-        }
-
-        @Override
-        public String createURI(String name, Map<String, String> argMap) {
-            StringBuilder out = new StringBuilder(name);
-            out.append("(");
-            int left = argMap.size();
-            for (Map.Entry<String, String> entry : argMap.entrySet()) {
-                out.append(entry.getKey()).append("=\"").append(entry.getValue()).append("\"");
-                if (--left > 0) out.append(", ");
-            }
-            out.append(")");
-            log.info(out.toString());
-            return "URI";
-        }
-    }
 }
