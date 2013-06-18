@@ -29,10 +29,9 @@ import eu.delving.sip.model.WorkModel;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import static eu.delving.sip.base.SwingHelper.LONG_TERM_JOB_COLOR;
 import static eu.delving.sip.base.SwingHelper.NORMAL_JOB_COLOR;
@@ -72,6 +71,7 @@ public class WorkPanel extends JPanel {
         this.list.setVisibleRowCount(4);
         setBorder(BorderFactory.createTitledBorder("Background Jobs"));
         this.add(SwingHelper.scrollVH(list), BorderLayout.CENTER);
+        this.add(new MemoryMonitor(), BorderLayout.EAST);
     }
 
     private String toFullString(WorkModel.JobContext jobContext) {
@@ -112,6 +112,44 @@ public class WorkPanel extends JPanel {
                 component.setBackground(NORMAL_JOB_COLOR);
             }
             return component;
+        }
+    }
+
+    private class MemoryMonitor extends JPanel implements ActionListener {
+        private static final long MEGA = 1024*1024;
+        private JProgressBar progressBar = new JProgressBar();
+        private Timer timer = new Timer(800, this);
+
+        public MemoryMonitor() {
+            super(new BorderLayout());
+            add(createProgressBar());
+            timer.start();
+        }
+
+        private JComponent createProgressBar() {
+            progressBar.setStringPainted(true);
+            progressBar.setOrientation(JProgressBar.VERTICAL);
+            progressBar.setMaximum(getMax());
+            progressBar.setValue(getUsed());
+            progressBar.setString("Memory");
+            progressBar.setPreferredSize(new Dimension(20,70));
+            return progressBar;
+        }
+
+        private int getUsed() {
+            return (int) ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / MEGA);
+        }
+
+        private int getMax() {
+            return (int) (Runtime.getRuntime().totalMemory() / MEGA);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            progressBar.getModel().setMaximum(getMax());
+            int used = getUsed();
+            progressBar.setValue(used);
+            progressBar.setString(String.format("%d MB", used));
         }
     }
 }
