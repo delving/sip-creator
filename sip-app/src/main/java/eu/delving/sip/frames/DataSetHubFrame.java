@@ -131,6 +131,7 @@ public class DataSetHubFrame extends FrameBase {
     }
 
     private JPanel createFilter() {
+        patternField.setOpaque(true);
         JLabel label = new JLabel("Filter:", JLabel.RIGHT);
         label.setLabelFor(patternField);
         JPanel p = new JPanel(new BorderLayout());
@@ -188,7 +189,6 @@ public class DataSetHubFrame extends FrameBase {
                 @Override
                 public void listReceived(List<CultureHubClient.DataSetEntry> entries) {
                     tableModel.setHubEntries(entries);
-                    patternField.setText(null);
                     setEnabled(true);
                 }
 
@@ -196,7 +196,6 @@ public class DataSetHubFrame extends FrameBase {
                 public void failed(Exception e) {
                     sipModel.getFeedback().alert("Unable to fetch data set list", e);
                     tableModel.setHubEntries(null);
-                    patternField.setText(null);
                     setEnabled(true);
                 }
             });
@@ -383,10 +382,12 @@ public class DataSetHubFrame extends FrameBase {
             if (pattern.isEmpty()) {
                 if (index != null) {
                     index = null;
+                    patternField.setBackground(MATCH);
                     fireTableStructureChanged();
                 }
             }
             else {
+                index = null;
                 Map<Integer, Integer> map = new HashMap<Integer, Integer>();
                 int actual = 0, virtual = 0;
                 for (Row row : rows) {
@@ -396,7 +397,8 @@ public class DataSetHubFrame extends FrameBase {
                     }
                     actual++;
                 }
-                index = map;
+                if (!map.isEmpty()) index = map;
+                patternField.setBackground(index == null ? MISMATCH : MATCH);
                 fireTableStructureChanged();
             }
         }

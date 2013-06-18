@@ -58,6 +58,8 @@ public class SwingHelper {
     public static Color REPORT_OK = new Color(0, 50, 0);
     public static Color REPORT_ERROR = new Color(50, 0, 0);
     public static Color UNCONVERTED = new Color(255, 180, 180);
+    public static Color MATCH = Color.WHITE;
+    public static Color MISMATCH = new Color(255, 180, 180);
 
     public static final Icon ICON_VALUE = icon("value");
     public static final Icon ICON_COMPOSITE = icon("composite");
