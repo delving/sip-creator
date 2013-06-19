@@ -89,6 +89,11 @@ public class MetadataRecordFactory {
                             rootNode = node = new GroovyNode(null, "input");
                         }
                         else {
+                            String extra = value.toString().trim();
+                            value.setLength(0);
+                            if (!extra.isEmpty()) {
+                                new GroovyNode(node, "text", extra);
+                            }
                             node = new GroovyNode(node, input.getNamespaceURI(), input.getLocalName(), input.getPrefix());
                         }
                         if (input.getAttributeCount() > 0) {
@@ -102,10 +107,10 @@ public class MetadataRecordFactory {
                                 }
                             }
                         }
-                        value.setLength(0);
                         break;
                     case XMLEvent.CHARACTERS:
-                        value.append(input.getText());
+                        String text = input.getText();
+                        value.append(text);
                         break;
                     case XMLEvent.CDATA:
                         value.append(String.format("<![CDATA[%s]]>", input.getText()));

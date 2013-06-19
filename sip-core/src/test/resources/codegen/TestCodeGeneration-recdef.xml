@@ -37,6 +37,7 @@
                 </elem>
             </elem>
         </elem>
+        <elem tag="markup" verbatim="true"/>
     </root>
 
     <field-markers>

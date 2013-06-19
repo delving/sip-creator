@@ -317,6 +317,10 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return false;
     }
 
+    public boolean isVerbatim() {
+        return elem != null && elem.verbatim;
+    }
+
     public String toString() {
         String name = isAttr() ? attr.tag.toString(defaultPrefix) : elem.tag.toString(defaultPrefix);
         if (dynOpt != null) {

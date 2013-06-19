@@ -36,5 +36,17 @@
              </member>
         </list>
         <fromOne>look this up</fromOne>
+        <htmlNonsense>
+            <h1>Hello there</h1>
+            what about text that is not contained in a sub-tag
+            <table>
+                <tr><td>Cell1</td><td>Cell2</td></tr>
+            </table>
+            <p>Shall we add a silly paragraph?</p>
+            <ul>
+                <li>Maybe</li>
+                <li>a list</li>
+            </ul>
+        </htmlNonsense>
     </record>
 </leadup>

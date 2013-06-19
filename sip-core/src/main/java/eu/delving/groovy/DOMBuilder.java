@@ -232,6 +232,30 @@ public class DOMBuilder extends BuilderSupport {
                 makeSibling(node, child);
             }
         }
+        if (result.verbatim != null) {
+            copyChildren(result.verbatim.root, node);
+        }
+    }
+
+    private void copyChildren(GroovyNode fromNode, Node toNode) {
+        Object fromValue = fromNode.getNodeValue();
+        if (fromValue instanceof List) {
+            for (Object childObject : (List) fromValue) {
+                GroovyNode child = (GroovyNode) childObject;
+                Node childNode = (Node) createNode(child.getNodeName());
+                toNode.appendChild(childNode);
+                Object childValue = child.getNodeValue();
+                if (childValue instanceof String) {
+                    toTextNodes(childValue.toString(), childNode);
+                }
+                else if (childValue instanceof List) {
+                    copyChildren(child, childNode);
+                }
+                else {
+                    throw new RuntimeException("Unknown child value class " + childValue.getClass().getName());
+                }
+            }
+        }
     }
 
     private Map runMapClosures(Map map) {
@@ -280,6 +304,9 @@ public class DOMBuilder extends BuilderSupport {
         else if (result instanceof Object[]) {
             cr.list = unpack(Arrays.asList((Object[]) result));
         }
+        else if (result instanceof Verbatim) {
+            cr.verbatim = (Verbatim) result;
+        }
         if (cr.string != null && cr.string.trim().isEmpty()) cr.string = null;
         if (cr.list != null) {
             Iterator<String> walk = cr.list.iterator();
@@ -321,6 +348,7 @@ public class DOMBuilder extends BuilderSupport {
     private static class ClosureResult {
         public String string;
         public List<String> list;
+        public Verbatim verbatim;
 
         public String toString() {
             if (string != null) {
@@ -328,6 +356,9 @@ public class DOMBuilder extends BuilderSupport {
             }
             else if (list != null) {
                 return String.format("List(%s)", list);
+            }
+            else if (verbatim != null) {
+                return verbatim.toString();
             }
             else {
                 return "Empty";

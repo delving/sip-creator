@@ -480,7 +480,8 @@ public class RecDef {
         @XStreamAsAttribute
         public Operator operator;
 
-        public Assertion assertion;
+        @XStreamAsAttribute
+        public boolean verbatim;
 
         @XStreamImplicit
         public List<Elem> subelements = new ArrayList<Elem>();
@@ -564,6 +565,9 @@ public class RecDef {
                 subelementsAdded = true;
             }
             for (Elem elem : elemList) elem.resolve(path, recDef);
+            if (verbatim && !elemList.isEmpty()) {
+                throw new RuntimeException("Verbatim element cannot have sub-elements");
+            }
         }
 
         String getFieldType() {

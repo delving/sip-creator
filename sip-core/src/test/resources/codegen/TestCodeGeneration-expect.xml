@@ -27,4 +27,19 @@
             </test:event>
         </test:events>
     </test:sub-one>
+    <test:markup>
+        <h1>Hello there</h1>
+        <text>what about text that is not contained in a sub-tag</text>
+        <table>
+            <tr>
+                <td>Cell1</td>
+                <td>Cell2</td>
+            </tr>
+        </table>
+        <p>Shall we add a silly paragraph?</p>
+        <ul>
+            <li>Maybe</li>
+            <li>a list</li>
+        </ul>
+    </test:markup>
 </test:test>

@@ -69,6 +69,7 @@ public class CodeGenerator {
         codeOut.line("// Discarding:");
         codeOut.line("import eu.delving.groovy.DiscardRecordException");
         codeOut.line("import eu.delving.metadata.OptList");
+        codeOut.line("import eu.delving.groovy.Verbatim");
         codeOut.line("def discard = { reason -> throw new DiscardRecordException(reason.toString()) }");
         codeOut.line("def discardIf = { thing, reason ->  if (thing) throw new DiscardRecordException(reason.toString()) }");
         codeOut.line("def discardIfNot = { thing, reason ->  if (!thing) throw new DiscardRecordException(reason.toString()) }");
@@ -412,6 +413,9 @@ public class CodeGenerator {
                 }
                 else if (recDefNode.hasFunction()) {
                     codeOut.line("\"${%s(%s)%s}\"", recDefNode.getFunction(), toLeafGroovyParam(path), sanitize);
+                }
+                else if (recDefNode.isVerbatim()) {
+                    codeOut.line("Verbatim.capture(%s)", toLeafGroovyParam(path));
                 }
                 else {
                     codeOut.line("\"${%s%s}\"", toLeafGroovyParam(path), sanitize);
