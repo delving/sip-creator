@@ -30,7 +30,7 @@
     <artifactId>sip-core</artifactId>
     <packaging>jar</packaging>
     <name>SIP-Core</name>
-    <version>1.1.5</version>
+    <version>1.1.6-SNAPSHOT</version>
     <description>
         A Minimal set of classes shared between client and server, avoiding dependency on core module.
     </description>
@@ -68,7 +68,7 @@
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-creator</artifactId>
-        <version>1.1.5</version>
+        <version>1.1.6-SNAPSHOT</version>
     </parent>
 
     <build>
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>eu.delving</groupId>
             <artifactId>schema-repo</artifactId>
-            <version>1.1.5</version>
+            <version>1.1.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
@@ -131,9 +131,29 @@
             <artifactId>proj4j</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>Saxon-HE</artifactId>
-            <version>9.4.0.6</version>
+            <groupId>org.apache</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>2.11.0-xsd1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.11.0-xsd1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache</groupId>
+            <artifactId>cup-runtime</artifactId>
+            <version>10k</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>xpath2</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache</groupId>
+            <artifactId>xerces-resolver</artifactId>
+            <version>2.11.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>

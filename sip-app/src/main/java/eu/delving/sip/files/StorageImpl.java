@@ -623,9 +623,9 @@ public class StorageImpl implements Storage {
         }
     }
 
-    private SchemaFactory schemaFactory() {
+    private SchemaFactory schemaFactory(String prefix) {
         if (schemaFactory == null) {
-            schemaFactory = XMLToolFactory.schemaFactory();
+            schemaFactory = XMLToolFactory.schemaFactory(prefix);
             if (resolver != null) schemaFactory.setResourceResolver(resolver);
         }
         return schemaFactory;
@@ -667,10 +667,10 @@ public class StorageImpl implements Storage {
                     FileUtils.write(file, valResponse.getSchemaText(), "UTF-8");
                 }
                 StreamSource source = new StreamSource(new StringReader(valResponse.getSchemaText()));
-                return schemaFactory().newSchema(source).newValidator();
+                return schemaFactory(schemaVersion.getPrefix()).newSchema(source).newValidator();
             }
             else {
-                return schemaFactory().newSchema(file).newValidator();
+                return schemaFactory(schemaVersion.getPrefix()).newSchema(file).newValidator();
             }
         }
         catch (SAXException e) {

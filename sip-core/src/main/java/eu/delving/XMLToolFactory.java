@@ -1,7 +1,8 @@
 package eu.delving;
 
 import com.ctc.wstx.stax.WstxInputFactory;
-import net.sf.saxon.xpath.XPathFactoryImpl;
+import com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl;
+import org.apache.xerces.impl.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
@@ -49,8 +50,22 @@ public class XMLToolFactory {
         return XMLEventFactory.newInstance();
     }
 
-    public static SchemaFactory schemaFactory() {
-        return SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+    public static SchemaFactory schemaFactory(String prefix) {
+        SchemaFactory schemaFactory;
+        if ("edm".equals(prefix)) {
+            schemaFactory = SchemaFactory.newInstance(Constants.W3C_XML_SCHEMA10_NS_URI);
+        }
+        else {
+            System.setProperty("javax.xml.validation.SchemaFactory:http://www.w3.org/XML/XMLSchema/v1.1", "org.apache.xerces.jaxp.validation.XMLSchema11Factory");
+            schemaFactory = SchemaFactory.newInstance(Constants.W3C_XML_SCHEMA11_NS_URI);
+            try {
+                schemaFactory.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.CTA_FULL_XPATH_CHECKING_FEATURE, true);
+            }
+            catch (Exception e) {
+                throw new RuntimeException("Configuring schema factory", e);
+            }
+        }
+        return schemaFactory;
     }
 
     public static String serialize(Document document) {

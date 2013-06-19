@@ -142,12 +142,11 @@ public class DOMBuilder extends BuilderSupport {
                 valueString = entry.getValue().toString();
             }
             TagValue tagValue = new TagValue(attrName, true);
-            if (tagValue.isNamespaceAdded()) {
-                element.setAttributeNS(tagValue.uri, tagValue.toString(), valueString);
-            }
-            else {
-                element.setAttribute(tagValue.localPart, valueString);
-            }
+            element.setAttributeNS(
+                    tagValue.isNamespaceAdded() ? tagValue.uri : null,
+                    tagValue.isNamespaceAdded() ? tagValue.toString() : tagValue.localPart,
+                    valueString
+            );
         }
         return element;
     }

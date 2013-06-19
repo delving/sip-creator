@@ -23,7 +23,6 @@ package eu.delving.metadata;
 
 import eu.delving.MappingResult;
 import eu.delving.groovy.XmlSerializer;
-import net.sf.saxon.dom.DOMNodeList;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -223,7 +222,7 @@ public class MappingResultImpl implements MappingResult {
             for (RecDef.FieldMarker fieldMarker : recDefTree.getRecDef().fieldMarkers) {
                 if (!fieldMarker.hasPath()) continue;
                 XPathExpression expression = recDefTree.getExpressionMap().get(fieldMarker.getXPath());
-                DOMNodeList nodeList = (DOMNodeList) expression.evaluate(root, XPathConstants.NODESET);
+                NodeList nodeList = (NodeList) expression.evaluate(root, XPathConstants.NODESET);
                 for (int walk = 0; walk < nodeList.getLength(); walk++) {
                     Node node = nodeList.item(walk);
                     String value = node.getTextContent().trim();

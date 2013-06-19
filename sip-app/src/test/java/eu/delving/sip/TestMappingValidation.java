@@ -22,6 +22,7 @@
 package eu.delving.sip;
 
 import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
@@ -69,13 +70,24 @@ public class TestMappingValidation {
     }
 
     @Test
+    public void testEDM() throws Exception {
+        mock.prepareDataset(
+                "edm",
+                "/delving-sip-source/input",
+                "/delving-sip-source/input/@id"
+        );
+        mock.validator();
+    }
+
+    @Test
     public void testEad() throws Exception {
         mock.prepareDataset(
                 "ead",
-                "/sample/eag",
-                "/sample/eag/eagheader/eagid"
+                "/delving-sip-source/input",
+                "/delving-sip-source/input/@id"
         );
-        runFullCycle(1);
+        String xml = runFullCycle(4);
+        assertTrue("missing otherfindaid", xml.contains("otherfindaid"));
     }
 
     @Test
@@ -150,7 +162,7 @@ public class TestMappingValidation {
         runFullCycle(42);
     }
 
-    private void runFullCycle(int expectedRecords) throws Exception {
+    private String runFullCycle(int expectedRecords) throws Exception {
         assertEquals(String.valueOf(Arrays.asList(mock.files())), 2, mock.fileCount());
 
         Work.LongTermWork importer = new FileImporter(mock.sampleInputFile(), dataSet(), null);
@@ -195,9 +207,6 @@ public class TestMappingValidation {
 //        System.out.println(XmlNodePrinter.toXml(record.getRootNode()));
 
         Node node = mock.runMapping(record);
-
-//        System.out.println(new XmlSerializer().toXml(node, true));
-
         Source source = new DOMSource(node);
         try {
             mock.validator().validate(source);
@@ -205,6 +214,8 @@ public class TestMappingValidation {
         catch (SAXException e) {
             fail(e.getMessage());
         }
+
+        return new XmlSerializer().toXml(node, true);
     }
 
     private void performAnalysis() {
