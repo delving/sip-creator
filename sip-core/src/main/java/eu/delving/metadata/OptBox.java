@@ -72,13 +72,16 @@ class OptBox {
         return optList.dictionary + index;
     }
 
-    public String getOptReference() {
-        if (role == ROOT) {
-            return String.format("OptList.Opt _found%s", optList.dictionary);
-        }
-        else {
-            return String.format("_found%s.%s", optList.dictionary, role.getFieldName());
-        }
+    public String getOuterOptReference() {
+        return String.format("OptList.Opt _found%s", optList.dictionary);
+    }
+
+    public String getInnerOptReference() {
+        return String.format(
+                "_found%s.%s",
+                optList.dictionary,
+                role == OptRole.ROOT? OptRole.VALUE.getFieldName() : role.getFieldName()
+        );
     }
 
     public String toString() {
