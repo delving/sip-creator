@@ -136,7 +136,7 @@ public class CodeGenerator {
             else if (recDefNode.hasActiveAttributes()) {
                 startBuilderCall(recDefNode, false, groovyParams);
                 if (recDefNode.isChildOpt()) {
-                    codeOut.line(recDefNode.getOptBox().getOptReference());
+                    codeOut.line(recDefNode.getOptBox().getInnerOptReference());
                 }
                 else {
                     codeOut.line("// no node mappings");
@@ -253,21 +253,21 @@ public class CodeGenerator {
         if (nodeMapping.isConstant()) {
             codeOut.line(
                     "%s = lookup%s('%s')",
-                    optBox.getOptReference(), optBox.getDictionaryName(nodeMapping.getIndexWithinNode()),
+                    optBox.getOuterOptReference(), optBox.getDictionaryName(nodeMapping.getIndexWithinNode()),
                     nodeMapping.getConstantValue()
             );
         }
         else if (valueNodeMapping == null) {
             codeOut.line(
                     "%s = lookup%s(%s)",
-                    optBox.getOptReference(), optBox.getDictionaryName(nodeMapping.getIndexWithinNode()),
+                    optBox.getOuterOptReference(), optBox.getDictionaryName(nodeMapping.getIndexWithinNode()),
                     toGroovyIdentifier(nodeMapping.inputPath.peek())
             );
         }
         else {
             codeOut.line(
                     "%s = lookup%s(%s.%s)",
-                    optBox.getOptReference(), optBox.getDictionaryName(nodeMapping.getIndexWithinNode()),
+                    optBox.getOuterOptReference(), optBox.getDictionaryName(nodeMapping.getIndexWithinNode()),
                     toGroovyIdentifier(nodeMapping.inputPath.peek()),
                     toGroovyFirstIdentifier(valueNodeMapping.inputPath.peek())
             );
@@ -291,7 +291,7 @@ public class CodeGenerator {
                 if (sub.isAttr()) continue;
                 if (sub.isChildOpt()) {
                     trace();
-                    codeOut.line("%s %s", sub.getTag().toBuilderCall(), sub.getOptBox().getOptReference());
+                    codeOut.line("%s %s", sub.getTag().toBuilderCall(), sub.getOptBox().getInnerOptReference());
                 }
                 else {
                     toElementCode(sub, groovyParams);
@@ -337,7 +337,7 @@ public class CodeGenerator {
                 if (subBox != null && subBox.role != ROOT && sub.getNodeMappings().isEmpty()) {
                     if (comma) codeOut.line(",");
                     trace();
-                    codeOut.line("%s : %s", sub.getTag().toBuilderCall(), sub.getOptBox().getOptReference());
+                    codeOut.line("%s : %s", sub.getTag().toBuilderCall(), sub.getOptBox().getInnerOptReference());
                     comma = true;
                 }
                 else {
@@ -397,8 +397,8 @@ public class CodeGenerator {
     private void toInnerLoop(NodeMapping nodeMapping, Path path, Stack<String> groovyParams) {
         RecDefNode recDefNode = nodeMapping.recDefNode;
         if (path.isEmpty()) throw new RuntimeException();
-        if (recDefNode.isChildOpt() && nodeMapping.hasDictionary()) {
-            codeOut.line(recDefNode.getOptBox().getOptReference());
+        if (recDefNode.getOptBox() != null && nodeMapping.hasDictionary()) {
+            codeOut.line(recDefNode.getOptBox().getInnerOptReference());
         }
         else if (path.size() == 1) {
             if (nodeMapping.hasMap()) {
