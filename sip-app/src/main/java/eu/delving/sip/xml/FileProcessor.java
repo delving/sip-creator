@@ -31,7 +31,6 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.ReportWriter;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.Feedback;
-import eu.delving.sip.model.SipModel;
 import eu.delving.stats.Stats;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -74,7 +73,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private File outputDirectory;
     private PrintWriter expertOutput;
     private int maxUniqueValueLength;
-    private SipModel sipModel;
+//    private SipModel sipModel;
 
     public interface Listener {
 
@@ -86,7 +85,9 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     }
 
     public FileProcessor(
-            SipModel sipModel,
+            Feedback feedback,
+            DataSet dataSet,
+            RecMapping recMapping,
             int maxUniqueValueLength,
             int recordCount,
             File outputDirectory,
@@ -94,13 +95,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             GroovyCodeResource groovyCodeResource,
             Listener listener
     ) {
-        this.sipModel = sipModel;
-        this.sipModel.getMappingModel().setLocked(true);
         this.maxUniqueValueLength = maxUniqueValueLength;
         this.recordCount = recordCount;
-        this.feedback = sipModel.getFeedback();
-        this.dataSet = sipModel.getDataSetModel().getDataSet();
-        this.recMapping = sipModel.getMappingModel().getRecMapping();
+        this.feedback = feedback;
+        this.dataSet = dataSet;
+        this.recMapping = recMapping;
         this.outputDirectory = outputDirectory;
         this.allowInvalid = allowInvalid;
         this.groovyCodeResource = groovyCodeResource;
@@ -391,7 +390,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         @Override
         public Feedback getFeedback() {
-            return sipModel.getFeedback();
+            return feedback;
         }
     }
 }

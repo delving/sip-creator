@@ -425,15 +425,49 @@ public class SipModel {
             outputDirectory = new File(directoryString);
             if (!outputDirectory.exists()) outputDirectory = null;
         }
-        exec(new FileProcessor(
-                this,
-                statsModel.getMaxUniqueValueLength(),
-                statsModel.getRecordCount(),
-                outputDirectory,
-                allowInvalid,
-                groovyCodeResource,
-                listener
-        ));
+        final DataSet dataSet = getDataSetModel().getDataSet();
+        if (allowInvalid) {
+            for (SchemaVersion schemaVersion : dataSet.getSchemaVersions()) {
+                try {
+                    RecMapping recMapping = dataSet.getRecMapping(schemaVersion.getPrefix(), dataSetModel);
+                    if (schemaVersion.getPrefix().equals(getMappingModel().getPrefix())) {
+                        getMappingModel().setLocked(true);
+                    }
+                    else {
+                        recMapping.setLocked(true);
+                        dataSet.setRecMapping(recMapping, true);
+                    }
+                    exec(new FileProcessor(
+                            feedback,
+                            dataSet,
+                            recMapping,
+                            statsModel.getMaxUniqueValueLength(),
+                            statsModel.getRecordCount(),
+                            outputDirectory,
+                            allowInvalid,
+                            groovyCodeResource,
+                            listener
+                    ));
+                }
+                catch (StorageException e) {
+                    feedback.alert("Unable to get rec mapping for " + schemaVersion);
+                }
+            }
+        }
+        else {
+            getMappingModel().setLocked(true);
+            exec(new FileProcessor(
+                    feedback,
+                    dataSet,
+                    getMappingModel().getRecMapping(),
+                    statsModel.getMaxUniqueValueLength(),
+                    statsModel.getRecordCount(),
+                    outputDirectory,
+                    allowInvalid,
+                    groovyCodeResource,
+                    listener
+            ));
+        }
     }
 
     public void seekReset() {
