@@ -418,7 +418,7 @@ public class SipModel {
         }));
     }
 
-    public void processFile(FileProcessor.Listener listener) {
+    public void processFile(boolean allowInvalid, FileProcessor.Listener listener) {
         File outputDirectory = null;
         String directoryString = getPreferences().get(FileProcessor.OUTPUT_FILE_PREF, "").trim();
         if (!directoryString.isEmpty()) {
@@ -430,6 +430,7 @@ public class SipModel {
                 statsModel.getMaxUniqueValueLength(),
                 statsModel.getRecordCount(),
                 outputDirectory,
+                allowInvalid,
                 groovyCodeResource,
                 listener
         ));

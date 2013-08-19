@@ -90,6 +90,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             int maxUniqueValueLength,
             int recordCount,
             File outputDirectory,
+            boolean allowInvalid,
             GroovyCodeResource groovyCodeResource,
             Listener listener
     ) {
@@ -101,6 +102,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         this.dataSet = sipModel.getDataSetModel().getDataSet();
         this.recMapping = sipModel.getMappingModel().getRecMapping();
         this.outputDirectory = outputDirectory;
+        this.allowInvalid = allowInvalid;
         this.groovyCodeResource = groovyCodeResource;
         this.listener = listener;
     }
