@@ -72,10 +72,10 @@ public class TestCodeGeneration {
         Assert.assertEquals("Unexpected xml", expect, xml);
     }
 
-        private void printWithLineNumbers(String code) {
-            int lineNumber = 1;
-            for (String line : code.split("\n")) System.out.println(String.format("%3d: %s", lineNumber++, line));
-        }
+    private void printWithLineNumbers(String code) {
+        int lineNumber = 1;
+        for (String line : code.split("\n")) System.out.println(String.format("%3d: %s", lineNumber++, line));
+    }
 
     private MetadataRecord createInputRecord() throws IOException, XMLStreamException {
         Map<String, String> ns = new TreeMap<String, String>();
