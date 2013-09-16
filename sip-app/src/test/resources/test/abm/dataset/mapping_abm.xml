@@ -1,4 +1,4 @@
-<rec-mapping prefix="abm" schemaVersion="1.0.4" locked="false">
+<rec-mapping prefix="abm" schemaVersion="1.0.8" locked="false">
   <facts>
     <entry>
       <string>orgId</string>
