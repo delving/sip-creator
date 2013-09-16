@@ -147,7 +147,13 @@ public class DataSetHubFrame extends FrameBase {
             tableModel.setHubEntries(null);
         }
         else {
-            refreshAction.actionPerformed(null);
+            Swing.Exec.later(new Swing() {
+                @Override
+                public void run() {
+                    tableModel.setHubEntries(null);
+                    refreshAction.actionPerformed(null);
+                }
+            });
         }
     }
 

@@ -214,6 +214,7 @@ public class VisualFeedback implements Feedback {
             // We disable the submit button by default and if the content != empty
             ok.addActionListener(this);
             ok.setEnabled(false);
+            this.dialog.getRootPane().setDefaultButton(ok);
             String savedPassword = preferences.get(PASSWORD, "");
             savePassword.setSelected(!savedPassword.isEmpty());
             passwordField.getDocument().addDocumentListener(new DocumentListener() {
