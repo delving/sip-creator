@@ -299,8 +299,11 @@ public class RecDef {
         @XStreamAsAttribute
         public Path path;
 
-        @XStreamImplicit
+        @XStreamImplicit(itemFieldName="string")
         public List<String> lines;
+
+        @XStreamImplicit(itemFieldName="para")
+        public List<DocParagraph> paraList;
 
         public List<DocParagraph> paras;
 

@@ -243,6 +243,12 @@ public class SwingHelper {
                             .append(para.content).append("</p></td></tr>");
                 }
             }
+            if (node.getDoc().paraList != null) {
+                for (RecDef.DocParagraph para : node.getDoc().paraList) {
+                    out.append("<tr><td><b>").append(para.name).append("</b><br><p>")
+                            .append(para.content).append("</p></td></tr>");
+                }
+            }
         }
         if (node.getOptList() != null) {
             out.append("<tr><td><ul>");
