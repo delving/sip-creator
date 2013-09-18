@@ -194,7 +194,6 @@ public class DataSetHubFrame extends FrameBase {
                 @Override
                 public void listReceived(List<CultureHubClient.DataSetEntry> entries) {
                     tableModel.setHubEntries(entries);
-                    patternField.setText(null);
                     setEnabled(true);
                 }
 
