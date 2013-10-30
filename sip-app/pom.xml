@@ -72,35 +72,27 @@
         <defaultGoal>compile</defaultGoal>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>webstart-maven-plugin</artifactId>
-                <version>1.0-beta-3</version>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>eu.delving.sip.Application</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
                 <executions>
                     <execution>
+                        <id>make-my-jar-with-dependencies</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>jnlp-inline</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <libPath/>
-                    <jnlp>
-                        <outputFile>sip-creator.jnlp</outputFile>
-                        <mainClass>eu.delving.sip.Application</mainClass>
-                    </jnlp>
-                    <sign>
-                        <keystore>${basedir}/src/main/jnlp/snakeoil.keystore</keystore>
-                        <keypass>sip-creator</keypass>
-                        <storepass>sip-creator</storepass>
-                        <alias>sip-creator</alias>
-                        <verify>true</verify>
-                    </sign>
-                    <pack200>false</pack200>
-                    <gzip>false</gzip>
-                    <outputJarVersions>false</outputJarVersions>
-                    <verbose>false</verbose>
-                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -117,12 +109,6 @@
             <groupId>eu.delving</groupId>
             <artifactId>sip-core</artifactId>
             <version>1.1.7-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.jnlp</groupId>
-            <artifactId>jnlp-api</artifactId>
-            <version>1.5.0</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.jgoodies</groupId>

@@ -23,9 +23,7 @@ package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.*;
-import eu.delving.schema.Fetcher;
 import eu.delving.schema.SchemaRepository;
-import eu.delving.schema.util.FileSystemFetcher;
 import eu.delving.sip.actions.*;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.*;
@@ -55,7 +53,6 @@ import java.util.prefs.Preferences;
 
 import static eu.delving.sip.base.HttpClientFactory.createHttpClient;
 import static eu.delving.sip.base.KeystrokeHelper.*;
-import static eu.delving.sip.base.SwingHelper.isDevelopmentMode;
 import static eu.delving.sip.files.DataSetState.*;
 import static eu.delving.sip.files.StorageFinder.isStandalone;
 
@@ -118,8 +115,7 @@ public class Application {
         feedback = new VisualFeedback(home, desktop, preferences);
         HttpClient httpClient = createHttpClient(storageDirectory);
         try {
-            Fetcher fetcher = isDevelopmentMode() ? new FileSystemFetcher(false) : new HTTPSchemaFetcher(httpClient);
-            this.schemaRepository = new SchemaRepository(fetcher);
+            this.schemaRepository = new SchemaRepository(new SchemaFetcher(httpClient));
         }
         catch (IOException e) {
             throw new StorageException("Unable to create Schema Repository", e);

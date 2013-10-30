@@ -24,13 +24,9 @@ package eu.delving.sip.base;
 import eu.delving.metadata.*;
 import eu.delving.stats.Stats;
 
-import javax.jnlp.ServiceManager;
-import javax.jnlp.UnavailableServiceException;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Desktop;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -138,16 +134,6 @@ public class SwingHelper {
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         p.add(scroll);
         return p;
-    }
-
-    public static boolean isDevelopmentMode() {
-        try {
-            ServiceManager.lookup("javax.jnlp.BasicService");
-            return false;
-        }
-        catch (UnavailableServiceException ue) {
-            return true;
-        }
     }
 
     public static class StringTransferable implements Transferable {

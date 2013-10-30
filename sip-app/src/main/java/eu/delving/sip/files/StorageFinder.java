@@ -21,16 +21,10 @@
 
 package eu.delving.sip.files;
 
-import javax.jnlp.BasicService;
-import javax.jnlp.ServiceManager;
-import javax.jnlp.UnavailableServiceException;
-import javax.swing.ButtonGroup;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import java.awt.GridLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.FileFilter;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -114,16 +108,6 @@ public class StorageFinder {
         return String.format("%s:%s/%s", getHostName(matcher), matcher.group(2), matcher.group(3));
     }
 
-    public static URL getCodebase() {
-        try {
-            BasicService bs = (BasicService) ServiceManager.lookup("javax.jnlp.BasicService");
-            return bs.getCodeBase();
-        }
-        catch (UnavailableServiceException ue) {
-            throw new RuntimeException("Unable to use JNLP service", ue);
-        }
-    }
-
     // ======== private
 
     private static String getHostName(Matcher matcher) {
@@ -172,15 +156,16 @@ public class StorageFinder {
     }
 
     private static File createHostPortDirectory(String[] args) {
-        if (args != null && args.length > 0) {
-            String user = args[0].trim();
-            URL codebase = getCodebase();
-            String host = codebase.getHost();
-            int port = codebase.getPort();
-            if (port < 0) port = 80;
-            return createDirectory(host, String.valueOf(port), user);
-        }
-        else while (true) {
+//        if (args != null && args.length > 0) {
+//            String user = args[0].trim();
+//            URL codebase = getCodebase();
+//            String host = codebase.getHost();
+//            int port = codebase.getPort();
+//            if (port < 0) port = 80;
+//            return createDirectory(host, String.valueOf(port), user);
+//        }
+//        else
+        while (true) {
             String answer = showInputDialog(null, "<html>Please enter host:port/user for your Culture Hub connection");
             if (answer == null) {
                 throw new RuntimeException("No host:port/user, so stopping");

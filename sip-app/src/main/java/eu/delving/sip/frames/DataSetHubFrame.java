@@ -143,18 +143,13 @@ public class DataSetHubFrame extends FrameBase {
 
     @Override
     public void refresh() {
-        if (SwingHelper.isDevelopmentMode()) {
-            tableModel.setHubEntries(null);
-        }
-        else {
-            Swing.Exec.later(new Swing() {
-                @Override
-                public void run() {
-                    tableModel.setHubEntries(null);
-                    refreshAction.actionPerformed(null);
-                }
-            });
-        }
+        Swing.Exec.later(new Swing() {
+            @Override
+            public void run() {
+                tableModel.setHubEntries(null);
+                refreshAction.actionPerformed(null);
+            }
+        });
     }
 
     private class UpDownAction extends AbstractAction {
@@ -174,7 +169,7 @@ public class DataSetHubFrame extends FrameBase {
                 selection.setSelectionInterval(row, row);
                 dataSetTable.requestFocus();
                 Rectangle cellRect = dataSetTable.getCellRect(row, 0, false);
-                if (cellRect != null) dataSetTable.scrollRectToVisible(cellRect);
+                dataSetTable.scrollRectToVisible(cellRect);
             }
         }
     }
