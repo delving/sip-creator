@@ -57,9 +57,8 @@ public class MetadataRecordFactory {
         this.namespaces = namespaces;
         try {
             documentBuilder = XMLToolFactory.documentBuilderFactory().newDocumentBuilder();
-        }
-        catch (ParserConfigurationException e) {
-            throw new RuntimeException("Parser config?",e);
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException("Parser config?", e);
         }
     }
 
@@ -68,13 +67,13 @@ public class MetadataRecordFactory {
     }
 
     public Node nodeFromXml(String id, String recordContents) throws IOException, SAXException {
-        String recordString = createCompleteRecordString(id, recordContents);
+        String recordString = createCompleteRecordString(id, recordContents, false);
         Document document = documentBuilder.parse(new InputSource(new StringReader(recordString)));
         return document.getDocumentElement();
     }
 
     public MetadataRecord metadataRecordFrom(String id, String recordContents) throws XMLStreamException {
-        String recordString = createCompleteRecordString(id, recordContents);
+        String recordString = createCompleteRecordString(id, recordContents, true);
         try {
             Reader reader = new StringReader(recordString);
             XMLStreamReader2 input = (XMLStreamReader2) inputFactory.createXMLStreamReader(reader);
@@ -87,8 +86,7 @@ public class MetadataRecordFactory {
                     case XMLEvent.START_ELEMENT:
                         if (node == null) {
                             rootNode = node = new GroovyNode(null, "input");
-                        }
-                        else {
+                        } else {
                             node = new GroovyNode(node, input.getNamespaceURI(), input.getLocalName(), input.getPrefix());
                         }
                         if (input.getAttributeCount() > 0) {
@@ -96,8 +94,7 @@ public class MetadataRecordFactory {
                                 QName attributeName = input.getAttributeName(walk);
                                 if (attributeName.getPrefix() == null || attributeName.getPrefix().isEmpty()) {
                                     node.attributes().put(attributeName.getLocalPart(), input.getAttributeValue(walk));
-                                }
-                                else {
+                                } else {
                                     node.attributes().put(String.format("%s:%s", attributeName.getPrefix(), attributeName.getLocalPart()), input.getAttributeValue(walk));
                                 }
                             }
@@ -127,21 +124,21 @@ public class MetadataRecordFactory {
                 input.next();
             }
             return new MetadataRecord(rootNode, -1, -1);
-        }
-        catch (WstxParsingException e) {
+        } catch (WstxParsingException e) {
             throw new XMLStreamException("Problem parsing record:\n" + recordString, e);
         }
     }
 
-    private String createCompleteRecordString(String id, String xmlRecord) {
+    private String createCompleteRecordString(String id, String xmlRecord, boolean includeNamespaces) {
         StringBuilder out = new StringBuilder("<?xml version=\"1.0\"?>\n");
         out.append("<record");
-        for (Map.Entry<String, String> namespace : namespaces.entrySet()) {
-            if (namespace.getKey().isEmpty()) {
-                out.append(String.format(" xmlns=\"%s\"", namespace.getValue()));
-            }
-            else {
-                out.append(String.format(" xmlns:%s=\"%s\"", namespace.getKey(), namespace.getValue()));
+        if (includeNamespaces) {
+            for (Map.Entry<String, String> namespace : namespaces.entrySet()) {
+                if (namespace.getKey().isEmpty()) {
+                    out.append(String.format(" xmlns=\"%s\"", namespace.getValue()));
+                } else {
+                    out.append(String.format(" xmlns:%s=\"%s\"", namespace.getKey(), namespace.getValue()));
+                }
             }
         }
         out.append(String.format(" id=\"%s\"", id));

@@ -127,11 +127,11 @@ public class TestMappingEngine {
 //        System.out.println(result.copyFields());
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void rawNode() throws IOException, SAXException, MappingException, XMLStreamException, MetadataException {
         Map<String, String> namespaces = createNamespaces(
-                "", "http://raw.org"
+                "dc", "http://purl.org/dc/elements/1.1/"
         );
         MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces);
         MappingResult result = mappingEngine.execute("rawNode", input("raw"));

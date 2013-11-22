@@ -1,0 +1,24 @@
+<record xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+        xmlns="http://www.w3.org/2000/xmlns/" id="oai-jhm-50000001"
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/\">
+    <header>
+        <identifier>oai:jhm:50000001</identifier>
+        <datestamp>11/10/2010</datestamp>
+        <setSpec>jhmbas:()</setSpec>
+    </header>
+    <metadata>
+        <oai_dc:dc>
+            <dc:title>Toraschild</dc:title>
+            <dc:creator>onbekend</dc:creator>
+            <dc:subject>toraversierselen</dc:subject>
+            <dc:subject>synagogedienst</dc:subject>
+            <dc:publisher>Joods Historisch Museum</dc:publisher>
+            <dc:date>1860 (ca.)</dc:date>
+            <dc:identifier>00035</dc:identifier>
+            <dc:coverage>Polen (?)</dc:coverage>
+            <image>025B039</image>
+        </oai_dc:dc>
+    </metadata>
+</record>
