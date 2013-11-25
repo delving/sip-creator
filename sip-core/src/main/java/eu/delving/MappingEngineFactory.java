@@ -15,13 +15,6 @@ public class MappingEngineFactory {
 
     public static MappingEngine newInstance(
             ClassLoader classLoader,
-            Map<String, String> namespaces
-    ) throws FileNotFoundException, MetadataException {
-        return new MappingEngineImpl(classLoader, namespaces, null, null);
-    }
-
-    public static MappingEngine newInstance(
-            ClassLoader classLoader,
             Map<String, String> namespaces,
             RecDefModel recDefModel,
             String mapping

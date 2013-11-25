@@ -133,7 +133,7 @@ public class TestMappingEngine {
         Map<String, String> namespaces = createNamespaces(
                 "", "http://raw.org"
         );
-        MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces);
+        MappingEngine mappingEngine = MappingEngineFactory.newInstance(classLoader(), namespaces, null, null);
         MappingResult result = mappingEngine.execute("rawNode", input("raw"));
         System.out.println(result.toXmlAugmented());
     }
