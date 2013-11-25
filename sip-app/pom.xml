@@ -73,6 +73,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -80,9 +81,9 @@
                             <mainClass>eu.delving.sip.Application</mainClass>
                         </manifest>
                     </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
+                    <descriptors>
+                        <descriptor>src/main/assembly/exejar.xml</descriptor>
+                    </descriptors>
                 </configuration>
                 <executions>
                     <execution>
