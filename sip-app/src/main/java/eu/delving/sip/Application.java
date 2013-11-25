@@ -129,7 +129,7 @@ public class Application {
         if (cultureHubClient != null) uploadAction = new UploadAction(sipModel, cultureHubClient);
         expertMenu = new ExpertMenu(desktop, sipModel, cultureHubClient, allFrames);
         statusPanel = new StatusPanel(sipModel);
-        home = new JFrame("Delving SIP Creator");
+        home = new JFrame(titleString());
         home.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent componentEvent) {
@@ -215,13 +215,13 @@ public class Application {
                                 return Job.CLEAR_FACTS_STATS;
                             }
                         });
-                        home.setTitle("Delving SIP Creator");
+                        home.setTitle(titleString());
                         sipModel.seekReset();
                         break;
                     default:
                         DataSetModel dataSetModel = sipModel.getDataSetModel();
                         home.setTitle(String.format(
-                                "Delving SIP Creator - [%s -> %s]",
+                                titleString()+" - [%s -> %s]",
                                 dataSetModel.getDataSet().getSpec(), dataSetModel.getPrefix().toUpperCase()
                         ));
                         sipModel.getReportFileModel().refresh();
@@ -231,6 +231,11 @@ public class Application {
         });
         attachAccelerator(new QuitAction(), home);
         attachAccelerator(statusPanel.getButtonAction(), home);
+    }
+
+    private String titleString() {
+        long megabytes = Runtime.getRuntime().maxMemory() / 1024 / 1024;
+        return "Delving SIP Creator (" + megabytes + "Mb)";
     }
 
     private JPanel createStatePanel() {
