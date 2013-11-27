@@ -24,12 +24,8 @@ package eu.delving.sip.base;
 import eu.delving.sip.files.StorageFinder;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
-import org.apache.http.conn.params.ConnRouteParams;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 import java.io.File;
 import java.net.*;
@@ -46,30 +42,20 @@ import static eu.delving.sip.files.StorageFinder.getHostPort;
 public class HttpClientFactory {
 
     public static HttpClient createLinkCheckClient() {
-        HttpParams httpParams = createConnectionParams();
-        ThreadSafeClientConnManager threaded = new ThreadSafeClientConnManager();
-        return new DefaultHttpClient(threaded, httpParams);
+        return HttpClientBuilder.create().disableAutomaticRetries().build();
     }
 
     public static HttpClient createHttpClient(File storageDirectory) {
-        HttpParams httpParams = createConnectionParams();
+        HttpClientBuilder builder = HttpClientBuilder.create().disableAutomaticRetries();
+        builder.setConnectionManager(new PoolingHttpClientConnectionManager());
         if (!StorageFinder.isStandalone(storageDirectory)) {
             String serverUrl = String.format("http://%s", getHostPort(storageDirectory));
-            handleProxy(serverUrl, httpParams);
+            handleProxy(serverUrl, builder);
         }
-        ThreadSafeClientConnManager threaded = new ThreadSafeClientConnManager();
-        return new DefaultHttpClient(threaded, httpParams);
+        return builder.build();
     }
 
-    private static HttpParams createConnectionParams() {
-        final int CONNECTION_TIMEOUT = 1000 * 60 * 30;
-        HttpParams httpParams = new BasicHttpParams();
-        HttpConnectionParams.setSoTimeout(httpParams, CONNECTION_TIMEOUT);
-        HttpConnectionParams.setConnectionTimeout(httpParams, CONNECTION_TIMEOUT);
-        return httpParams;
-    }
-
-    private static void handleProxy(String serverUrl, HttpParams httpParams) {
+    private static void handleProxy(String serverUrl, HttpClientBuilder builder) {
         try {
             List<Proxy> proxies = ProxySelector.getDefault().select(new URI(serverUrl));
             for (Proxy proxy : proxies) {
@@ -77,8 +63,7 @@ public class HttpClientFactory {
                 InetSocketAddress addr = (InetSocketAddress) proxy.address();
                 String host = addr.getHostName();
                 int port = addr.getPort();
-                HttpHost httpHost = new HttpHost(host, port);
-                ConnRouteParams.setDefaultProxy(httpParams, httpHost);
+                builder.setProxy(new HttpHost(host, port));
             }
         }
         catch (URISyntaxException e) {
