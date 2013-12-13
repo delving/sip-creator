@@ -65,7 +65,11 @@ public class TargetFrame extends FrameBase {
             Object model = recDefTree.getModel();
             if (model instanceof RecDefTreeModel) {
                 RecDefTreeModel ftm = (RecDefTreeModel) model;
-                ftm.setFilter(filterField.getText().trim());
+                String sought = filterField.getText().trim();
+                ftm.setFilter(sought);
+                if (!sought.isEmpty()) {
+                    showPath((RecDefTreeNode) ftm.getRoot());
+                }
             }
         }
     });
@@ -268,6 +272,7 @@ public class TargetFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+
             RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
             if (root != null) showPopulated(root);
         }
