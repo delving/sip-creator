@@ -97,26 +97,27 @@ public class MappingResultImpl implements MappingResult {
 
     @Override
     public void checkMissingFields() throws MissingFieldsException {
-        if (!isRecDefDelvingAware()) return;
-        Set<String> missing = new TreeSet<String>();
-        Set<String> keys = copyFields.keySet();
-        for (String required : REQUIRED_FIELDS) {
-            if (!keys.contains(required)) missing.add(required);
-        }
-        if (missing.isEmpty()) return;
-        if (missing.size() == 1 && (missing.contains(LANDING_PAGE) || missing.contains(THUMBNAIL))) {
-            return; // ok, only need one of these two
-        }
-        Map<String, Path> missingMap = new TreeMap<String, Path>();
-        for (RecDef.FieldMarker fieldMarker : recDefTree.getRecDef().fieldMarkers) {
-            if (fieldMarker.name == null || fieldMarker.type != null || fieldMarker.path == null) continue;
-            if (missing.contains(fieldMarker.name)) missingMap.put(fieldMarker.name, fieldMarker.path);
-        }
-        StringBuilder out = new StringBuilder("Required fields missing: ");
-        for (Map.Entry<String, Path> entry : missingMap.entrySet()) {
-            out.append(String.format("%s (%s) ", entry.getKey(), entry.getValue()));
-        }
-        throw new MissingFieldsException(out.toString());
+// todo: this should return at some point
+//        if (!isRecDefDelvingAware()) return;
+//        Set<String> missing = new TreeSet<String>();
+//        Set<String> keys = copyFields.keySet();
+//        for (String required : REQUIRED_FIELDS) {
+//            if (!keys.contains(required)) missing.add(required);
+//        }
+//        if (missing.isEmpty()) return;
+//        if (missing.size() == 1 && (missing.contains(LANDING_PAGE) || missing.contains(THUMBNAIL))) {
+//            return; // ok, only need one of these two
+//        }
+//        Map<String, Path> missingMap = new TreeMap<String, Path>();
+//        for (RecDef.FieldMarker fieldMarker : recDefTree.getRecDef().fieldMarkers) {
+//            if (fieldMarker.name == null || fieldMarker.type != null || fieldMarker.path == null) continue;
+//            if (missing.contains(fieldMarker.name)) missingMap.put(fieldMarker.name, fieldMarker.path);
+//        }
+//        StringBuilder out = new StringBuilder("Required fields missing: ");
+//        for (Map.Entry<String, Path> entry : missingMap.entrySet()) {
+//            out.append(String.format("%s (%s) ", entry.getKey(), entry.getValue()));
+//        }
+//        throw new MissingFieldsException(out.toString());
     }
 
     @Override
