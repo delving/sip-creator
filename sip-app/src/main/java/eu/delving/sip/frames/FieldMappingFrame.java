@@ -58,7 +58,7 @@ import static eu.delving.sip.base.SwingHelper.*;
  */
 
 public class FieldMappingFrame extends FrameBase {
-    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 16);
+//    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 16);
     private final Action REVERT_ACTION = new RevertAction();
     private final Action UNDO_ACTION = new UndoAction();
     private final Action REDO_ACTION = new RedoAction();
@@ -79,12 +79,12 @@ public class FieldMappingFrame extends FrameBase {
         super(Which.FIELD_MAPPING, sipModel, "Field Mapping");
         dictionaryPanel = new DictionaryPanel(sipModel);
         docArea = new JTextArea(sipModel.getFieldCompileModel().getDocDocument());
-        docArea.setFont(MONOSPACED);
+//        docArea.setFont(MONOSPACED);
         docArea.setTabSize(3);
         docArea.setLineWrap(true);
         docArea.setWrapStyleWord(true);
         codeArea = new JTextArea(sipModel.getFieldCompileModel().getCodeDocument());
-        codeArea.setFont(MONOSPACED);
+//        codeArea.setFont(MONOSPACED);
         codeArea.setTabSize(3);
         outputArea = new JTextArea(sipModel.getFieldCompileModel().getOutputDocument());
         outputArea.setWrapStyleWord(true);
