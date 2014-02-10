@@ -24,6 +24,7 @@ package eu.delving.sip.files;
 import eu.delving.schema.Fetcher;
 import eu.delving.schema.SchemaType;
 import eu.delving.schema.SchemaVersion;
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -31,6 +32,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 
 /**
@@ -39,22 +42,35 @@ import java.io.IOException;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class HTTPSchemaFetcher implements Fetcher {
+public class SchemaFetcher implements Fetcher {
     private static final String SCHEMA_SERVER = "http://schemas.delving.eu";
+    private File localSchemaDirectory;
     private HttpClient httpClient;
 
-    public HTTPSchemaFetcher(HttpClient httpClient) {
+    public SchemaFetcher(HttpClient httpClient) {
+        findSchemasDirectory();
         this.httpClient = httpClient;
     }
 
     @Override
     public String fetchList() throws IOException {
-        return fetchFile(SCHEMA_DIRECTORY);
+        if (localSchemaDirectory != null) {
+            return getFileContents(SCHEMA_DIRECTORY);
+        }
+        else {
+            return httpGetFile(SCHEMA_DIRECTORY);
+        }
     }
 
     @Override
     public String fetchSchema(SchemaVersion schemaVersion, SchemaType schemaType) throws IOException {
-        return fetchFile(schemaVersion.getPath(schemaType));
+        String path = schemaVersion.getPath(schemaType);
+        if (localSchemaDirectory != null) {
+            return getFileContents(path);
+        }
+        else {
+            return httpGetFile(path);
+        }
     }
 
     @Override
@@ -62,7 +78,39 @@ public class HTTPSchemaFetcher implements Fetcher {
         return true;
     }
 
-    private String fetchFile(String path) throws IOException {
+    private String getFileContents(String path) {
+        try {
+            return FileUtils.readFileToString(new File(localSchemaDirectory, path), "UTF-8");
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void findSchemasDirectory() {
+        String here = new File(".").getAbsolutePath();
+        localSchemaDirectory = new File(here.substring(0, here.length() - 1)); // remove the dot
+        while (localSchemaDirectory != null) {
+            String schemasPath = localSchemaDirectory.getAbsolutePath();
+            if (schemasPath.length() > 1) {
+                File[] schemaDirectory = localSchemaDirectory.listFiles(new SchemaFilter());
+                if (schemaDirectory.length == 1) {
+                    localSchemaDirectory = schemaDirectory[0];
+                    break;
+                }
+            }
+            localSchemaDirectory = localSchemaDirectory.getParentFile();
+        }
+    }
+
+    private class SchemaFilter implements FileFilter {
+        @Override
+        public boolean accept(File directory) {
+            return directory.isDirectory() && directory.getName().equals("schemas.delving.eu");
+        }
+    }
+
+    private String httpGetFile(String path) throws IOException {
         String url = SCHEMA_SERVER + path;
         HttpGet get = new HttpGet(url);
         HttpResponse response = httpClient.execute(get);

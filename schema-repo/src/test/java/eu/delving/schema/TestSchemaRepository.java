@@ -29,7 +29,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -105,7 +105,7 @@ public class TestSchemaRepository {
 //    }
 
     private class HTTPFetcher implements Fetcher {
-        private HttpClient httpClient = new DefaultHttpClient();
+        private HttpClient httpClient = HttpClientBuilder.create().build();
 
         @Override
         public String fetchList() throws IOException {

@@ -23,9 +23,7 @@ package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.*;
-import eu.delving.schema.Fetcher;
 import eu.delving.schema.SchemaRepository;
-import eu.delving.schema.util.FileSystemFetcher;
 import eu.delving.sip.actions.*;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.*;
@@ -55,7 +53,6 @@ import java.util.prefs.Preferences;
 
 import static eu.delving.sip.base.HttpClientFactory.createHttpClient;
 import static eu.delving.sip.base.KeystrokeHelper.*;
-import static eu.delving.sip.base.SwingHelper.isDevelopmentMode;
 import static eu.delving.sip.files.DataSetState.*;
 import static eu.delving.sip.files.StorageFinder.isStandalone;
 
@@ -118,8 +115,7 @@ public class Application {
         feedback = new VisualFeedback(home, desktop, preferences);
         HttpClient httpClient = createHttpClient(storageDirectory);
         try {
-            Fetcher fetcher = isDevelopmentMode() ? new FileSystemFetcher(false) : new HTTPSchemaFetcher(httpClient);
-            this.schemaRepository = new SchemaRepository(fetcher);
+            this.schemaRepository = new SchemaRepository(new SchemaFetcher(httpClient));
         }
         catch (IOException e) {
             throw new StorageException("Unable to create Schema Repository", e);
@@ -133,7 +129,7 @@ public class Application {
         if (cultureHubClient != null) uploadAction = new UploadAction(sipModel, cultureHubClient);
         expertMenu = new ExpertMenu(desktop, sipModel, cultureHubClient, allFrames);
         statusPanel = new StatusPanel(sipModel);
-        home = new JFrame("Delving SIP Creator");
+        home = new JFrame(titleString());
         home.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent componentEvent) {
@@ -219,13 +215,13 @@ public class Application {
                                 return Job.CLEAR_FACTS_STATS;
                             }
                         });
-                        home.setTitle("Delving SIP Creator");
+                        home.setTitle(titleString());
                         sipModel.seekReset();
                         break;
                     default:
                         DataSetModel dataSetModel = sipModel.getDataSetModel();
                         home.setTitle(String.format(
-                                "Delving SIP Creator - [%s -> %s]",
+                                titleString()+" - [%s -> %s]",
                                 dataSetModel.getDataSet().getSpec(), dataSetModel.getPrefix().toUpperCase()
                         ));
                         sipModel.getReportFileModel().refresh();
@@ -235,6 +231,11 @@ public class Application {
         });
         attachAccelerator(new QuitAction(), home);
         attachAccelerator(statusPanel.getButtonAction(), home);
+    }
+
+    private String titleString() {
+        long megabytes = Runtime.getRuntime().maxMemory() / 1024 / 1024;
+        return "Delving SIP Creator (" + megabytes + "Mb)";
     }
 
     private JPanel createStatePanel() {

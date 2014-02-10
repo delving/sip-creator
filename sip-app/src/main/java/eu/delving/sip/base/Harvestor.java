@@ -28,11 +28,9 @@ import eu.delving.sip.files.DataSet;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import javax.xml.stream.*;
@@ -64,7 +62,7 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
     private XMLInputFactory inputFactory = XMLToolFactory.xmlInputFactory();
     private XMLOutputFactory outputFactory = XMLToolFactory.xmlOutputFactory();
     private XMLEventFactory eventFactory = XMLToolFactory.xmlEventFactory();
-    private DefaultHttpClient httpClient;
+    private HttpClient httpClient;
     private NamespaceCollector namespaceCollector = new NamespaceCollector();
     private Context context;
     private int recordCount;
@@ -83,10 +81,7 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
     public Harvestor(DataSet dataSet, Context context) {
         this.dataSet = dataSet;
         this.context = context;
-        HttpParams timeoutParams = new BasicHttpParams();
-        HttpConnectionParams.setSoTimeout(timeoutParams, CONNECTION_TIMEOUT);
-        HttpConnectionParams.setConnectionTimeout(timeoutParams, CONNECTION_TIMEOUT);
-        httpClient = new DefaultHttpClient(timeoutParams);
+        this.httpClient = HttpClientBuilder.create().disableAutomaticRetries().build();
     }
 
     @Override

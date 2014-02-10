@@ -154,7 +154,11 @@ public class StorageImpl implements Storage {
                 schemaVersions = temporarilyHackedSchemaVersions(here);
             }
             else {
-                for (String sv : fact.split(" *, *")) schemaVersions.add(new SchemaVersion(sv));
+                for (String sv : fact.split(" *, *")) {
+                    SchemaVersion schemaVersion = new SchemaVersion(sv);
+                    if ("raw".equals(schemaVersion.getPrefix())) continue;
+                    schemaVersions.add(schemaVersion);
+                }
             }
             Collections.sort(schemaVersions);
             return schemaVersions;

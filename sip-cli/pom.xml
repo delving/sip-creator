@@ -27,11 +27,11 @@
         >
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>sip-app</artifactId>
+    <artifactId>sip-cli</artifactId>
     <packaging>jar</packaging>
-    <name>SIP-App</name>
+    <name>SIP-CLI</name>
     <version>1.1.7-SNAPSHOT</version>
-    <inceptionYear>2008</inceptionYear>
+    <inceptionYear>2013</inceptionYear>
 
     <organization>
         <name>Delving B.V.</name>
@@ -40,25 +40,8 @@
 
     <developers>
         <developer>
-            <name>Sjoerd Siebinga</name>
-            <email>sjoerd@delving.eu</email>
-            <roles>
-                <role>developer</role>
-            </roles>
-        </developer>
-        <developer>
             <name>Gerald de Jong</name>
             <email>gerald@delving.eu</email>
-            <roles>
-                <role>developer</role>
-            </roles>
-        </developer>
-        <developer>
-            <name>Eric van der Meulen</name>
-            <email>eric@delving.eu</email>
-            <roles>
-                <role>developer</role>
-            </roles>
         </developer>
     </developers>
 
@@ -73,17 +56,16 @@
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4</version>
                 <configuration>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>eu.delving.sip.Application</mainClass>
+                            <mainClass>eu.delving.Main</mainClass>
                         </manifest>
                     </archive>
-                    <descriptors>
-                        <descriptor>src/main/assembly/exejar.xml</descriptor>
-                    </descriptors>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                 </configuration>
                 <executions>
                     <execution>
@@ -99,10 +81,6 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.apache.amber</groupId>
-            <artifactId>oauth2-client</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
@@ -112,26 +90,9 @@
             <version>1.1.7-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.jgoodies</groupId>
-            <artifactId>jgoodies-forms</artifactId>
-            <version>1.6.0</version>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.2</version>
         </dependency>
-        <dependency>
-            <groupId>postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>9.1-901.jdbc3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.24</version>
-            <scope>test</scope>
-        </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.apache.poi</groupId>-->
-            <!--<artifactId>poi</artifactId>-->
-        <!--</dependency>-->
-
     </dependencies>
 </project>

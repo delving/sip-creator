@@ -79,10 +79,6 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-
-        <!--had to add manually to 3rd-party hosted in Nexus:-->
-        <!--  javax.jnlp:jnlp-api:1.5.0-->
-
     </repositories>
 
     <distributionManagement>
@@ -104,6 +100,7 @@
         <module>schema-repo</module>
         <module>sip-core</module>
         <module>sip-app</module>
+        <module>sip-cli</module>
     </modules>
 
     <build>
