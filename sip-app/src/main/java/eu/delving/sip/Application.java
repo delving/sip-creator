@@ -117,7 +117,8 @@ public class Application {
         HttpClient httpClient = createHttpClient(storageDirectory);
         try {
             this.schemaRepository = new SchemaRepository(new SchemaFetcher(httpClient));
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new StorageException("Unable to create Schema Repository", e);
         }
         ResolverContext context = new ResolverContext();
@@ -249,7 +250,8 @@ public class Application {
         statusPanel.setReaction(MAPPING, validateAction);
         if (uploadAction == null) {
             statusPanel.setReaction(VALIDATED, allFrames.prepareForNothing());
-        } else {
+        }
+        else {
             statusPanel.setReaction(VALIDATED, uploadAction);
         }
         JPanel p = new JPanel(new GridLayout(1, 0, 6, 6));
@@ -295,7 +297,8 @@ public class Application {
                 helpPanel.initialize();
                 if (item.isSelected()) {
                     home.getContentPane().add(helpPanel, BorderLayout.EAST);
-                } else {
+                }
+                else {
                     home.getContentPane().remove(helpPanel);
                 }
                 home.getContentPane().validate();
@@ -334,7 +337,8 @@ public class Application {
         );
         if (restart) {
             EventQueue.invokeLater(LAUNCH);
-        } else {
+        }
+        else {
             System.exit(0);
         }
     }
@@ -371,7 +375,8 @@ public class Application {
                     ));
                 }
                 return EntityUtils.toString(response.getEntity());
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw new RuntimeException("Fetching problem: " + url, e);
             }
         }
@@ -412,7 +417,8 @@ public class Application {
                 application = new Application(storageDirectory);
                 application.home.setVisible(true);
                 application.allFrames.initiate();
-            } catch (StorageException e) {
+            }
+            catch (StorageException e) {
                 JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
                 e.printStackTrace();
             }
@@ -420,7 +426,7 @@ public class Application {
     }
 
     private static LaunchAction LAUNCH = new LaunchAction();
-    private static String JAR_NAME = "SIP-Creator-2014-02-10.jar";
+    private static String JAR_NAME = "SIP-Creator-2014-XX-XX.jar";
 
     private static void memoryNotConfigured() {
         String os = System.getProperty("os.name");
@@ -430,10 +436,12 @@ public class Application {
         if (os.startsWith("Windows")) {
             out.append(":: SIP-Creator Startup Batch file for Windows (more memory than ").append(totalMemory).append("Mb)\n");
             out.append("java -jar -Xms1024m -Xmx1024m ").append(JAR_NAME);
-        } else if (os.startsWith("Mac")) {
+        }
+        else if (os.startsWith("Mac")) {
             out.append("# SIP-Creator Startup Script for Mac OSX (more memory than ").append(totalMemory).append("Mb)\n");
             out.append("java -jar -Xms1024m -Xmx1024m ").append(JAR_NAME);
-        } else {
+        }
+        else {
             System.out.println("Unrecognized OS: " + os);
         }
         String script = out.toString();
@@ -447,20 +455,20 @@ public class Application {
         scriptPanel.add(scriptArea, BorderLayout.CENTER);
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        JButton ok = new JButton("OK");
+        JButton ok = new JButton("OK, Continue anyway");
         ok.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dialog.setVisible(false);
-                System.exit(0);
+                EventQueue.invokeLater(LAUNCH);
             }
         });
         buttonPanel.add(ok);
         JPanel centralPanel = new JPanel(new GridLayout(0, 1));
         centralPanel.setBorder(BorderFactory.createEmptyBorder(15, 25, 15, 25));
         centralPanel.add(new JLabel(
-                "<html><b>The SIP-Creator cannot be started directly because not enough default memory is allocated." +
-                        "<br>It must be started with the following script:</b>"
+                "<html><b>The SIP-Creator started directly can have too little default memory allocated." +
+                        "<br>It should be started with the following script:</b>"
         ));
         centralPanel.add(scriptPanel);
         centralPanel.add(new JLabel(
@@ -477,13 +485,14 @@ public class Application {
     }
 
     public static void main(final String[] args) throws StorageException {
+        storageFinder.setArgs(args);
         Runtime rt = Runtime.getRuntime();
         int totalMemory = (int) (rt.totalMemory() / 1024 / 1024);
         System.out.println("Total memory: " + totalMemory);
         if (totalMemory < 900) {
             memoryNotConfigured();
-        } else {
-            storageFinder.setArgs(args);
+        }
+        else {
             EventQueue.invokeLater(LAUNCH);
         }
     }
