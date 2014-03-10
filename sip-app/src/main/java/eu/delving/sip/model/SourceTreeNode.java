@@ -28,15 +28,15 @@ import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.Storage;
 import eu.delving.stats.Stats;
 
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
-import java.awt.Color;
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
+import java.util.List;
 
 import static eu.delving.sip.base.SwingHelper.*;
 
@@ -65,7 +65,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         if (root == null) {
             root = new SourceTreeNode("No statistics", "<h3>No statistics</h3>");
         }
-        else if (root.getTag().toString().equals(Storage.ENVELOPE_TAG)) {
+        else if (root.getTag().toString().equals(Storage.SOURCE_ROOT_TAG)) {
             SourceTreeNode factNode = new SourceTreeNode(root, Storage.FACTS_TAG, "<h3>Select a fact from here</h3>");
             root.getChildren().add(0, factNode);
             for (Map.Entry<String, String> entry : facts.entrySet()) new SourceTreeNode(factNode, entry);

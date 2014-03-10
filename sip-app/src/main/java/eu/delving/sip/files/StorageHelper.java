@@ -157,12 +157,12 @@ public class StorageHelper {
         return findOrNull(dir, 0, new PrefixFileFilter(MAPPING), MAPPING);
     }
 
-    static File[] validationFiles(File dir, String prefix) {
-        return dir.listFiles(new NameFileFilter(VALIDATION.getName(prefix)));
+    static File[] targetFiles(File dir, String prefix) {
+        return dir.listFiles(new NameFileFilter(TARGET.getName(prefix)));
     }
 
-    static File[] validationFiles(File dir) {
-        return dir.listFiles(new PrefixFileFilter(VALIDATION));
+    static File[] targetFiles(File dir) {
+        return dir.listFiles(new PrefixFileFilter(TARGET));
     }
 
     static InputStream zipIn(File file) throws StorageException {
@@ -191,12 +191,12 @@ public class StorageHelper {
         return new File(dir, REPORT_INDEX.getName(prefix));
     }
 
-    static File validationFile(File dir, String prefix) {
-        return findLatestFile(dir, VALIDATION, prefix);
-    }
-
     static File linkFile(File dir, String prefix) {
         return new File(dir, LINKS.getName(prefix));
+    }
+
+    static File targetFile(File dir, String prefix) {
+        return new File(dir, TARGET.getName(prefix));
     }
 
     public static File statsFile(File dir, boolean sourceFormat, String prefix) {
@@ -260,8 +260,8 @@ public class StorageHelper {
         return latestFile;
     }
 
-    static List<File> findHashedMappingFiles(File dir, String prefix) {
-        File[] files = dir.listFiles(new HashedMappingFileFilter(prefix));
+    static List<File> findHashedPrefixFiles(File dir, FileType fileType, String prefix) {
+        File[] files = dir.listFiles(new HashedPrefixFileFilter(fileType, prefix));
         List<File> sorted = new ArrayList<File>(Arrays.asList(files));
         Collections.sort(sorted, new LastModifiedComparator());
         return sorted;
@@ -365,11 +365,11 @@ public class StorageHelper {
         return files[which];
     }
 
-    static class HashedMappingFileFilter implements FileFilter {
+    static class HashedPrefixFileFilter implements FileFilter {
         private String ending;
 
-        HashedMappingFileFilter(String prefix) {
-            this.ending = MAPPING.getName(prefix);
+        HashedPrefixFileFilter(FileType fileType, String prefix) {
+            this.ending = Hasher.SEPARATOR + fileType.getName(prefix);
         }
 
         @Override

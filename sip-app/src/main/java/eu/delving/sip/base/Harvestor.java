@@ -121,7 +121,7 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
                 resumptionToken = saveRecords(fetchedRecords, out);
                 if (!isValidResumptionToken(resumptionToken) && recordCount > 0) EntityUtils.consume(fetchedRecords);
             }
-            out.add(eventFactory.createEndElement("", "", ENVELOPE_TAG));
+            out.add(eventFactory.createEndElement("", "", SOURCE_ROOT_TAG));
             out.add(eventFactory.createCharacters("\n"));
             out.add(eventFactory.createEndDocument());
             out.flush();

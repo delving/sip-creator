@@ -36,14 +36,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JRadioButton;
-import javax.xml.stream.XMLStreamException;
+import javax.swing.*;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
-import java.io.*;
-import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 
@@ -56,12 +52,10 @@ import java.util.Map;
  */
 
 public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork {
-    public static final String OUTPUT_FILE_PREF = "outputFile";
     private XmlSerializer serializer = new XmlSerializer();
     private Feedback feedback;
     private DataSet dataSet;
     private RecMapping recMapping;
-    private BitSet valid;
     private ReportWriter reportWriter;
     private GroovyCodeResource groovyCodeResource;
     private ProgressListener progressListener;
@@ -70,10 +64,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private boolean allowInvalid;
     private int validCount, invalidCount, recordCount, recordNumber;
     private Stats stats;
-    private File outputDirectory;
-    private PrintWriter expertOutput;
     private int maxUniqueValueLength;
-//    private SipModel sipModel;
+    private XmlOutput targetXmlOutput;
 
     public interface Listener {
 
@@ -90,7 +82,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             RecMapping recMapping,
             int maxUniqueValueLength,
             int recordCount,
-            File outputDirectory,
             boolean allowInvalid,
             GroovyCodeResource groovyCodeResource,
             Listener listener
@@ -100,7 +91,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         this.feedback = feedback;
         this.dataSet = dataSet;
         this.recMapping = recMapping;
-        this.outputDirectory = outputDirectory;
         this.allowInvalid = allowInvalid;
         this.groovyCodeResource = groovyCodeResource;
         this.listener = listener;
@@ -108,10 +98,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     public String getSpec() {
         return dataSet.getSpec();
-    }
-
-    public BitSet getValid() {
-        return valid;
     }
 
     public Stats getStats() {
@@ -149,7 +135,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     @Override
     public void run() {
-        valid = new BitSet(recordCount);
         stats = createStats();
         MappingRunner mappingRunner;
         MetadataParser parser;
@@ -162,7 +147,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             parser.setProgressListener(new FakeProgressListener());
             assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
             reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
-            if (outputDirectory != null) expertOutput = createExpertOutput();
+            targetXmlOutput = new XmlOutput(getDataSet().targetOutput(getPrefix()), recDef().getNamespaceMap());
         }
         catch (Exception e) {
             feedback.alert("Initialization of file processor failed", e);
@@ -187,17 +172,9 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                             if (violation != null) throw new AssertionException(violation);
                         }
                         validCount++;
-                        valid.set(record.getRecordNumber());
                         recordStatistics((Element) node, Path.create());
-                        if (expertOutput != null) {
-                            for (Map.Entry<String, List<String>> copyField : result.copyFields().entrySet()) {
-                                for (String value : copyField.getValue()) {
-                                    expertOutput.printf("%s = %s\n", copyField.getKey(), value);
-                                }
-                            }
-                            expertOutput.println("==");
-                        }
                         reportWriter.valid(record.getId(), result);
+                        targetXmlOutput.write(node, record.getId());
                     }
                     catch (Exception e) {
                         invalidCount++;
@@ -241,29 +218,18 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             feedback.alert("File processing problem", e);
         }
         finally {
-            if (expertOutput != null) expertOutput.close();
             if (aborted) {
                 reportWriter.abort();
+                targetXmlOutput.finish();
+                getDataSet().targetOutput(getPrefix()).delete();
                 listener.aborted(this);
             }
             else {
                 listener.succeeded(this);
+                targetXmlOutput.finish();
                 reportWriter.finish(validCount, invalidCount);
             }
         }
-    }
-
-    private XmlOutput createXmlOutput() throws FileNotFoundException, UnsupportedEncodingException, XMLStreamException {
-        String fileName = String.format("%s-%s.xml", getDataSet().getSpec(), recMapping.getPrefix());
-        File outputFile = new File(outputDirectory, fileName);
-        OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
-        return new XmlOutput(outputStream, recDef().getNamespaceMap());
-    }
-
-    private PrintWriter createExpertOutput() throws FileNotFoundException, UnsupportedEncodingException {
-        String fileName = String.format("%s-%s.txt", getDataSet().getSpec(), recMapping.getPrefix());
-        File outputFile = new File(outputDirectory, fileName);
-        return new PrintWriter(new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8"));
     }
 
     private RecDef recDef() {

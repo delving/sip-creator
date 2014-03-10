@@ -32,7 +32,6 @@ import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +55,7 @@ public interface DataSet extends Comparable<DataSet> {
 
     Validator newValidator(String prefix) throws StorageException;
 
-    boolean isValidated(String prefix) throws StorageException;
+    boolean isProcessed(String prefix) throws StorageException;
 
     DataSetState getState(String prefix);
 
@@ -72,9 +71,9 @@ public interface DataSet extends Comparable<DataSet> {
 
     void deleteConverted() throws StorageException;
 
-    boolean deleteValidation(String prefix) throws StorageException;
+    boolean deleteTarget(String prefix) throws StorageException;
 
-    void deleteAllValidations() throws StorageException;
+    void deleteAllTargets() throws StorageException;
 
     File importedOutput();
 
@@ -83,6 +82,8 @@ public interface DataSet extends Comparable<DataSet> {
     File sourceOutput();
 
     InputStream openSourceInputStream() throws StorageException;
+
+    File targetOutput(String prefix);
 
     File renameInvalidSource() throws StorageException;
 
@@ -101,8 +102,6 @@ public interface DataSet extends Comparable<DataSet> {
     void setRecMapping(RecMapping recMapping, boolean freeze) throws StorageException;
 
     List<File> getRecMappingFiles(String prefix) throws StorageException;
-
-    void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws StorageException;
 
     ReportWriter openReportWriter(RecDef recDef) throws StorageException;
 

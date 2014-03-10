@@ -44,8 +44,8 @@ import java.security.DigestOutputStream;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static eu.delving.sip.files.Storage.*;
 import static eu.delving.sip.files.Storage.FileType.SOURCE;
+import static eu.delving.sip.files.Storage.*;
 import static eu.delving.sip.files.StorageHelper.*;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.FileUtils.moveFile;
@@ -175,7 +175,7 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
                             if (XSI_SCHEMA.equals(entry.getValue())) continue;
                             nslist.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
                         }
-                        out.add(eventFactory.createStartElement("", "", ENVELOPE_TAG, null, nslist.iterator()));
+                        out.add(eventFactory.createStartElement("", "", SOURCE_ROOT_TAG, null, nslist.iterator()));
                         out.add(eventFactory.createCharacters("\n"));
                         break;
                     case XMLEvent.START_ELEMENT:
@@ -245,7 +245,7 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
                         path = path.parent();
                         break;
                     case XMLEvent.END_DOCUMENT:
-                        out.add(eventFactory.createEndElement("", "", ENVELOPE_TAG));
+                        out.add(eventFactory.createEndElement("", "", SOURCE_ROOT_TAG));
                         out.add(eventFactory.createCharacters("\n"));
                         out.add(eventFactory.createEndDocument());
                         out.flush();

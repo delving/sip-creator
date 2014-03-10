@@ -22,6 +22,7 @@
 package eu.delving.sip.xml;
 
 import eu.delving.XMLToolFactory;
+import eu.delving.metadata.Hasher;
 import eu.delving.metadata.RecDef;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -33,14 +34,13 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPOutputStream;
 
-import static eu.delving.sip.files.Storage.OUTPUT_TAG;
+import static eu.delving.sip.files.Storage.TARGET_ROOT_TAG;
 
 /**
  * Create an output file with our standard record wrapping from a file of otherwise wrapped records, given by
@@ -50,25 +50,36 @@ import static eu.delving.sip.files.Storage.OUTPUT_TAG;
  */
 
 public class XmlOutput {
+    private File outputZipFile;
     private XMLEventFactory eventFactory = XMLToolFactory.xmlEventFactory();
-    private OutputStream outputStream;
+    private GZIPOutputStream outputStream;
     private XMLEventWriter out;
 
-    public XmlOutput(OutputStream outputStream, Map<String, RecDef.Namespace> namespaces) throws UnsupportedEncodingException, XMLStreamException {
-        this.outputStream = outputStream;
+    public XmlOutput(File outputZipFile, Map<String, RecDef.Namespace> namespaces) throws IOException, XMLStreamException {
+        this.outputZipFile = outputZipFile;
+        outputStream = new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream(outputZipFile)));
         out = XMLToolFactory.xmlOutputFactory().createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
         out.add(eventFactory.createStartDocument());
         out.add(eventFactory.createCharacters("\n"));
+        StringBuilder schemaLocation = new StringBuilder();
         List<Namespace> namespaceList = new ArrayList<Namespace>();
         for (RecDef.Namespace namespace : namespaces.values()) {
             namespaceList.add(eventFactory.createNamespace(namespace.prefix, namespace.uri));
+            if (namespace.schema != null) {
+                schemaLocation.append(namespace.uri).append(' ').append(namespace.schema).append(' ');
+            }
         }
-        out.add(eventFactory.createStartElement("", "", OUTPUT_TAG, null, namespaceList.iterator()));
+        List<Attribute> attributes = new ArrayList<Attribute>();
+        attributes.add(eventFactory.createAttribute("xsi:schemaLocation", schemaLocation.toString()));
+        out.add(eventFactory.createStartElement("", "", TARGET_ROOT_TAG, attributes.iterator(), namespaceList.iterator()));
     }
 
-    public void write(Node node) {
+    public void write(Node node, String identifier) {
         try {
-            writeElement((Element) node, 1);
+            Element element = (Element) node;
+            element.removeAttribute("xsi:schemaLocation");
+            element.setAttribute("id", identifier);
+            writeElement(element, 1);
         }
         catch (XMLStreamException e) {
             throw new RuntimeException("Trouble writing node to output", e);
@@ -78,11 +89,12 @@ public class XmlOutput {
     public void finish() {
         try {
             out.add(eventFactory.createCharacters("\n"));
-            out.add(eventFactory.createEndElement("", "", OUTPUT_TAG));
+            out.add(eventFactory.createEndElement("", "", TARGET_ROOT_TAG));
             out.add(eventFactory.createCharacters("\n"));
             out.add(eventFactory.createEndDocument());
             out.flush();
             outputStream.close();
+            outputZipFile = Hasher.ensureFileHashed(outputZipFile);
         }
         catch (Exception e) {
             throw new RuntimeException("Trouble closing xml output", e);

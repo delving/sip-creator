@@ -193,7 +193,7 @@ public class TestMappingValidation {
         Stats stats = dataSet().getLatestStats();
         assertTrue(stats.sourceFormat);
         SourceTreeNode tree = SourceTreeNode.create(stats.fieldValueMap, dataSet().getDataSetFacts());
-        assertEquals(Tag.element(Storage.ENVELOPE_TAG), tree.getTag());
+        assertEquals(Tag.element(Storage.SOURCE_ROOT_TAG), tree.getTag());
         assertEquals(MAPPING, state());
 
 //        System.out.println(mock.mapping());

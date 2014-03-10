@@ -32,14 +32,11 @@ import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
-import eu.delving.sip.xml.FileProcessor;
 import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 
-import javax.swing.AbstractAction;
-import javax.swing.JDesktopPane;
-import javax.swing.JMenu;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
@@ -60,7 +57,6 @@ public class ExpertMenu extends JMenu {
         this.allFrames = allFrames;
         add(new MaxUniqueValueLengthAction());
         add(new UniqueConverterAction());
-        add(new WriteOutputAction());
         add(new ReloadMappingAction());
         add(new DeleteCachesAction());
         add(new ToggleFrameArrangements());
@@ -138,39 +134,6 @@ public class ExpertMenu extends JMenu {
                     }
                 });
             }
-        }
-    }
-
-    private class WriteOutputAction extends AbstractAction {
-
-        private WriteOutputAction() {
-            super("Write XML output of the validation");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            String answer = sipModel.getFeedback().ask(
-                    "Enter the directory where output is to be stored",
-                    sipModel.getPreferences().get(FileProcessor.OUTPUT_FILE_PREF, "")
-            );
-            if (answer != null) {
-                answer = answer.trim();
-                File directory = new File(answer);
-                if (!directory.exists()) {
-                    failedAnswer(answer + " doesn't exist");
-                }
-                else if (!directory.isDirectory()) {
-                    failedAnswer(answer + " is not a directory");
-                }
-                else {
-                    sipModel.getPreferences().put(FileProcessor.OUTPUT_FILE_PREF, directory.getAbsolutePath());
-                }
-            }
-        }
-
-        private void failedAnswer(String message) {
-            sipModel.getFeedback().alert(message);
-            sipModel.getPreferences().put(FileProcessor.OUTPUT_FILE_PREF, "");
         }
     }
 
@@ -327,7 +290,7 @@ public class ExpertMenu extends JMenu {
                         if (dataSet == null) return;
                         dataSet.setStats(null, false, getPrefix());
                         dataSet.setStats(null, true, getPrefix());
-                        dataSet.setValidation(getPrefix(), null, 0);
+                        dataSet.deleteTarget(getPrefix());
                     }
                     catch (StorageException e) {
                         sipModel.getFeedback().alert("Cannot delete caches", e);

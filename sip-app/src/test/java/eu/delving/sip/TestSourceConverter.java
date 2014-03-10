@@ -39,7 +39,10 @@ import org.junit.Test;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.validation.Validator;
 import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import static eu.delving.sip.files.Storage.*;
 
@@ -238,7 +241,7 @@ public class TestSourceConverter {
         }
 
         @Override
-        public boolean isValidated(String prefix) throws StorageException {
+        public boolean isProcessed(String prefix) throws StorageException {
             return false;
         }
 
@@ -280,12 +283,12 @@ public class TestSourceConverter {
         }
 
         @Override
-        public boolean deleteValidation(String prefix) throws StorageException {
+        public boolean deleteTarget(String prefix) throws StorageException {
             return false;
         }
 
         @Override
-        public void deleteAllValidations() throws StorageException {
+        public void deleteAllTargets() throws StorageException {
         }
 
         @Override
@@ -305,6 +308,11 @@ public class TestSourceConverter {
 
         @Override
         public InputStream openSourceInputStream() throws StorageException {
+            return null;
+        }
+
+        @Override
+        public File targetOutput(String prefix) {
             return null;
         }
 
@@ -351,11 +359,6 @@ public class TestSourceConverter {
         @Override
         public List<File> getRecMappingFiles(String prefix) throws StorageException {
             return null;
-        }
-
-        @Override
-        public void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws StorageException {
-          
         }
 
         @Override

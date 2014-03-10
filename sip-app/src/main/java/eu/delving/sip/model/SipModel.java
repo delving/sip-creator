@@ -38,7 +38,7 @@ import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.log4j.Logger;
 
-import javax.swing.JDesktopPane;
+import javax.swing.*;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -203,7 +203,7 @@ public class SipModel {
 
     private void clearValidations() {
         try {
-            dataSetModel.getDataSet().deleteAllValidations();
+            dataSetModel.getDataSet().deleteAllTargets();
         }
         catch (StorageException e) {
             LOG.warn(String.format("Error while deleting validation files %s", e));
@@ -419,12 +419,6 @@ public class SipModel {
     }
 
     public void processFile(boolean allowInvalid, FileProcessor.Listener listener) {
-        File outputDirectory = null;
-        String directoryString = getPreferences().get(FileProcessor.OUTPUT_FILE_PREF, "").trim();
-        if (!directoryString.isEmpty()) {
-            outputDirectory = new File(directoryString);
-            if (!outputDirectory.exists()) outputDirectory = null;
-        }
         final DataSet dataSet = getDataSetModel().getDataSet();
         if (allowInvalid) {
             for (SchemaVersion schemaVersion : dataSet.getSchemaVersions()) {
@@ -443,8 +437,7 @@ public class SipModel {
                             recMapping,
                             statsModel.getMaxUniqueValueLength(),
                             statsModel.getRecordCount(),
-                            outputDirectory,
-                            allowInvalid,
+                            true,
                             groovyCodeResource,
                             listener
                     ));
@@ -462,8 +455,7 @@ public class SipModel {
                     getMappingModel().getRecMapping(),
                     statsModel.getMaxUniqueValueLength(),
                     statsModel.getRecordCount(),
-                    outputDirectory,
-                    allowInvalid,
+                    false,
                     groovyCodeResource,
                     listener
             ));

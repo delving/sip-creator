@@ -151,7 +151,7 @@ public class StatsFrame extends FrameBase {
                         statsSets[0].setStats(dataSet.getStats(false, null));
                         statsSets[1].setStats(dataSet.getStats(true, null));
                         break;
-                    case VALIDATED:
+                    case PROCESSED:
                         statsSets[0].setStats(dataSet.getStats(false, null));
                         statsSets[1].setStats(dataSet.getStats(true, null));
                         statsSets[2].setStats(dataSet.getStats(true, model.getPrefix()));
