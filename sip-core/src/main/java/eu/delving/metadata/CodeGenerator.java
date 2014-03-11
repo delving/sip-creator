@@ -72,10 +72,11 @@ public class CodeGenerator {
         codeOut.line("def discard = { reason -> throw new DiscardRecordException(reason.toString()) }");
         codeOut.line("def discardIf = { thing, reason ->  if (thing) throw new DiscardRecordException(reason.toString()) }");
         codeOut.line("def discardIfNot = { thing, reason ->  if (!thing) throw new DiscardRecordException(reason.toString()) }");
-        codeOut.line("// Facts:");
-        for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
-            codeOut.line(String.format("String %s = '''%s'''", entry.getKey(), entry.getValue()));
-        }
+        codeOut.line("Object _facts = WORLD._facts");
+        codeOut.line("Object _optLookup = WORLD._optLookup");
+//        for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
+//            codeOut.line(String.format("String %s = '''%s'''", entry.getKey(), entry.getValue()));
+//        }
         codeOut.line("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'");
         codeOut.line("// Functions from Mapping:");
         Set<String> names = new TreeSet<String>();
@@ -99,9 +100,9 @@ public class CodeGenerator {
         codeOut.line("boolean _absent_");
         codeOut.line("org.w3c.dom.Node outputNode");
         codeOut.line_("use (MappingCategory) {");
-        codeOut.line_("input * { _input ->");
+        codeOut.line_("WORLD.input * { _input ->");
         codeOut.line("_uniqueIdentifier = _input['@id'][0].toString()");
-        codeOut.line("outputNode = output.");
+        codeOut.line("outputNode = WORLD.output.");
         if (recDefTree.getRoot().isPopulated()) {
             toElementCode(recDefTree.getRoot(), new Stack<String>());
         }

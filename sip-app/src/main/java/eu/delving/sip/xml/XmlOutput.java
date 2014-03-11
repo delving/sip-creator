@@ -24,6 +24,7 @@ package eu.delving.sip.xml;
 import eu.delving.XMLToolFactory;
 import eu.delving.metadata.Hasher;
 import eu.delving.metadata.RecDef;
+import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -74,19 +75,14 @@ public class XmlOutput {
         out.add(eventFactory.createStartElement("", "", TARGET_ROOT_TAG, attributes.iterator(), namespaceList.iterator()));
     }
 
-    public void write(Node node, String identifier) {
-        try {
-            Element element = (Element) node;
-            element.removeAttribute("xsi:schemaLocation");
-            element.setAttribute("id", identifier);
-            writeElement(element, 1);
-        }
-        catch (XMLStreamException e) {
-            throw new RuntimeException("Trouble writing node to output", e);
-        }
+    public void write(String identifier, Node node) throws XMLStreamException {
+        Element element = (Element) node;
+        element.removeAttribute("xsi:schemaLocation");
+        element.setAttribute("id", identifier);
+        writeElement(element, 1);
     }
 
-    public void finish() {
+    public void finish(boolean aborted) {
         try {
             out.add(eventFactory.createCharacters("\n"));
             out.add(eventFactory.createEndElement("", "", TARGET_ROOT_TAG));
@@ -94,7 +90,12 @@ public class XmlOutput {
             out.add(eventFactory.createEndDocument());
             out.flush();
             outputStream.close();
-            outputZipFile = Hasher.ensureFileHashed(outputZipFile);
+            if (aborted) {
+                FileUtils.deleteQuietly(outputZipFile);
+            }
+            else {
+                outputZipFile = Hasher.ensureFileHashed(outputZipFile);
+            }
         }
         catch (Exception e) {
             throw new RuntimeException("Trouble closing xml output", e);

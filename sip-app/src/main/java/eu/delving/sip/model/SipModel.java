@@ -66,7 +66,7 @@ public class SipModel {
     private FunctionCompileModel functionCompileModel;
     private MappingCompileModel recordCompileModel;
     private MappingCompileModel fieldCompileModel;
-    private MetadataParser metadataParser;
+    private MetadataParser parser;
     private StatsModel statsModel;
     private MappingHintsModel mappingHintsModel;
     private DataSetModel dataSetModel;
@@ -466,9 +466,9 @@ public class SipModel {
         exec(new Work.DataSetWork() {
             @Override
             public void run() {
-                if (metadataParser != null) {
-                    metadataParser.close();
-                    metadataParser = null;
+                if (parser != null) {
+                    parser.close();
+                    parser = null;
                     for (ParseListener parseListener : parseListeners) parseListener.updatedRecord(null);
                 }
             }
@@ -525,12 +525,11 @@ public class SipModel {
                     for (ParseListener parseListener : parseListeners) parseListener.updatedRecord(null);
                     return;
                 }
-                if (metadataParser == null) {
-                    metadataParser = new MetadataParser(dataSetModel.getDataSet().openSourceInputStream(), statsModel.getRecordCount());
+                if (parser == null) {
+                    parser = new MetadataParser(dataSetModel.getDataSet().openSourceInputStream(), statsModel.getRecordCount());
                 }
-                metadataParser.setProgressListener(progressListener);
-                MetadataRecord metadataRecord;
-                while ((metadataRecord = metadataParser.nextRecord()) != null) {
+                parser.setProgressListener(progressListener);
+                for (MetadataRecord metadataRecord = parser.nextRecord(); !metadataRecord.isPoison(); metadataRecord = parser.nextRecord()) {
                     if (scanPredicate == null || scanPredicate.accept(metadataRecord)) {
                         for (ParseListener parseListener : parseListeners) {
                             parseListener.updatedRecord(metadataRecord);
@@ -541,7 +540,7 @@ public class SipModel {
             }
             catch (Exception e) {
                 feedback.alert("Unable to fetch the next record", e);
-                metadataParser = null;
+                parser = null;
             }
             finally {
                 if (finished != null) exec(finished);

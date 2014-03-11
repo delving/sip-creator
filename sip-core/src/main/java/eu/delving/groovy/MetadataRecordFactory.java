@@ -63,7 +63,7 @@ public class MetadataRecordFactory {
     }
 
     public MetadataRecord fromGroovyNode(GroovyNode rootNode, int recordNumber, int recordCount) {
-        return new MetadataRecord(rootNode, recordNumber, recordCount);
+        return MetadataRecord.create(rootNode, recordNumber, recordCount);
     }
 
     public Node nodeFromXml(String id, String recordContents) throws IOException, SAXException {
@@ -123,7 +123,7 @@ public class MetadataRecordFactory {
                 }
                 input.next();
             }
-            return new MetadataRecord(rootNode, -1, -1);
+            return MetadataRecord.create(rootNode, -1, -1);
         } catch (WstxParsingException e) {
             throw new XMLStreamException("Problem parsing record:\n" + recordString, e);
         }

@@ -30,7 +30,6 @@ import groovy.lang.Script;
 
 import java.io.*;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -46,7 +45,7 @@ import java.util.Map;
 public class GroovyCodeResource {
     private static final URL MAPPING_CATEGORY = GroovyCodeResource.class.getResource("/MappingCategory.groovy");
     private final ClassLoader classLoader;
-    private GroovyClassLoader groovyClassLoader;
+    private GroovyClassLoader categoryClassLoader;
 
     public GroovyCodeResource(ClassLoader classLoader) {
         this.classLoader = classLoader;
@@ -69,24 +68,22 @@ public class GroovyCodeResource {
     }
 
     public Script createMappingScript(String code) {
-        return new GroovyShell(getGroovyClassLoader()).parse(code);
+        GroovyShell groovyShell = new GroovyShell(getGroovyClassLoader());
+        return groovyShell.parse(code);
     }
 
-    private GroovyClassLoader getGroovyClassLoader() {
-        if (groovyClassLoader == null) {
+    private synchronized GroovyClassLoader getGroovyClassLoader() {
+        if (categoryClassLoader == null) {
             try {
-                ClassLoader classLoader = this.classLoader;
-                GroovyClassLoader categoryClassLoader = new GroovyClassLoader(classLoader);
+                categoryClassLoader = new GroovyClassLoader(this.classLoader);
                 String categoryCode = readResourceCode(MAPPING_CATEGORY);
                 categoryClassLoader.parseClass(categoryCode);
-                groovyClassLoader = new GroovyClassLoader(categoryClassLoader); 
             }
             catch (Exception e) {
                 throw new RuntimeException("Cannot initialize Groovy Code Resource", e);
             }
         }
-        groovyClassLoader.clearCache();
-        return groovyClassLoader;
+        return new GroovyClassLoader(categoryClassLoader);
     }
 
     private String readResourceCode(URL resource) throws IOException {
@@ -110,21 +107,18 @@ public class GroovyCodeResource {
         return out.toString();
     }
 
-    public void flush() {
-        // Groovy generates classes for each script evaluation
-        // this ends up eating up all permGen space
-        // thus we clear the caches referencing those classes so that GC can remove them
-
-        // additionally Groovy also at each script evaluation generates instances of MetaMethodIndex$Elem
-        // those are SoftReferences so they only disappear when the used memory reaches its max allowed heap
-        // but they also pretty much impact on the execution time, probably because method cache lookup time increases
-        // (maybe because of a poorly implemented equals() & hashcode() implementation)
-        // thus in order to get rid of this performance impact we need a reasonabily low -XX:MaxPermSize
-        // yet it can't be too low because otherwise Groovy won't be able to generate its classes anymore
-        // this is why we now clear those every 50 iterations.
-
+    static {
         GroovySystem.setKeepJavaMetaClasses(false);
-        for (Iterator it = GroovySystem.getMetaClassRegistry().iterator(); it.hasNext(); ) it.remove();
-        groovyClassLoader.clearCache();
     }
+    // Groovy generates classes for each script evaluation
+    // this ends up eating up all permGen space
+    // thus we clear the caches referencing those classes so that GC can remove them
+
+    // additionally Groovy also at each script evaluation generates instances of MetaMethodIndex$Elem
+    // those are SoftReferences so they only disappear when the used memory reaches its max allowed heap
+    // but they also pretty much impact on the execution time, probably because method cache lookup time increases
+    // (maybe because of a poorly implemented equals() & hashcode() implementation)
+    // thus in order to get rid of this performance impact we need a reasonabily low -XX:MaxPermSize
+    // yet it can't be too low because otherwise Groovy won't be able to generate its classes anymore
+    // this is why we now clear those every 50 iterations.
 }

@@ -98,13 +98,13 @@ public class ValidateAction extends AbstractAction {
                                 @Override
                                 public void run() {
 //                                    dataSetMenu.refreshAndChoose(fileProcessor.getDataSet(), fileProcessor.getPrefix());
-                                    sipModel.seekRecordNumber(fileProcessor.getRecordNumber());
+                                    sipModel.seekRecordNumber(fileProcessor.getFailedRecordNumber());
                                     investigate.run();
                                 }
                             });
                         }
                         else {
-                            sipModel.seekRecordNumber(fileProcessor.getRecordNumber());
+                            sipModel.seekRecordNumber(fileProcessor.getFailedRecordNumber());
                             investigate.run();
                         }
                     }
