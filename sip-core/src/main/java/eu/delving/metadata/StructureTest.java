@@ -44,7 +44,7 @@ public class StructureTest {
     private XPathExpression test;
 
     public static List<StructureTest> listFrom(RecDef recDef) throws XPathFactoryConfigurationException {
-        StructureTest.Factory factory = new StructureTest.Factory(new XPathContext(recDef.namespaces));
+        StructureTest.Factory factory = new StructureTest.Factory(new RecDefNamespaceContext(recDef.namespaces));
         List<StructureTest> tests = new ArrayList<StructureTest>();
         collectStructureTests(recDef.root, Path.create(), tests, factory);
         return tests;

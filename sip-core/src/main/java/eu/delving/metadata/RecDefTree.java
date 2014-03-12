@@ -52,7 +52,7 @@ import static eu.delving.metadata.RecDef.REQUIRED_FIELDS;
  */
 
 public class RecDefTree implements RecDefNodeListener {
-    private XPathContext pathContext;
+    private RecDefNamespaceContext pathContext;
     private RecDef recDef;
     private RecDefNode root;
     private RecDefNodeListener listener;
@@ -72,7 +72,7 @@ public class RecDefTree implements RecDefNodeListener {
     private RecDefTree(RecDef recDef) {
         this.recDef = recDef;
         this.root = RecDefNode.create(this, recDef);
-        this.pathContext = new XPathContext(recDef.namespaces);
+        this.pathContext = new RecDefNamespaceContext(recDef.namespaces);
     }
 
     public void setListener(RecDefNodeListener listener) {

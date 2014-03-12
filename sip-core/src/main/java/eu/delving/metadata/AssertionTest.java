@@ -48,7 +48,7 @@ public class AssertionTest {
     public static List<AssertionTest> listFrom(RecDef recDef, GroovyCodeResource groovy) throws XPathFactoryConfigurationException, XPathExpressionException {
         List<AssertionTest> tests = new ArrayList<AssertionTest>();
         if (recDef.assertionList == null) return tests;
-        Factory factory = new Factory(new XPathContext(recDef.namespaces), groovy);
+        Factory factory = new Factory(new RecDefNamespaceContext(recDef.namespaces), groovy);
         for (Assertion assertion : recDef.assertionList.assertions) {
             tests.add(factory.create(assertion));
         }

@@ -1,7 +1,6 @@
 package eu.delving;
 
 import com.ctc.wstx.stax.WstxInputFactory;
-import eu.delving.metadata.XPathContext;
 import org.apache.xerces.impl.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -36,19 +35,12 @@ public class XMLToolFactory {
             e.printStackTrace();
             System.exit(1);
         }
-        System.out.println(XPATH_FACTORY);
     }
 
     public static DocumentBuilderFactory documentBuilderFactory() {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         return factory;
-    }
-
-    public static XPath xpath(XPathContext pathContext) {
-        XPath path = XPATH_FACTORY.newXPath();
-        path.setNamespaceContext(pathContext);
-        return path;
     }
 
     public static XPath xpath(NamespaceContext pathContext) {

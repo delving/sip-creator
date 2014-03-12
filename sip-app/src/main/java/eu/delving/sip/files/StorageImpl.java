@@ -471,7 +471,7 @@ public class StorageImpl implements Storage {
             File reportFile = new File(here, FileType.REPORT.getName(recDef.prefix));
             File reportIndexFile = new File(here, FileType.REPORT_INDEX.getName(recDef.prefix));
             try {
-                LinkCheckExtractor linkCheckExtractor = new LinkCheckExtractor(recDef.fieldMarkers, new XPathContext(recDef.namespaces));
+                LinkCheckExtractor linkCheckExtractor = new LinkCheckExtractor(recDef.fieldMarkers, new RecDefNamespaceContext(recDef.namespaces));
                 return new ReportWriter(reportFile, reportIndexFile, linkCheckExtractor);
             }
             catch (IOException e) {
