@@ -141,12 +141,14 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         final MetadataParser parser;
         final TransferQueue<MetadataRecord> sink;
         final Termination termination;
+        final GroovyCodeResource groovyCodeResource;
         private Thread thread = new Thread(this);
 
-        private QueueFiller(MetadataParser parser, TransferQueue<MetadataRecord> sink, Termination termination) {
+        private QueueFiller(MetadataParser parser, TransferQueue<MetadataRecord> sink, Termination termination, GroovyCodeResource groovyCodeResource) {
             this.parser = parser;
             this.sink = sink;
             this.termination = termination;
+            this.groovyCodeResource = groovyCodeResource;
         }
 
         @Override
@@ -282,7 +284,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             parser.setProgressListener(progressListener);
             ReportWriter reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
             XmlOutput xmlOutput = new XmlOutput(getDataSet().targetOutput(getPrefix()), recDef().getNamespaceMap());
-            QueueFiller queueFiller = new QueueFiller(parser, recordSource, termination);
+            QueueFiller queueFiller = new QueueFiller(parser, recordSource, termination, groovyCodeResource);
             this.stats = createStats();
             Consumer consumer = new Consumer(reportWriter, xmlOutput, stats, termination);
             int engineCount = Runtime.getRuntime().availableProcessors() - 1;
@@ -297,6 +299,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 engine.start();
             }
             queueFiller.start();
+            System.out.println(Thread.currentThread().getName() + " about to consume");
             consumer.run();
         }
         catch (Exception e) {
@@ -527,12 +530,13 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         boolean shouldShow() {
             if (lastAppearance > System.currentTimeMillis() - 1000) return false;
-            lastAppearance = System.currentTimeMillis() + (long)(Math.random() * 200);
+            lastAppearance = System.currentTimeMillis() + (long) (Math.random() * 200);
             return true;
         }
 
         public String toString() {
-            return name + "/" + count + ": " + (out - in) + ":in=" + totalIn + ":out=" + totalOut;
+            Runtime r = Runtime.getRuntime();
+            return name + "/" + count + ": " + (out - in) + ": in=" + totalIn + ": out=" + totalOut;
         }
 
         public void stamp(boolean goIn) {

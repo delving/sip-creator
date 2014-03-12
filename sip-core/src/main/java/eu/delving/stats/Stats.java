@@ -21,6 +21,7 @@
 
 package eu.delving.stats;
 
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.*;
 import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 import eu.delving.metadata.Path;
@@ -53,7 +54,8 @@ public class Stats {
     public static Stats read(InputStream in) {
         try {
             Reader inReader = new InputStreamReader(in, "UTF-8");
-            Stats stats = (Stats) getStreamFor(Stats.class).fromXML(inReader);
+            XStream xstream = getStreamFor(Stats.class);
+            Stats stats = (Stats) xstream.fromXML(inReader);
             stats.finish();
             return stats;
         }

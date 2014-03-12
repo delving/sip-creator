@@ -1,19 +1,21 @@
 package eu.delving;
 
 import com.ctc.wstx.stax.WstxInputFactory;
-import com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl;
+import eu.delving.metadata.XPathContext;
 import org.apache.xerces.impl.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.validation.SchemaFactory;
+import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -24,14 +26,35 @@ import java.io.UnsupportedEncodingException;
 
 public class XMLToolFactory {
 
+    private static XPathFactory XPATH_FACTORY;
+
+    static {
+        try {
+            XPATH_FACTORY = XPathFactory.newInstance();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        System.out.println(XPATH_FACTORY);
+    }
+
     public static DocumentBuilderFactory documentBuilderFactory() {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         return factory;
     }
 
-    public static XPathFactory xpathFactory() {
-        return new XPathFactoryImpl();
+    public static XPath xpath(XPathContext pathContext) {
+        XPath path = XPATH_FACTORY.newXPath();
+        path.setNamespaceContext(pathContext);
+        return path;
+    }
+
+    public static XPath xpath(NamespaceContext pathContext) {
+        XPath path = XPATH_FACTORY.newXPath();
+        path.setNamespaceContext(pathContext);
+        return path;
     }
 
     public static XMLInputFactory xmlInputFactory() {

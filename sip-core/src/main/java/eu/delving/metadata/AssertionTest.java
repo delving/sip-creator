@@ -48,7 +48,7 @@ public class AssertionTest {
     public static List<AssertionTest> listFrom(RecDef recDef, GroovyCodeResource groovy) throws XPathFactoryConfigurationException, XPathExpressionException {
         List<AssertionTest> tests = new ArrayList<AssertionTest>();
         if (recDef.assertionList == null) return tests;
-        Factory factory = new Factory(XMLToolFactory.xpathFactory(), new XPathContext(recDef.namespaces), groovy);
+        Factory factory = new Factory(new XPathContext(recDef.namespaces), groovy);
         for (Assertion assertion : recDef.assertionList.assertions) {
             tests.add(factory.create(assertion));
         }
@@ -108,12 +108,10 @@ public class AssertionTest {
     }
 
     public static class Factory {
-        private XPathFactory pathFactory;
         private NamespaceContext namespaceContext;
         private GroovyCodeResource groovy;
 
-        public Factory(XPathFactory pathFactory, NamespaceContext namespaceContext, GroovyCodeResource groovy) {
-            this.pathFactory = pathFactory;
+        public Factory(NamespaceContext namespaceContext, GroovyCodeResource groovy) {
             this.namespaceContext = namespaceContext;
             this.groovy = groovy;
         }
@@ -123,9 +121,7 @@ public class AssertionTest {
         }
 
         private XPath createPath() {
-            XPath path = pathFactory.newXPath();
-            path.setNamespaceContext(namespaceContext);
-            return path;
+            return XMLToolFactory.xpath(namespaceContext);
         }
     }
 

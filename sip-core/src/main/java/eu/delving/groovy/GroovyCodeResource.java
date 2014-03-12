@@ -110,15 +110,4 @@ public class GroovyCodeResource {
     static {
         GroovySystem.setKeepJavaMetaClasses(false);
     }
-    // Groovy generates classes for each script evaluation
-    // this ends up eating up all permGen space
-    // thus we clear the caches referencing those classes so that GC can remove them
-
-    // additionally Groovy also at each script evaluation generates instances of MetaMethodIndex$Elem
-    // those are SoftReferences so they only disappear when the used memory reaches its max allowed heap
-    // but they also pretty much impact on the execution time, probably because method cache lookup time increases
-    // (maybe because of a poorly implemented equals() & hashcode() implementation)
-    // thus in order to get rid of this performance impact we need a reasonabily low -XX:MaxPermSize
-    // yet it can't be too low because otherwise Groovy won't be able to generate its classes anymore
-    // this is why we now clear those every 50 iterations.
 }

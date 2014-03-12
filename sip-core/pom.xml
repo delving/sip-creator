@@ -123,9 +123,9 @@
             <version>2.11.0-xsd1.1</version>
         </dependency>
         <dependency>
-            <groupId>org.apache</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>2.11.0-xsd1.1</version>
+            <groupId>com.rackspace.apache</groupId>
+            <artifactId>xerces2-xsd11</artifactId>
+            <version>2.11.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache</groupId>
@@ -133,9 +133,9 @@
             <version>10k</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse</groupId>
-            <artifactId>xpath2</artifactId>
-            <version>1.2.0</version>
+            <groupId>com.ximpleware</groupId>
+            <artifactId>vtd-xml</artifactId>
+            <version>2.11</version>
         </dependency>
         <dependency>
             <groupId>org.apache</groupId>

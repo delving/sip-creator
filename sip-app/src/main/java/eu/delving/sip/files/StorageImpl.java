@@ -642,6 +642,7 @@ public class StorageImpl implements Storage {
         String fileName = schemaVersion.getFullFileName(VALIDATION_SCHEMA);
         try {
             File file = cache(fileName);
+            SchemaFactory schemaFactory = schemaFactory(schemaVersion.getPrefix());
             if (!file.exists()) {
                 SchemaResponse valResponse = schemaRepository.getSchema(schemaVersion, VALIDATION_SCHEMA);
                 if (valResponse == null) {
@@ -651,10 +652,10 @@ public class StorageImpl implements Storage {
                     FileUtils.write(file, valResponse.getSchemaText(), "UTF-8");
                 }
                 StreamSource source = new StreamSource(new StringReader(valResponse.getSchemaText()));
-                return schemaFactory(schemaVersion.getPrefix()).newSchema(source).newValidator();
+                return schemaFactory.newSchema(source).newValidator();
             }
             else {
-                return schemaFactory(schemaVersion.getPrefix()).newSchema(file).newValidator();
+                return schemaFactory.newSchema(file).newValidator();
             }
         }
         catch (SAXException e) {

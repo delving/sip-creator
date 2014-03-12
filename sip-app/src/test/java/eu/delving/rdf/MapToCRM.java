@@ -34,7 +34,6 @@ import org.xml.sax.SAXException;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -45,7 +44,6 @@ import java.util.*;
 
 public class MapToCRM {
     private static Logger LOG = Logger.getLogger(MapToCRM.class);
-    private static final XPathFactory PATH_FACTORY = XMLToolFactory.xpathFactory();
     private static final NamespaceContext NAMESPACE_CONTEXT = new XPathContext(new String[][]{
             {"lido", "http://www.lido-schema.org"}
     });
@@ -66,9 +64,7 @@ public class MapToCRM {
     }
 
     private static XPath path() {
-        XPath path = PATH_FACTORY.newXPath();
-        path.setNamespaceContext(NAMESPACE_CONTEXT);
-        return path;
+        return XMLToolFactory.xpath(NAMESPACE_CONTEXT);
     }
 
     @XStreamAlias("mappings")

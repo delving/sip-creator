@@ -61,18 +61,15 @@ import java.util.regex.Pattern;
 public class MappingRunner {
     private final ScriptBinding binding = new ScriptBinding();
     private Script script;
-    private GroovyCodeResource groovyCodeResource;
     private RecMapping recMapping;
-    private GroovyNode factsNode = new GroovyNode(null, "facts");
     private String code;
-    private int counter = 1;
 
     public MappingRunner(GroovyCodeResource groovyCodeResource, RecMapping recMapping, EditPath editPath, boolean trace) {
-        this.groovyCodeResource = groovyCodeResource;
         this.recMapping = recMapping;
         this.code = new CodeGenerator(recMapping).withEditPath(editPath).withTrace(trace).toRecordMappingCode();
         this.script = groovyCodeResource.createMappingScript(code);
         this.script.getBinding().setVariable("WORLD", binding);
+        GroovyNode factsNode = new GroovyNode(null, "facts");
         for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
             new GroovyNode(factsNode, entry.getKey(), entry.getValue());
         }
@@ -89,13 +86,7 @@ public class MappingRunner {
     }
 
     public Node runMapping(MetadataRecord metadataRecord) throws MappingException  {
-//        if ((counter % 1000) == 0) {
-//            GroovySystem.getMetaClassRegistry().removeMetaClass(script.getBinding().getm);
-//            this.script = groovyCodeResource.createMappingScript(code);
-//            System.out.println(Thread.currentThread().getName()+": refreshing");
-//        }
         if (metadataRecord == null) throw new RuntimeException("Null input metadata record");
-        counter += 1;
         try {
             binding.output = DOMBuilder.createFor(recMapping.getRecDefTree().getRecDef());
             binding.input = wrap(metadataRecord.getRootNode());
