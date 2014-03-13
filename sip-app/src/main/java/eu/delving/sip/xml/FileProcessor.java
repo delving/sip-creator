@@ -239,7 +239,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
 
         public void accept(MetadataRecord metadataRecord, MappingResult mappingResult, Exception exception) {
-            timer("mapping", false);
+//            timer("mapping", false);
             recordCount++;
             outputQueue.add(new MappingOutput(metadataRecord, mappingResult, exception, termination));
         }
@@ -349,7 +349,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         return;
                     }
                     try {
-                        timer("mapping", true);
+//                        timer("mapping", true);
                         Node node = mappingRunner.runMapping(record);
                         MappingResult result = new MappingResultImpl(serializer, record.getId(), node, mappingRunner.getRecDefTree()).resolve();
                         try {
@@ -518,56 +518,56 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
     }
 
-    static class MapStat {
-        final String name;
-        long totalIn, totalOut, count;
-        long in, out;
-        long lastAppearance;
-
-        MapStat(String name) {
-            this.name = name;
-        }
-
-        boolean shouldShow() {
-            if (lastAppearance > System.currentTimeMillis() - 1000) return false;
-            lastAppearance = System.currentTimeMillis() + (long) (Math.random() * 200);
-            return true;
-        }
-
-        public String toString() {
-            Runtime r = Runtime.getRuntime();
-            return name + "/" + count + ": " + (out - in) + ": in=" + totalIn + ": out=" + totalOut;
-        }
-
-        public void stamp(boolean goIn) {
-            if (goIn) {
-                count++;
-                in = System.currentTimeMillis();
-                if (out == 0) {
-                    out = in;
-                }
-                else {
-                    totalOut += in - out;
-                }
-            }
-            else {
-                out = System.currentTimeMillis();
-                totalIn += out - in;
-            }
-        }
-    }
-
-    static Map<String, MapStat> mapStats = new ConcurrentHashMap<String, MapStat>();
-
-    static void timer(String message, boolean goIn) {
-        String name = Thread.currentThread().getName() + ":" + message;
-        MapStat mapStat = mapStats.get(name);
-        if (mapStat == null) {
-            mapStats.put(name, mapStat = new MapStat(name));
-        }
-        mapStat.stamp(goIn);
-        if (!goIn && mapStat.shouldShow()) {
-            System.out.println(mapStat);
-        }
-    }
+//    static class MapStat {
+//        final String name;
+//        long totalIn, totalOut, count;
+//        long in, out;
+//        long lastAppearance;
+//
+//        MapStat(String name) {
+//            this.name = name;
+//        }
+//
+//        boolean shouldShow() {
+//            if (lastAppearance > System.currentTimeMillis() - 1000) return false;
+//            lastAppearance = System.currentTimeMillis() + (long) (Math.random() * 200);
+//            return true;
+//        }
+//
+//        public String toString() {
+//            Runtime r = Runtime.getRuntime();
+//            return name + "/" + count + ": " + (out - in) + ": in=" + totalIn + ": out=" + totalOut;
+//        }
+//
+//        public void stamp(boolean goIn) {
+//            if (goIn) {
+//                count++;
+//                in = System.currentTimeMillis();
+//                if (out == 0) {
+//                    out = in;
+//                }
+//                else {
+//                    totalOut += in - out;
+//                }
+//            }
+//            else {
+//                out = System.currentTimeMillis();
+//                totalIn += out - in;
+//            }
+//        }
+//    }
+//
+//    static Map<String, MapStat> mapStats = new ConcurrentHashMap<String, MapStat>();
+//
+//    static void timer(String message, boolean goIn) {
+//        String name = Thread.currentThread().getName() + ":" + message;
+//        MapStat mapStat = mapStats.get(name);
+//        if (mapStat == null) {
+//            mapStats.put(name, mapStat = new MapStat(name));
+//        }
+//        mapStat.stamp(goIn);
+//        if (!goIn && mapStat.shouldShow()) {
+//            System.out.println(mapStat);
+//        }
+//    }
 }
