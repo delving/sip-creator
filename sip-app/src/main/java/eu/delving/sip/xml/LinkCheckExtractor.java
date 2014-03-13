@@ -24,8 +24,11 @@ package eu.delving.sip.xml;
 import eu.delving.MappingResult;
 import eu.delving.XMLToolFactory;
 import eu.delving.metadata.RecDef;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import java.util.ArrayList;
@@ -56,11 +59,11 @@ public class LinkCheckExtractor {
         for (RecDef.FieldMarker fieldMarker : fieldMarkers) {
             if (fieldMarker.check == null || !fieldMarker.hasPath()) continue;
             XPathExpression expression = expressionMap.get(fieldMarker.getXPath());
-//            NodeList nodeList = (NodeList) expression.evaluate(mappingResult.root(), XPathConstants.NODESET);
-//            for (int walk = 0; walk < nodeList.getLength(); walk++) {
-//                Node node = nodeList.item(walk);
-//                checks.add(String.format("<<<%s>>>%s", fieldMarker.check, node.getTextContent().trim()));
-//            }
+            NodeList nodeList = (NodeList) expression.evaluate(mappingResult.root(), XPathConstants.NODESET);
+            for (int walk = 0; walk < nodeList.getLength(); walk++) {
+                Node node = nodeList.item(walk);
+                checks.add(String.format("<<<%s>>>%s", fieldMarker.check, node.getTextContent().trim()));
+            }
         }
         return checks;
     }

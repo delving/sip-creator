@@ -29,7 +29,7 @@ public class XMLToolFactory {
 
     static {
         try {
-            XPATH_FACTORY = XPathFactory.newInstance();
+            XPATH_FACTORY = net.sf.saxon.xpath.XPathFactoryImpl.newInstance();
         }
         catch (Exception e) {
             e.printStackTrace();

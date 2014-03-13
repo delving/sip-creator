@@ -287,7 +287,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             QueueFiller queueFiller = new QueueFiller(parser, recordSource, termination, groovyCodeResource);
             this.stats = createStats();
             Consumer consumer = new Consumer(reportWriter, xmlOutput, stats, termination);
-            int engineCount = Runtime.getRuntime().availableProcessors() - 1;
+            int engineCount = Runtime.getRuntime().availableProcessors();
             for (int walk = 0; walk < engineCount; walk++) {
                 Validator validator = dataSet.newValidator(recDef().prefix);
                 validator.setErrorHandler(null);
