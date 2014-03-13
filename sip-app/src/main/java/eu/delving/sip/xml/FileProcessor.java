@@ -156,8 +156,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             try {
                 while (termination.notYet()) {
                     MetadataRecord metadataRecord = parser.nextRecord();
-                    while (!sink.tryTransfer(metadataRecord, 100, TimeUnit.MILLISECONDS)) {
-                        System.out.println("RETRYING");
+                    while (!sink.tryTransfer(metadataRecord, 1000, TimeUnit.MILLISECONDS)) {
+                        System.out.println("retry feeding record");
                     }
                     if (metadataRecord.isPoison()) {
                         termination.normalCompletion();
@@ -365,16 +365,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         catch (Exception e) {
                             consumer.accept(record, result, e);
                             if (!allowInvalid) {
-                                switch (termination.askHowToProceed(record.getRecordNumber())) {
-                                    case ABORT:
-                                        termination.dueToCancellation();
-                                        break;
-                                    case CONTINUE:
-                                        break;
-                                    case INVESTIGATE:
-                                        termination.dueToException(record, e);
-                                        break;
-                                }
+                                termination.askHowToProceed(record, e);
                             }
                         }
                     }
@@ -443,9 +434,9 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     }
 
     private enum NextStep {
-        ABORT,
+        CONTINUE,
         INVESTIGATE,
-        CONTINUE
+        ABORT
     }
 
     private static class Termination {
@@ -456,6 +447,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         private MetadataRecord failedRecord;
         private Exception exception;
         private boolean cancelled, completed;
+        private NextStep nextStep = NextStep.CONTINUE;
+        private ConcurrentLinkedQueue<Integer> recordsToInvestigate = new ConcurrentLinkedQueue<Integer>();
 
         private Termination(FileProcessor fileProcessor, Feedback feedback, Listener listener) {
             this.fileProcessor = fileProcessor;
@@ -475,6 +468,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             return failedRecord == null ? 0 : failedRecord.getRecordNumber();
         }
 
+        void normalCompletion() {
+            completed = true;
+            listener.succeeded(fileProcessor);
+        }
+
         void dueToCancellation() {
             cancelled = true;
             listener.aborted(fileProcessor);
@@ -484,19 +482,38 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             dueToException(null, exception);
         }
 
-        void dueToException(MetadataRecord failedRecord, Exception exception) {
+        synchronized void dueToException(MetadataRecord failedRecord, Exception exception) {
+            if (this.exception == null) { // only show one of them
+                feedback.alert("Problem processing", exception);
+            }
             this.failedRecord = failedRecord;
             this.exception = exception;
-            feedback.alert("Problem processing", exception);
             listener.failed(fileProcessor);
         }
 
-        void normalCompletion() {
-            completed = true;
-            listener.succeeded(fileProcessor);
+        synchronized void askHowToProceed(MetadataRecord failedRecord, Exception exception) {
+            switch (nextStep) {
+                case CONTINUE:
+                    break;
+                case INVESTIGATE:
+                case ABORT:
+                    return;
+            }
+            nextStep = blockForNextStep(failedRecord.getRecordNumber());
+            switch (nextStep) {
+                case CONTINUE:
+                    break;
+                case INVESTIGATE:
+                    this.exception = exception; // prevent reporting, because they chose to investigate
+                    dueToException(failedRecord, exception);
+                    break;
+                case ABORT:
+                    dueToCancellation();
+                    break;
+            }
         }
 
-        NextStep askHowToProceed(int recordNumber) {
+        private NextStep blockForNextStep(int recordNumber) {
             JRadioButton continueButton = new JRadioButton(String.format(
                     "<html><b>Continue</b> - Continue the %s mapping of data set %s, discarding invalid record %d",
                     fileProcessor.getPrefix(), fileProcessor.getSpec(), recordNumber
@@ -510,7 +527,12 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             continueButton.setSelected(true);
             bg.add(investigateButton);
             if (feedback.form("Invalid Record! How to proceed?", continueButton, investigateButton)) {
-                return investigateButton.isSelected() ? NextStep.INVESTIGATE : NextStep.CONTINUE;
+                if (investigateButton.isSelected()) {
+                    return NextStep.INVESTIGATE;
+                }
+                else {
+                    return NextStep.CONTINUE;
+                }
             }
             else {
                 return NextStep.ABORT;

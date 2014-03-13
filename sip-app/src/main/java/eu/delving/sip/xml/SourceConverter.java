@@ -298,9 +298,9 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
                 List<Attribute> attrs = new ArrayList<Attribute>();
                 attrs.add(id);
                 try {
-                    out.add(eventFactory.createStartElement("", "", RECORD_TAG, attrs.iterator(), null));
+                    out.add(eventFactory.createStartElement("", "", SOURCE_RECORD_TAG, attrs.iterator(), null));
                     for (XMLEvent bufferedEvent : eventBuffer) out.add(bufferedEvent);
-                    out.add(eventFactory.createEndElement("", "", RECORD_TAG));
+                    out.add(eventFactory.createEndElement("", "", SOURCE_RECORD_TAG));
                     out.add(eventFactory.createCharacters("\n"));
                 }
                 catch (XMLStreamException e) {

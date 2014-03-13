@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
+import static eu.delving.sip.files.Storage.TARGET_RECORD_TAG;
 import static eu.delving.sip.files.Storage.TARGET_ROOT_TAG;
 
 /**
@@ -76,10 +77,15 @@ public class XmlOutput {
     }
 
     public void write(String identifier, Node node) throws XMLStreamException {
+        List<Attribute> attributes = new ArrayList<Attribute>();
+        attributes.add(eventFactory.createAttribute("", "", "id", identifier));
+        out.add(eventFactory.createCharacters("\n"));
+        out.add(eventFactory.createStartElement("","", TARGET_RECORD_TAG, attributes.iterator(), null));
         Element element = (Element) node;
         element.removeAttribute("xsi:schemaLocation");
-        element.setAttribute("id", identifier);
         writeElement(element, 1);
+        out.add(eventFactory.createCharacters("\n"));
+        out.add(eventFactory.createEndElement("", "", TARGET_RECORD_TAG));
     }
 
     public void finish(boolean aborted) {

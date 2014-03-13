@@ -97,12 +97,13 @@ public interface Storage {
 
     String HARVEST_TAG = "delving-harvest";
     String SOURCE_ROOT_TAG = "delving-sip-source";
-    String TARGET_ROOT_TAG = "delving-sip-output";
+    String SOURCE_RECORD_TAG = "input";
+    String TARGET_ROOT_TAG = "delving-sip-target";
+    String TARGET_RECORD_TAG = "output";
     String TEXT_TAG = "text_chunk";
     String FACTS_TAG = "facts";
     String CONSTANT_TAG = "constant";
     String UNIQUE_ATTR = "id";
-    String RECORD_TAG = "input";
     String RECORD_ROOT_PATH = "recordRootPath";
     String RECORD_COUNT = "recordCount";
     String UNIQUE_ELEMENT_PATH = "uniqueElementPath";
@@ -118,8 +119,8 @@ public interface Storage {
     String HELP_FILE = "help.html";
     String FRAME_ARRANGEMENTS_FILE = "frame-arrangements.xml";
     String STANDALONE_DIR = "StandaloneDataSets";
-    Path RECORD_ROOT = Path.create(String.format("/%s/%s", SOURCE_ROOT_TAG, RECORD_TAG));
-    Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/@%s", SOURCE_ROOT_TAG, RECORD_TAG, UNIQUE_ATTR));
-    Path CONSTANT_PATH = Path.create(String.format("/%s", CONSTANT_TAG));
+    Path RECORD_ROOT = Path.create(String.format("/%s/%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG));
+    Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/@%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG, UNIQUE_ATTR));
+//    Path CONSTANT_PATH = Path.create(String.format("/%s", CONSTANT_TAG)); doesn't seem to be used
     long MAPPING_FREEZE_INTERVAL = 60000;
 }

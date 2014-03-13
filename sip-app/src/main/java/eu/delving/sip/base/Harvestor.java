@@ -193,11 +193,11 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
                 case XMLEvent.END_ELEMENT:
                     if (!recordEvents.isEmpty()) {
                         if (path.equals(RECORD_ROOT)) {
-                            out.add(eventFactory.createStartElement("", "", RECORD_TAG, null, null));
+                            out.add(eventFactory.createStartElement("", "", SOURCE_RECORD_TAG, null, null));
                             for (XMLEvent saved : recordEvents) {
                                 out.add(saved);
                             }
-                            out.add(eventFactory.createEndElement("", "", RECORD_TAG));
+                            out.add(eventFactory.createEndElement("", "", SOURCE_RECORD_TAG));
                             out.add(eventFactory.createCharacters("\n"));
                             recordEvents.clear();
                             tokenBuilder = null;
