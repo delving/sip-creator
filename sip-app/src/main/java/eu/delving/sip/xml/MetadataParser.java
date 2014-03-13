@@ -69,10 +69,10 @@ public class MetadataParser {
 
     @SuppressWarnings("unchecked")
     public synchronized MetadataRecord nextRecord() throws XMLStreamException, IOException, CancelException {
-        MetadataRecord metadataRecord = null;
+        MetadataRecord metadataRecord = MetadataRecord.poisonPill();
         GroovyNode node = null;
         StringBuilder value = new StringBuilder();
-        while (metadataRecord == null) {
+        while (metadataRecord.isPoison()) {
             switch (input.getEventType()) {
                 case XMLEvent.START_DOCUMENT:
                     break;

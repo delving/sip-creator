@@ -24,11 +24,13 @@ package eu.delving.sip.xml;
 import eu.delving.MappingResult;
 import eu.delving.XMLToolFactory;
 import eu.delving.metadata.RecDef;
-import eu.delving.metadata.XPathContext;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.xpath.*;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,17 +43,14 @@ import java.util.Map;
  */
 
 public class LinkCheckExtractor {
-    private XPathFactory pathFactory = XMLToolFactory.xpathFactory();
     private Map<String, XPathExpression> expressionMap = new HashMap<String, XPathExpression>();
     private List<RecDef.FieldMarker> fieldMarkers;
-    private XPathContext pathContext;
 
-    public LinkCheckExtractor(List<RecDef.FieldMarker> fieldMarkers, XPathContext pathContext) throws XPathExpressionException {
+    public LinkCheckExtractor(List<RecDef.FieldMarker> fieldMarkers, NamespaceContext pathContext) throws XPathExpressionException {
         this.fieldMarkers = fieldMarkers;
-        this.pathContext = pathContext;
         for (RecDef.FieldMarker fieldMarker : fieldMarkers) {
             if (fieldMarker.check == null || !fieldMarker.hasPath()) continue;
-            expressionMap.put(fieldMarker.getXPath(), createPath().compile(fieldMarker.getXPath()));
+            expressionMap.put(fieldMarker.getXPath(), XMLToolFactory.xpath(pathContext).compile(fieldMarker.getXPath()));
         }
     }
 
@@ -67,11 +66,5 @@ public class LinkCheckExtractor {
             }
         }
         return checks;
-    }
-
-    private XPath createPath() {
-        XPath path = pathFactory.newXPath();
-        path.setNamespaceContext(pathContext);
-        return path;
     }
 }

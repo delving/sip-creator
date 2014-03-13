@@ -45,7 +45,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 
 import javax.swing.*;
-import javax.swing.text.html.HTMLDocument;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -249,10 +248,10 @@ public class Application {
         statusPanel.setReaction(ANALYZED_SOURCE, allFrames.prepareForMapping(desktop));
         statusPanel.setReaction(MAPPING, validateAction);
         if (uploadAction == null) {
-            statusPanel.setReaction(VALIDATED, allFrames.prepareForNothing());
+            statusPanel.setReaction(PROCESSED, allFrames.prepareForNothing());
         }
         else {
-            statusPanel.setReaction(VALIDATED, uploadAction);
+            statusPanel.setReaction(PROCESSED, uploadAction);
         }
         JPanel p = new JPanel(new GridLayout(1, 0, 6, 6));
         p.setBorder(BorderFactory.createCompoundBorder(

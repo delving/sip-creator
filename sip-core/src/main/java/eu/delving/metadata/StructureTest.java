@@ -44,7 +44,7 @@ public class StructureTest {
     private XPathExpression test;
 
     public static List<StructureTest> listFrom(RecDef recDef) throws XPathFactoryConfigurationException {
-        StructureTest.Factory factory = new StructureTest.Factory(XMLToolFactory.xpathFactory(), new XPathContext(recDef.namespaces));
+        StructureTest.Factory factory = new StructureTest.Factory(new RecDefNamespaceContext(recDef.namespaces));
         List<StructureTest> tests = new ArrayList<StructureTest>();
         collectStructureTests(recDef.root, Path.create(), tests, factory);
         return tests;
@@ -108,11 +108,9 @@ public class StructureTest {
     }
 
     public static class Factory {
-        private XPathFactory pathFactory;
         private NamespaceContext namespaceContext;
 
-        public Factory(XPathFactory pathFactory, NamespaceContext namespaceContext) {
-            this.pathFactory = pathFactory;
+        public Factory(NamespaceContext namespaceContext) {
             this.namespaceContext = namespaceContext;
         }
 
@@ -121,9 +119,7 @@ public class StructureTest {
         }
 
         private XPath createPath() {
-            XPath path = pathFactory.newXPath();
-            path.setNamespaceContext(namespaceContext);
-            return path;
+            return XMLToolFactory.xpath(namespaceContext);
         }
     }
 

@@ -25,7 +25,6 @@ import eu.delving.metadata.CodeGenerator;
 import eu.delving.metadata.EditPath;
 import eu.delving.metadata.RecDefTree;
 import eu.delving.metadata.RecMapping;
-import groovy.lang.Binding;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
@@ -60,21 +59,22 @@ import java.util.regex.Pattern;
  */
 
 public class MappingRunner {
+    private final ScriptBinding binding = new ScriptBinding();
     private Script script;
-    private GroovyCodeResource groovyCodeResource;
     private RecMapping recMapping;
-    private GroovyNode factsNode = new GroovyNode(null, "facts");
     private String code;
-    private int counter = 0;
 
     public MappingRunner(GroovyCodeResource groovyCodeResource, RecMapping recMapping, EditPath editPath, boolean trace) {
-        this.groovyCodeResource = groovyCodeResource;
         this.recMapping = recMapping;
         this.code = new CodeGenerator(recMapping).withEditPath(editPath).withTrace(trace).toRecordMappingCode();
         this.script = groovyCodeResource.createMappingScript(code);
+        this.script.getBinding().setVariable("WORLD", binding);
+        GroovyNode factsNode = new GroovyNode(null, "facts");
         for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
             new GroovyNode(factsNode, entry.getKey(), entry.getValue());
         }
+        this.binding._facts = wrap(factsNode);
+        this.binding._optLookup = recMapping.getRecDefTree().getRecDef().valueOptLookup;
     }
 
     public RecDefTree getRecDefTree() {
@@ -86,17 +86,10 @@ public class MappingRunner {
     }
 
     public Node runMapping(MetadataRecord metadataRecord) throws MappingException  {
-        if ((counter % 100) == 0) groovyCodeResource.flush();
         if (metadataRecord == null) throw new RuntimeException("Null input metadata record");
-        counter += 1;
         try {
-            Binding binding = new Binding();
-            DOMBuilder builder = DOMBuilder.createFor(recMapping.getRecDefTree().getRecDef());
-            binding.setVariable("_optLookup", recMapping.getRecDefTree().getRecDef().valueOptLookup);
-            binding.setVariable("output", builder);
-            binding.setVariable("input", wrap(metadataRecord.getRootNode()));
-            binding.setVariable("_facts", wrap(factsNode));
-            script.setBinding(binding);
+            binding.output = DOMBuilder.createFor(recMapping.getRecDefTree().getRecDef());
+            binding.input = wrap(metadataRecord.getRootNode());
             return stripEmptyElements(script.run());
         }
         catch (DiscardRecordException e) {
@@ -187,5 +180,12 @@ public class MappingRunner {
             return sb.toString();
         }
         return null;
+    }
+
+    public class ScriptBinding {
+        public Object _optLookup;
+        public Object output;
+        public Object input;
+        public Object _facts;
     }
 }

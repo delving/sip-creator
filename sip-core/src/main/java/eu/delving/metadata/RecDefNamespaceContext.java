@@ -30,11 +30,11 @@ import java.util.*;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class XPathContext implements NamespaceContext {
+public class RecDefNamespaceContext implements NamespaceContext {
     private Map<String, String> prefixUri = new TreeMap<String, String>();
     private Map<String, String> uriPrefix = new TreeMap<String, String>();
 
-    public XPathContext(List<RecDef.Namespace> namespaces) {
+    public RecDefNamespaceContext(List<RecDef.Namespace> namespaces) {
         for (RecDef.Namespace namespace : namespaces) {
             prefixUri.put(namespace.prefix, namespace.uri);
             uriPrefix.put(namespace.uri, namespace.prefix);

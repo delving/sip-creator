@@ -26,7 +26,6 @@ import eu.delving.XMLToolFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,8 +52,7 @@ import static eu.delving.metadata.RecDef.REQUIRED_FIELDS;
  */
 
 public class RecDefTree implements RecDefNodeListener {
-    private XPathFactory pathFactory = XMLToolFactory.xpathFactory();
-    private XPathContext pathContext;
+    private RecDefNamespaceContext pathContext;
     private RecDef recDef;
     private RecDefNode root;
     private RecDefNodeListener listener;
@@ -74,7 +72,7 @@ public class RecDefTree implements RecDefNodeListener {
     private RecDefTree(RecDef recDef) {
         this.recDef = recDef;
         this.root = RecDefNode.create(this, recDef);
-        this.pathContext = new XPathContext(recDef.namespaces);
+        this.pathContext = new RecDefNamespaceContext(recDef.namespaces);
     }
 
     public void setListener(RecDefNodeListener listener) {
@@ -180,8 +178,6 @@ public class RecDefTree implements RecDefNodeListener {
     }
 
     private XPath createPath() {
-        XPath path = pathFactory.newXPath();
-        path.setNamespaceContext(pathContext);
-        return path;
+        return XMLToolFactory.xpath(pathContext);
     }
 }

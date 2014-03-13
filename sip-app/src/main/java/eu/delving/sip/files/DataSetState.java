@@ -36,7 +36,7 @@ public enum DataSetState {
     SOURCED("Analyze Source","Source data is available", "Analyze the source data"),
     ANALYZED_SOURCE("Map", "Source data has been analyzed", "Building the mapping is now possible"),
     MAPPING("Validate", "There is a mapping", "Transform and validate all of the data"),
-    VALIDATED("Upload", "Dataset has been validated", "Initiate upload to CultureHub");
+    PROCESSED("Upload", "Dataset has been processed", "Initiate upload to CultureHub");
 
     private String[] description;
 

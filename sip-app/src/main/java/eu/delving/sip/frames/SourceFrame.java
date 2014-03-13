@@ -213,7 +213,7 @@ public class SourceFrame extends FrameBase {
                         SourceTreeNode node = (SourceTreeNode) path.getLastPathComponent();
                         if (autoFoldBox.isSelected()) showPath(node);
                         if (node.getTag().equals(Tag.attribute(Storage.FACTS_TAG))) continue;
-                        if (node.getTag().equals(Tag.attribute(Storage.ENVELOPE_TAG))) continue;
+                        if (node.getTag().equals(Tag.attribute(Storage.SOURCE_ROOT_TAG))) continue;
                         nodeList.add(node);
                     }
                 }

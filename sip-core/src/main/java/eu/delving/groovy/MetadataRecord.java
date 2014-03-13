@@ -37,10 +37,22 @@ public class MetadataRecord {
     private GroovyNode rootNode;
     private int recordNumber, recordCount;
 
-    MetadataRecord(GroovyNode rootNode, int recordNumber, int recordCount) {
+    public static MetadataRecord create(GroovyNode rootNode, int recordNumber, int recordCount) {
+        return new MetadataRecord(rootNode, recordNumber, recordCount);
+    }
+
+    public static MetadataRecord poisonPill() {
+        return new MetadataRecord(null, -1, -1);
+    }
+
+    private MetadataRecord(GroovyNode rootNode, int recordNumber, int recordCount) {
         this.rootNode = rootNode;
         this.recordNumber = recordNumber;
         this.recordCount = recordCount;
+    }
+
+    public boolean isPoison() {
+        return rootNode == null;
     }
 
     public GroovyNode getRootNode() {

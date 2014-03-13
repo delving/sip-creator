@@ -71,14 +71,15 @@ public class VisualFeedback implements Feedback {
     @Override
     public void alert(final String message, final Exception exception) {
         log.warn(message, exception);
+        final String exceptionMessage = exception.getMessage().trim().isEmpty() ? exception.getClass().getName() : exception.getMessage();
         if (SwingUtilities.isEventDispatchThread()) {
-            inYourFace(message, exception.getMessage());
+            inYourFace(message, exceptionMessage);
         }
         else {
             execWait(new Runnable() {
                 @Override
                 public void run() {
-                    inYourFace(message, exception.getMessage());
+                    inYourFace(message, exceptionMessage);
                 }
             });
         }

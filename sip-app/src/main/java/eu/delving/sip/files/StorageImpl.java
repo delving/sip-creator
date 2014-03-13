@@ -183,8 +183,8 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public boolean isValidated(String prefix) throws StorageException {
-            return findLatestFile(here, VALIDATION, prefix).exists();
+        public boolean isProcessed(String prefix) throws StorageException {
+            return findLatestFile(here, TARGET, prefix).exists();
         }
 
         @Override
@@ -222,8 +222,8 @@ public class StorageImpl implements Storage {
             if (statistics.exists() && statistics.lastModified() >= source.lastModified()) {
                 File mapping = findLatestFile(here, MAPPING, prefix);
                 if (mapping.exists()) {
-                    File validation = findLatestFile(here, VALIDATION, prefix);
-                    return validation.exists() ? DataSetState.VALIDATED : DataSetState.MAPPING;
+                    List<File> targetFiles = findHashedPrefixFiles(here, TARGET, prefix);
+                    return targetFiles.isEmpty() ? DataSetState.MAPPING : DataSetState.PROCESSED;
                 }
                 else {
                     return DataSetState.ANALYZED_SOURCE;
@@ -290,9 +290,9 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public boolean deleteValidation(String prefix) throws StorageException {
+        public boolean deleteTarget(String prefix) throws StorageException {
             boolean deleted = false;
-            for (File file : validationFiles(here, prefix)) {
+            for (File file : targetFiles(here, prefix)) {
                 delete(file);
                 deleted = true;
             }
@@ -300,8 +300,8 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public void deleteAllValidations() throws StorageException {
-            for (File file : validationFiles(here)) delete(file);
+        public void deleteAllTargets() throws StorageException {
+            for (File file : targetFiles(here)) delete(file);
         }
 
         @Override
@@ -322,6 +322,11 @@ public class StorageImpl implements Storage {
         @Override
         public InputStream openSourceInputStream() throws StorageException {
             return zipIn(sourceFile(here));
+        }
+
+        @Override
+        public File targetOutput(String prefix) {
+            return new File(here, TARGET.getName(prefix));
         }
 
         @Override
@@ -458,32 +463,7 @@ public class StorageImpl implements Storage {
 
         @Override
         public List<File> getRecMappingFiles(String prefix) throws StorageException {
-            return findHashedMappingFiles(here, prefix);
-        }
-
-        @Override
-        public void setValidation(String metadataPrefix, BitSet validation, int recordCount) throws StorageException {
-            if (validation == null) {
-                deleteValidation(metadataPrefix);
-            }
-            else {
-                File file = new File(here, FileType.VALIDATION.getName(metadataPrefix));
-                DataOutputStream out = null;
-                try {
-                    out = new DataOutputStream(new FileOutputStream(file));
-                    int invalidCount = recordCount - validation.cardinality();
-                    out.writeInt(invalidCount);
-                    for (int index = validation.nextClearBit(0); index >= 0 && index < recordCount; index = validation.nextClearBit(index + 1)) {
-                        out.writeInt(index);
-                    }
-                }
-                catch (IOException e) {
-                    throw new StorageException(String.format("Unable to save mapping to %s", file.getAbsolutePath()), e);
-                }
-                finally {
-                    IOUtils.closeQuietly(out);
-                }
-            }
+            return findHashedPrefixFiles(here, MAPPING, prefix);
         }
 
         @Override
@@ -491,7 +471,7 @@ public class StorageImpl implements Storage {
             File reportFile = new File(here, FileType.REPORT.getName(recDef.prefix));
             File reportIndexFile = new File(here, FileType.REPORT_INDEX.getName(recDef.prefix));
             try {
-                LinkCheckExtractor linkCheckExtractor = new LinkCheckExtractor(recDef.fieldMarkers, new XPathContext(recDef.namespaces));
+                LinkCheckExtractor linkCheckExtractor = new LinkCheckExtractor(recDef.fieldMarkers, new RecDefNamespaceContext(recDef.namespaces));
                 return new ReportWriter(reportFile, reportIndexFile, linkCheckExtractor);
             }
             catch (IOException e) {
@@ -507,9 +487,9 @@ public class StorageImpl implements Storage {
             try {
                 File reportFile = reportFile(here, prefix);
                 File reportIndexFile = reportIndexFile(here, prefix);
-                File validationFile = validationFile(here, prefix);
-                if (!(reportFile.exists() && reportIndexFile.exists() && validationFile.exists())) return null;
-                return new ReportFile(reportFile, reportIndexFile, validationFile, linkFile(here, prefix), this, prefix);
+                File targetFile = targetFile(here, prefix);
+                if (!(reportFile.exists() && reportIndexFile.exists() && targetFile.exists())) return null;
+                return new ReportFile(reportFile, reportIndexFile, targetFile, linkFile(here, prefix), this, prefix);
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
@@ -529,9 +509,9 @@ public class StorageImpl implements Storage {
                 for (SchemaVersion schemaVersion : getSchemaVersions()) {
                     String prefix = schemaVersion.getPrefix();
                     addLatestHashed(here, MAPPING, prefix, files);
-                    addLatestHashed(here, VALIDATION, prefix, files);
                     addLatestHashed(here, RESULT_STATS, prefix, files);
                     addLatestHashed(here, LINKS, prefix, files);
+                    addLatestHashed(here, TARGET, prefix, files);
                 }
                 files.add(Hasher.ensureFileHashed(sourceFile(here)));
                 return files;
@@ -662,6 +642,7 @@ public class StorageImpl implements Storage {
         String fileName = schemaVersion.getFullFileName(VALIDATION_SCHEMA);
         try {
             File file = cache(fileName);
+            SchemaFactory schemaFactory = schemaFactory(schemaVersion.getPrefix());
             if (!file.exists()) {
                 SchemaResponse valResponse = schemaRepository.getSchema(schemaVersion, VALIDATION_SCHEMA);
                 if (valResponse == null) {
@@ -671,10 +652,10 @@ public class StorageImpl implements Storage {
                     FileUtils.write(file, valResponse.getSchemaText(), "UTF-8");
                 }
                 StreamSource source = new StreamSource(new StringReader(valResponse.getSchemaText()));
-                return schemaFactory(schemaVersion.getPrefix()).newSchema(source).newValidator();
+                return schemaFactory.newSchema(source).newValidator();
             }
             else {
-                return schemaFactory(schemaVersion.getPrefix()).newSchema(file).newValidator();
+                return schemaFactory.newSchema(file).newValidator();
             }
         }
         catch (SAXException e) {

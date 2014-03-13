@@ -37,10 +37,10 @@ import java.util.zip.GZIPInputStream;
  */
 
 public class Hasher {
-    private static final String SEPARATOR = "__";
+    public static final String SEPARATOR = "__";
+    public static final int QUICK_SAMPLE_SIZE = 1024;
     private static final int BLOCK_SIZE = 4096;
     private static final int QUICK_SAMPLES = 8;
-    public static final int QUICK_SAMPLE_SIZE = 1024;
     private MessageDigest messageDigest;
 
     public static String extractFileName(File file) {
@@ -133,7 +133,7 @@ public class Hasher {
 
     public void update(File inputFile) throws IOException {
         try {
-            InputStream inputStream = new FileInputStream(inputFile);
+            InputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile));
             if (inputFile.getName().endsWith(".gz")) {
                 inputStream = new GZIPInputStream(inputStream);
             }

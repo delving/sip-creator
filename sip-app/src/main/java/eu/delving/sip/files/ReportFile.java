@@ -32,7 +32,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.swing.*;
-import java.awt.Component;
+import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,14 +58,11 @@ public class ReportFile {
     private RandomAccessFile reportAccess;
     private RandomAccessFile reportIndexAccess;
     private List<Rec> recs;
-    private List<Rec> invalidRecs;
     private LinkChecker linkChecker;
     private ResultLinkChecks resultLinkChecks;
-    private boolean allVisible;
     private All all = new All();
-    private OnlyInvalid onlyInvalid = new OnlyInvalid();
 
-    public ReportFile(File reportFile, File reportIndexFile, File invalidFile, File linkFile, DataSet dataSet, String prefix) throws IOException {
+    public ReportFile(File reportFile, File reportIndexFile, File targetFile, File linkFile, DataSet dataSet, String prefix) throws IOException {
         this.reportFile = reportFile;
         this.reportAccess = new RandomAccessFile(this.reportFile, "r");
         this.reportIndexAccess = new RandomAccessFile(reportIndexFile, "r");
@@ -75,24 +72,10 @@ public class ReportFile {
         int recordCount = (int) (reportIndexAccess.length() / LONG_SIZE);
         recs = new ArrayList<Rec>(recordCount);
         for (int walk = 0; walk < recordCount; walk++) recs.add(new Rec(walk));
-        DataInputStream invalidIn = new DataInputStream(new FileInputStream(invalidFile));
-        int invalidCount = invalidIn.readInt();
-        invalidRecs = new ArrayList<Rec>(invalidCount);
-        for (int walk = 0; walk < invalidCount; walk++) {
-            int recordNumber = invalidIn.readInt();
-            invalidRecs.add(recs.get(recordNumber));
-        }
-        invalidIn.close();
     }
 
     public ListModel getAll() {
-        allVisible = true;
         return all;
-    }
-
-    public OnlyInvalid getOnlyInvalid() {
-        allVisible = false;
-        return onlyInvalid;
     }
 
     public LinkFile getLinkFile() {
@@ -233,12 +216,7 @@ public class ReportFile {
                 @Override
                 public void run() {
                     lines = freshLines;
-                    if (allVisible) {
-                        all.fireContentsChanged(recordNumber);
-                    }
-                    else {
-                        onlyInvalid.fireContentsChanged(recordNumber);
-                    }
+                    all.fireContentsChanged(recordNumber);
                 }
             });
         }
@@ -462,27 +440,27 @@ public class ReportFile {
         }
     }
 
-    public class OnlyInvalid extends AbstractListModel {
-        @Override
-        public int getSize() {
-            return invalidRecs.size();
-        }
-
-        @Override
-        public Object getElementAt(int index) {
-            return invalidRecs.get(index).activate();
-        }
-
-        public void fireContentsChanged(int recordNumber) {
-            int index = 0;
-            for (Rec invalidRec : invalidRecs) {
-                if (invalidRec.recordNumber == recordNumber) {
-                    fireContentsChanged(OnlyInvalid.this, index, index);
-                    break;
-                }
-                index++;
-            }
-        }
-
-    }
+//    public class OnlyInvalid extends AbstractListModel {
+//        @Override
+//        public int getSize() {
+//            return invalidRecs.size();
+//        }
+//
+//        @Override
+//        public Object getElementAt(int index) {
+//            return invalidRecs.get(index).activate();
+//        }
+//
+//        public void fireContentsChanged(int recordNumber) {
+//            int index = 0;
+//            for (Rec invalidRec : invalidRecs) {
+//                if (invalidRec.recordNumber == recordNumber) {
+//                    fireContentsChanged(OnlyInvalid.this, index, index);
+//                    break;
+//                }
+//                index++;
+//            }
+//        }
+//
+//    }
 }

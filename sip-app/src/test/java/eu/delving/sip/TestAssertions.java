@@ -43,7 +43,6 @@ import org.xml.sax.SAXException;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathFactoryConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -61,7 +60,6 @@ public class TestAssertions {
 
     private final XmlSerializer SERIAL = new XmlSerializer();
     private GroovyCodeResource groovyCodeResource;
-    private XPathFactory pathFactory;
     private Document modsDoc, icnDoc;
     private DocContext modsContext;
     private SchemaRepository schemaRepository;
@@ -72,7 +70,6 @@ public class TestAssertions {
         modsDoc = parseDoc("mods.xml");
         icnDoc = parseDoc("icn.xml");
         modsContext = new DocContext(modsDoc);
-        pathFactory = XMLToolFactory.xpathFactory();
         schemaRepository = new SchemaRepository(new FileSystemFetcher(true));
     }
 
@@ -112,7 +109,7 @@ public class TestAssertions {
 
     @Test
     public void testStructure() throws XPathExpressionException {
-        StructureTest.Factory factory = new StructureTest.Factory(pathFactory, modsContext);
+        StructureTest.Factory factory = new StructureTest.Factory(modsContext);
         StructureTest structureTest = factory.create(Path.create("/mods:mods/mods:name/mods:namePart"), true, true);
         Assert.assertEquals("Unexpected Violation", StructureTest.Violation.NONE, structureTest.getViolation(modsDoc));
 //        System.out.println(structureTest + ": " + structureTest.getViolation(modsDoc));
@@ -126,7 +123,7 @@ public class TestAssertions {
         URL assertionResource = getClass().getResource("/assertion/assertion-list.xml");
         File assertionFile = new File(assertionResource.getFile());
         Assertion.AssertionList assertionList = (Assertion.AssertionList) getStream().fromXML(assertionFile);
-        AssertionTest.Factory factory = new AssertionTest.Factory(pathFactory, new DocContext(modsDoc), groovyCodeResource);
+        AssertionTest.Factory factory = new AssertionTest.Factory(new DocContext(modsDoc), groovyCodeResource);
         List<AssertionTest> tests = new ArrayList<AssertionTest>();
         for (Assertion assertion : assertionList.assertions) tests.add(factory.create(assertion));
         // violation messages can be found in assertion-list.xml

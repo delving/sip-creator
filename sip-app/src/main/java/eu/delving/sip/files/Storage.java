@@ -52,11 +52,11 @@ public interface Storage {
         FACTS("dataset_facts.txt"),
         HINTS("hints.txt"),
         MAPPING(null, "mapping_", ".xml", "mapping_%s.xml", 30),
-        VALIDATION(null, "validation_", ".int", "validation_%s.int", 1),
         RESULT_STATS(null, "stats-result_", ".xml.gz", "stats-result_%s.xml.gz", 1),
         REPORT(null, "report_", null, "report_%s.txt", 1),
         REPORT_INDEX(null, "report_", null, "report_%s.long", 1),
-        LINKS(null, "links_", null, "links_%s.csv.gz", 1);
+        LINKS(null, "links_", null, "links_%s.csv.gz", 1),
+        TARGET(null, "target_", ".xml.gz", "target_%s.xml.gz", 1);
 
         private String name, prefix, suffix, pattern;
         private int historySize = 1;
@@ -96,9 +96,9 @@ public interface Storage {
     }
 
     String HARVEST_TAG = "delving-harvest";
-    String ENVELOPE_TAG = "delving-sip-source";
+    String SOURCE_ROOT_TAG = "delving-sip-source";
+    String TARGET_ROOT_TAG = "delving-sip-output";
     String TEXT_TAG = "text_chunk";
-    String OUTPUT_TAG = "delving-output";
     String FACTS_TAG = "facts";
     String CONSTANT_TAG = "constant";
     String UNIQUE_ATTR = "id";
@@ -118,8 +118,8 @@ public interface Storage {
     String HELP_FILE = "help.html";
     String FRAME_ARRANGEMENTS_FILE = "frame-arrangements.xml";
     String STANDALONE_DIR = "StandaloneDataSets";
-    Path RECORD_ROOT = Path.create(String.format("/%s/%s", ENVELOPE_TAG, RECORD_TAG));
-    Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/@%s", ENVELOPE_TAG, RECORD_TAG, UNIQUE_ATTR));
+    Path RECORD_ROOT = Path.create(String.format("/%s/%s", SOURCE_ROOT_TAG, RECORD_TAG));
+    Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/@%s", SOURCE_ROOT_TAG, RECORD_TAG, UNIQUE_ATTR));
     Path CONSTANT_PATH = Path.create(String.format("/%s", CONSTANT_TAG));
     long MAPPING_FREEZE_INTERVAL = 60000;
 }

@@ -38,7 +38,7 @@ import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.log4j.Logger;
 
-import javax.swing.JDesktopPane;
+import javax.swing.*;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +66,7 @@ public class SipModel {
     private FunctionCompileModel functionCompileModel;
     private MappingCompileModel recordCompileModel;
     private MappingCompileModel fieldCompileModel;
-    private MetadataParser metadataParser;
+    private MetadataParser parser;
     private StatsModel statsModel;
     private MappingHintsModel mappingHintsModel;
     private DataSetModel dataSetModel;
@@ -203,7 +203,7 @@ public class SipModel {
 
     private void clearValidations() {
         try {
-            dataSetModel.getDataSet().deleteAllValidations();
+            dataSetModel.getDataSet().deleteAllTargets();
         }
         catch (StorageException e) {
             LOG.warn(String.format("Error while deleting validation files %s", e));
@@ -419,12 +419,6 @@ public class SipModel {
     }
 
     public void processFile(boolean allowInvalid, FileProcessor.Listener listener) {
-        File outputDirectory = null;
-        String directoryString = getPreferences().get(FileProcessor.OUTPUT_FILE_PREF, "").trim();
-        if (!directoryString.isEmpty()) {
-            outputDirectory = new File(directoryString);
-            if (!outputDirectory.exists()) outputDirectory = null;
-        }
         final DataSet dataSet = getDataSetModel().getDataSet();
         if (allowInvalid) {
             for (SchemaVersion schemaVersion : dataSet.getSchemaVersions()) {
@@ -443,8 +437,7 @@ public class SipModel {
                             recMapping,
                             statsModel.getMaxUniqueValueLength(),
                             statsModel.getRecordCount(),
-                            outputDirectory,
-                            allowInvalid,
+                            true,
                             groovyCodeResource,
                             listener
                     ));
@@ -462,8 +455,7 @@ public class SipModel {
                     getMappingModel().getRecMapping(),
                     statsModel.getMaxUniqueValueLength(),
                     statsModel.getRecordCount(),
-                    outputDirectory,
-                    allowInvalid,
+                    false,
                     groovyCodeResource,
                     listener
             ));
@@ -474,9 +466,9 @@ public class SipModel {
         exec(new Work.DataSetWork() {
             @Override
             public void run() {
-                if (metadataParser != null) {
-                    metadataParser.close();
-                    metadataParser = null;
+                if (parser != null) {
+                    parser.close();
+                    parser = null;
                     for (ParseListener parseListener : parseListeners) parseListener.updatedRecord(null);
                 }
             }
@@ -533,12 +525,11 @@ public class SipModel {
                     for (ParseListener parseListener : parseListeners) parseListener.updatedRecord(null);
                     return;
                 }
-                if (metadataParser == null) {
-                    metadataParser = new MetadataParser(dataSetModel.getDataSet().openSourceInputStream(), statsModel.getRecordCount());
+                if (parser == null) {
+                    parser = new MetadataParser(dataSetModel.getDataSet().openSourceInputStream(), statsModel.getRecordCount());
                 }
-                metadataParser.setProgressListener(progressListener);
-                MetadataRecord metadataRecord;
-                while ((metadataRecord = metadataParser.nextRecord()) != null) {
+                parser.setProgressListener(progressListener);
+                for (MetadataRecord metadataRecord = parser.nextRecord(); !metadataRecord.isPoison(); metadataRecord = parser.nextRecord()) {
                     if (scanPredicate == null || scanPredicate.accept(metadataRecord)) {
                         for (ParseListener parseListener : parseListeners) {
                             parseListener.updatedRecord(metadataRecord);
@@ -549,7 +540,7 @@ public class SipModel {
             }
             catch (Exception e) {
                 feedback.alert("Unable to fetch the next record", e);
-                metadataParser = null;
+                parser = null;
             }
             finally {
                 if (finished != null) exec(finished);

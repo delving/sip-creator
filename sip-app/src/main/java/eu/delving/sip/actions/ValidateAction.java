@@ -29,9 +29,7 @@ import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.xml.FileProcessor;
 
-import javax.swing.AbstractAction;
-import javax.swing.ButtonGroup;
-import javax.swing.JRadioButton;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 import static eu.delving.sip.base.KeystrokeHelper.configAction;
@@ -100,13 +98,13 @@ public class ValidateAction extends AbstractAction {
                                 @Override
                                 public void run() {
 //                                    dataSetMenu.refreshAndChoose(fileProcessor.getDataSet(), fileProcessor.getPrefix());
-                                    sipModel.seekRecordNumber(fileProcessor.getRecordNumber());
+                                    sipModel.seekRecordNumber(fileProcessor.getFailedRecordNumber());
                                     investigate.run();
                                 }
                             });
                         }
                         else {
-                            sipModel.seekRecordNumber(fileProcessor.getRecordNumber());
+                            sipModel.seekRecordNumber(fileProcessor.getFailedRecordNumber());
                             investigate.run();
                         }
                     }
@@ -125,7 +123,7 @@ public class ValidateAction extends AbstractAction {
                 DataSet dataSet = processor.getDataSet();
                 try {
                     dataSet.setStats(null, false, processor.getPrefix());
-                    dataSet.setValidation(processor.getPrefix(),  null, 0);
+                    dataSet.deleteTarget(processor.getPrefix());
                 }
                 catch (StorageException e) {
                     sipModel.getFeedback().alert("Unable to remove validation results", e);
@@ -135,9 +133,7 @@ public class ValidateAction extends AbstractAction {
             @Override
             public void succeeded(FileProcessor processor) {
                 try {
-                    DataSet dataSet = processor.getDataSet();
-                    dataSet.setStats(processor.getStats(), false, processor.getPrefix());
-                    dataSet.setValidation(processor.getPrefix(), processor.getValid(), processor.getRecordCount());
+                    processor.getDataSet().setStats(processor.getStats(), false, processor.getPrefix());
                 }
                 catch (StorageException e) {
                     sipModel.getFeedback().alert("Unable to store validation results", e);

@@ -22,7 +22,7 @@
 package eu.delving.sip.frames;
 
 import eu.delving.MappingResult;
-import eu.delving.metadata.XPathContext;
+import eu.delving.metadata.RecDefNamespaceContext;
 import eu.delving.sip.base.*;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.LinkChecker;
@@ -40,10 +40,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
 import javax.xml.xpath.XPathExpressionException;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Font;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -94,7 +91,7 @@ public class OutputFrame extends FrameBase {
                 try {
                     LinkCheckExtractor extractor = new LinkCheckExtractor(
                             mappingResult.getRecDefTree().getRecDef().fieldMarkers,
-                            new XPathContext(mappingResult.getRecDefTree().getRecDef().namespaces)
+                            new RecDefNamespaceContext(mappingResult.getRecDefTree().getRecDef().namespaces)
                     );
                     final List<String> checkLines = extractor.getChecks(mappingResult);
                     DataSet dataSet = sipModel.getDataSetModel().getDataSet();

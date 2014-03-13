@@ -29,7 +29,7 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.xml.validation.Validator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -84,7 +84,7 @@ public class DataSetModel implements RecDefModel {
         if (!isEmpty()) {
             for (SchemaVersion schemaVersion : dataSet.getSchemaVersions()) {
                 String prefix = schemaVersion.getPrefix();
-                if (!dataSet.isValidated(prefix)) invalid.add(prefix);
+                if (!dataSet.isProcessed(prefix)) invalid.add(prefix);
             }
         }
         return invalid;
@@ -139,7 +139,7 @@ public class DataSetModel implements RecDefModel {
     }
 
     public boolean deleteValidation() throws StorageException {
-        return !isEmpty() && dataSet.deleteValidation(getPrefix());
+        return !isEmpty() && dataSet.deleteTarget(getPrefix());
     }
 
     private class StateCheckTimer implements Work, ActionListener, Work.DataSetWork {
