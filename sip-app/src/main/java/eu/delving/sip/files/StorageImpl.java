@@ -638,7 +638,7 @@ public class StorageImpl implements Storage {
         }
     }
 
-    private Validator validator(SchemaVersion schemaVersion) throws StorageException {
+    private synchronized Validator validator(SchemaVersion schemaVersion) throws StorageException {
         String fileName = schemaVersion.getFullFileName(VALIDATION_SCHEMA);
         try {
             File file = cache(fileName);
