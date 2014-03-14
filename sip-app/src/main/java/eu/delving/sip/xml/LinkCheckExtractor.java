@@ -28,7 +28,10 @@ import eu.delving.metadata.XPathContext;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.xpath.*;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +44,6 @@ import java.util.Map;
  */
 
 public class LinkCheckExtractor {
-    private XPathFactory pathFactory = XMLToolFactory.xpathFactory();
     private Map<String, XPathExpression> expressionMap = new HashMap<String, XPathExpression>();
     private List<RecDef.FieldMarker> fieldMarkers;
     private XPathContext pathContext;
@@ -70,8 +72,6 @@ public class LinkCheckExtractor {
     }
 
     private XPath createPath() {
-        XPath path = pathFactory.newXPath();
-        path.setNamespaceContext(pathContext);
-        return path;
+        return XMLToolFactory.xpath(pathContext);
     }
 }
