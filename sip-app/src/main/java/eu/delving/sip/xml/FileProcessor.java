@@ -36,8 +36,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JRadioButton;
+import javax.swing.*;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
@@ -274,7 +273,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         return recMapping.getRecDefTree();
     }
 
-    private Validator createValidator() throws MetadataException {
+    private synchronized Validator createValidator() throws MetadataException {
         try {
             Validator validator = dataSet.newValidator(getPrefix());
             validator.setErrorHandler(null);
