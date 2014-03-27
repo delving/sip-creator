@@ -122,19 +122,22 @@ public class FileImporter implements Work.DataSetWork, Work.LongTermWork {
         Writer writer = new OutputStreamWriter(outputStream, "UTF-8");
         writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         writer.write("<csv-entries>\n");
+        char delimiter = ',';
         String line;
         List<String> titles = null;
         int lineNumber = 0;
         while ((line = reader.readLine()) != null) {
             if (lineNumber == 0) {
-                titles = csvLineParse(line);
+                delimiter = csvDelimiter(line);
+                titles = csvLineParse(line, delimiter);
                 for (int walk = 0; walk < titles.size(); walk++) {
                     titles.set(walk, csvTitleToTag(titles.get(walk), walk));
                 }
             }
             else {
-                List<String> values = csvLineParse(line);
+                List<String> values = csvLineParse(line, delimiter);
                 if (values.size() != titles.size()) {
+                    if (values.size() == 1 && values.get(0).isEmpty()) continue;
                     throw new IOException(String.format(
                             "Expected %d fields in CSV file on line %d",
                             titles.size(), lineNumber

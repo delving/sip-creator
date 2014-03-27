@@ -67,22 +67,38 @@ public class StringUtil {
         return tagString.isEmpty() ? String.format("column%d", index) : tagString;
     }
 
-    public static List<String> csvLineParse(String line) {
+    public static char csvDelimiter(String line) {
+        int semiCount = 0, commaCount = 0;
+        for (int walk = 0; walk < line.length(); walk++) {
+            char ch = line.charAt(walk);
+            switch(ch) {
+                case ';':
+                    semiCount++;
+                    break;
+                case ',':
+                    commaCount++;
+                    break;
+            }
+        }
+        return commaCount > semiCount ? ',' : ';';
+    }
+
+    public static List<String> csvLineParse(String line, char delimiter) {
         List<String> strings = new ArrayList<String>();
         boolean inQuotes = false;
         StringBuilder field = new StringBuilder();
         for (int walk = 0; walk < line.length(); walk++) {
             char ch = line.charAt(walk);
-            switch (ch) {
-                case ',':
-                    if (inQuotes) {
-                        field.append(ch);
-                    }
-                    else {
-                        strings.add(field.toString());
-                        field.setLength(0);
-                    }
-                    break;
+            if (ch == delimiter) {
+                if (inQuotes) {
+                    field.append(ch);
+                }
+                else {
+                    strings.add(field.toString());
+                    field.setLength(0);
+                }
+            }
+            else switch (ch) {
                 case '"':
                     if (inQuotes) {
                         if (walk + 1 < line.length() && line.charAt(walk + 1) == '"') { // two quotes escapes one

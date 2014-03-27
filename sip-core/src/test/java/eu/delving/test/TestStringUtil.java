@@ -26,6 +26,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
+import static eu.delving.metadata.StringUtil.csvDelimiter;
 import static eu.delving.metadata.StringUtil.csvLineParse;
 import static junit.framework.Assert.assertEquals;
 
@@ -39,11 +40,13 @@ public class TestStringUtil {
 
     @Test
     public void samples() {
-        assertEquals("simple", expect("gumby", "pokey"), csvLineParse("gumby, pokey"));
-        assertEquals("spaces", expect("gumby", "pokey"), csvLineParse(" gumby , pokey "));
-        assertEquals("numbers", expect("1", "2", "3"), csvLineParse("1,2,3"));
-        assertEquals("quotes", expect("1", " 2", "3"), csvLineParse("1,\" 2\",3"));
-        assertEquals("internal quotes", expect("1", " 2", "they say \"3\""), csvLineParse("1,\" 2\", \"they say \"\"3\"\"\""));
+        assertEquals("simple", expect("gumby", "pokey"), csvLineParse("gumby, pokey", ','));
+        assertEquals("spaces", expect("gumby", "pokey"), csvLineParse(" gumby , pokey ", ','));
+        assertEquals("numbers", expect("1", "2", "3"), csvLineParse("1,2,3", ','));
+        assertEquals("quotes", expect("1", " 2", "3"), csvLineParse("1,\" 2\",3", ','));
+        assertEquals("internal quotes", expect("1", " 2", "they say \"3\""), csvLineParse("1,\" 2\", \"they say \"\"3\"\"\"", ','));
+        String semi = "csv;delimited;with;semicolons?;idiots!";
+        assertEquals("semi", expect("csv", "delimited", "with", "semicolons?", "idiots!"), csvLineParse(semi, csvDelimiter(semi)));
     }
 
     private static List<String> expect(String... values) {
