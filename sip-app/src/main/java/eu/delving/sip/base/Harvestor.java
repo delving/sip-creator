@@ -132,7 +132,9 @@ public class Harvestor implements Work.DataSetWork, Work.LongTermWork {
             recordCount = 0;
         }
         catch (Exception e) {
-            progressListener.getFeedback().alert(String.format("Unable to complete harvest of %s because of an error", context.harvestUrl()), e);
+            progressListener.getFeedback().alert(String.format(
+                    "Unable to complete harvest of %s because of: %s", context.harvestUrl(), e.getMessage()
+            ), e);
             recordCount = 0;
         }
         finally {
