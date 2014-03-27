@@ -41,10 +41,10 @@ public class TestStringUtil {
     @Test
     public void samples() {
         assertEquals("simple", expect("gumby", "pokey"), csvLineParse("gumby, pokey", ','));
-        assertEquals("spaces", expect("gumby", "pokey"), csvLineParse(" gumby , pokey ", ','));
+        assertEquals("spaces", expect("gumby rulez", "pokey"), csvLineParse(" gumby rulez, pokey ", ','));
         assertEquals("numbers", expect("1", "2", "3"), csvLineParse("1,2,3", ','));
-        assertEquals("quotes", expect("1", " 2", "3"), csvLineParse("1,\" 2\",3", ','));
-        assertEquals("internal quotes", expect("1", " 2", "they say \"3\""), csvLineParse("1,\" 2\", \"they say \"\"3\"\"\"", ','));
+        assertEquals("quotes", expect("1", "2", "3"), csvLineParse("1,\" 2\",3", ','));
+        assertEquals("internal quotes", expect("1", "2", "they say \"3\""), csvLineParse("1,\" 2\", \"they say \"\"3\"\"\"", ','));
         String semi = "csv;delimited;with;semicolons?;idiots!";
         assertEquals("semi", expect("csv", "delimited", "with", "semicolons?", "idiots!"), csvLineParse(semi, csvDelimiter(semi)));
     }

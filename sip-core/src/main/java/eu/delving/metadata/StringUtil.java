@@ -94,7 +94,7 @@ public class StringUtil {
                     field.append(ch);
                 }
                 else {
-                    strings.add(field.toString());
+                    strings.add(field.toString().trim());
                     field.setLength(0);
                 }
             }
@@ -113,15 +113,15 @@ public class StringUtil {
                         inQuotes = true;
                     }
                     break;
-                case '\t':
-                case ' ':
-                    if (inQuotes) field.append(ch);
-                    break;
+//                case '\t':
+//                case ' ':
+//                    if (inQuotes) field.append(ch);
+//                    break;
                 default:
                     field.append(ch);
             }
         }
-        strings.add(field.toString());
+        strings.add(field.toString().trim());
         return strings;
     }
 
