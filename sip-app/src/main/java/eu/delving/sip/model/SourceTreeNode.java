@@ -28,15 +28,15 @@ import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.Storage;
 import eu.delving.stats.Stats;
 
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
-import java.awt.Color;
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
+import java.util.List;
 
 import static eu.delving.sip.base.SwingHelper.*;
 import static eu.delving.sip.model.SourceTreeNode.NodeType.*;
@@ -342,8 +342,8 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
             Component component = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             if (value instanceof SourceTreeNode) {
                 SourceTreeNode node = (SourceTreeNode) value;
-                setHorizontalTextPosition(JLabel.RIGHT);
-                setVerticalTextPosition(JLabel.TOP);
+                setHorizontalTextPosition(RIGHT);
+                setVerticalTextPosition(TOP);
                 if (node.getTag().isAttribute()) {
                     setIcon(SwingHelper.ICON_ATTRIBUTE);
                 }
@@ -353,7 +353,6 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
                 else {
                     setIcon(SwingHelper.ICON_VALUE);
                 }
-//                setOpaque(!node.nodeMappings.isEmpty());
                 switch (node.nodeType) {
                     case NORMAL:
                         setSourceNodeColor(this, node, selected, MAPPED_COLOR);
