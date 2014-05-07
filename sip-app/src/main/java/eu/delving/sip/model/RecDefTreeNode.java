@@ -27,13 +27,12 @@ import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.files.Storage;
 
-import javax.swing.JTree;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
-import java.awt.Color;
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
@@ -203,10 +202,10 @@ public class RecDefTreeNode extends FilterNode {
 
     public static class Renderer extends DefaultTreeCellRenderer {
         @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             setOpaque(false);
             setBorder(null);
-            Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            Component component = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             if (value instanceof RecDefTreeNode) {
                 RecDefTreeNode node = (RecDefTreeNode) value;
                 if (node.recDefNode.isUnmappable()) {
@@ -222,7 +221,7 @@ public class RecDefTreeNode extends FilterNode {
                     setIcon(SwingHelper.ICON_VALUE);
                 }
                 if (node.recDefNode.isPopulated()) {
-                    setColor(sel, node);
+                    setColor(selected, node);
                 }
                 if (!node.recDefNode.getNodeMappings().isEmpty()) {
                     markNodeMappings(node);
@@ -235,7 +234,7 @@ public class RecDefTreeNode extends FilterNode {
         }
 
         private void setColor(boolean selected, RecDefTreeNode node) {
-            Color color = node.isHighlighted() ? HILIGHTED_COLOR : MAPPED_COLOR;
+            Color color = node.isHighlighted() ? HIGHLIGHTED_COLOR : MAPPED_COLOR;
             if (selected) {
                 setOpaque(false);
                 setBackground(Color.WHITE);
@@ -253,12 +252,19 @@ public class RecDefTreeNode extends FilterNode {
         }
 
         private String getCommaList(RecDefTreeNode node) {
-            Set<String> tails = new TreeSet<String>();
+            Set<String> inputStrings = new TreeSet<String>();
             for (NodeMapping nodeMapping : node.recDefNode.getNodeMappings().values()) {
-                for (Path path : nodeMapping.getInputPaths()) tails.add(path.getTail());
+                for (Path path : nodeMapping.getInputPaths()) {
+                    if (path.getTag(0).getLocalName().equals(Storage.CONSTANT_TAG)) {
+                        inputStrings.add(String.format("\"%s\"", nodeMapping.getConstantValue()));
+                    }
+                    else {
+                        inputStrings.add(path.getTail());
+                    }
+                }
             }
             StringBuilder list = new StringBuilder();
-            Iterator<String> walk = tails.iterator();
+            Iterator<String> walk = inputStrings.iterator();
             while (walk.hasNext()) {
                 list.append(walk.next());
                 if (walk.hasNext()) list.append(", ");
