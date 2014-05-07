@@ -22,6 +22,7 @@
 package eu.delving.sip.base;
 
 import eu.delving.metadata.*;
+import eu.delving.sip.model.SourceTreeNode;
 import eu.delving.stats.Stats;
 
 import javax.swing.*;
@@ -42,13 +43,15 @@ import java.util.Map;
  */
 
 public class SwingHelper {
-    private static Color NORMAL_BG = Color.WHITE;
-    private static Color NORMAL_FG = Color.BLACK;
-    private static Color ERROR_BG = new Color(255, 200, 200);
-    public static Color UNEDITABLE_BG = new Color(255, 255, 200);
-    private static Color DELIMITER_BG = new Color(255, 255, 200);
+    public static Color NORMAL_BG = new Color(255, 255, 255);
+    public static Color NORMAL_FG = new Color(0, 0, 0);
+    public static Color ERROR_BG = new Color(255, 200, 200);
+    public static Color NOT_EDITABLE_BG = new Color(255, 255, 200);
+    public static Color DELIMITER_BG = new Color(255, 255, 200);
     public static Color MAPPED_COLOR = new Color(220, 255, 220);
-    public static Color HILIGHTED_COLOR = new Color(255, 205, 205);
+    public static Color HIGHLIGHTED_COLOR = new Color(255, 205, 205);
+    public static Color FACT_COLOR = new Color(212, 195, 255);
+    public static Color CONSTANT_COLOR = new Color(186, 245, 255);
     public static Color LONG_TERM_JOB_COLOR = new Color(255, 180, 180);
     public static Color NORMAL_JOB_COLOR = new Color(200, 255, 200);
     public static Color REPORT_OK = new Color(0, 50, 0);
@@ -83,7 +86,7 @@ public class SwingHelper {
 
     public static void setEditable(JTextComponent component, boolean editable) {
         component.setEditable(editable);
-        component.setBackground(editable ? NORMAL_BG : UNEDITABLE_BG);
+        component.setBackground(editable ? NORMAL_BG : NOT_EDITABLE_BG);
     }
 
     public static void setError(JTextComponent component, boolean error) {
@@ -91,8 +94,18 @@ public class SwingHelper {
     }
 
     public static void setDelimitedColor(JComponent component, boolean selected) {
-        component.setBackground(selected ? NORMAL_BG : DELIMITER_BG);
         component.setForeground(selected ? DELIMITER_BG : NORMAL_FG);
+        component.setBackground(selected ? NORMAL_BG : DELIMITER_BG);
+    }
+
+    public static void setSourceNodeColor(JComponent component, SourceTreeNode node, boolean selected, Color normalColor) {
+        if (node.getNodeMappings().isEmpty()) {
+            normalColor = normalColor.brighter();
+        }
+        Color color = node.isHighlighted() ? HIGHLIGHTED_COLOR : normalColor;
+        component.setOpaque(!selected);
+        component.setForeground(selected ? color : NORMAL_FG);
+        component.setBackground(selected ? NORMAL_BG : color);
     }
 
     public static JComponent scrollVH(JComponent content) {

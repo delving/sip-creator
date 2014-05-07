@@ -89,7 +89,7 @@ public class FunctionFrame extends FrameBase {
         outputArea.setFont(MONOSPACED);
         factsList.setFont(MONOSPACED);
         libraryList.setFont(MONOSPACED);
-        libraryList.setBackground(UNEDITABLE_BG);
+        libraryList.setBackground(NOT_EDITABLE_BG);
         MappingFunction function = new MappingFunction("thisIsAVeryLongFunctionNameIndeed()");
         FunctionEntry entry = new FunctionEntry(function, false);
         libraryList.setPrototypeCellValue(entry);

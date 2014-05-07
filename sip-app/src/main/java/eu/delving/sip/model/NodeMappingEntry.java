@@ -25,10 +25,8 @@ import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.sip.base.SwingHelper;
 
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import java.awt.Component;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * An entry in the NodeMappingListModel, with its associated cell renderer.
@@ -86,7 +84,7 @@ public class NodeMappingEntry {
     }
 
     public static class CellRenderer extends DefaultListCellRenderer {
-        private static final int MAX_LENGTH = 30;
+        private static final int MAX_LENGTH = 60;
         private boolean sourceTargetOrdering = true;
 
         public void setSourceTargetOrdering(boolean sourceTargetOrdering) {
@@ -98,7 +96,7 @@ public class NodeMappingEntry {
             String string = getHtml(entry.nodeMapping);
             JLabel label = (JLabel) super.getListCellRendererComponent(list, string, index, selected, cellHasFocus);
             if (entry.isHighlighted()) {
-                setBackground(SwingHelper.HILIGHTED_COLOR);
+                setBackground(SwingHelper.HIGHLIGHTED_COLOR);
             }
             else {
                 setBackground(selected ? list.getSelectionBackground() : list.getBackground());
@@ -116,21 +114,32 @@ public class NodeMappingEntry {
                 html.append(input);
             }
             else if (sourceTargetOrdering) {
-                html.append(String.format("%s &rarr; %s", input, targetTail));
+                html.append(String.format("%s &rarr; %s", stripPath(input), targetTail));
             }
             else {
-                html.append(String.format("%s &larr; %s", targetTail, input));
+                html.append(String.format("%s &larr; %s", targetTail, stripPath(input)));
             }
             html.append(nodeMapping.groovyCode == null ? "</p>" : "</b>");
             html.append("</font>");
             html.append("<table border=0 cellpadding=0>");
             html.append("<tr><td width=30></td><td><i>");
-            for (Path path : nodeMapping.getInputPaths()) html.append(path).append("<br>");
-            html.append("&rarr; ").append(nodeMapping.outputPath);
+            for (Path path : nodeMapping.getInputPaths()) html.append(stripPath(path.toString())).append("<br>");
+            html.append("&rarr; ").append(stripPath(nodeMapping.outputPath.toString()));
             if (nodeMapping.groovyCode != null) html.append("</b>");
             html.append("</i></td><tr>");
             html.append("</table>");
             return html.toString();
+        }
+
+        private String stripPath(String path) {
+            if (path.length() > MAX_LENGTH) {
+                path = path.substring(path.length() - MAX_LENGTH);
+                int chop = path.indexOf('/');
+                return ".." + path.substring(chop);
+            }
+            else {
+                return path;
+            }
         }
 
     }

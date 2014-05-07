@@ -87,6 +87,7 @@ public class SourceFrame extends FrameBase {
         sourceTree.setTransferHandler(sipModel.getNodeTransferHandler());
         sourceTree.setDragEnabled(true);
         sourceTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+        sourceTree.setRowHeight(0);
         timer.setRepeats(false);
         treePanel.add(scrollVH(sourceTree), BorderLayout.CENTER);
         recordRootButton.setEnabled(false);

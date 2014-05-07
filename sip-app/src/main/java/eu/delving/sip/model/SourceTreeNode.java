@@ -39,6 +39,7 @@ import java.awt.event.ActionListener;
 import java.util.*;
 
 import static eu.delving.sip.base.SwingHelper.*;
+import static eu.delving.sip.model.SourceTreeNode.NodeType.*;
 
 /**
  * A node of the analysis tree, where the statistics are stored, and also the node mappings associated
@@ -51,10 +52,14 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     private SourceTreeNode parent;
     private List<SourceTreeNode> children = new ArrayList<SourceTreeNode>();
     private Tag tag;
-    private boolean recordRoot, uniqueElement;
+    private NodeType nodeType = NORMAL;
     private Stats.ValueStats valueStats;
     private String htmlToolTip, htmlDetails;
     private Set<NodeMapping> nodeMappings = new HashSet<NodeMapping>();
+
+    public enum NodeType {
+        NORMAL, RECORD_ROOT, UNIQUE_ELEMENT, CONSTANT, FACT
+    }
 
     public static SourceTreeNode create(String rootTag) {
         return new SourceTreeNode(rootTag, "<h3>Root</h3>");
@@ -66,36 +71,39 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
             root = new SourceTreeNode("No statistics", "<h3>No statistics</h3>");
         }
         else if (root.getTag().toString().equals(Storage.ENVELOPE_TAG)) {
-            SourceTreeNode factNode = new SourceTreeNode(root, Storage.FACTS_TAG, "<h3>Select a fact from here</h3>");
+            SourceTreeNode factNode = new SourceTreeNode(root, Storage.FACTS_TAG, FACT, "<h3>Select a fact from here</h3>");
             root.getChildren().add(0, factNode);
-            for (Map.Entry<String, String> entry : facts.entrySet()) new SourceTreeNode(factNode, entry);
-            root.getChildren().add(0, new SourceTreeNode(root, Storage.CONSTANT_TAG, "<html>Constant value which you can adjust in the code snippet"));
+            for (Map.Entry<String, String> entry : facts.entrySet()) new SourceTreeNode(factNode, FACT, entry);
+            SourceTreeNode constantNode = new SourceTreeNode(root, Storage.CONSTANT_TAG, CONSTANT, "<html>Constant value which you can adjust in the code snippet");
+            root.getChildren().add(0, constantNode);
         }
         return root;
     }
 
-    private SourceTreeNode(SourceTreeNode parent, String name, String htmlChunk) {
+    private SourceTreeNode(SourceTreeNode parent, String name, NodeType nodeType, String htmlChunk) {
         this.parent = parent;
         this.tag = Tag.create(name);
+        this.nodeType = nodeType;
         this.htmlToolTip = this.htmlDetails = htmlChunk;
     }
 
     private SourceTreeNode(String name, String htmlChunk) {
-        this(null, name, htmlChunk);
+        this(null, name, NORMAL, htmlChunk);
     }
 
-    private SourceTreeNode(SourceTreeNode parent, Tag tag) {
+    private SourceTreeNode(SourceTreeNode parent, NodeType nodeType, Tag tag) {
         if ((this.parent = parent) != null) parent.children.add(this);
+        this.nodeType = nodeType;
         this.tag = tag;
     }
 
-    private SourceTreeNode(SourceTreeNode parent, Map.Entry<String, String> entry) {
-        this(parent, Tag.create(entry.getKey()));
+    private SourceTreeNode(SourceTreeNode parent, NodeType nodeType, Map.Entry<String, String> entry) {
+        this(parent, nodeType, Tag.create(entry.getKey()));
         this.htmlToolTip = this.htmlDetails = SwingHelper.factEntryToHTML(entry);
     }
 
     private SourceTreeNode(SourceTreeNode parent, Tag tag, Stats.ValueStats valueStats) {
-        this(parent, tag);
+        this(parent, NORMAL, tag);
         setStats(valueStats);
     }
 
@@ -141,31 +149,42 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     }
 
     public int setRecordRoot(Path recordRoot) {
-        boolean oldValue = this.recordRoot;
-        Path ourPath = getPath(true);
-        this.recordRoot = recordRoot != null && ourPath.equals(recordRoot);
-        if (this.recordRoot || this.recordRoot != oldValue) fireChanged();
+        if (recordRoot != null && getPath(true).equals(recordRoot)) {
+            nodeType = RECORD_ROOT;
+            fireChanged();
+            return getStats().total;
+        }
+        if (nodeType == RECORD_ROOT) {
+            nodeType = NORMAL;
+            fireChanged();
+        }
         int childTotal = 0;
         for (SourceTreeNode child : children) {
             int subtotal = child.setRecordRoot(recordRoot);
             if (subtotal > 0) childTotal = subtotal;
         }
-        return this.recordRoot ? getStats().total : childTotal;
+        return childTotal;
     }
 
     public void setUniqueElement(Path uniqueElement) {
-        boolean oldValue = this.uniqueElement;
-        this.uniqueElement = uniqueElement != null && getPath(true).equals(uniqueElement);
-        if (this.uniqueElement != oldValue) fireChanged();
+        if (uniqueElement != null && getPath(true).equals(uniqueElement)) {
+            nodeType = UNIQUE_ELEMENT;
+            fireChanged();
+            return;
+        }
+        if (nodeType == UNIQUE_ELEMENT) {
+            nodeType = NORMAL;
+            fireChanged();
+        }
         for (SourceTreeNode child : children) child.setUniqueElement(uniqueElement);
     }
 
     public boolean isRecordRoot() {
-        return recordRoot;
+        return nodeType == RECORD_ROOT;
     }
 
     public boolean isUniqueElement() {
-        return uniqueElement;
+        return nodeType == UNIQUE_ELEMENT;
     }
 
     public boolean couldBeRecordRoot() {
@@ -207,17 +226,6 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     @Override
     public boolean isAttr() {
         return tag.isAttribute();
-    }
-
-    private void compilePathList(List<SourceTreeNode> list, boolean fromRoot) {
-        if (fromRoot) {
-            if (parent != null) parent.compilePathList(list, fromRoot);
-            list.add(this);
-        }
-        else if (parent != null) { // only take nodes with parents
-            parent.compilePathList(list, fromRoot);
-            list.add(this);
-        }
     }
 
     @Override
@@ -270,6 +278,17 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         }
     }
 
+    private void compilePathList(List<SourceTreeNode> list, boolean fromRoot) {
+        if (fromRoot) {
+            if (parent != null) parent.compilePathList(list, fromRoot);
+            list.add(this);
+        }
+        else if (parent != null) { // only take nodes with parents
+            parent.compilePathList(list, fromRoot);
+            list.add(this);
+        }
+    }
+
     private void addMappedIn(NodeMapping nodeMapping) {
         this.nodeMappings.add(nodeMapping);
         fireChanged();
@@ -294,7 +313,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         }
         if (statisticsMap.isEmpty()) return null;
         Tag tag = path.peek();
-        SourceTreeNode node = tag == null ? null : new SourceTreeNode(parent, tag);
+        SourceTreeNode node = tag == null ? null : new SourceTreeNode(parent, NORMAL, tag);
         for (Map.Entry<Tag, Map<Path, Stats.ValueStats>> entry : statisticsMap.entrySet()) {
             Path childPath = path.child(entry.getKey());
             Stats.ValueStats valueStatsForChild = null;
@@ -319,10 +338,12 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     public static class Renderer extends DefaultTreeCellRenderer {
 
         @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            Component component = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             if (value instanceof SourceTreeNode) {
                 SourceTreeNode node = (SourceTreeNode) value;
+                setHorizontalTextPosition(JLabel.RIGHT);
+                setVerticalTextPosition(JLabel.TOP);
                 if (node.getTag().isAttribute()) {
                     setIcon(SwingHelper.ICON_ATTRIBUTE);
                 }
@@ -332,48 +353,66 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
                 else {
                     setIcon(SwingHelper.ICON_VALUE);
                 }
-                if (node.isRecordRoot() || node.isUniqueElement()) {
-                    markDelimiters(sel, node);
-                }
-                else if (!node.nodeMappings.isEmpty()) {
-                    markNodeMappings(sel, node);
-                }
-                else {
-                    setOpaque(false);
-                    setBorder(null);
+//                setOpaque(!node.nodeMappings.isEmpty());
+                switch (node.nodeType) {
+                    case NORMAL:
+                        setSourceNodeColor(this, node, selected, MAPPED_COLOR);
+                        setText(node);
+                        break;
+                    case RECORD_ROOT:
+                        setDelimitedColor(this, selected);
+                        setOpaque(!this.selected);
+                        setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), "Record Root"));
+                        break;
+                    case UNIQUE_ELEMENT:
+                        setDelimitedColor(this, selected);
+                        setOpaque(!this.selected);
+                        setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), "Unique Element"));
+                        break;
+                    case CONSTANT:
+                        setSourceNodeColor(this, node, selected, CONSTANT_COLOR);
+                        setConstantText(node);
+                        break;
+                    case FACT:
+                        setSourceNodeColor(this, node, selected, FACT_COLOR);
+                        setText(node);
+                        break;
+                    default:
+                        throw new RuntimeException();
                 }
             }
             return component;
         }
 
-        private void markDelimiters(boolean selected, SourceTreeNode node) {
-            setDelimitedColor(this, selected);
-            setOpaque(!selected);
-//            setBorder(BorderFactory.createEtchedBorder());
-            setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), node.isRecordRoot() ? "Record Root" : "Unique Element"));
-        }
-
-        private void markNodeMappings(boolean selected, SourceTreeNode node) {
-            Color color = node.isHighlighted() ? HILIGHTED_COLOR : MAPPED_COLOR;
-            if (selected) {
-                setOpaque(false);
-                setBackground(Color.WHITE);
-                setForeground(color);
+        private void setText(SourceTreeNode node) {
+            if (node.getNodeMappings().isEmpty()) {
+                setText(node.toString());
             }
             else {
-                setOpaque(true);
-                setBackground(color);
-                setForeground(Color.BLACK);
+                StringBuilder commaList = new StringBuilder();
+                Iterator<NodeMapping> walk = node.nodeMappings.iterator();
+                while (walk.hasNext()) {
+                    commaList.append(walk.next().recDefNode.toString());
+                    if (walk.hasNext()) commaList.append(", ");
+                }
+                setText(String.format("<html><b>%s</b> &rarr; %s", node.toString(), commaList.toString()));
             }
-//            setBorder(BorderFactory.createEtchedBorder());
-            StringBuilder commaList = new StringBuilder();
-            Iterator<NodeMapping> walk = node.nodeMappings.iterator();
-            while (walk.hasNext()) {
-                commaList.append(walk.next().recDefNode.toString());
-                if (walk.hasNext()) commaList.append(", ");
-            }
-            setText(String.format("<html><b>%s</b> &rarr; %s", node.toString(), commaList.toString()));
         }
+
+        private void setConstantText(SourceTreeNode node) {
+            if (node.getNodeMappings().isEmpty()) {
+                setText(node.toString());
+            }
+            else {
+                StringBuilder html = new StringBuilder(String.format("<html><table><th>%s</th><th/>", node.toString()));
+                for (NodeMapping nodeMapping : node.nodeMappings) {
+                    html.append(String.format("<tr><td/><td>\"%s\" &rarr %s</td></tr>", nodeMapping.getConstantValue(), nodeMapping.recDefNode.toString()));
+                }
+                html.append("</table>");
+                setText(html.toString());
+            }
+        }
+
     }
 
 }
