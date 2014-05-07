@@ -343,8 +343,8 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
             Component component = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             if (value instanceof SourceTreeNode) {
                 SourceTreeNode node = (SourceTreeNode) value;
-                setHorizontalTextPosition(JLabel.RIGHT);
-                setVerticalTextPosition(JLabel.TOP);
+                setHorizontalTextPosition(RIGHT);
+                setVerticalTextPosition(TOP);
                 if (node.getTag().isAttribute()) {
                     setIcon(SwingHelper.ICON_ATTRIBUTE);
                 }
@@ -354,7 +354,6 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
                 else {
                     setIcon(SwingHelper.ICON_VALUE);
                 }
-//                setOpaque(!node.nodeMappings.isEmpty());
                 switch (node.nodeType) {
                     case NORMAL:
                         setSourceNodeColor(this, node, selected, MAPPED_COLOR);
