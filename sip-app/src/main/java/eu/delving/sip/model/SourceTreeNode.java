@@ -404,11 +404,21 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
                 setText(node.toString());
             }
             else {
-                StringBuilder html = new StringBuilder(String.format("<html><table><th>%s</th><th/>", node.toString()));
-                for (NodeMapping nodeMapping : node.nodeMappings) {
-                    html.append(String.format("<tr><td/><td>\"%s\" &rarr %s</td></tr>", nodeMapping.getConstantValue(), nodeMapping.recDefNode.toString()));
+                StringBuilder html = new StringBuilder(String.format("<html><table><tr><th align=left>%s</th><th/></tr><tr><td>", node.toString()));
+                Iterator<NodeMapping> walk = node.nodeMappings.iterator();
+                int maxWidth = 80, width = 0;
+                while (walk.hasNext()) {
+                    NodeMapping nodeMapping = walk.next();
+                    String addition = String.format("\"%s\" &rarr %s", nodeMapping.getConstantValue(), nodeMapping.recDefNode.toString());
+                    width += addition.length();
+                    if (width > maxWidth) {
+                        html.append("<br/>");
+                        width = addition.length();
+                    }
+                    html.append(addition);
+                    if (walk.hasNext()) html.append(", ");
                 }
-                html.append("</table>");
+                html.append("</td></tr></table>");
                 setText(html.toString());
             }
         }
