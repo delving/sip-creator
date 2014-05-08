@@ -45,7 +45,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 
 import javax.swing.*;
-import javax.swing.text.html.HTMLDocument;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -331,16 +330,7 @@ public class Application {
             );
             if (exitAnyway) return;
         }
-        boolean restart = feedback.confirm(
-                "Exit",
-                "Would you like to restart?"
-        );
-        if (restart) {
-            EventQueue.invokeLater(LAUNCH);
-        }
-        else {
-            System.exit(0);
-        }
+        System.exit(0);
     }
 
     private void destroy() {
