@@ -34,7 +34,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import javax.swing.*;
 import java.awt.Component;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

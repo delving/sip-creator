@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import static eu.delving.metadata.StringUtil.csvDelimiter;
 import static eu.delving.metadata.StringUtil.csvEscapeXML;
 import static eu.delving.metadata.StringUtil.csvLineParse;
 import static eu.delving.metadata.StringUtil.csvTitleToTag;

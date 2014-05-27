@@ -85,10 +85,6 @@ public interface DataSet extends Comparable<DataSet> {
 
     File targetOutput(String prefix);
 
-    File renameInvalidSource() throws StorageException;
-
-    File renameInvalidImport() throws StorageException;
-
     Stats getLatestStats();
 
     Stats getStats(boolean sourceFormat, String prefix);
