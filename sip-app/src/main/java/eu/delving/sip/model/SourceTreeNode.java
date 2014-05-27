@@ -29,17 +29,30 @@ import eu.delving.sip.files.Storage;
 import eu.delving.stats.Stats;
 
 import javax.swing.*;
-import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeMap;
 
-import static eu.delving.sip.base.SwingHelper.*;
-import static eu.delving.sip.model.SourceTreeNode.NodeType.*;
+import static eu.delving.sip.base.SwingHelper.CONSTANT_COLOR;
+import static eu.delving.sip.base.SwingHelper.FACT_COLOR;
+import static eu.delving.sip.base.SwingHelper.MAPPED_COLOR;
+import static eu.delving.sip.base.SwingHelper.setDelimitedColor;
+import static eu.delving.sip.base.SwingHelper.setSourceNodeColor;
+import static eu.delving.sip.model.SourceTreeNode.NodeType.CONSTANT;
+import static eu.delving.sip.model.SourceTreeNode.NodeType.FACT;
+import static eu.delving.sip.model.SourceTreeNode.NodeType.NORMAL;
+import static eu.delving.sip.model.SourceTreeNode.NodeType.RECORD_ROOT;
+import static eu.delving.sip.model.SourceTreeNode.NodeType.UNIQUE_ELEMENT;
 
 /**
  * A node of the analysis tree, where the statistics are stored, and also the node mappings associated
