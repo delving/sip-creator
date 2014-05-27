@@ -84,10 +84,6 @@ public interface DataSet extends Comparable<DataSet> {
 
     InputStream openSourceInputStream() throws StorageException;
 
-    File renameInvalidSource() throws StorageException;
-
-    File renameInvalidImport() throws StorageException;
-
     Stats getLatestStats();
 
     Stats getStats(boolean sourceFormat, String prefix);
@@ -108,7 +104,7 @@ public interface DataSet extends Comparable<DataSet> {
 
     ReportFile getReport(String prefix) throws StorageException;
 
-    void deleteSource() throws StorageException;
+    void deleteSource();
 
     List<File> getUploadFiles() throws StorageException;
 

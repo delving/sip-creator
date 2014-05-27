@@ -27,7 +27,11 @@ import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.files.*;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.ReportFile;
+import eu.delving.sip.files.ReportWriter;
+import eu.delving.sip.files.StorageException;
 import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.commons.lang.StringUtils;
@@ -38,10 +42,21 @@ import org.junit.Test;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.validation.Validator;
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-import static eu.delving.sip.files.Storage.*;
+import static eu.delving.sip.files.Storage.RECORD_COUNT;
+import static eu.delving.sip.files.Storage.RECORD_ROOT_PATH;
+import static eu.delving.sip.files.Storage.UNIQUE_ELEMENT_PATH;
+import static eu.delving.sip.files.Storage.UNIQUE_VALUE_CONVERTER;
 
 /**
  * Make sure the source converter works as expected
@@ -309,16 +324,6 @@ public class TestSourceConverter {
         }
 
         @Override
-        public File renameInvalidSource() throws StorageException {
-            return null;
-        }
-
-        @Override
-        public File renameInvalidImport() throws StorageException {
-            return null;
-        }
-
-        @Override
         public Stats getLatestStats() {
             return null;
         }
@@ -369,9 +374,7 @@ public class TestSourceConverter {
         }
 
         @Override
-        public void deleteSource() throws StorageException {
-            throw new StorageException("what?");
-          
+        public void deleteSource() {
         }
 
         @Override

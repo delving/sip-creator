@@ -35,18 +35,30 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridLayout;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static eu.delving.metadata.NodeMappingChange.DICTIONARY;
-import static eu.delving.sip.base.DictionaryHelper.*;
+import static eu.delving.sip.base.DictionaryHelper.countNonemptyDictionaryEntries;
+import static eu.delving.sip.base.DictionaryHelper.isDictionaryPossible;
+import static eu.delving.sip.base.DictionaryHelper.refreshDictionary;
+import static eu.delving.sip.base.DictionaryHelper.removeDictionary;
 
 /**
  * Dictionary editing is handled by this panel, and it is set up to create an efficient workflow.  The user
@@ -65,7 +77,7 @@ public class DictionaryPanel extends JPanel {
     private DictionaryModel dictionaryModel = new DictionaryModel(statusLabel);
     private JTextField patternField = new JTextField(6);
     private ValueModel valueModel = new ValueModel();
-    private JList valueList = new JList(valueModel);
+    private JList<String> valueList = new JList<String>(valueModel);
     private JTable table = new JTable(dictionaryModel, createTableColumnModel());
     private Timer timer = new Timer(300, new ActionListener() {
         @Override
@@ -141,7 +153,7 @@ public class DictionaryPanel extends JPanel {
     }
 
     private String getChosenValue() {
-        String value = (String) valueList.getSelectedValue();
+        String value = valueList.getSelectedValue();
         return value == null || COPY_VERBATIM.equals(value) ? "" : value;
     }
 
@@ -338,7 +350,7 @@ public class DictionaryPanel extends JPanel {
 
     }
 
-    private static class ValueModel extends AbstractListModel {
+    private static class ValueModel extends AbstractListModel<String> {
         private List<String> values = new ArrayList<String>();
 
         public void setRecDefTreeNode(RecDefTreeNode recDefTreeNode) {
@@ -358,7 +370,7 @@ public class DictionaryPanel extends JPanel {
         }
 
         @Override
-        public Object getElementAt(int index) {
+        public String getElementAt(int index) {
             return values.get(index);
         }
     }

@@ -29,16 +29,15 @@ import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
-import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.stats.Stats;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.stax2.XMLStreamReader2;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.events.XMLEvent;
-import java.io.File;
 import java.io.InputStream;
 
 /**
@@ -90,7 +89,6 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
         try {
             XMLInputFactory xmlif = XMLToolFactory.xmlInputFactory();
             Path path = Path.create();
-            boolean running = true;
             InputStream inputStream = null;
             if (dataSetModel.isEmpty()) return;
             try {
@@ -110,7 +108,7 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
                 XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), inputStream);
                 StringBuilder text = new StringBuilder();
                 int count = 0;
-                while (running) {
+                while (true) {
                     switch (input.getEventType()) {
                         case XMLEvent.START_ELEMENT:
                             if (++count % ELEMENT_STEP == 0) {
@@ -150,36 +148,25 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
             finally {
                 IOUtils.closeQuietly(inputStream);
             }
-            if (running) {
-                stats.finish();
-                listener.success(stats);
-            }
-            else {
-                listener.failure(null, null);
-            }
+            stats.finish();
+            listener.success(stats);
         }
         catch (CancelException e) {
             listener.failure("Cancellation", e);
         }
         catch (Exception e) {
-            try {
-                File renamedTo;
-                switch (dataSetModel.getDataSetState()) {
-                    case IMPORTED:
-                    case DELIMITED:
-                        renamedTo = dataSetModel.getDataSet().renameInvalidImport();
-                        break;
-                    case SOURCED:
-                        renamedTo = dataSetModel.getDataSet().renameInvalidSource();
-                        break;
-                    default:
-                        throw new IllegalStateException("Unexpected state " + dataSetModel.getDataSetState(), e);
-                }
-                listener.failure(String.format("The imported file contains errors, the file has been renamed to '%s'", renamedTo.getName()), e);
+            switch (dataSetModel.getDataSetState()) {
+                case IMPORTED:
+                case DELIMITED:
+                    FileUtils.deleteQuietly(dataSetModel.getDataSet().importedOutput());
+                    break;
+                case SOURCED:
+                    dataSetModel.getDataSet().deleteSource();
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected state " + dataSetModel.getDataSetState(), e);
             }
-            catch (StorageException se) {
-                listener.failure("Error renaming file", e);
-            }
+            listener.failure("The imported file contains errors, the file has been deleted", e);
         }
     }
 }

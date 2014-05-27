@@ -27,9 +27,7 @@ import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.Swing;
 
-import javax.swing.AbstractListModel;
-import javax.swing.JList;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -41,12 +39,12 @@ import java.util.List;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class NodeMappingListModel extends AbstractListModel {
+public class NodeMappingListModel extends AbstractListModel<NodeMappingEntry> {
     private List<NodeMappingEntry> entries = new ArrayList<NodeMappingEntry>();
     private EntrySorting entrySorting = new EntrySorting(true);
 
-    public JList createJList() {
-        JList list = new JList(this);
+    public JList<NodeMappingEntry> createJList() {
+        JList<NodeMappingEntry> list = new JList<NodeMappingEntry>(this);
         list.setCellRenderer(new NodeMappingEntry.CellRenderer());
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         return list;
@@ -58,7 +56,7 @@ public class NodeMappingListModel extends AbstractListModel {
     }
 
     @Override
-    public Object getElementAt(int i) {
+    public NodeMappingEntry getElementAt(int i) {
         return entries.get(i);
     }
 

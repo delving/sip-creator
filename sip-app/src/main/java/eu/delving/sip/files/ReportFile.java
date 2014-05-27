@@ -33,7 +33,13 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.swing.*;
 import java.awt.Component;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -85,7 +91,7 @@ public class ReportFile {
         invalidIn.close();
     }
 
-    public ListModel getAll() {
+    public ListModel<Rec> getAll() {
         allVisible = true;
         return all;
     }
@@ -446,14 +452,14 @@ public class ReportFile {
         }
     }
 
-    public class All extends AbstractListModel {
+    public class All extends AbstractListModel<Rec> {
         @Override
         public int getSize() {
             return recs.size();
         }
 
         @Override
-        public Object getElementAt(int index) {
+        public Rec getElementAt(int index) {
             return recs.get(index).activate();
         }
 
@@ -462,14 +468,14 @@ public class ReportFile {
         }
     }
 
-    public class OnlyInvalid extends AbstractListModel {
+    public class OnlyInvalid extends AbstractListModel<Rec> {
         @Override
         public int getSize() {
             return invalidRecs.size();
         }
 
         @Override
-        public Object getElementAt(int index) {
+        public Rec getElementAt(int index) {
             return invalidRecs.get(index).activate();
         }
 

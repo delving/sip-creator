@@ -27,16 +27,25 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSetState;
 
-import javax.swing.JComboBox;
+import javax.swing.*;
 import javax.swing.tree.TreePath;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static eu.delving.sip.files.DataSetState.*;
-import static eu.delving.sip.model.CreateModel.Setter.*;
-import static eu.delving.sip.model.CreateState.*;
+import static eu.delving.sip.files.DataSetState.ABSENT;
+import static eu.delving.sip.files.DataSetState.MAPPING;
+import static eu.delving.sip.files.DataSetState.SOURCED;
+import static eu.delving.sip.model.CreateModel.Setter.NODE_MAPPING;
+import static eu.delving.sip.model.CreateModel.Setter.NONE;
+import static eu.delving.sip.model.CreateModel.Setter.SOURCE;
+import static eu.delving.sip.model.CreateModel.Setter.TARGET;
+import static eu.delving.sip.model.CreateState.COMPLETE;
+import static eu.delving.sip.model.CreateState.NOTHING;
+import static eu.delving.sip.model.CreateState.SOURCE_AND_TARGET;
+import static eu.delving.sip.model.CreateState.SOURCE_ONLY;
+import static eu.delving.sip.model.CreateState.TARGET_ONLY;
 import static eu.delving.sip.model.CreateTransition.*;
 
 /**
@@ -117,7 +126,8 @@ public class CreateModel {
         recDefTreeNode.addNodeMapping(created);
         if (created.isConstant()) {
             if (created.hasOptList()) {
-                JComboBox box = new JComboBox(created.getOptListValues().toArray());
+                String [] array = new String[created.getOptListValues().size()];
+                JComboBox box = new JComboBox<String>(created.getOptListValues().toArray(array));
                 while (true) {
                     boolean ok = sipModel.getFeedback().form("Please choose the constant value", box);
                     if (!ok) {

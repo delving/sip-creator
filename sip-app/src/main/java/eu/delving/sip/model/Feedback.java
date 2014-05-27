@@ -30,9 +30,11 @@ package eu.delving.sip.model;
 
 public interface Feedback {
 
+    void info(String message);
+
     void alert(String message);
 
-    void alert(String message, Exception exception);
+    void alert(String message, Throwable throwable);
 
     String ask(String question);
 
@@ -43,4 +45,8 @@ public interface Feedback {
     boolean form(String title, Object ... components);
 
     String getPassword();
+
+    public interface Log {
+        void log(String message, Throwable throwable);
+    }
 }

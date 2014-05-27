@@ -22,19 +22,36 @@
 package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.metadata.*;
+import eu.delving.metadata.CachedResourceResolver;
+import eu.delving.metadata.MappingFunction;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.NodeMappingChange;
+import eu.delving.metadata.RecDefNode;
 import eu.delving.schema.SchemaRepository;
-import eu.delving.sip.actions.*;
-import eu.delving.sip.base.*;
-import eu.delving.sip.files.*;
+import eu.delving.sip.actions.ImportAction;
+import eu.delving.sip.actions.SelectAnotherMappingAction;
+import eu.delving.sip.actions.UnlockMappingAction;
+import eu.delving.sip.actions.UploadAction;
+import eu.delving.sip.actions.ValidateAction;
+import eu.delving.sip.base.CultureHubClient;
+import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.VisualFeedback;
+import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.SchemaFetcher;
+import eu.delving.sip.files.Storage;
+import eu.delving.sip.files.StorageException;
+import eu.delving.sip.files.StorageFinder;
+import eu.delving.sip.files.StorageImpl;
 import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.frames.DataSetHubFrame;
 import eu.delving.sip.frames.DataSetStandaloneFrame;
+import eu.delving.sip.frames.LogFrame;
 import eu.delving.sip.menus.ExpertMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
-import eu.delving.sip.panels.HelpPanel;
 import eu.delving.sip.panels.StatusPanel;
 import eu.delving.sip.panels.WorkPanel;
 import org.apache.http.HttpResponse;
@@ -45,14 +62,28 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.prefs.Preferences;
 
 import static eu.delving.sip.base.HttpClientFactory.createHttpClient;
-import static eu.delving.sip.base.KeystrokeHelper.*;
+import static eu.delving.sip.base.KeystrokeHelper.MENU_W;
+import static eu.delving.sip.base.KeystrokeHelper.attachAccelerator;
 import static eu.delving.sip.files.DataSetState.*;
 import static eu.delving.sip.files.StorageFinder.isStandalone;
 
@@ -66,9 +97,7 @@ import static eu.delving.sip.files.StorageFinder.isStandalone;
 public class Application {
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
-    private File storageDirectory;
     private SipModel sipModel;
-    private SchemaRepository schemaRepository;
     private Action importAction;
     private Action validateAction;
     private JFrame home;
@@ -76,7 +105,6 @@ public class Application {
     private AllFrames allFrames;
     private VisualFeedback feedback;
     private StatusPanel statusPanel;
-    private HelpPanel helpPanel;
     private Timer resizeTimer;
     private ExpertMenu expertMenu;
     private UploadAction uploadAction;
@@ -84,7 +112,6 @@ public class Application {
     private SelectAnotherMappingAction selectAnotherMappingAction;
 
     private Application(final File storageDir) throws StorageException {
-        this.storageDirectory = storageDir;
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
         desktop = new JDesktopPane() {
@@ -113,15 +140,16 @@ public class Application {
         });
         Preferences preferences = Preferences.userNodeForPackage(SipModel.class);
         feedback = new VisualFeedback(home, desktop, preferences);
-        HttpClient httpClient = createHttpClient(storageDirectory);
+        HttpClient httpClient = createHttpClient(storageDir);
+        SchemaRepository schemaRepository;
         try {
-            this.schemaRepository = new SchemaRepository(new SchemaFetcher(httpClient));
+            schemaRepository = new SchemaRepository(new SchemaFetcher(httpClient));
         }
         catch (IOException e) {
             throw new StorageException("Unable to create Schema Repository", e);
         }
         ResolverContext context = new ResolverContext();
-        Storage storage = new StorageImpl(storageDirectory, schemaRepository, new CachedResourceResolver(context));
+        Storage storage = new StorageImpl(storageDir, schemaRepository, new CachedResourceResolver(context));
         context.setStorage(storage);
         context.setHttpClient(httpClient);
         sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, preferences);
@@ -139,9 +167,10 @@ public class Application {
         JPanel content = (JPanel) home.getContentPane();
         content.setFocusable(true);
         FrameBase dataSetFrame = cultureHubClient != null ? new DataSetHubFrame(sipModel, cultureHubClient) : new DataSetStandaloneFrame(sipModel, schemaRepository);
-        allFrames = new AllFrames(sipModel, content, dataSetFrame);
+        LogFrame logFrame = new LogFrame(sipModel);
+        feedback.setLog(logFrame.getLog());
+        allFrames = new AllFrames(sipModel, content, dataSetFrame, logFrame);
         desktop.setBackground(new Color(190, 190, 200));
-        helpPanel = new HelpPanel(sipModel, httpClient);
         content.add(desktop, BorderLayout.CENTER);
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
             @Override
@@ -282,30 +311,7 @@ public class Application {
         JMenuBar bar = new JMenuBar();
         bar.add(allFrames.getViewMenu());
         bar.add(expertMenu);
-        bar.add(createHelpMenu());
         return bar;
-    }
-
-    private JMenu createHelpMenu() {
-        JMenu menu = new JMenu("Help");
-        final JCheckBoxMenuItem item = new JCheckBoxMenuItem("Show Help Panel");
-        item.setAccelerator(MENU_H);
-        item.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                helpPanel.initialize();
-                if (item.isSelected()) {
-                    home.getContentPane().add(helpPanel, BorderLayout.EAST);
-                }
-                else {
-                    home.getContentPane().remove(helpPanel);
-                }
-                home.getContentPane().validate();
-                allFrames.getViewSelector().refreshView();
-            }
-        });
-        menu.add(item);
-        return menu;
     }
 
     private class InputAnalyzer implements Swing {
@@ -416,13 +422,13 @@ public class Application {
     }
 
     private static LaunchAction LAUNCH = new LaunchAction();
-    private static String JAR_NAME = "SIP-Creator-2014-XX-XX.jar";
 
     private static void memoryNotConfigured() {
         String os = System.getProperty("os.name");
         Runtime rt = Runtime.getRuntime();
         int totalMemory = (int) (rt.totalMemory() / 1024 / 1024);
         StringBuilder out = new StringBuilder();
+        String JAR_NAME = "SIP-Creator-2014-XX-XX.jar";
         if (os.startsWith("Windows")) {
             out.append(":: SIP-Creator Startup Batch file for Windows (more memory than ").append(totalMemory).append("Mb)\n");
             out.append("java -jar -Xms1024m -Xmx1024m ").append(JAR_NAME);

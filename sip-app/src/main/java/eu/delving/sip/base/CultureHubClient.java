@@ -42,12 +42,24 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
-import static org.apache.http.HttpStatus.*;
+import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 /**
  * Connect to the culture hub using HTTP for fetching, uploading, and unlocking datasets.
@@ -57,7 +69,6 @@ import static org.apache.http.HttpStatus.*;
 
 public class CultureHubClient {
     private static final int BLOCK_SIZE = 1024;
-    private Logger log = Logger.getLogger(getClass());
     private SipModel sipModel;
     private HttpClient httpClient;
     private OAuthClient oauthClient;
@@ -209,8 +220,7 @@ public class CultureHubClient {
                 listReceiveListener.failed(e);
             }
             catch (Exception e) {
-                log.error("Unable to fetch list", e);
-                feedback().alert(String.format("Error fetching list from hub: %s", e.getMessage()));
+                feedback().alert("Error fetching list from hub", e);
                 listReceiveListener.failed(e);
             }
         }
@@ -259,8 +269,7 @@ public class CultureHubClient {
                 unlockListener.unlockComplete(false);
             }
             catch (Exception e) {
-                log.error("Unable to unlock dataset", e);
-                feedback().alert(String.format("Error unlocking dataset server: %s", e.getMessage()));
+                feedback().alert("Error unlocking dataset", e);
                 unlockListener.unlockComplete(false);
             }
         }
@@ -325,7 +334,6 @@ public class CultureHubClient {
                 reportOAuthProblem(e);
             }
             catch (Exception e) {
-                log.warn("Unable to download data set", e);
                 feedback().alert("Unable to download data set", e);
             }
             finally {
@@ -391,7 +399,7 @@ public class CultureHubClient {
                             for (File file : uploadFiles) {
                                 HttpPost upload = createUploadRequest(dataSet, file, progressListener);
                                 FileEntity fileEntity = (FileEntity) upload.getEntity();
-                                log.info("Uploading " + file);
+                                feedback().info("Uploading " + file);
                                 HttpResponse uploadResponse = httpClient.execute(upload);
                                 EntityUtils.consume(uploadResponse.getEntity());
                                 code = Code.from(uploadResponse);
@@ -425,8 +433,7 @@ public class CultureHubClient {
                 reportOAuthProblem(e);
             }
             catch (Exception e) {
-                log.error("Error while connecting", e);
-                feedback().alert("Authorization system problem: " + e.getMessage());
+                feedback().alert("Problem connecting", e);
             }
             finally {
                 if (finished != null) Swing.Exec.later(finished);
@@ -484,7 +491,7 @@ public class CultureHubClient {
                             for (File file : uploadFiles) {
                                 HttpPost upload = createUploadRequest(dataSet, file, progressListener);
                                 FileEntity fileEntity = (FileEntity) upload.getEntity();
-                                log.info("Uploading media " + file);
+                                feedback().info("Uploading media " + file);
                                 HttpResponse uploadResponse = httpClient.execute(upload);
                                 EntityUtils.consume(uploadResponse.getEntity());
                                 code = Code.from(uploadResponse);
@@ -518,8 +525,7 @@ public class CultureHubClient {
                 reportOAuthProblem(e);
             }
             catch (Exception e) {
-                log.error("Error while connecting", e);
-                feedback().alert("Authorization system problem: " + e.getMessage());
+                feedback().alert("Problem connecting", e);
             }
             finally {
                 if (finished != null) Swing.Exec.later(finished);
@@ -771,14 +777,6 @@ public class CultureHubClient {
             return recordCount;
         }
 
-        public LockedBy getLockedBy() {
-            return lockedBy;
-        }
-
-        public CreatedBy getCreatedBy() {
-            return createdBy;
-        }
-
         public String toString() {
             return "data-set spec=" + spec;
         }
@@ -790,18 +788,6 @@ public class CultureHubClient {
         public String fullname;
         public String email;
 
-        public String getUsername() {
-            return username;
-        }
-
-        public String getFullname() {
-            return fullname;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
         public String toString() {
             return String.format("%s <%s>", fullname, email);
         }
@@ -812,18 +798,6 @@ public class CultureHubClient {
         public String username;
         public String fullname;
         public String email;
-
-        public String getUsername() {
-            return username;
-        }
-
-        public String getFullname() {
-            return fullname;
-        }
-
-        public String getEmail() {
-            return email;
-        }
     }
 
     @XStreamAlias("schemaVersion")

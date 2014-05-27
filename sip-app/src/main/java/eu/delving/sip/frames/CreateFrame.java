@@ -29,14 +29,24 @@ import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
-import eu.delving.sip.model.*;
+import eu.delving.sip.model.CreateModel;
+import eu.delving.sip.model.CreateTransition;
+import eu.delving.sip.model.MappingModel;
+import eu.delving.sip.model.NodeMappingEntry;
+import eu.delving.sip.model.RecDefTreeNode;
+import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.SourceTreeNode;
 import eu.delving.sip.panels.HtmlPanel;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.util.List;
 import java.util.SortedSet;
 
 /**
@@ -58,7 +68,7 @@ public class CreateFrame extends FrameBase {
     private HtmlPanel statsHtml = new HtmlPanel("Source Statistics");
     private HtmlPanel recDefHtml = new HtmlPanel("Target Documentation");
     private JTextArea hintDocArea = new JTextArea();
-    private JList mappingHintsList;
+    private JList<NodeMappingEntry> mappingHintsList;
     private CreateMappingAction createMappingAction;
     private CopyMappingAction copyMappingAction;
 
@@ -141,8 +151,7 @@ public class CreateFrame extends FrameBase {
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
                 if (listSelectionEvent.getValueIsAdjusting()) return;
                 NodeMappingEntry selectedHint = null;
-                for (Object nodeMappingObject : mappingHintsList.getSelectedValues()) {
-                    NodeMappingEntry entry = (NodeMappingEntry) nodeMappingObject;
+                for (NodeMappingEntry entry : mappingHintsList.getSelectedValuesList()) {
                     if (selectedHint == null) selectedHint = entry;
                 }
                 if (selectedHint != null) {
@@ -226,13 +235,12 @@ public class CreateFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            final Object[] selectedValues = mappingHintsList.getSelectedValues();
-            if (selectedValues != null && selectedValues.length > 0) {
+            final List<NodeMappingEntry> selectedValues = mappingHintsList.getSelectedValuesList();
+            if (!selectedValues.isEmpty()) {
                 exec(new Work() {
                     @Override
                     public void run() {
-                        for (Object selectedValue : selectedValues) {
-                            NodeMappingEntry nodeMappingEntry = (NodeMappingEntry) selectedValue;
+                        for (NodeMappingEntry nodeMappingEntry : selectedValues) {
                             createModel.addMapping(nodeMappingEntry.getNodeMapping());
                         }
                     }

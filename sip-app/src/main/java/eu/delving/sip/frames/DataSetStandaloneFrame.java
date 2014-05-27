@@ -53,7 +53,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import static eu.delving.sip.base.KeystrokeHelper.SPACE;
@@ -77,7 +81,7 @@ public class DataSetStandaloneFrame extends FrameBase {
     private List<FactDefinition> factDefinitions;
     private Map<String, FieldComponent> fieldComponents = new TreeMap<String, FieldComponent>();
     private DataSetListModel listModel = new DataSetListModel();
-    private JList dataSetList = new JList(listModel);
+    private JList<DataSet> dataSetList = new JList<DataSet>(listModel);
     private JPanel fieldPanel = new JPanel();
     private EditAction editAction = new EditAction();
 
@@ -92,7 +96,7 @@ public class DataSetStandaloneFrame extends FrameBase {
             @Override
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
                 if (listSelectionEvent.getValueIsAdjusting()) return;
-                DataSet dataSet = (DataSet) dataSetList.getSelectedValue();
+                DataSet dataSet = dataSetList.getSelectedValue();
                 Map<String, String> facts = dataSet == null ? null : dataSet.getDataSetFacts();
                 setFacts(facts);
                 editAction.setEnabled(dataSet != null);
@@ -191,7 +195,7 @@ public class DataSetStandaloneFrame extends FrameBase {
                         fieldComponents.put(factDefinition.name, new FieldComponent(field));
                     }
                     else {
-                        JComboBox comboBox = new JComboBox(factDefinition.getOptions());
+                        JComboBox comboBox = new JComboBox<String>(factDefinition.getOptions());
                         pb.add(comboBox, cc.xy(3, count));
                         fieldComponents.put(factDefinition.name, new FieldComponent(comboBox));
                     }
@@ -359,7 +363,7 @@ public class DataSetStandaloneFrame extends FrameBase {
         }
     }
 
-    private class DataSetListModel extends AbstractListModel {
+    private class DataSetListModel extends AbstractListModel<DataSet> {
         private List<DataSet> dataSets;
 
         public void refresh() {
@@ -388,7 +392,7 @@ public class DataSetStandaloneFrame extends FrameBase {
         }
 
         @Override
-        public Object getElementAt(int i) {
+        public DataSet getElementAt(int i) {
             return dataSets == null ? null : dataSets.get(i);
         }
 

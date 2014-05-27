@@ -22,7 +22,11 @@
 package eu.delving.sip.frames;
 
 import eu.delving.metadata.RecDef;
-import eu.delving.sip.base.*;
+import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.ReportChartHelper;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.base.Work;
 import eu.delving.sip.files.LinkChecker;
 import eu.delving.sip.files.LinkFile;
 import eu.delving.sip.files.ReportFile;
@@ -32,7 +36,12 @@ import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.HtmlPanel;
 
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -128,7 +137,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         private ReportFile.Rec recShowing;
         private List<ReportFile.Rec> activeLinkChecks = new ArrayList<ReportFile.Rec>();
         private ReportFile report;
-        private JList list;
+        private JList<ReportFile.Rec> list;
         private JCheckBox onlyInvalidBox = new JCheckBox("Show invalid records only");
         private JToggleButton toggle = new JToggleButton("Automatic Link Checking");
         private LoadAction loadAction = new LoadAction();
@@ -185,10 +194,10 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
             return p;
         }
 
+        @SuppressWarnings("unchecked")
         private void createList() {
-            list = new JList(report.getAll());
-            list.setCellRenderer(report.getCellRenderer());
-            list.setPrototypeCellValue("One single line of something or other");
+            list = new JList<ReportFile.Rec>(report.getAll());
+            list.setCellRenderer(report.getCellRenderer()); // too bad this is untyped still
             list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
                 @Override

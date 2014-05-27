@@ -37,9 +37,7 @@ import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 
-import javax.swing.AbstractAction;
-import javax.swing.JDesktopPane;
-import javax.swing.JMenu;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
@@ -118,13 +116,8 @@ public class ExpertMenu extends JMenu {
                 sipModel.exec(new Work.DataSetWork() {
                     @Override
                     public void run() {
-                        try {
-                            if (sipModel.getDataSetModel().isEmpty()) return;
-                            sipModel.getDataSetModel().getDataSet().deleteSource();
-                        }
-                        catch (StorageException e) {
-                            sipModel.getFeedback().alert("Unable to delete source", e);
-                        }
+                        if (sipModel.getDataSetModel().isEmpty()) return;
+                        sipModel.getDataSetModel().getDataSet().deleteSource();
                     }
 
                     @Override
@@ -230,7 +223,7 @@ public class ExpertMenu extends JMenu {
                             File targetFile = new File(outputDirectory, Hasher.extractFileName(file));
                             FileUtils.copyFile(file, targetFile);
                         }
-                        sipModel.getFeedback().alert("Look in "+outputDirectory);
+                        sipModel.getFeedback().alert("Look in " + outputDirectory);
                     }
                     catch (Exception e) {
                         sipModel.getFeedback().alert("Unable to copy upload files to " + outputDirectory, e);

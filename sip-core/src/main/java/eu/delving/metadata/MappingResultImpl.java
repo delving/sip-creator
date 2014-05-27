@@ -23,7 +23,6 @@ package eu.delving.metadata;
 
 import eu.delving.MappingResult;
 import eu.delving.groovy.XmlSerializer;
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -32,9 +31,14 @@ import org.w3c.dom.NodeList;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-import static eu.delving.metadata.RecDef.*;
+import static eu.delving.metadata.RecDef.DELVING_NAMESPACE_URI;
+import static eu.delving.metadata.RecDef.DELVING_PREFIX;
 
 /**
  * The result of the mapping engine is wrapped in this class so that some post-processing and checking
@@ -44,7 +48,6 @@ import static eu.delving.metadata.RecDef.*;
  */
 
 public class MappingResultImpl implements MappingResult {
-    private Logger logger = Logger.getLogger(getClass());
     private XmlSerializer serializer;
     private Map<String, List<String>> allFields = new TreeMap<String, List<String>>();
     private Map<String, List<String>> copyFields = new TreeMap<String, List<String>>();
@@ -189,7 +192,7 @@ public class MappingResultImpl implements MappingResult {
             Node kid = kids.item(walk);
             switch (kid.getNodeType()) {
                 case Node.ATTRIBUTE_NODE:
-                    logger.warn("Attribute appeared as child of the root node: " + kid.getNodeName());
+                    System.err.println("Attribute appeared as child of the root node: " + kid.getNodeName());
                     break;
                 case Node.TEXT_NODE:
                 case Node.CDATA_SECTION_NODE:

@@ -40,7 +40,11 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -249,7 +253,7 @@ public class StatsFrame extends FrameBase {
     private JComponent createHistogramList(Stats.Histogram values) {
         HistogramModel histogramModel = new HistogramModel();
         histogramModel.setHistogram(values);
-        JList list = new JList(histogramModel);
+        JList<Stats.Counter> list = new JList<Stats.Counter>(histogramModel);
         list.setCellRenderer(new HistogramCellRenderer());
         list.setTransferHandler(new ListTransferHandler());
         JLabel trimLabel = new JLabel("All values present", JLabel.CENTER);
@@ -263,7 +267,7 @@ public class StatsFrame extends FrameBase {
         return p;
     }
 
-    private static class HistogramModel extends AbstractListModel {
+    private static class HistogramModel extends AbstractListModel<Stats.Counter> {
         private List<Stats.Counter> list = new ArrayList<Stats.Counter>();
 
         public void setHistogram(Stats.Histogram histogram) {
@@ -283,7 +287,7 @@ public class StatsFrame extends FrameBase {
         }
 
         @Override
-        public Object getElementAt(int i) {
+        public Stats.Counter getElementAt(int i) {
             return list.get(i);
         }
     }

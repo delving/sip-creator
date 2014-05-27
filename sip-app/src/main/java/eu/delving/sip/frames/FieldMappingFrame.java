@@ -22,9 +22,23 @@
 package eu.delving.sip.frames;
 
 import eu.delving.MappingResult;
-import eu.delving.metadata.*;
-import eu.delving.sip.base.*;
-import eu.delving.sip.model.*;
+import eu.delving.metadata.MappingFunction;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.NodeMappingChange;
+import eu.delving.metadata.Operator;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RecDefNode;
+import eu.delving.sip.base.CompileState;
+import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.URLLauncher;
+import eu.delving.sip.base.Work;
+import eu.delving.sip.model.CreateModel;
+import eu.delving.sip.model.CreateTransition;
+import eu.delving.sip.model.MappingCompileModel;
+import eu.delving.sip.model.MappingModel;
+import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.SourceTreeNode;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -36,9 +50,12 @@ import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -46,8 +63,13 @@ import java.util.List;
 import static eu.delving.metadata.NodeMappingChange.OPERATOR;
 import static eu.delving.metadata.StringUtil.toGroovyFirstIdentifier;
 import static eu.delving.metadata.StringUtil.toGroovyIdentifier;
-import static eu.delving.sip.base.KeystrokeHelper.*;
-import static eu.delving.sip.base.SwingHelper.*;
+import static eu.delving.sip.base.KeystrokeHelper.MENU_Z;
+import static eu.delving.sip.base.KeystrokeHelper.SH_MENU_Z;
+import static eu.delving.sip.base.KeystrokeHelper.attachAccelerator;
+import static eu.delving.sip.base.KeystrokeHelper.configAction;
+import static eu.delving.sip.base.SwingHelper.scrollV;
+import static eu.delving.sip.base.SwingHelper.scrollVH;
+import static eu.delving.sip.base.SwingHelper.setEditable;
 
 /**
  * Refining the mapping interactively involves editing the mapping code for an individual NodeMapping.  This involves
@@ -66,7 +88,7 @@ public class FieldMappingFrame extends FrameBase {
     private JTextArea docArea;
     private JTextArea outputArea;
     private boolean operatorBoxSetting = false;
-    private JComboBox operatorBox = new JComboBox(Operator.values());
+    private JComboBox<Operator> operatorBox = new JComboBox<Operator>(Operator.values());
     private FunctionListModel functionModel = new FunctionListModel();
     private JList functionList = new MappingFunctionJList(functionModel);
     private ContextVarListModel contextVarModel = new ContextVarListModel();

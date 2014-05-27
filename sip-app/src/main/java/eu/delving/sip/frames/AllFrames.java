@@ -34,16 +34,34 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.WordUtils;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import static eu.delving.sip.base.FrameBase.INSETS;
-import static eu.delving.sip.base.KeystrokeHelper.*;
+import static eu.delving.sip.base.KeystrokeHelper.SPACE;
+import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
+import static eu.delving.sip.base.KeystrokeHelper.menuDigit;
 import static eu.delving.sip.base.SwingHelper.scrollV;
-import static eu.delving.sip.frames.AllFrames.View.*;
+import static eu.delving.sip.frames.AllFrames.View.BIG_PICTURE;
+import static eu.delving.sip.frames.AllFrames.View.CLEAR;
+import static eu.delving.sip.frames.AllFrames.View.DATA_SETS;
+import static eu.delving.sip.frames.AllFrames.View.DECADENT_DISPLAY;
+import static eu.delving.sip.frames.AllFrames.View.QUICK_MAPPING;
 
 /**
  * Hold on to all the frames and manage their arrangement on the desktop.  It is possible to make adjustments in
@@ -92,9 +110,10 @@ public class AllFrames {
         DEEP_DELVING,
         DECADENT_DISPLAY,
         FUNCTIONS,
-        MAPPING_CODE,
         STATISTICS,
-        REPORT;
+        REPORT,
+        MAPPING_CODE,
+        LOG;
 
         public String getHtml() {
             return WordUtils.capitalizeFully(super.toString().replaceAll("_", " "));
@@ -107,7 +126,7 @@ public class AllFrames {
         void refreshView();
     }
 
-    public AllFrames(final SipModel sipModel, JPanel content, FrameBase dataSetFrame) {
+    public AllFrames(final SipModel sipModel, JPanel content, FrameBase dataSetFrame, FrameBase logFrame) {
         this.sipModel = sipModel;
         this.content = content;
         this.dataSetFrame = dataSetFrame;
@@ -137,9 +156,10 @@ public class AllFrames {
                 fieldMapping,
                 output,
                 functionFrame,
-                mappingCodeFrame,
                 statsFrame,
-                reportFrame
+                reportFrame,
+                mappingCodeFrame,
+                logFrame
         };
         try {
             File file = frameArrangementsFile();
