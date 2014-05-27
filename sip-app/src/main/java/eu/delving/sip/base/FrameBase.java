@@ -27,7 +27,13 @@ import eu.delving.sip.model.SipModel;
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -66,6 +72,7 @@ public abstract class FrameBase extends JInternalFrame {
         STATISTICS,
         INPUT,
         REC_MAPPING,
+        LOG,
         FIELD_MAPPING,
         OUTPUT,
         MAPPING_CODE,

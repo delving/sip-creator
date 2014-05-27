@@ -32,8 +32,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.swing.*;
-import java.awt.*;
-import java.io.*;
+import java.awt.Component;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -74,7 +80,7 @@ public class ReportFile {
         for (int walk = 0; walk < recordCount; walk++) recs.add(new Rec(walk));
     }
 
-    public ListModel getAll() {
+    public ListModel<Rec> getAll() {
         return all;
     }
 
@@ -424,14 +430,14 @@ public class ReportFile {
         }
     }
 
-    public class All extends AbstractListModel {
+    public class All extends AbstractListModel<Rec> {
         @Override
         public int getSize() {
             return recs.size();
         }
 
         @Override
-        public Object getElementAt(int index) {
+        public Rec getElementAt(int index) {
             return recs.get(index).activate();
         }
 

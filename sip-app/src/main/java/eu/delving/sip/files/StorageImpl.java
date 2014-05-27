@@ -22,7 +22,12 @@
 package eu.delving.sip.files;
 
 import eu.delving.XMLToolFactory;
-import eu.delving.metadata.*;
+import eu.delving.metadata.Hasher;
+import eu.delving.metadata.MetadataException;
+import eu.delving.metadata.RecDef;
+import eu.delving.metadata.RecDefModel;
+import eu.delving.metadata.RecMapping;
+import eu.delving.metadata.XPathContext;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaResponse;
 import eu.delving.schema.SchemaVersion;
@@ -42,7 +47,13 @@ import javax.xml.validation.Validator;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -311,7 +322,7 @@ public class StorageImpl implements Storage {
 
         @Override
         public InputStream openImportedInputStream() throws StorageException {
-            return zipIn(findOrCreate(here, IMPORTED));
+            return zipIn(new File(here, IMPORTED.getName()));
         }
 
         @Override
@@ -327,32 +338,6 @@ public class StorageImpl implements Storage {
         @Override
         public File targetOutput(String prefix) {
             return new File(here, TARGET.getName(prefix));
-        }
-
-        @Override
-        public File renameInvalidSource() throws StorageException {
-            File sourceFile = sourceFile(here);
-            File renamedFile = new File(here, String.format("%s.error", sourceFile.getName()));
-            try {
-                FileUtils.moveFile(sourceFile, renamedFile);
-            }
-            catch (IOException e) {
-                throw new StorageException("Unable to rename source file to error", e);
-            }
-            return renamedFile;
-        }
-
-        @Override
-        public File renameInvalidImport() throws StorageException {
-            File importFile = importedFile(here);
-            File renamedFile = new File(here, String.format("%s.error", importFile.getName()));
-            try {
-                FileUtils.moveFile(importFile, renamedFile);
-            }
-            catch (IOException e) {
-                throw new StorageException("Unable to rename import file to error", e);
-            }
-            return renamedFile;
         }
 
         @Override
@@ -497,7 +482,7 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public void deleteSource() throws StorageException {
+        public void deleteSource() {
             for (File file : findSourceFiles(here)) delete(file);
         }
 

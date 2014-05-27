@@ -25,7 +25,6 @@ import eu.delving.metadata.RecDef;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.model.Feedback;
-import org.apache.log4j.Logger;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
 
@@ -54,7 +53,6 @@ public class LinkFile {
     public static final String LINE_FORMAT = "\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, \"%s\"";
     public static final Pattern LINK_CHECK_PATTERN = Pattern.compile("\"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", (-?\\d+), (-?\\d+), \"([^\"]*)\"");
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    private Logger log = Logger.getLogger(getClass());
     private File file;
     private DataSet dataSet;
     private String prefix;
@@ -103,7 +101,6 @@ public class LinkFile {
                         map.put(entry.url, entry.linkCheck);
                     }
                     in.close();
-                    log.info("Loaded " + map.size() + " links");
                 }
                 catch (IOException e) {
                     feedback.alert("Unable to load links", e);
@@ -147,7 +144,6 @@ public class LinkFile {
                         count++;
                     }
                     out.close();
-                    log.info("Saved " + count + " links");
                 }
                 catch (IOException e) {
                     feedback.alert("Unable to save links", e);
@@ -199,7 +195,6 @@ public class LinkFile {
                         count++;
                     }
                     in.close();
-                    log.info("Analyzed " + count + " links");
                     callback.linkStatistics(linkStatsMap);
                 }
                 catch (IOException e) {

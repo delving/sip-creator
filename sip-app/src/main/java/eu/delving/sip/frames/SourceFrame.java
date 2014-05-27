@@ -21,20 +21,37 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.*;
+import eu.delving.metadata.MappingFunction;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.NodeMappingChange;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.Tag;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
-import eu.delving.sip.model.*;
-import org.apache.log4j.lf5.viewer.categoryexplorer.TreeModelAdapter;
+import eu.delving.sip.model.CreateModel;
+import eu.delving.sip.model.CreateTransition;
+import eu.delving.sip.model.DataSetModel;
+import eu.delving.sip.model.FilterTreeModel;
+import eu.delving.sip.model.MappingModel;
+import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.SourceTreeNode;
 
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -136,7 +153,19 @@ public class SourceFrame extends FrameBase {
                 }
             }
         });
-        sourceTree.getModel().addTreeModelListener(new TreeModelAdapter() {
+        sourceTree.getModel().addTreeModelListener(new TreeModelListener() {
+            @Override
+            public void treeNodesChanged(TreeModelEvent e) {
+            }
+
+            @Override
+            public void treeNodesInserted(TreeModelEvent e) {
+            }
+
+            @Override
+            public void treeNodesRemoved(TreeModelEvent e) {
+            }
+
             @Override
             public void treeStructureChanged(TreeModelEvent treeModelEvent) {
                 SourceTreeNode node = (SourceTreeNode) treeModelEvent.getTreePath().getLastPathComponent();

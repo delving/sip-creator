@@ -34,7 +34,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Map;
@@ -48,7 +47,6 @@ import java.util.Map;
  */
 
 public class OAuthClient {
-    private Logger log = Logger.getLogger(getClass());
     private String hostPort;
     private String username;
     private PasswordRequest passwordRequest;
@@ -158,7 +156,6 @@ public class OAuthClient {
                 );
             }
             catch (IOException e) {
-                log.error("OAuth Client problem", e);
                 throw new OAuthSystemException(String.format("Can't connect to server : %s", e.getMessage()), e);
             }
         }

@@ -33,9 +33,13 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import static eu.delving.metadata.StringUtil.*;
-import static eu.delving.sip.files.StorageHelper.*;
-import static org.apache.commons.io.FileUtils.moveFile;
+import static eu.delving.metadata.StringUtil.csvDelimiter;
+import static eu.delving.metadata.StringUtil.csvEscapeXML;
+import static eu.delving.metadata.StringUtil.csvLineParse;
+import static eu.delving.metadata.StringUtil.csvTitleToTag;
+import static eu.delving.sip.files.StorageHelper.BLOCK_SIZE;
+import static eu.delving.sip.files.StorageHelper.delete;
+import static eu.delving.sip.files.StorageHelper.statsFile;
 
 /**
  * Handle the importing of files into a dataset
@@ -102,9 +106,6 @@ public class FileImporter implements Work.DataSetWork, Work.LongTermWork {
                 IOUtils.closeQuietly(outputStream);
                 IOUtils.closeQuietly(inputStream);
             }
-            File hashedImport = new File(dataSet.importedOutput().getParentFile(), hasher.prefixFileName(Storage.FileType.IMPORTED.getName()));
-            if (hashedImport.exists()) delete(hashedImport);
-            moveFile(dataSet.importedOutput(), hashedImport);
             delete(statsFile(dataSet.importedOutput().getParentFile(), false, null));
             if (finished != null) finished.run();
         }
@@ -113,6 +114,7 @@ public class FileImporter implements Work.DataSetWork, Work.LongTermWork {
             progressListener.getFeedback().alert("Cancelled", e);
         }
         catch (IOException e) {
+            delete(dataSet.importedOutput());
             progressListener.getFeedback().alert("Unable to import: "+e.getMessage(), e);
         }
     }

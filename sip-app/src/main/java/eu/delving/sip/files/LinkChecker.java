@@ -30,7 +30,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 
@@ -43,7 +42,6 @@ import java.io.IOException;
  */
 
 public class LinkChecker {
-    private static Logger log = Logger.getLogger(LinkChecker.class);
     private final HttpClient httpClient;
     private HTreeMap<String, LinkCheck> map;
 
@@ -73,7 +71,6 @@ public class LinkChecker {
         if (check == RecDef.Check.DEEP_ZOOM && linkCheck.ok) {
             linkCheck.ok = "application/xml".equals(linkCheck.mimeType);
         }
-        log.info(String.format("Found %s by requesting: %s", url, linkCheck));
         map.put(url, linkCheck);
         return linkCheck;
     }

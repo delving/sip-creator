@@ -68,13 +68,18 @@ public class MockProgressListener implements ProgressListener {
     private class MockFeedback implements Feedback {
 
         @Override
+        public void info(String message) {
+            alerts.add(message);
+        }
+
+        @Override
         public void alert(String message) {
             alerts.add(message);
         }
 
         @Override
-        public void alert(String message, Exception exception) {
-            alerts.add(message + " exception:"+exception.toString());
+        public void alert(String message, Throwable throwable) {
+            alerts.add(message + " throwable:"+throwable.toString());
         }
 
         @Override

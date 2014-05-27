@@ -23,20 +23,29 @@ package eu.delving.sip.model;
 
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MetadataRecord;
-import eu.delving.metadata.*;
+import eu.delving.metadata.AssertionTest;
+import eu.delving.metadata.MappingFunction;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.NodeMappingChange;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.NodeTransferHandler;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
-import eu.delving.sip.files.*;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.FileImporter;
+import eu.delving.sip.files.Storage;
+import eu.delving.sip.files.StorageException;
 import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.FileProcessor;
 import eu.delving.sip.xml.MetadataParser;
 import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
-import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import java.io.File;
@@ -55,7 +64,6 @@ import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
  */
 
 public class SipModel {
-    private static final Logger LOG = Logger.getLogger(SipModel.class);
     private JDesktopPane desktop;
     private AllFrames.ViewSelector viewSelector;
     private WorkModel workModel;
@@ -197,7 +205,7 @@ public class SipModel {
             dataSetModel.deleteValidation();
         }
         catch (StorageException e) {
-            LOG.warn(String.format("Error while deleting validation file %s", e));
+            feedback.alert(String.format("Error while deleting validation file %s", e));
         }
     }
 
@@ -206,7 +214,7 @@ public class SipModel {
             dataSetModel.getDataSet().deleteAllTargets();
         }
         catch (StorageException e) {
-            LOG.warn(String.format("Error while deleting validation files %s", e));
+            feedback.alert(String.format("Error while deleting validation files %s", e));
         }
     }
 

@@ -26,13 +26,22 @@ import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 
-import javax.swing.AbstractListModel;
-import javax.swing.ListModel;
-import javax.swing.Timer;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A model of all the work that is being done in background threads at any time.  The contents of the list
@@ -56,8 +65,20 @@ public class WorkModel {
         String getProgressString();
     }
 
-    public WorkModel(Feedback feedback) {
+    public WorkModel(final Feedback feedback) {
         this.feedback = feedback;
+        this.executor = new ThreadPoolExecutor(
+                0, Integer.MAX_VALUE,
+                60L, TimeUnit.SECONDS,
+                new SynchronousQueue<Runnable>()
+        ) {
+            @Override
+            public void afterExecute(Runnable runnable, Throwable throwable) {
+                super.afterExecute(runnable, throwable);
+                if (throwable == null) return;
+                feedback.alert("Exception: " + throwable.toString(), throwable);
+            }
+        };
         Timer tick = new Timer(REFRESH_RATE, jobListModel);
         tick.setRepeats(true);
         tick.start();
@@ -125,7 +146,7 @@ public class WorkModel {
         Work.DataSetPrefixWork w = (Work.DataSetPrefixWork) work;
         DataSet dataSet = w.getDataSet();
         String prefix = w.getPrefix();
-        if (dataSet != null && prefix == null) {
+        if (dataSet != null && prefix == null) { // todo: what's with prefix here?
             for (JobContext context : jobContexts) {
                 String dataSetSpec = context.getDataSet();
                 String contextPrefix = context.getPrefix();
@@ -173,11 +194,11 @@ public class WorkModel {
         jobContexts.add(new JobContext(work));
     }
 
-    public ListModel getListModel() {
+    public ListModel<JobContext> getListModel() {
         return jobListModel;
     }
 
-    private class JobListModel extends AbstractListModel implements ActionListener {
+    private class JobListModel extends AbstractListModel<JobContext> implements ActionListener {
         private List<JobContext> snapshot = new ArrayList<JobContext>();
 
         @Override
@@ -186,7 +207,7 @@ public class WorkModel {
         }
 
         @Override
-        public Object getElementAt(int index) {
+        public JobContext getElementAt(int index) {
             return snapshot.get(index);
         }
 

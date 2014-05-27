@@ -107,7 +107,7 @@ public interface DataSet extends Comparable<DataSet> {
 
     ReportFile getReport(String prefix) throws StorageException;
 
-    void deleteSource() throws StorageException;
+    void deleteSource();
 
     List<File> getUploadFiles() throws StorageException;
 

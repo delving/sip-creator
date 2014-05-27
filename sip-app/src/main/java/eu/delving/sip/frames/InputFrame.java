@@ -29,8 +29,12 @@ import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
-import javax.swing.Timer;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -39,7 +43,12 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 import java.util.regex.Pattern;
 
 import static eu.delving.sip.base.SwingHelper.StringTransferable;
@@ -56,7 +65,7 @@ import static eu.delving.sip.base.SwingHelper.scrollVH;
 public class InputFrame extends FrameBase {
     private static final DefaultTreeModel EMPTY_MODEL = new DefaultTreeModel(new DefaultMutableTreeNode("No input"));
     private JTree recordTree;
-    private JComboBox filterBox = new JComboBox(Filter.values());
+    private JComboBox<Filter> filterBox = new JComboBox<Filter>(Filter.values());
     private JTextField filterField = new JTextField();
 
     private enum Filter {
@@ -143,7 +152,7 @@ public class InputFrame extends FrameBase {
         private static final int MAX_LENGTH = 40;
         private MetadataRecord metadataRecord;
         private GroovyTreeNode parent;
-        private String attrKey, attrValue;
+        private String attrKey;
         private GroovyNode node;
         private Vector<GroovyTreeNode> children = new Vector<GroovyTreeNode>();
         private String string;
@@ -157,7 +166,6 @@ public class InputFrame extends FrameBase {
         private GroovyTreeNode(GroovyTreeNode parent, String attrKey, String attrValue) {
             this.parent = parent;
             this.attrKey = attrKey;
-            this.attrValue = attrValue;
             string = String.format("<html><b>%s</b> = %s</html>", attrKey, attrValue);
             toolTip = string; // todo
         }
@@ -281,7 +289,7 @@ public class InputFrame extends FrameBase {
         public int compareTo(GroovyTreeNode gtn) {
             if (attrKey != null && gtn.attrKey == null) return -1;
             if (attrKey == null && gtn.attrKey != null) return 1;
-            if (attrKey != null && gtn.attrKey != null) return attrKey.compareTo(gtn.attrKey);
+            if (attrKey != null) return attrKey.compareTo(gtn.attrKey);
             return node.getNodeName().compareTo(gtn.node.getNodeName());
         }
     }

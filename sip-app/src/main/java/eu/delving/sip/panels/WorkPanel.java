@@ -45,11 +45,11 @@ import static eu.delving.sip.base.SwingHelper.NORMAL_JOB_COLOR;
 
 public class WorkPanel extends JPanel {
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
-    private JList list;
+    private JList<WorkModel.JobContext> list;
 
     public WorkPanel(final SipModel sipModel) {
         super(new BorderLayout());
-        this.list = new JList(sipModel.getWorkModel().getListModel());
+        this.list = new JList<WorkModel.JobContext>(sipModel.getWorkModel().getListModel());
         this.list.setFont(MONOSPACED);
         this.list.setCellRenderer(new WorkCellRenderer());
         this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -57,7 +57,7 @@ public class WorkPanel extends JPanel {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting() || list.isSelectionEmpty()) return;
-                WorkModel.JobContext context = (WorkModel.JobContext) list.getSelectedValue();
+                WorkModel.JobContext context = list.getSelectedValue();
                 if (context != null && context.getProgressIndicator() != null) {
                     String message = String.format(
                             "<html>Do you want to cancel this job?<br>%s",

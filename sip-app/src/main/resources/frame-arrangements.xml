@@ -42,5 +42,8 @@
     <arrangement view="REPORT">
         <frame where="0011" which="REPORT"/>
     </arrangement>
+    <arrangement view="LOG">
+        <frame where="0011" which="LOG"/>
+    </arrangement>
 
 </frame-arrangements>

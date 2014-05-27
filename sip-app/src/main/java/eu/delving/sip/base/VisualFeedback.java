@@ -23,12 +23,16 @@ package eu.delving.sip.base;
 
 import eu.delving.sip.model.Feedback;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.KeyboardFocusManager;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
@@ -43,8 +47,8 @@ import static javax.swing.JOptionPane.*;
  */
 
 public class VisualFeedback implements Feedback {
-    private Logger log = Logger.getLogger(getClass());
     private JDesktopPane desktop;
+    private Log log;
     private PasswordFetcher passwordFetcher;
 
     public VisualFeedback(JFrame frame, JDesktopPane desktop, Preferences preferences) {
@@ -52,9 +56,29 @@ public class VisualFeedback implements Feedback {
         this.passwordFetcher = new PasswordFetcher(frame, preferences);
     }
 
+    public void setLog(Log log) {
+        this.log = log;
+    }
+
+    @Override
+    public void info(final String message) {
+        if (log != null) {
+            if (SwingUtilities.isEventDispatchThread()) {
+                log.log(message, null);
+            }
+            else {
+                execWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        log.log(message, null);
+                    }
+                });
+            }
+        }
+    }
+
     @Override
     public void alert(final String message) {
-        log.warn(message);
         if (SwingUtilities.isEventDispatchThread()) {
             inYourFace(message, null);
         }
@@ -69,17 +93,15 @@ public class VisualFeedback implements Feedback {
     }
 
     @Override
-    public void alert(final String message, final Exception exception) {
-        log.warn(message, exception);
-        final String exceptionMessage = exception.getMessage().trim().isEmpty() ? exception.getClass().getName() : exception.getMessage();
+    public void alert(final String message, final Throwable throwable) {
         if (SwingUtilities.isEventDispatchThread()) {
-            inYourFace(message, exceptionMessage);
+            inYourFace(message, throwable);
         }
         else {
             execWait(new Runnable() {
                 @Override
                 public void run() {
-                    inYourFace(message, exceptionMessage);
+                    inYourFace(message, throwable);
                 }
             });
         }
@@ -110,11 +132,15 @@ public class VisualFeedback implements Feedback {
         return passwordFetcher.getPassword();
     }
 
-    private void inYourFace(String message, String extra) {
+    private void inYourFace(String message, Throwable throwable) {
+        if (log != null) {
+            log.log(message, throwable);
+        }
         String sanitizedMessage = sanitizeHtml(message);
-        String sanitizedExtra = sanitizeHtml(extra);
-        String html = String.format("<html><b>%s</b></html>", sanitizedMessage);
-        if (extra != null) html = html + String.format("<p>%s</p>", sanitizedExtra);
+        String html = String.format("<html><b>%s</b>", sanitizedMessage);
+        if (throwable != null) {
+            html += "<br/><br/><center><p>Check the Log panel for details</p></center>";
+        }
         askOption(desktop, html, "Message", DEFAULT_OPTION, INFORMATION_MESSAGE);
     }
 
@@ -151,46 +177,25 @@ public class VisualFeedback implements Feedback {
         if (fo != null && fo.isShowing()) fo.requestFocus();
     }
 
-//    private static void startLWModal(JInternalFrame frame) {
-//        try {
-//            Object obj = AccessController.doPrivileged(new ModalPrivilegedAction(Container.class, "startLWModal"));
-//            if (obj != null) ((Method) obj).invoke(frame, (Object[]) null);
-//        }
-//        catch (Exception ex) {
-//            // ignore
-//        }
-//    }
-//
-//    private static class ModalPrivilegedAction implements PrivilegedAction {
-//        private Class clazz;
-//        private String methodName;
-//
-//        public ModalPrivilegedAction(Class clazz, String methodName) {
-//            this.clazz = clazz;
-//            this.methodName = methodName;
-//        }
-//
-//        public Object run() {
-//            Method method = null;
-//            try {
-//                method = clazz.getDeclaredMethod(methodName, (Class[]) null);
-//            }
-//            catch (NoSuchMethodException ex) {
-//                // ignore
-//            }
-//            if (method != null) method.setAccessible(true);
-//            return method;
-//        }
-//    }
-
     private static String sanitizeHtml(String string) {
         if (string == null) return null;
         return string.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
     }
 
-    private void execWait(Runnable runnable) {
+    private void execWait(final Runnable runnable) {
         try {
-            SwingUtilities.invokeAndWait(runnable);
+            Runnable wrapper = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        runnable.run();
+                    }
+                    catch (Exception e) {
+                        alert(e.toString(), e); // todo: better idea?
+                    }
+                }
+            };
+            SwingUtilities.invokeAndWait(wrapper);
         }
         catch (InterruptedException e) {
             throw new RuntimeException(e);
