@@ -328,16 +328,6 @@ public class TestSourceConverter {
         }
 
         @Override
-        public File renameInvalidSource() throws StorageException {
-            return null;
-        }
-
-        @Override
-        public File renameInvalidImport() throws StorageException {
-            return null;
-        }
-
-        @Override
         public Stats getLatestStats() {
             return null;
         }

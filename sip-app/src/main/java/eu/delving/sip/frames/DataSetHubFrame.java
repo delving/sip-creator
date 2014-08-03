@@ -31,20 +31,40 @@ import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
-import javax.swing.Timer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.*;
-import java.awt.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-import static eu.delving.sip.base.KeystrokeHelper.*;
-import static eu.delving.sip.base.SwingHelper.*;
+import static eu.delving.sip.base.KeystrokeHelper.DOWN;
+import static eu.delving.sip.base.KeystrokeHelper.SPACE;
+import static eu.delving.sip.base.KeystrokeHelper.UP;
+import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
+import static eu.delving.sip.base.KeystrokeHelper.attachAccelerator;
+import static eu.delving.sip.base.SwingHelper.ICON_DOWNLOAD;
+import static eu.delving.sip.base.SwingHelper.ICON_HUH;
+import static eu.delving.sip.base.SwingHelper.ICON_OWNED;
+import static eu.delving.sip.base.SwingHelper.ICON_UNAVAILABLE;
 
 /**
  * Show the datasets both local and on the server, so all info about their status is unambiguous.
@@ -681,11 +701,11 @@ public class DataSetHubFrame extends FrameBase {
     }
 
     private enum State {
-        OWNED_BY_YOU(true, false, "yours", ICON_OWNED),
+        OWNED_BY_YOU(true, true, "yours", ICON_OWNED),
         AVAILABLE(false, true, "downloadable", ICON_DOWNLOAD),
-        UNAVAILABLE(false, false, "taken", ICON_UNAVAILABLE),
+        UNAVAILABLE(false, true, "taken", ICON_UNAVAILABLE),
         BUSY(false, false, "busy", SwingHelper.ICON_BUSY),
-        ORPHAN_TAKEN(true, false, "taken but present locally", ICON_HUH),
+        ORPHAN_TAKEN(true, true, "taken but present locally", ICON_HUH),
         ORPHAN_LONELY(true, false, "only present locally", ICON_HUH),
         ORPHAN_UPDATE(false, true, "yours but absent locally", ICON_HUH),
         ORPHAN_ARCHIVE(true, true, "free but present locally", ICON_HUH),
