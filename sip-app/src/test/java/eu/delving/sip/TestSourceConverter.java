@@ -299,10 +299,6 @@ public class TestSourceConverter {
         }
 
         @Override
-        public void deleteAllTargets() throws StorageException {
-        }
-
-        @Override
         public File importedOutput() {
             return null;
         }

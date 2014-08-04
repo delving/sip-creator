@@ -211,7 +211,10 @@ public class SipModel {
 
     private void clearValidations() {
         try {
-            dataSetModel.getDataSet().deleteAllTargets();
+            DataSet dataSet = dataSetModel.getDataSet();
+            for (SchemaVersion schemaVersion : dataSet.getSchemaVersions()) {
+                dataSet.deleteTarget(schemaVersion.getPrefix());
+            }
         }
         catch (StorageException e) {
             feedback.alert(String.format("Error while deleting validation files %s", e));

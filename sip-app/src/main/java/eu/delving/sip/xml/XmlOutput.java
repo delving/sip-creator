@@ -22,7 +22,6 @@
 package eu.delving.sip.xml;
 
 import eu.delving.XMLToolFactory;
-import eu.delving.metadata.Hasher;
 import eu.delving.metadata.RecDef;
 import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Element;
@@ -35,7 +34,11 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -98,9 +101,6 @@ public class XmlOutput {
             outputStream.close();
             if (aborted) {
                 FileUtils.deleteQuietly(outputZipFile);
-            }
-            else {
-                outputZipFile = Hasher.ensureFileHashed(outputZipFile);
             }
         }
         catch (Exception e) {

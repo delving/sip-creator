@@ -54,8 +54,7 @@ public interface Storage {
         MAPPING(null, "mapping_", ".xml", "mapping_%s.xml", 30),
         REPORT(null, "report_", null, "report_%s.txt", 1),
         REPORT_INDEX(null, "report_", null, "report_%s.long", 1),
-        LINKS(null, "links_", null, "links_%s.csv.gz", 1),
-        TARGET(null, "target_", ".xml.gz", "target_%s.xml.gz", 1);
+        LINKS(null, "links_", null, "links_%s.csv.gz", 1);
 
         private String name, prefix, suffix, pattern;
         private int historySize = 1;

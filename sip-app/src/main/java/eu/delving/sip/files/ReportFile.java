@@ -67,7 +67,7 @@ public class ReportFile {
     private ResultLinkChecks resultLinkChecks;
     private All all = new All();
 
-    public ReportFile(File reportFile, File reportIndexFile, File targetFile, File linkFile, DataSet dataSet, String prefix) throws IOException {
+    public ReportFile(File reportFile, File reportIndexFile, File linkFile, DataSet dataSet, String prefix) throws IOException {
         this.reportFile = reportFile;
         this.reportAccess = new RandomAccessFile(this.reportFile, "r");
         this.reportIndexAccess = new RandomAccessFile(reportIndexFile, "r");

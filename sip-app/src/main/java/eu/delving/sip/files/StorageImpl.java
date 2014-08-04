@@ -70,7 +70,6 @@ import static eu.delving.schema.SchemaType.VALIDATION_SCHEMA;
 import static eu.delving.sip.files.Storage.FileType.IMPORTED;
 import static eu.delving.sip.files.Storage.FileType.MAPPING;
 import static eu.delving.sip.files.Storage.FileType.SOURCE;
-import static eu.delving.sip.files.Storage.FileType.TARGET;
 import static eu.delving.sip.files.StorageHelper.*;
 
 /**
@@ -205,7 +204,7 @@ public class StorageImpl implements Storage {
 
         @Override
         public boolean isProcessed(String prefix) throws StorageException {
-            return findLatestFile(here, TARGET, prefix).exists();
+            return targetOutput(prefix).exists();
         }
 
         @Override
@@ -243,8 +242,7 @@ public class StorageImpl implements Storage {
             if (statistics.exists() && statistics.lastModified() >= source.lastModified()) {
                 File mapping = findLatestFile(here, MAPPING, prefix);
                 if (mapping.exists()) {
-                    List<File> targetFiles = findHashedPrefixFiles(here, TARGET, prefix);
-                    return targetFiles.isEmpty() ? DataSetState.MAPPING : DataSetState.PROCESSED;
+                    return targetOutput(prefix).exists() ? DataSetState.PROCESSED : DataSetState.MAPPING;
                 }
                 else {
                     return DataSetState.ANALYZED_SOURCE;
@@ -312,17 +310,10 @@ public class StorageImpl implements Storage {
 
         @Override
         public boolean deleteTarget(String prefix) throws StorageException {
-            boolean deleted = false;
-            for (File file : targetFiles(here, prefix)) {
-                delete(file);
-                deleted = true;
-            }
+            File targetFile = targetFile(here, dataSetFacts, prefix);
+            boolean deleted = targetFile.exists();
+            delete(targetFile);
             return deleted;
-        }
-
-        @Override
-        public void deleteAllTargets() throws StorageException {
-            for (File file : targetFiles(here)) delete(file);
         }
 
         @Override
@@ -347,7 +338,7 @@ public class StorageImpl implements Storage {
 
         @Override
         public File targetOutput(String prefix) {
-            return new File(here, TARGET.getName(prefix));
+            return targetFile(here, dataSetFacts, prefix);
         }
 
         @Override
@@ -482,9 +473,8 @@ public class StorageImpl implements Storage {
             try {
                 File reportFile = reportFile(here, prefix);
                 File reportIndexFile = reportIndexFile(here, prefix);
-                File targetFile = targetFile(here, prefix);
-                if (!(reportFile.exists() && reportIndexFile.exists() && targetFile.exists())) return null;
-                return new ReportFile(reportFile, reportIndexFile, targetFile, linkFile(here, prefix), this, prefix);
+                if (!(reportFile.exists() && reportIndexFile.exists())) return null;
+                return new ReportFile(reportFile, reportIndexFile, linkFile(here, prefix), this, prefix);
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
@@ -501,7 +491,8 @@ public class StorageImpl implements Storage {
             List<File> files = new ArrayList<File>();
             for (SchemaVersion schemaVersion : getSchemaVersions()) {
                 String prefix = schemaVersion.getPrefix();
-                addLatestHashed(here, TARGET, prefix, files);
+                File targetFile = targetOutput(prefix);
+                if (targetFile.exists()) files.add(targetFile);
             }
             return files;
         }

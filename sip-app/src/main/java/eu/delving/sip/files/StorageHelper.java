@@ -170,12 +170,10 @@ public class StorageHelper {
         return findOrNull(dir, 0, new PrefixFileFilter(MAPPING), MAPPING);
     }
 
-    static File[] targetFiles(File dir, String prefix) {
-        return dir.listFiles(new NameFileFilter(TARGET.getName(prefix)));
-    }
-
-    static File[] targetFiles(File dir) {
-        return dir.listFiles(new PrefixFileFilter(TARGET));
+    static File targetFile(File dir, Map<String,String> facts, String prefix) {
+        String name = facts.get("name").replaceAll(" ", "_");
+        String fileName = String.format("%s_%s.xml.gz", name, prefix.toUpperCase());
+        return new File(dir, fileName);
     }
 
     static InputStream zipIn(File file) throws StorageException {
@@ -206,10 +204,6 @@ public class StorageHelper {
 
     static File linkFile(File dir, String prefix) {
         return new File(dir, LINKS.getName(prefix));
-    }
-
-    static File targetFile(File dir, String prefix) {
-        return new File(dir, TARGET.getName(prefix));
     }
 
     public static File statsFile(File dir, boolean sourceFormat) {

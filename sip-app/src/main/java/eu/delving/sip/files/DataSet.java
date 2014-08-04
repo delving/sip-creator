@@ -73,8 +73,6 @@ public interface DataSet extends Comparable<DataSet> {
 
     boolean deleteTarget(String prefix) throws StorageException;
 
-    void deleteAllTargets() throws StorageException;
-
     File importedOutput();
 
     InputStream openImportedInputStream() throws StorageException;
