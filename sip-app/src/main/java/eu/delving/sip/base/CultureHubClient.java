@@ -26,7 +26,6 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import eu.delving.XStreamFactory;
 import eu.delving.metadata.Hasher;
 import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
@@ -50,11 +49,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
@@ -141,10 +136,6 @@ public class CultureHubClient {
 
     public void uploadFiles(DataSet dataSet, Swing finished) throws StorageException {
         sipModel.exec(new DataUploader(1, dataSet, finished));
-    }
-
-    public void uploadMedia(DataSet dataSet, Swing finished) throws StorageException {
-        sipModel.exec(new MediaUploader(1, dataSet, finished));
     }
 
     private abstract class Attempt implements Work {
@@ -368,65 +359,30 @@ public class CultureHubClient {
 
     private class DataUploader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
         private DataSet dataSet;
-        private List<File> uploadFiles;
         private ProgressListener progressListener;
         private Swing finished;
 
         DataUploader(int attempt, DataSet dataSet, Swing finished) throws StorageException {
             super(attempt);
             this.dataSet = dataSet;
-            this.uploadFiles = dataSet.getUploadFiles();
             this.finished = finished;
         }
 
         @Override
         public void run() {
             try {
-                HttpPost listRequest = createSubmitRequest(dataSet, uploadFiles);
-                HttpResponse listResponse = httpClient.execute(listRequest);
-                HttpEntity listEntity = listResponse.getEntity();
-                if (listEntity != null) {
-                    Code code = Code.from(listResponse);
-                    switch (code) {
-                        case OK:
-                            String listString = EntityUtils.toString(listEntity);
-                            Set<String> requestedFiles = new TreeSet<String>(Arrays.asList(listString.split("\n")));
-                            Iterator<File> walk = uploadFiles.iterator();
-                            while (walk.hasNext()) {
-                                File file = walk.next();
-                                if (!requestedFiles.contains(file.getName())) walk.remove();
-                            }
-                            for (File file : uploadFiles) {
-                                HttpPost upload = createUploadRequest(dataSet, file, progressListener);
-                                FileEntity fileEntity = (FileEntity) upload.getEntity();
-                                feedback().info("Uploading " + file);
-                                HttpResponse uploadResponse = httpClient.execute(upload);
-                                EntityUtils.consume(uploadResponse.getEntity());
-                                code = Code.from(uploadResponse);
-                                if (code != Code.OK && !fileEntity.abort) {
-                                    oauthClient.invalidateTokens();
-                                    reportResponse(Code.from(uploadResponse), uploadResponse.getStatusLine());
-                                    return;
-                                }
-                            }
-                            break;
-                        case UNAUTHORIZED:
-                            if (reactToUnauthorized(new DataUploader(attempt + 1, dataSet, finished))) {
-                                finished = null;
-                            }
-                            else {
-                                feedback().alert("Unable to complete upload");
-                            }
-                            break;
-                        default:
-                            oauthClient.invalidateTokens();
-                            reportResponse(code, listResponse.getStatusLine());
-                            break;
+                for (File file : dataSet.getUploadFiles()) {
+                    HttpPost upload = createUploadRequest(file, progressListener);
+                    FileEntity fileEntity = (FileEntity) upload.getEntity();
+                    feedback().info("Uploading " + file);
+                    HttpResponse uploadResponse = httpClient.execute(upload);
+                    System.out.println(EntityUtils.toString(uploadResponse.getEntity()));
+                    Code code = Code.from(uploadResponse);
+                    if (code != Code.OK && !fileEntity.abort) {
+                        oauthClient.invalidateTokens();
+                        reportResponse(Code.from(uploadResponse), uploadResponse.getStatusLine());
+                        return;
                     }
-                    EntityUtils.consume(listResponse.getEntity());
-                }
-                else {
-                    throw new IOException("Empty entity");
                 }
             }
             catch (OAuthProblemException e) {
@@ -454,98 +410,6 @@ public class CultureHubClient {
         public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
             progressListener.setProgressMessage("Uploading to the hub");
-        }
-    }
-
-    private class MediaUploader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
-        private DataSet dataSet;
-        private ProgressListener progressListener;
-        private Swing finished;
-
-        MediaUploader(int attempt, DataSet dataSet, Swing finished) throws StorageException {
-            super(attempt);
-            this.dataSet = dataSet;
-            this.finished = finished;
-        }
-
-        @Override
-        public void run() {
-            try {
-                FileInputStream inputStream = new FileInputStream(new File(dataSet.getMediaDirectory(), Storage.INDEX_FILE));
-                MediaFiles mediaFiles = MediaFiles.read(inputStream);
-                inputStream.close();
-                HttpPost listRequest = createSubmitRequest(dataSet, mediaFiles);
-                HttpResponse listResponse = httpClient.execute(listRequest);
-                HttpEntity listEntity = listResponse.getEntity();
-                if (listEntity != null) {
-                    Code code = Code.from(listResponse);
-                    switch (code) {
-                        case OK:
-                            String listString = EntityUtils.toString(listEntity);
-                            Set<String> requestedFiles = new TreeSet<String>(Arrays.asList(listString.split("\n")));
-                            List<File> uploadFiles = new ArrayList<File>();
-                            for (MediaFiles.MediaFile file : mediaFiles.mediaFiles) {
-                                if (!requestedFiles.contains(file.name)) continue;
-                                uploadFiles.add(new File(dataSet.getMediaDirectory(), file.name));
-                            }
-                            for (File file : uploadFiles) {
-                                HttpPost upload = createUploadRequest(dataSet, file, progressListener);
-                                FileEntity fileEntity = (FileEntity) upload.getEntity();
-                                feedback().info("Uploading media " + file);
-                                HttpResponse uploadResponse = httpClient.execute(upload);
-                                EntityUtils.consume(uploadResponse.getEntity());
-                                code = Code.from(uploadResponse);
-                                if (code != Code.OK && !fileEntity.abort) {
-                                    oauthClient.invalidateTokens();
-                                    reportResponse(Code.from(uploadResponse), uploadResponse.getStatusLine());
-                                    return;
-                                }
-                            }
-                            break;
-                        case UNAUTHORIZED:
-                            if (reactToUnauthorized(new DataUploader(attempt + 1, dataSet, finished))) {
-                                finished = null;
-                            }
-                            else {
-                                feedback().alert("Unable to complete upload");
-                            }
-                            break;
-                        default:
-                            oauthClient.invalidateTokens();
-                            reportResponse(code, listResponse.getStatusLine());
-                            break;
-                    }
-                    EntityUtils.consume(listResponse.getEntity());
-                }
-                else {
-                    throw new IOException("Empty entity");
-                }
-            }
-            catch (OAuthProblemException e) {
-                reportOAuthProblem(e);
-            }
-            catch (Exception e) {
-                feedback().alert("Problem connecting", e);
-            }
-            finally {
-                if (finished != null) Swing.Exec.later(finished);
-            }
-        }
-
-        @Override
-        public Job getJob() {
-            return Job.UPLOAD;
-        }
-
-        @Override
-        public DataSet getDataSet() {
-            return dataSet;
-        }
-
-        @Override
-        public void setProgressListener(ProgressListener progressListener) {
-            this.progressListener = progressListener;
-            progressListener.setProgressMessage("Uploading media to hub");
         }
     }
 
@@ -660,33 +524,8 @@ public class CultureHubClient {
         return get;
     }
 
-    private HttpPost createSubmitRequest(DataSet dataSet, List<File> uploadFiles) throws OAuthSystemException, OAuthProblemException, UnsupportedEncodingException {
-        HttpPost post = createPost(String.format(
-                "submit/%s/%s",
-                dataSet.getOrganization(), dataSet.getSpec()
-        ));
-        post.setEntity(createListEntityFiles(uploadFiles));
-        post.setHeader("Accept", "text/plain");
-        return post;
-    }
-
-    private HttpPost createSubmitRequest(DataSet dataSet, MediaFiles mediaFiles) throws OAuthSystemException, OAuthProblemException, UnsupportedEncodingException {
-        HttpPost post = createPost(String.format(
-                "submit/%s/%s",
-                dataSet.getOrganization(), dataSet.getSpec()
-        ));
-        List<String> names = new ArrayList<String>();
-        for (MediaFiles.MediaFile file : mediaFiles.mediaFiles) names.add(file.name);
-        post.setEntity(createListEntityStrings(names));
-        post.setHeader("Accept", "text/plain");
-        return post;
-    }
-
-    private HttpPost createUploadRequest(DataSet dataSet, File file, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
-        HttpPost post = createPost(String.format(
-                "submit/%s/%s/%s",
-                dataSet.getOrganization(), dataSet.getSpec(), file.getName()
-        ));
+    private HttpPost createUploadRequest(File file, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
+        HttpPost post = new HttpPost(String.format("http://localhost:9000/api/AK47/gerald_delving.eu/upload/%s", file.getName()));
         FileEntity fileEntity = new FileEntity(file, progressListener);
         post.setEntity(fileEntity);
         return post;
@@ -699,10 +538,6 @@ public class CultureHubClient {
         ));
         get.setHeader("Accept", "text/xml");
         return get;
-    }
-
-    private HttpPost createPost(String path) throws OAuthSystemException, OAuthProblemException {
-        return new HttpPost(String.format("%s/%s?accessKey=%s", getServerUrl(), path, oauthClient.getToken()));
     }
 
     private HttpGet createGet(String path) throws OAuthSystemException, OAuthProblemException {
@@ -721,7 +556,7 @@ public class CultureHubClient {
 
     private void reportResponse(Code code, StatusLine statusLine) {
         feedback().alert(String.format(
-                "Problem communicating with the CultureHub: %s. Status [%d] %s",
+                "Problem communicating with server: %s. Status [%d] %s",
                 code.message,
                 statusLine.getStatusCode(),
                 statusLine.getReasonPhrase()

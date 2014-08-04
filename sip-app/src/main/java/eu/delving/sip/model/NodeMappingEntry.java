@@ -26,7 +26,7 @@ import eu.delving.metadata.Path;
 import eu.delving.sip.base.SwingHelper;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
 
 /**
  * An entry in the NodeMappingListModel, with its associated cell renderer.
@@ -135,7 +135,12 @@ public class NodeMappingEntry {
             if (path.length() > MAX_LENGTH) {
                 path = path.substring(path.length() - MAX_LENGTH);
                 int chop = path.indexOf('/');
-                return ".." + path.substring(chop);
+                if (chop < 0) {
+                    return path;
+                }
+                else {
+                    return ".." + path.substring(chop);
+                }
             }
             else {
                 return path;

@@ -67,7 +67,10 @@ import java.util.zip.ZipInputStream;
 
 import static eu.delving.schema.SchemaType.RECORD_DEFINITION;
 import static eu.delving.schema.SchemaType.VALIDATION_SCHEMA;
-import static eu.delving.sip.files.Storage.FileType.*;
+import static eu.delving.sip.files.Storage.FileType.IMPORTED;
+import static eu.delving.sip.files.Storage.FileType.MAPPING;
+import static eu.delving.sip.files.Storage.FileType.SOURCE;
+import static eu.delving.sip.files.Storage.FileType.TARGET;
 import static eu.delving.sip.files.StorageHelper.*;
 
 /**
@@ -495,22 +498,12 @@ public class StorageImpl implements Storage {
 
         @Override
         public List<File> getUploadFiles() throws StorageException {
-            try {
-                List<File> files = new ArrayList<File>();
-                files.add(Hasher.ensureFileHashed(hintsFile(here)));
-                for (SchemaVersion schemaVersion : getSchemaVersions()) {
-                    String prefix = schemaVersion.getPrefix();
-                    addLatestHashed(here, MAPPING, prefix, files);
-                    addLatestHashed(here, RESULT_STATS, prefix, files);
-                    addLatestHashed(here, LINKS, prefix, files);
-                    addLatestHashed(here, TARGET, prefix, files);
-                }
-                files.add(Hasher.ensureFileHashed(sourceFile(here)));
-                return files;
+            List<File> files = new ArrayList<File>();
+            for (SchemaVersion schemaVersion : getSchemaVersions()) {
+                String prefix = schemaVersion.getPrefix();
+                addLatestHashed(here, TARGET, prefix, files);
             }
-            catch (IOException e) {
-                throw new StorageException("Unable to collect upload files", e);
-            }
+            return files;
         }
 
         @Override

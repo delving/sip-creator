@@ -21,10 +21,8 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.metadata.Hasher;
 import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
@@ -34,11 +32,9 @@ import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
-import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
 
 /**
  * Special functions for experts, not to be spoken of in mixed company, or among people with potential heart
@@ -128,72 +124,6 @@ public class ExpertMenu extends JMenu {
                         return sipModel.getDataSetModel().getDataSet();
                     }
                 });
-            }
-        }
-    }
-
-    private class UploadMediaAction extends AbstractAction {
-        private CultureHubClient cultureHubClient;
-
-        private UploadMediaAction(CultureHubClient cultureHubClient) {
-            super("Upload media files");
-            this.cultureHubClient = cultureHubClient;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            setEnabled(false);
-            if (sipModel.getDataSetModel().isEmpty()) return;
-            try {
-                cultureHubClient.uploadMedia(sipModel.getDataSetModel().getDataSet(), new Swing() {
-                    @Override
-                    public void run() {
-                        setEnabled(true);
-                    }
-                });
-            }
-            catch (StorageException e) {
-                sipModel.getFeedback().alert("Unable to upload media", e);
-            }
-        }
-    }
-
-    private class CreateSampleDataSetAction extends AbstractAction {
-
-        private CreateSampleDataSetAction() {
-            super("Create a sample dataset for culture hub testing");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            String answer = sipModel.getFeedback().ask(
-                    "Enter the directory where the dataset is to be stored",
-                    System.getProperty("user.home")
-            );
-            if (answer != null) {
-                answer = answer.trim();
-                File directory = new File(answer);
-                if (!directory.exists()) {
-                    sipModel.getFeedback().alert(answer + " doesn't exist");
-                }
-                else if (!directory.isDirectory()) {
-                    sipModel.getFeedback().alert(answer + " is not a directory");
-                }
-                else if (!sipModel.getDataSetModel().isEmpty()) {
-                    File outputDirectory = new File(directory, sipModel.getDataSetModel().getDataSet().getSpec());
-                    FileUtils.deleteQuietly(outputDirectory);
-                    outputDirectory.mkdirs();
-                    try {
-                        for (File file : sipModel.getDataSetModel().getDataSet().getUploadFiles()) {
-                            File targetFile = new File(outputDirectory, Hasher.extractFileName(file));
-                            FileUtils.copyFile(file, targetFile);
-                        }
-                        sipModel.getFeedback().alert("Look in " + outputDirectory);
-                    }
-                    catch (Exception e) {
-                        sipModel.getFeedback().alert("Unable to copy upload files to " + outputDirectory, e);
-                    }
-                }
             }
         }
     }
