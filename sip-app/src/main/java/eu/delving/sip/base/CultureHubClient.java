@@ -525,7 +525,7 @@ public class CultureHubClient {
     }
 
     private HttpPost createUploadRequest(File file, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
-        HttpPost post = new HttpPost(String.format("http://localhost:9000/api/AK47/gerald_delving.eu/upload/%s", file.getName()));
+        HttpPost post = new HttpPost(String.format("http://localhost:9000/api/AK47/gerald_delving.eu/sip-creator-upload/%s", file.getName()));
         FileEntity fileEntity = new FileEntity(file, progressListener);
         post.setEntity(fileEntity);
         return post;
