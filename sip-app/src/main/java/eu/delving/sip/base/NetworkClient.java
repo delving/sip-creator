@@ -62,7 +62,7 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class CultureHubClient {
+public class NetworkClient {
     private static final int BLOCK_SIZE = 1024;
     private SipModel sipModel;
     private HttpClient httpClient;
@@ -94,7 +94,7 @@ public class CultureHubClient {
         }
     }
 
-    public CultureHubClient(SipModel sipModel, HttpClient httpClient) {
+    public NetworkClient(SipModel sipModel, HttpClient httpClient) {
         this.sipModel = sipModel;
         this.httpClient = httpClient;
         oauthClient = new OAuthClient(
@@ -134,8 +134,8 @@ public class CultureHubClient {
         sipModel.exec(new DataSetDownloader(1, dataSet, finished));
     }
 
-    public void uploadFiles(DataSet dataSet, Swing finished) throws StorageException {
-        sipModel.exec(new DataUploader(1, dataSet, finished));
+    public void uploadFiles(DataSet dataSet, String url, String email, String apiKey, Swing finished) throws StorageException {
+        sipModel.exec(new DataUploader(1, dataSet, url, email, apiKey, finished));
     }
 
     private abstract class Attempt implements Work {
@@ -358,13 +358,19 @@ public class CultureHubClient {
     }
 
     private class DataUploader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
-        private DataSet dataSet;
+        private final DataSet dataSet;
+        private final String url;
+        private final String email;
+        private final String apiKey;
         private ProgressListener progressListener;
         private Swing finished;
 
-        DataUploader(int attempt, DataSet dataSet, Swing finished) throws StorageException {
+        DataUploader(int attempt, DataSet dataSet, String url, String email, String apiKey, Swing finished) throws StorageException {
             super(attempt);
             this.dataSet = dataSet;
+            this.url = url;
+            this.email = email;
+            this.apiKey = apiKey;
             this.finished = finished;
         }
 
@@ -411,6 +417,17 @@ public class CultureHubClient {
             this.progressListener = progressListener;
             progressListener.setProgressMessage("Uploading to the hub");
         }
+
+        private HttpPost createUploadRequest(File file, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
+            HttpPost post = new HttpPost(String.format(
+                    "%s/api/%s/%s/sip-creator-upload/%s",
+                    url, apiKey, email.replace("@", "_"), file.getName()
+            ));
+            FileEntity fileEntity = new FileEntity(file, progressListener);
+            post.setEntity(fileEntity);
+            return post;
+        }
+
     }
 
     private void reportOAuthProblem(OAuthProblemException e) {
@@ -522,13 +539,6 @@ public class CultureHubClient {
         ));
         get.setHeader("Accept", "application/zip");
         return get;
-    }
-
-    private HttpPost createUploadRequest(File file, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
-        HttpPost post = new HttpPost(String.format("http://localhost:9000/api/AK47/gerald_delving.eu/sip-creator-upload/%s", file.getName()));
-        FileEntity fileEntity = new FileEntity(file, progressListener);
-        post.setEntity(fileEntity);
-        return post;
     }
 
     private HttpGet createUnlockRequest(DataSet dataSet) throws OAuthSystemException, OAuthProblemException {

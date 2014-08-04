@@ -24,7 +24,7 @@ package eu.delving.sip;
 import com.ctc.wstx.util.StringUtil;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import eu.delving.sip.base.CultureHubClient;
+import eu.delving.sip.base.NetworkClient;
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -63,7 +63,7 @@ public class TestListFetch {
                 "</data-set-list>",
         };
         String listString = StringUtil.concatEntries(Arrays.asList(DS), "\n", "\n");
-        CultureHubClient.DataSetList list = (CultureHubClient.DataSetList) getStream().fromXML(listString);
+        NetworkClient.DataSetList list = (NetworkClient.DataSetList) getStream().fromXML(listString);
         Assert.assertEquals("oops", "legermuseum-voertuigen", list.list.get(0).spec);
         Assert.assertEquals("oops", "pokey", list.list.get(0).schemaVersions.get(0).version);
     }
@@ -71,7 +71,7 @@ public class TestListFetch {
     private static XStream getStream() {
         XStream xstream = new XStream(new PureJavaReflectionProvider());
         xstream.setMode(XStream.NO_REFERENCES);
-        xstream.processAnnotations(CultureHubClient.DataSetList.class);
+        xstream.processAnnotations(NetworkClient.DataSetList.class);
         return xstream;
     }
 

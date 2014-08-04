@@ -21,18 +21,19 @@
 
 package eu.delving.sip.actions;
 
-import eu.delving.sip.base.CultureHubClient;
+import eu.delving.sip.base.NetworkClient;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
-import eu.delving.sip.base.Work;
-import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
+import org.apache.commons.lang.StringUtils;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.util.List;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.prefs.Preferences;
 
 /**
  * Upload what is necessary to the culture hub
@@ -42,75 +43,62 @@ import java.util.List;
 
 public class UploadAction extends AbstractAction {
     private SipModel sipModel;
-    private CultureHubClient cultureHubClient;
+    private NetworkClient networkClient;
 
-    public UploadAction(SipModel sipModel, CultureHubClient cultureHubClient) {
+    public UploadAction(SipModel sipModel, NetworkClient networkClient) {
         super("Upload");
         putValue(Action.SMALL_ICON, SwingHelper.ICON_UPLOAD);
         this.sipModel = sipModel;
-        this.cultureHubClient = cultureHubClient;
+        this.networkClient = networkClient;
     }
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         setEnabled(false);
-        DataSet dataSet = sipModel.getDataSetModel().getDataSet();
-        final InvalidPrefixesFetcher fetcher = new InvalidPrefixesFetcher(dataSet);
-        fetcher.swing = new Swing() {
-            @Override
-            public void run() {
-                if (fetcher.invalidPrefixes.isEmpty()) {
-                    try {
-                        cultureHubClient.uploadFiles(sipModel.getDataSetModel().getDataSet(), new Swing() {
-                            @Override
-                            public void run() {
-                                setEnabled(true);
-                            }
-                        });
-                    }
-                    catch (final StorageException e) {
-                        sipModel.getFeedback().alert("Unable to complete uploading", e);
-                        setEnabled(true);
-                    }
-                }
-                else {
-                    sipModel.getFeedback().alert(String.format("Upload not permitted until all mappings are validated. Still missing: %s.", fetcher.invalidPrefixes));
+        if (sipModel.getDataSetModel().isEmpty()) return;
+        Preferences prefs = sipModel.getPreferences();
+        String narthexUrl = prefs.get(Storage.NARTHEX_URL, "");
+        String narthexEmail = prefs.get(Storage.NARTHEX_EMAIL, "");
+        String narthexApiKey = prefs.get(Storage.NARTHEX_API_KEY, "");
+        JTextField urlField = new JTextField(narthexUrl, 45);
+        JTextField emailField = new JTextField(narthexEmail);
+        JTextField apiKeyField = new JTextField(narthexApiKey);
+        if (!sipModel.getFeedback().form(
+                "Narthex details",
+                "Server", urlField,
+                "EMail", emailField,
+                "API Key", apiKeyField
+        )) return;
+        if (!StringUtils.isEmpty(urlField.getText())) {
+            try {
+                new URL(urlField.getText());
+                narthexUrl = urlField.getText().trim();
+                narthexEmail = emailField.getText().trim();
+                narthexApiKey = apiKeyField.getText().trim();
+                prefs.put(Storage.NARTHEX_URL, narthexUrl);
+                prefs.put(Storage.NARTHEX_EMAIL, narthexEmail);
+                prefs.put(Storage.NARTHEX_API_KEY, narthexApiKey);
+                initiateUpload(narthexUrl, narthexEmail, narthexApiKey);
+            }
+            catch (MalformedURLException e) {
+                sipModel.getFeedback().alert("Malformed URL: " + urlField);
+            }
+        }
+
+    }
+
+    private void initiateUpload(String url, String email, String apiKey) {
+        try {
+            networkClient.uploadFiles(sipModel.getDataSetModel().getDataSet(), url, email, apiKey, new Swing() {
+                @Override
+                public void run() {
                     setEnabled(true);
                 }
-            }
-        };
-        sipModel.exec(fetcher);
-    }
-
-    private class InvalidPrefixesFetcher implements Work.DataSetWork {
-        private DataSet dataSet;
-        private Swing swing;
-        private List<String> invalidPrefixes;
-
-        private InvalidPrefixesFetcher(DataSet dataSet) {
-            this.dataSet = dataSet;
+            });
         }
-
-        @Override
-        public void run() {
-            try {
-                invalidPrefixes = sipModel.getDataSetModel().getInvalidPrefixes();
-                sipModel.exec(swing);
-            }
-            catch (StorageException e) {
-                sipModel.getFeedback().alert("Unable to fetch invalid prefixes", e);
-            }
-        }
-
-        @Override
-        public Job getJob() {
-            return Job.FIND_INVALID_PREFIXES;
-        }
-
-        @Override
-        public DataSet getDataSet() {
-            return dataSet;
+        catch (final StorageException e) {
+            sipModel.getFeedback().alert("Unable to complete uploading", e);
+            setEnabled(true);
         }
     }
-
 }

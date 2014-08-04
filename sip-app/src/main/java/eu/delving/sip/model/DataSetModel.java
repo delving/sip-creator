@@ -21,7 +21,11 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.*;
+import eu.delving.metadata.MetadataException;
+import eu.delving.metadata.RecDef;
+import eu.delving.metadata.RecDefModel;
+import eu.delving.metadata.RecDefTree;
+import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
@@ -33,7 +37,6 @@ import javax.swing.*;
 import javax.xml.validation.Validator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -77,17 +80,6 @@ public class DataSetModel implements RecDefModel {
 
     public DataSetState getDataSetState() {
         return isEmpty() ? ABSENT : dataSet.getState(getPrefix());
-    }
-
-    public List<String> getInvalidPrefixes() throws StorageException {
-        List<String> invalid = new ArrayList<String>();
-        if (!isEmpty()) {
-            for (SchemaVersion schemaVersion : dataSet.getSchemaVersions()) {
-                String prefix = schemaVersion.getPrefix();
-                if (!dataSet.isProcessed(prefix)) invalid.add(prefix);
-            }
-        }
-        return invalid;
     }
 
     public RecMapping getRecMapping() throws StorageException {

@@ -33,8 +33,8 @@ import eu.delving.sip.actions.SelectAnotherMappingAction;
 import eu.delving.sip.actions.UnlockMappingAction;
 import eu.delving.sip.actions.UploadAction;
 import eu.delving.sip.actions.ValidateAction;
-import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.NetworkClient;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.VisualFeedback;
 import eu.delving.sip.base.Work;
@@ -153,9 +153,9 @@ public class Application {
         context.setStorage(storage);
         context.setHttpClient(httpClient);
         sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, preferences);
-        CultureHubClient cultureHubClient = isStandalone(storageDir) ? null : new CultureHubClient(sipModel, httpClient);
-        if (cultureHubClient != null) uploadAction = new UploadAction(sipModel, cultureHubClient);
-        expertMenu = new ExpertMenu(desktop, sipModel, cultureHubClient, allFrames);
+        NetworkClient networkClient = isStandalone(storageDir) ? null : new NetworkClient(sipModel, httpClient);
+        if (networkClient != null) uploadAction = new UploadAction(sipModel, networkClient);
+        expertMenu = new ExpertMenu(desktop, sipModel, networkClient, allFrames);
         statusPanel = new StatusPanel(sipModel);
         home = new JFrame(titleString());
         home.addComponentListener(new ComponentAdapter() {
@@ -166,7 +166,7 @@ public class Application {
         });
         JPanel content = (JPanel) home.getContentPane();
         content.setFocusable(true);
-        FrameBase dataSetFrame = cultureHubClient != null ? new DataSetHubFrame(sipModel, cultureHubClient) : new DataSetStandaloneFrame(sipModel, schemaRepository);
+        FrameBase dataSetFrame = networkClient != null ? new DataSetHubFrame(sipModel, networkClient) : new DataSetStandaloneFrame(sipModel, schemaRepository);
         LogFrame logFrame = new LogFrame(sipModel);
         feedback.setLog(logFrame.getLog());
         allFrames = new AllFrames(sipModel, content, dataSetFrame, logFrame);

@@ -111,6 +111,9 @@ public interface Storage {
     String HARVEST_URL = "harvestUrl";
     String HARVEST_PREFIX = "harvestPrefix";
     String HARVEST_SPEC = "harvestSpec";
+    String NARTHEX_URL = "narthexUrl";
+    String NARTHEX_EMAIL = "narthexEmail";
+    String NARTHEX_API_KEY = "narthexApiKey";
     String CACHE_DIR = "Cache";
     String MEDIA_DIR = "Media";
     String INDEX_FILE = "media-files.xml";

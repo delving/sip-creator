@@ -2,7 +2,11 @@ package eu.delving.sip.base;
 
 import eu.delving.sip.files.DataSet;
 
-import static eu.delving.sip.base.Work.Kind.*;
+import static eu.delving.sip.base.Work.Kind.DATA_SET;
+import static eu.delving.sip.base.Work.Kind.DATA_SET_PREFIX;
+import static eu.delving.sip.base.Work.Kind.NETWORK;
+import static eu.delving.sip.base.Work.Kind.NETWORK_DATA_SET;
+import static eu.delving.sip.base.Work.Kind.SILENT;
 
 /**
  * A runnable that will be executed in the worker thread
@@ -56,7 +60,6 @@ public interface Work extends Runnable {
         SAVE_MAPPING(DATA_SET_PREFIX),
         REVERT_MAPPING(DATA_SET_PREFIX),
 
-        FIND_INVALID_PREFIXES(DATA_SET),
         DELETE_SOURCE(DATA_SET),
         CHECK_STATE(DATA_SET),
         SEEK_RESET(DATA_SET),

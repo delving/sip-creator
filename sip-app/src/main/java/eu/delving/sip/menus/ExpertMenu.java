@@ -21,8 +21,8 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.NetworkClient;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
@@ -47,7 +47,7 @@ public class ExpertMenu extends JMenu {
     private SipModel sipModel;
     private AllFrames allFrames;
 
-    public ExpertMenu(JDesktopPane desktop, final SipModel sipModel, CultureHubClient cultureHubClient, AllFrames allFrames) {
+    public ExpertMenu(JDesktopPane desktop, final SipModel sipModel, NetworkClient networkClient, AllFrames allFrames) {
         super("Expert");
         this.sipModel = sipModel;
         this.allFrames = allFrames;

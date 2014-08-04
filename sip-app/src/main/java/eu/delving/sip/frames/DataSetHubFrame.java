@@ -22,8 +22,8 @@
 package eu.delving.sip.frames;
 
 import eu.delving.schema.SchemaVersion;
-import eu.delving.sip.base.CultureHubClient;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.NetworkClient;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
@@ -74,7 +74,7 @@ import static eu.delving.sip.base.SwingHelper.ICON_UNAVAILABLE;
  */
 
 public class DataSetHubFrame extends FrameBase {
-    private CultureHubClient cultureHubClient;
+    private NetworkClient networkClient;
     private DataSetTableModel tableModel = new DataSetTableModel();
     private JTable dataSetTable;
     private EditAction editAction = new EditAction();
@@ -83,9 +83,9 @@ public class DataSetHubFrame extends FrameBase {
     private DataSetHubFrame.RefreshAction refreshAction = new RefreshAction();
     private JTextField patternField = new JTextField(6);
 
-    public DataSetHubFrame(final SipModel sipModel, CultureHubClient cultureHubClient) {
+    public DataSetHubFrame(final SipModel sipModel, NetworkClient networkClient) {
         super(Which.DATA_SET, sipModel, "Data Sets");
-        this.cultureHubClient = cultureHubClient;
+        this.networkClient = networkClient;
         this.dataSetTable = new JTable(tableModel, tableModel.getColumnModel());
         this.dataSetTable.setFont(this.dataSetTable.getFont().deriveFont(Font.PLAIN, 10));
         this.dataSetTable.setRowHeight(25);
@@ -206,9 +206,9 @@ public class DataSetHubFrame extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             setEnabled(false);
             // todo: change the icon to a waiting one?
-            cultureHubClient.fetchDataSetList(new CultureHubClient.ListReceiveListener() {
+            networkClient.fetchDataSetList(new NetworkClient.ListReceiveListener() {
                 @Override
-                public void listReceived(List<CultureHubClient.DataSetEntry> entries) {
+                public void listReceived(List<NetworkClient.DataSetEntry> entries) {
                     tableModel.setHubEntries(entries);
                     setEnabled(true);
                 }
@@ -293,7 +293,7 @@ public class DataSetHubFrame extends FrameBase {
             setEnabled(false);
             try {
                 DataSet dataSet = sipModel.getStorage().createDataSet(row.getSpec(), row.getOrganization());
-                cultureHubClient.downloadDataSet(dataSet, new Swing() {
+                networkClient.downloadDataSet(dataSet, new Swing() {
                     @Override
                     public void run() {
                         setEnabled(true);
@@ -334,7 +334,7 @@ public class DataSetHubFrame extends FrameBase {
         }
 
         private void unlockDataSet(final DataSet dataSet) {
-            cultureHubClient.unlockDataSet(dataSet, new CultureHubClient.UnlockListener() {
+            networkClient.unlockDataSet(dataSet, new NetworkClient.UnlockListener() {
                 @Override
                 public void unlockComplete(boolean successful) {
                     if (successful) {
@@ -427,12 +427,12 @@ public class DataSetHubFrame extends FrameBase {
             }
         }
 
-        public void setHubEntries(List<CultureHubClient.DataSetEntry> list) {
+        public void setHubEntries(List<NetworkClient.DataSetEntry> list) {
             needsFetch = list == null;
             List<Row> freshRows = new ArrayList<Row>();
             Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets();
             if (list != null) {
-                for (CultureHubClient.DataSetEntry incoming : list) {
+                for (NetworkClient.DataSetEntry incoming : list) {
                     DataSet dataSet = dataSets.get(incoming.getDirectoryName());
                     freshRows.add(new Row(incoming, dataSet));
                     if (dataSet != null) dataSets.remove(incoming.getDirectoryName()); // remove used ones
@@ -544,7 +544,7 @@ public class DataSetHubFrame extends FrameBase {
         public Object getValueAt(int rowIndex, int columnIndex) {
             Row row = getRow(rowIndex);
             State state = row.getState();
-            CultureHubClient.DataSetEntry entry = row.getDataSetEntry();
+            NetworkClient.DataSetEntry entry = row.getDataSetEntry();
             switch (columnIndex) {
                 case 0:
                     return row.getSpec();
@@ -587,11 +587,11 @@ public class DataSetHubFrame extends FrameBase {
     }
 
     private class Row implements Comparable<Row> {
-        private CultureHubClient.DataSetEntry dataSetEntry;
+        private NetworkClient.DataSetEntry dataSetEntry;
         private DataSet dataSet;
         private State previousState;
 
-        private Row(CultureHubClient.DataSetEntry dataSetEntry, DataSet dataSet) {
+        private Row(NetworkClient.DataSetEntry dataSetEntry, DataSet dataSet) {
             this.dataSetEntry = dataSetEntry;
             this.dataSet = dataSet;
             this.previousState = getState();
@@ -605,7 +605,7 @@ public class DataSetHubFrame extends FrameBase {
             return dataSetEntry != null ? dataSetEntry.spec : dataSet.getSpec();
         }
 
-        public CultureHubClient.DataSetEntry getDataSetEntry() {
+        public NetworkClient.DataSetEntry getDataSetEntry() {
             return dataSetEntry;
         }
 
@@ -631,7 +631,7 @@ public class DataSetHubFrame extends FrameBase {
             }
             else if (dataSetEntry.schemaVersions != null) {
                 List<SchemaVersion> list = new ArrayList<SchemaVersion>();
-                for (CultureHubClient.SchemaVersionTag schemaVersionTag : dataSetEntry.schemaVersions) {
+                for (NetworkClient.SchemaVersionTag schemaVersionTag : dataSetEntry.schemaVersions) {
                     list.add(new SchemaVersion(schemaVersionTag.prefix, schemaVersionTag.version));
                 }
                 return list;
