@@ -27,6 +27,7 @@ import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
@@ -86,7 +87,7 @@ public class DataSetHubFrame extends FrameBase {
         super(Which.DATA_SET, sipModel, "Data Sets");
         this.cultureHubClient = cultureHubClient;
         this.dataSetTable = new JTable(tableModel, tableModel.getColumnModel());
-        this.dataSetTable.setFont(this.dataSetTable.getFont().deriveFont(Font.PLAIN, 14));
+        this.dataSetTable.setFont(this.dataSetTable.getFont().deriveFont(Font.PLAIN, 10));
         this.dataSetTable.setRowHeight(25);
         this.dataSetTable.setIntercellSpacing(new Dimension(12, 4));
         this.dataSetTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -373,7 +374,12 @@ public class DataSetHubFrame extends FrameBase {
         private String pattern = "";
 
         private DataSetTableModel() {
-            createColumnModel();
+            createSpecColumn();
+            createNameColumn();
+            createStateColumn();
+            createSchemaVersionsColumn();
+            createRecordCountColumn();
+            createOwnedColumn();
         }
 
         public TableColumnModel getColumnModel() {
@@ -469,7 +475,7 @@ public class DataSetHubFrame extends FrameBase {
         }
 
         private void createSpecColumn() {
-            TableColumn tc = addColumn("Spec", "how long can a spec name actually be?");
+            TableColumn tc = addColumn("Spec", "this is spec");
             tc.setCellRenderer(new DefaultTableCellRenderer() {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -477,14 +483,14 @@ public class DataSetHubFrame extends FrameBase {
                     String spec = (String) value;
                     DataSet dataSet = sipModel.getDataSetModel().getDataSet();
                     if (dataSet != null && dataSet.getSpec().equals(spec))
-                        label.setFont(label.getFont().deriveFont(Font.BOLD, 18));
+                        label.setFont(label.getFont().deriveFont(Font.BOLD, 12));
                     return label;
                 }
             });
         }
 
         private void createStateColumn() {
-            TableColumn tc = addColumn("State", State.NEEDS_FETCH.string + "extra");
+            TableColumn tc = addColumn("State", "fetch state");
             tc.setCellRenderer(new DefaultTableCellRenderer() {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -496,11 +502,11 @@ public class DataSetHubFrame extends FrameBase {
                 }
             });
             tc.setHeaderValue("State");
-            tc.setMinWidth(100);
+//            tc.setMinWidth(100);
         }
 
         private void createRecordCountColumn() {
-            TableColumn tc = addColumn("Record Count", "   manyrecords   ");
+            TableColumn tc = addColumn("Record Count", "1000000");
             tc.setCellRenderer(new DefaultTableCellRenderer() {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -512,7 +518,7 @@ public class DataSetHubFrame extends FrameBase {
         }
 
         private void createOwnedColumn() {
-            addColumn("Owner", "Somebody's long name <andtheirbig@email.address>");
+            addColumn("Owner", "name <their@email.address>");
         }
 
         private void createSchemaVersionsColumn() {
@@ -520,7 +526,7 @@ public class DataSetHubFrame extends FrameBase {
         }
 
         private void createNameColumn() {
-            addColumn("Name", "This is a very long dataset name");
+            addColumn("Name", "A big dataset name");
         }
 
         private TableColumn addColumn(String title, String prototype) {
@@ -532,15 +538,6 @@ public class DataSetHubFrame extends FrameBase {
             tableColumn.setMinWidth(width * 3 / 4);
             columnModel.addColumn(tableColumn);
             return tableColumn;
-        }
-
-        private void createColumnModel() {
-            createSpecColumn();
-            createNameColumn();
-            createStateColumn();
-            createSchemaVersionsColumn();
-            createRecordCountColumn();
-            createOwnedColumn();
         }
 
         @Override
@@ -556,7 +553,7 @@ public class DataSetHubFrame extends FrameBase {
                 case 2:
                     return state;
                 case 3:
-                    return toString(row.getSchemaVersions());
+                    return schemaVersionsString(row);
                 case 4:
                     int recordCount = 0;
                     if (entry != null) {
@@ -568,20 +565,21 @@ public class DataSetHubFrame extends FrameBase {
                             recordCount = Integer.parseInt(recordCountString);
                         }
                     }
-                    return String.format("   %11d   ", recordCount);
+                    return String.format(" %11d ", recordCount);
                 case 5:
                     return entry == null || entry.lockedBy == null ? "" : entry.lockedBy;
             }
             throw new RuntimeException();
         }
 
-        private String toString(List<SchemaVersion> schemaVersions) {
-            if (schemaVersions == null) return "?";
+        private String schemaVersionsString(Row row) {
+            if (row.getSchemaVersions() == null) return "?";
             StringBuilder out = new StringBuilder();
-            Iterator<SchemaVersion> walk = schemaVersions.iterator();
+            Iterator<SchemaVersion> walk = row.getSchemaVersions().iterator();
             while (walk.hasNext()) {
                 SchemaVersion schemaVersion = walk.next();
                 out.append(schemaVersion.toString());
+                out.append(" (").append(row.getDataSetState(schemaVersion)).append(")");
                 if (walk.hasNext()) out.append(", ");
             }
             return out.toString();
@@ -631,7 +629,7 @@ public class DataSetHubFrame extends FrameBase {
             if (dataSet != null) {
                 return dataSet.getSchemaVersions();
             }
-            else if (dataSetEntry.schemaVersions != null && dataSetEntry.schemaVersions != null) {
+            else if (dataSetEntry.schemaVersions != null) {
                 List<SchemaVersion> list = new ArrayList<SchemaVersion>();
                 for (CultureHubClient.SchemaVersionTag schemaVersionTag : dataSetEntry.schemaVersions) {
                     list.add(new SchemaVersion(schemaVersionTag.prefix, schemaVersionTag.version));
@@ -674,6 +672,11 @@ public class DataSetHubFrame extends FrameBase {
             }
         }
 
+        public String getDataSetState(SchemaVersion schemaVersion) {
+            if (dataSet == null) return DataSetState.NO_DATA.toString();
+            return dataSet.getState(schemaVersion.getPrefix()).toString();
+        }
+
         @Override
         public int compareTo(Row row) {
             return getSpec().compareTo(row.getSpec());
@@ -702,14 +705,14 @@ public class DataSetHubFrame extends FrameBase {
 
     private enum State {
         OWNED_BY_YOU(true, true, "yours", ICON_OWNED),
-        AVAILABLE(false, true, "downloadable", ICON_DOWNLOAD),
+        AVAILABLE(false, true, "free", ICON_DOWNLOAD),
         UNAVAILABLE(false, true, "taken", ICON_UNAVAILABLE),
         BUSY(false, false, "busy", SwingHelper.ICON_BUSY),
-        ORPHAN_TAKEN(true, true, "taken but present locally", ICON_HUH),
-        ORPHAN_LONELY(true, false, "only present locally", ICON_HUH),
-        ORPHAN_UPDATE(false, true, "yours but absent locally", ICON_HUH),
-        ORPHAN_ARCHIVE(true, true, "free but present locally", ICON_HUH),
-        NEEDS_FETCH(true, false, "refresh to fetch culture hub info", ICON_OWNED);
+        ORPHAN_TAKEN(true, true, "taken/local", ICON_HUH),
+        ORPHAN_LONELY(true, false, "only local", ICON_HUH),
+        ORPHAN_UPDATE(false, true, "yours notlocal", ICON_HUH),
+        ORPHAN_ARCHIVE(true, true, "free/local", ICON_HUH),
+        NEEDS_FETCH(true, false, "fetch", ICON_OWNED);
 
         private final String string;
         private final Icon icon;
