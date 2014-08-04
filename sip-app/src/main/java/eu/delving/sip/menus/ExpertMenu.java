@@ -213,8 +213,6 @@ public class ExpertMenu extends JMenu {
                     try {
                         DataSet dataSet = dsm.getDataSet();
                         if (dataSet == null) return;
-                        dataSet.setStats(null, false, getPrefix());
-                        dataSet.setStats(null, true, getPrefix());
                         dataSet.deleteTarget(getPrefix());
                     }
                     catch (StorageException e) {

@@ -36,16 +36,37 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.*;
-import javax.xml.stream.events.*;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.Namespace;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.security.DigestOutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static eu.delving.sip.files.Storage.FileType.SOURCE;
-import static eu.delving.sip.files.Storage.*;
+import static eu.delving.sip.files.Storage.SOURCE_RECORD_TAG;
+import static eu.delving.sip.files.Storage.SOURCE_ROOT_TAG;
+import static eu.delving.sip.files.Storage.TEXT_TAG;
 import static eu.delving.sip.files.StorageHelper.*;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.FileUtils.moveFile;
@@ -106,13 +127,13 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
             if (!dataSet.isRecentlyImported()) {
                 throw new StorageException("Import to source would be redundant, since source is newer");
             }
-            Stats stats = dataSet.getStats(false, null);
+            Stats stats = dataSet.getStats(false);
             if (stats == null) {
                 throw new StorageException("No analysis stats so conversion doesn't trust the record count");
             }
             File parent = dataSet.sourceOutput().getParentFile();
             dataSet.deleteSource(); // clean out before the new import
-            deleteQuietly(statsFile(parent, true, null));
+            deleteQuietly(statsFile(parent, true));
             Hasher hasher = new Hasher();
             DigestOutputStream digestOut = hasher.createDigestOutputStream(zipOut(dataSet.sourceOutput()));
             parse(dataSet.openImportedInputStream(), digestOut, stats.namespaces); // streams closed within parse()

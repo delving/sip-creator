@@ -52,7 +52,6 @@ public interface Storage {
         FACTS("dataset_facts.txt"),
         HINTS("hints.txt"),
         MAPPING(null, "mapping_", ".xml", "mapping_%s.xml", 30),
-        RESULT_STATS(null, "stats-result_", ".xml.gz", "stats-result_%s.xml.gz", 1),
         REPORT(null, "report_", null, "report_%s.txt", 1),
         REPORT_INDEX(null, "report_", null, "report_%s.long", 1),
         LINKS(null, "links_", null, "links_%s.csv.gz", 1),
@@ -116,7 +115,6 @@ public interface Storage {
     String CACHE_DIR = "Cache";
     String MEDIA_DIR = "Media";
     String INDEX_FILE = "media-files.xml";
-    String HELP_FILE = "help.html";
     String FRAME_ARRANGEMENTS_FILE = "frame-arrangements.xml";
     String STANDALONE_DIR = "StandaloneDataSets";
     Path RECORD_ROOT = Path.create(String.format("/%s/%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG));

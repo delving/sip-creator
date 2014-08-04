@@ -379,7 +379,7 @@ public class SipModel {
             @Override
             public void success(final Stats stats) {
                 try {
-                    dataSetModel.getDataSet().setStats(stats, stats.sourceFormat, null);
+                    dataSetModel.getDataSet().setStats(stats, stats.sourceFormat);
                     exec(new Swing() {
                         @Override
                         public void run() {

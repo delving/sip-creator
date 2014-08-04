@@ -105,7 +105,7 @@ public class FileImporter implements Work.DataSetWork, Work.LongTermWork {
                 IOUtils.closeQuietly(outputStream);
                 IOUtils.closeQuietly(inputStream);
             }
-            delete(statsFile(dataSet.importedOutput().getParentFile(), false, null));
+            delete(statsFile(dataSet.importedOutput().getParentFile(), false));
             if (finished != null) finished.run();
         }
         catch (CancelException e) {

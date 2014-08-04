@@ -87,9 +87,9 @@ public interface DataSet extends Comparable<DataSet> {
 
     Stats getLatestStats();
 
-    Stats getStats(boolean sourceFormat, String prefix);
+    Stats getStats(boolean sourceFormat);
 
-    void setStats(Stats stats, boolean sourceFormat, String prefix) throws StorageException;
+    void setStats(Stats stats, boolean sourceFormat) throws StorageException;
 
     RecMapping getRecMapping(String prefix, RecDefModel recDefModel) throws StorageException;
 

@@ -24,7 +24,12 @@ package eu.delving.sip;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.util.FileSystemFetcher;
 import eu.delving.sip.base.Work;
-import eu.delving.sip.files.*;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.FileImporter;
+import eu.delving.sip.files.Storage;
+import eu.delving.sip.files.StorageException;
+import eu.delving.sip.files.StorageImpl;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.SourceConverter;
@@ -70,7 +75,7 @@ public class TestStorage {
             @Override
             public void success(Stats stats) {
                 try {
-                    dataSet.setStats(stats, false, null);
+                    dataSet.setStats(stats, false);
                 }
                 catch (StorageException e) {
                     throw new RuntimeException(e);

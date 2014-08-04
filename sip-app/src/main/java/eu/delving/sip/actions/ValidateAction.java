@@ -122,7 +122,6 @@ public class ValidateAction extends AbstractAction {
                 });
                 DataSet dataSet = processor.getDataSet();
                 try {
-                    dataSet.setStats(null, false, processor.getPrefix());
                     dataSet.deleteTarget(processor.getPrefix());
                 }
                 catch (StorageException e) {
@@ -132,12 +131,6 @@ public class ValidateAction extends AbstractAction {
 
             @Override
             public void succeeded(FileProcessor processor) {
-                try {
-                    processor.getDataSet().setStats(processor.getStats(), false, processor.getPrefix());
-                }
-                catch (StorageException e) {
-                    sipModel.getFeedback().alert("Unable to store validation results", e);
-                }
                 sipModel.getReportFileModel().refresh();
                 sipModel.exec(new Swing() {
                     @Override

@@ -229,7 +229,7 @@ public class StorageImpl implements Storage {
         }
 
         private DataSetState importedState(File imported) {
-            File statistics = statsFile(here, false, null);
+            File statistics = statsFile(here, false);
             if (statistics.exists() && statistics.lastModified() >= imported.lastModified()) {
                 return allHintsSet(getHints()) ? DataSetState.DELIMITED : DataSetState.ANALYZED_IMPORT;
             }
@@ -239,7 +239,7 @@ public class StorageImpl implements Storage {
         }
 
         private DataSetState postSourceState(File source, String prefix) {
-            File statistics = statsFile(here, true, null);
+            File statistics = statsFile(here, true);
             if (statistics.exists() && statistics.lastModified() >= source.lastModified()) {
                 File mapping = findLatestFile(here, MAPPING, prefix);
                 if (mapping.exists()) {
@@ -352,24 +352,24 @@ public class StorageImpl implements Storage {
 
         @Override
         public Stats getLatestStats() {
-            File analysis = statsFile(here, false, null);
-            File source = statsFile(here, true, null);
+            File analysis = statsFile(here, false);
+            File source = statsFile(here, true);
             if (analysis.exists()) {
                 if (source.exists()) {
-                    return getStats(source.lastModified() >= analysis.lastModified(), null);
+                    return getStats(source.lastModified() >= analysis.lastModified());
                 }
                 else {
-                    return getStats(false, null);
+                    return getStats(false);
                 }
             }
             else {
-                return getStats(true, null);
+                return getStats(true);
             }
         }
 
         @Override
-        public Stats getStats(boolean sourceFormat, String prefix) {
-            File statsFile = statsFile(here, sourceFormat, prefix);
+        public Stats getStats(boolean sourceFormat) {
+            File statsFile = statsFile(here, sourceFormat);
             if (statsFile.exists()) {
                 InputStream in = null;
                 try {
@@ -387,8 +387,8 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public void setStats(Stats stats, boolean sourceFormat, String prefix) throws StorageException {
-            File statsFile = statsFile(here, sourceFormat, prefix);
+        public void setStats(Stats stats, boolean sourceFormat) throws StorageException {
+            File statsFile = statsFile(here, sourceFormat);
             if (stats == null) {
                 delete(statsFile);
             }

@@ -61,8 +61,7 @@ import static eu.delving.sip.base.SwingHelper.scrollV;
 public class StatsFrame extends FrameBase {
     private StatsSet[] statsSets = {
             new StatsSet("Import"),
-            new StatsSet("Source"),
-            new StatsSet("Result"),
+            new StatsSet("Source")
     };
     private JPanel wordCountPanel = emptyPanel();
     private JPanel fieldFrequencyPanel = emptyPanel();
@@ -148,17 +147,16 @@ public class StatsFrame extends FrameBase {
                     case ANALYZED_IMPORT:
                     case DELIMITED:
                     case SOURCED:
-                        statsSets[0].setStats(dataSet.getStats(false, null));
+                        statsSets[0].setStats(dataSet.getStats(false));
                         break;
                     case MAPPING:
                     case ANALYZED_SOURCE:
-                        statsSets[0].setStats(dataSet.getStats(false, null));
-                        statsSets[1].setStats(dataSet.getStats(true, null));
+                        statsSets[0].setStats(dataSet.getStats(false));
+                        statsSets[1].setStats(dataSet.getStats(true));
                         break;
                     case PROCESSED:
-                        statsSets[0].setStats(dataSet.getStats(false, null));
-                        statsSets[1].setStats(dataSet.getStats(true, null));
-                        statsSets[2].setStats(dataSet.getStats(true, model.getPrefix()));
+                        statsSets[0].setStats(dataSet.getStats(false));
+                        statsSets[1].setStats(dataSet.getStats(true));
                         break;
                 }
             }

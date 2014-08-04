@@ -22,17 +22,25 @@
 package eu.delving.sip.xml;
 
 import eu.delving.MappingResult;
-import eu.delving.groovy.*;
-import eu.delving.metadata.*;
+import eu.delving.groovy.DiscardRecordException;
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.MappingException;
+import eu.delving.groovy.MappingRunner;
+import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.XmlSerializer;
+import eu.delving.metadata.AssertionException;
+import eu.delving.metadata.AssertionTest;
+import eu.delving.metadata.MappingResultImpl;
+import eu.delving.metadata.RecDef;
+import eu.delving.metadata.RecDefTree;
+import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.ReportWriter;
 import eu.delving.sip.model.Feedback;
 import eu.delving.stats.Stats;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import javax.swing.*;
 import javax.xml.transform.Source;
@@ -40,7 +48,11 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedTransferQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TransferQueue;
 
 /**
  * Process an input file, mapping it to output records which are validated and used to gather statistics.
@@ -199,12 +211,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             return termination == null;
         }
 
-        public void record(ReportWriter reportWriter, XmlOutput xmlOutput, Stats stats) {
+        public void record(ReportWriter reportWriter, XmlOutput xmlOutput) {
             try {
                 if (exception == null) {
                     reportWriter.valid(metadataRecord.getId(), mappingResult);
                     xmlOutput.write(metadataRecord.getId(), mappingResult.rootAugmented());
-                    recordStatistics((Element) mappingResult.root(), Path.create(), stats);
                 }
                 else if (exception instanceof DiscardRecordException) {
                     reportWriter.discarded(metadataRecord, exception.getMessage());
@@ -227,14 +238,12 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         final BlockingQueue<MappingOutput> outputQueue = new LinkedBlockingDeque<MappingOutput>();
         final ReportWriter reportWriter;
         final XmlOutput xmlOutput;
-        final Stats stats;
         final Termination termination;
         private int recordCount, validCount;
 
-        private Consumer(ReportWriter reportWriter, XmlOutput xmlOutput, Stats stats, Termination termination) {
+        private Consumer(ReportWriter reportWriter, XmlOutput xmlOutput, Termination termination) {
             this.reportWriter = reportWriter;
             this.xmlOutput = xmlOutput;
-            this.stats = stats;
             this.termination = termination;
         }
 
@@ -261,7 +270,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     if (mappingOutput.exception == null) {
                         validCount++;
                     }
-                    mappingOutput.record(reportWriter, xmlOutput, stats);
+                    mappingOutput.record(reportWriter, xmlOutput);
                 }
             }
             catch (InterruptedException e) {
@@ -286,7 +295,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             XmlOutput xmlOutput = new XmlOutput(getDataSet().targetOutput(getPrefix()), recDef().getNamespaceMap());
             QueueFiller queueFiller = new QueueFiller(parser, recordSource, termination, groovyCodeResource);
             this.stats = createStats();
-            Consumer consumer = new Consumer(reportWriter, xmlOutput, stats, termination);
+            Consumer consumer = new Consumer(reportWriter, xmlOutput, termination);
             int engineCount = Runtime.getRuntime().availableProcessors();
             for (int walk = 0; walk < engineCount; walk++) {
                 Validator validator = dataSet.newValidator(recDef().prefix);
@@ -394,45 +403,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         return stats;
     }
 
-    private static void recordStatistics(Element element, Path path, Stats stats) {
-        String prefix = element.getPrefix();
-        String name = element.getLocalName();
-        String namespaceUri = element.getNamespaceURI();
-        path = path.child(Tag.element(prefix, name, null));
-        if (!prefix.isEmpty()) stats.recordNamespace(prefix, namespaceUri);
-        stats.recordValue(path, getTextContent(element));
-        NodeList childNodes = element.getChildNodes();
-        for (int walk = 0; walk < childNodes.getLength(); walk++) {
-            Node kid = childNodes.item(walk);
-            switch (kid.getNodeType()) {
-                case Node.ATTRIBUTE_NODE:
-                    break;
-                case Node.TEXT_NODE:
-                    break;
-                case Node.ELEMENT_NODE:
-                    recordStatistics((Element) kid, path, stats);
-                    break;
-                default:
-                    throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
-            }
-        }
-    }
-
-    private static String getTextContent(Element element) {
-        NodeList childNodes = element.getChildNodes();
-        String text = null;
-        for (int walk = 0; walk < childNodes.getLength(); walk++) {
-            Node kid = childNodes.item(walk);
-            if (kid.getNodeType() == Node.TEXT_NODE) {
-                String content = kid.getTextContent().trim();
-                if (content.isEmpty()) continue;
-                if (text != null) throw new RuntimeException("Multiple text nodes??");
-                text = content;
-            }
-        }
-        return text;
-    }
-
     private enum NextStep {
         CONTINUE,
         INVESTIGATE,
@@ -448,7 +418,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         private Exception exception;
         private boolean cancelled, completed;
         private NextStep nextStep = NextStep.CONTINUE;
-        private ConcurrentLinkedQueue<Integer> recordsToInvestigate = new ConcurrentLinkedQueue<Integer>();
 
         private Termination(FileProcessor fileProcessor, Feedback feedback, Listener listener) {
             this.fileProcessor = fileProcessor;

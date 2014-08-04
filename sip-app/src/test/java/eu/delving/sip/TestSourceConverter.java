@@ -333,12 +333,12 @@ public class TestSourceConverter {
         }
 
         @Override
-        public Stats getStats(boolean sourceFormat, String prefix) {
+        public Stats getStats(boolean sourceFormat) {
             return null;
         }
 
         @Override
-        public void setStats(Stats stats, boolean sourceFormat, String prefix) throws StorageException {
+        public void setStats(Stats stats, boolean sourceFormat) throws StorageException {
           
         }
 
