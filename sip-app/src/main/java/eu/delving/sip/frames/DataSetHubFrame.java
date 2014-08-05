@@ -28,6 +28,7 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
@@ -62,6 +63,7 @@ import static eu.delving.sip.base.KeystrokeHelper.SPACE;
 import static eu.delving.sip.base.KeystrokeHelper.UP;
 import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
 import static eu.delving.sip.base.KeystrokeHelper.attachAccelerator;
+import static eu.delving.sip.base.NetworkClient.*;
 import static eu.delving.sip.base.SwingHelper.ICON_DOWNLOAD;
 import static eu.delving.sip.base.SwingHelper.ICON_HUH;
 import static eu.delving.sip.base.SwingHelper.ICON_OWNED;
@@ -75,8 +77,8 @@ import static eu.delving.sip.base.SwingHelper.ICON_UNAVAILABLE;
 
 public class DataSetHubFrame extends FrameBase {
     private NetworkClient networkClient;
-    private DataSetTableModel tableModel = new DataSetTableModel();
-    private JTable dataSetTable;
+    private HubDataSetTableModel hubTableModel = new HubDataSetTableModel();
+    private JTable hubTable;
     private EditAction editAction = new EditAction();
     private DownloadAction downloadAction = new DownloadAction();
     private ReleaseAction releaseAction = new ReleaseAction();
@@ -86,12 +88,12 @@ public class DataSetHubFrame extends FrameBase {
     public DataSetHubFrame(final SipModel sipModel, NetworkClient networkClient) {
         super(Which.DATA_SET, sipModel, "Data Sets");
         this.networkClient = networkClient;
-        this.dataSetTable = new JTable(tableModel, tableModel.getColumnModel());
-        this.dataSetTable.setFont(this.dataSetTable.getFont().deriveFont(Font.PLAIN, 10));
-        this.dataSetTable.setRowHeight(25);
-        this.dataSetTable.setIntercellSpacing(new Dimension(12, 4));
-        this.dataSetTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        this.dataSetTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+        this.hubTable = new JTable(hubTableModel, hubTableModel.getColumnModel());
+        this.hubTable.setFont(this.hubTable.getFont().deriveFont(Font.PLAIN, 10));
+        this.hubTable.setRowHeight(25);
+        this.hubTable.setIntercellSpacing(new Dimension(12, 4));
+        this.hubTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.hubTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) return;
@@ -100,16 +102,16 @@ public class DataSetHubFrame extends FrameBase {
                 releaseAction.checkEnabled();
             }
         });
-        this.dataSetTable.addMouseListener(new MouseAdapter() {
+        this.hubTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 1 && editAction.isEnabled()) {
-                    if (dataSetTable.getSelectedRow() != dataSetTable.rowAtPoint(e.getPoint())) return;
+                    if (hubTable.getSelectedRow() != hubTable.rowAtPoint(e.getPoint())) return;
                     editAction.actionPerformed(null);
                 }
             }
         });
-        tableModel.setStateCheckDelay(500);
+        hubTableModel.setStateCheckDelay(500);
         editAction.checkEnabled();
         downloadAction.checkEnabled();
         releaseAction.checkEnabled();
@@ -120,14 +122,14 @@ public class DataSetHubFrame extends FrameBase {
         if (opened) Swing.Exec.later(new Swing() {
             @Override
             public void run() {
-                dataSetTable.requestFocus();
+                hubTable.requestFocus();
             }
         });
     }
 
     @Override
     protected void buildContent(Container content) {
-        content.add(SwingHelper.scrollV("Data Sets", dataSetTable), BorderLayout.CENTER);
+        content.add(SwingHelper.scrollV("Hub Data Sets", hubTable), BorderLayout.CENTER);
         content.add(createSouth(), BorderLayout.SOUTH);
     }
 
@@ -167,7 +169,7 @@ public class DataSetHubFrame extends FrameBase {
         Swing.Exec.later(new Swing() {
             @Override
             public void run() {
-                tableModel.setHubEntries(null);
+                hubTableModel.setHubEntries(null);
                 refreshAction.actionPerformed(null);
             }
         });
@@ -184,13 +186,13 @@ public class DataSetHubFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ListSelectionModel selection = dataSetTable.getSelectionModel();
-            if (tableModel.getRowCount() > 0 && dataSetTable.getSelectionModel().isSelectionEmpty()) {
-                int row = down ? 0 : tableModel.getRowCount() - 1;
+            ListSelectionModel selection = hubTable.getSelectionModel();
+            if (hubTableModel.getRowCount() > 0 && hubTable.getSelectionModel().isSelectionEmpty()) {
+                int row = down ? 0 : hubTableModel.getRowCount() - 1;
                 selection.setSelectionInterval(row, row);
-                dataSetTable.requestFocus();
-                Rectangle cellRect = dataSetTable.getCellRect(row, 0, false);
-                dataSetTable.scrollRectToVisible(cellRect);
+                hubTable.requestFocus();
+                Rectangle cellRect = hubTable.getCellRect(row, 0, false);
+                hubTable.scrollRectToVisible(cellRect);
             }
         }
     }
@@ -206,21 +208,41 @@ public class DataSetHubFrame extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             setEnabled(false);
             // todo: change the icon to a waiting one?
-            networkClient.fetchDataSetList(new NetworkClient.ListReceiveListener() {
+            networkClient.fetchHubDatasetList(new HubListListener() {
                 @Override
                 public void listReceived(List<NetworkClient.DataSetEntry> entries) {
-                    tableModel.setHubEntries(entries);
+                    hubTableModel.setHubEntries(entries);
                     setEnabled(true);
                 }
 
                 @Override
                 public void failed(Exception e) {
-                    sipModel.getFeedback().alert("Unable to fetch data set list", e);
-                    tableModel.setHubEntries(null);
+                    sipModel.getFeedback().alert("Unable to fetch hub data set list", e);
+                    hubTableModel.setHubEntries(null);
                     patternField.setText(null);
                     setEnabled(true);
                 }
             });
+
+//            todo: Just a test
+            networkClient.fetchNarthexSipList(
+                    new NarthexListListener() {
+                        @Override
+                        public void listReceived(List<NetworkClient.Sip> entries) {
+                            for (Sip sip : entries) {
+                                System.out.println("Narthex: " + sip.file.trim());
+                            }
+                        }
+
+                        @Override
+                        public void failed(Exception e) {
+                            sipModel.getFeedback().alert("Unable to fetch data set list", e);
+                        }
+                    },
+                    sipModel.getPreferences().get(Storage.NARTHEX_URL, ""),
+                    sipModel.getPreferences().get(Storage.NARTHEX_EMAIL, ""),
+                    sipModel.getPreferences().get(Storage.NARTHEX_API_KEY, "")
+            );
         }
     }
 
@@ -232,15 +254,15 @@ public class DataSetHubFrame extends FrameBase {
         }
 
         public void checkEnabled() {
-            Row row = getSelectedRow();
-            this.setEnabled(row != null && row.getState().selectable);
+            HubRow hubRow = getSelectedRow();
+            this.setEnabled(hubRow != null && hubRow.getState().selectable);
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Row row = getSelectedRow();
-            if (row == null) return;
-            List<SchemaVersion> schemaVersions = row.getSchemaVersions();
+            HubRow hubRow = getSelectedRow();
+            if (hubRow == null) return;
+            List<SchemaVersion> schemaVersions = hubRow.getSchemaVersions();
             if (schemaVersions == null || schemaVersions.isEmpty()) return;
             setEnabled(false);
             String prefix;
@@ -251,7 +273,7 @@ public class DataSetHubFrame extends FrameBase {
                 prefix = askForPrefix(schemaVersions);
                 if (prefix == null) return;
             }
-            sipModel.setDataSetPrefix(row.dataSet, prefix, new Swing() {
+            sipModel.setDataSetPrefix(hubRow.dataSet, prefix, new Swing() {
                 @Override
                 public void run() {
                     setEnabled(true);
@@ -282,18 +304,18 @@ public class DataSetHubFrame extends FrameBase {
         }
 
         public void checkEnabled() {
-            Row row = getSelectedRow();
-            this.setEnabled(!tableModel.needsFetch && row != null && row.getState().downloadable);
+            HubRow hubRow = getSelectedRow();
+            this.setEnabled(!hubTableModel.needsFetch && hubRow != null && hubRow.getState().downloadable);
         }
 
         @Override
         public void actionPerformed(final ActionEvent actionEvent) {
-            Row row = getSelectedRow();
-            if (row == null) return;
+            HubRow hubRow = getSelectedRow();
+            if (hubRow == null) return;
             setEnabled(false);
             try {
-                DataSet dataSet = sipModel.getStorage().createDataSet(row.getSpec(), row.getOrganization());
-                networkClient.downloadDataSet(dataSet, new Swing() {
+                DataSet dataSet = sipModel.getStorage().createDataSet(hubRow.getSpec(), hubRow.getOrganization());
+                networkClient.downloadHubDataset(dataSet, new Swing() {
                     @Override
                     public void run() {
                         setEnabled(true);
@@ -302,7 +324,7 @@ public class DataSetHubFrame extends FrameBase {
                 });
             }
             catch (StorageException e) {
-                sipModel.getFeedback().alert("Unable to create data set called " + row.getSpec(), e);
+                sipModel.getFeedback().alert("Unable to create data set called " + hubRow.getSpec(), e);
             }
         }
     }
@@ -315,26 +337,26 @@ public class DataSetHubFrame extends FrameBase {
         }
 
         public void checkEnabled() {
-            Row row = getSelectedRow();
-            this.setEnabled(!tableModel.needsFetch && row != null && row.getState() == State.OWNED_BY_YOU);
+            HubRow hubRow = getSelectedRow();
+            this.setEnabled(!hubTableModel.needsFetch && hubRow != null && hubRow.getState() == State.OWNED_BY_YOU);
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            Row row = getSelectedRow();
-            if (row == null) return;
+            HubRow hubRow = getSelectedRow();
+            if (hubRow == null) return;
             boolean unlock = sipModel.getFeedback().confirm(
                     "Release",
                     String.format("<html>Are you sure that you want to delete your local copy of<br>" +
-                            "this data set %s, and unlock it so that someone else can access it?",
-                            row.getSpec()
+                                    "this data set %s, and unlock it so that someone else can access it?",
+                            hubRow.getSpec()
                     )
             );
-            if (unlock) unlockDataSet(row.getDataSet());
+            if (unlock) unlockDataSet(hubRow.getDataSet());
         }
 
         private void unlockDataSet(final DataSet dataSet) {
-            networkClient.unlockDataSet(dataSet, new NetworkClient.UnlockListener() {
+            networkClient.unlockHubDataset(dataSet, new UnlockListener() {
                 @Override
                 public void unlockComplete(boolean successful) {
                     if (successful) {
@@ -361,19 +383,19 @@ public class DataSetHubFrame extends FrameBase {
         }
     }
 
-    private Row getSelectedRow() {
-        int rowIndex = dataSetTable.getSelectedRow();
-        return rowIndex < 0 ? null : tableModel.getRow(rowIndex);
+    private HubRow getSelectedRow() {
+        int rowIndex = hubTable.getSelectedRow();
+        return rowIndex < 0 ? null : hubTableModel.getRow(rowIndex);
     }
 
-    private class DataSetTableModel extends AbstractTableModel {
+    private class HubDataSetTableModel extends AbstractTableModel {
         private DefaultTableColumnModel columnModel = new DefaultTableColumnModel();
-        private List<Row> rows = new ArrayList<Row>();
+        private List<HubRow> hubRows = new ArrayList<HubRow>();
         private Map<Integer, Integer> index;
         private boolean needsFetch;
         private String pattern = "";
 
-        private DataSetTableModel() {
+        private HubDataSetTableModel() {
             createSpecColumn();
             createNameColumn();
             createStateColumn();
@@ -395,7 +417,7 @@ public class DataSetHubFrame extends FrameBase {
                         setPattern();
                     }
                     int row = 0;
-                    for (Row entry : rows) {
+                    for (HubRow entry : hubRows) {
                         if (entry.hasStateChanged()) fireTableRowsUpdated(row, row);
                         row++;
                     }
@@ -415,8 +437,8 @@ public class DataSetHubFrame extends FrameBase {
             else {
                 Map<Integer, Integer> map = new HashMap<Integer, Integer>();
                 int actual = 0, virtual = 0;
-                for (Row row : rows) {
-                    if (row.getSpec().contains(pattern)) {
+                for (HubRow hubRow : hubRows) {
+                    if (hubRow.getSpec().contains(pattern)) {
                         map.put(virtual, actual);
                         virtual++;
                     }
@@ -429,29 +451,29 @@ public class DataSetHubFrame extends FrameBase {
 
         public void setHubEntries(List<NetworkClient.DataSetEntry> list) {
             needsFetch = list == null;
-            List<Row> freshRows = new ArrayList<Row>();
+            List<HubRow> freshHubRows = new ArrayList<HubRow>();
             Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets();
             if (list != null) {
-                for (NetworkClient.DataSetEntry incoming : list) {
+                for (DataSetEntry incoming : list) {
                     DataSet dataSet = dataSets.get(incoming.getDirectoryName());
-                    freshRows.add(new Row(incoming, dataSet));
+                    freshHubRows.add(new HubRow(incoming, dataSet));
                     if (dataSet != null) dataSets.remove(incoming.getDirectoryName()); // remove used ones
                 }
             }
             for (DataSet dataSet : dataSets.values()) { // remaining ones
-                freshRows.add(new Row(null, dataSet));
+                freshHubRows.add(new HubRow(null, dataSet));
             }
-            Collections.sort(freshRows);
-            rows = freshRows;
+            Collections.sort(freshHubRows);
+            hubRows = freshHubRows;
             fireTableStructureChanged();
         }
 
-        public Row getRow(int rowIndex) {
+        public HubRow getRow(int rowIndex) {
             if (index != null) {
                 Integer foundRow = index.get(rowIndex);
                 if (foundRow != null) rowIndex = foundRow;
             }
-            return rows.get(rowIndex);
+            return hubRows.get(rowIndex);
         }
 
         @Override
@@ -460,7 +482,7 @@ public class DataSetHubFrame extends FrameBase {
                 return index.size();
             }
             else {
-                return rows.size();
+                return hubRows.size();
             }
         }
 
@@ -495,7 +517,7 @@ public class DataSetHubFrame extends FrameBase {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                     JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                    State state = tableModel.needsFetch ? State.NEEDS_FETCH : (State) value;
+                    State state = hubTableModel.needsFetch ? State.NEEDS_FETCH : (State) value;
                     label.setIcon(state.icon);
                     label.setText(state.string);
                     return label;
@@ -542,25 +564,25 @@ public class DataSetHubFrame extends FrameBase {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            Row row = getRow(rowIndex);
-            State state = row.getState();
-            NetworkClient.DataSetEntry entry = row.getDataSetEntry();
+            HubRow hubRow = getRow(rowIndex);
+            State state = hubRow.getState();
+            DataSetEntry entry = hubRow.getDataSetEntry();
             switch (columnIndex) {
                 case 0:
-                    return row.getSpec();
+                    return hubRow.getSpec();
                 case 1:
-                    return row.getDataSetName();
+                    return hubRow.getDataSetName();
                 case 2:
                     return state;
                 case 3:
-                    return schemaVersionsString(row);
+                    return schemaVersionsString(hubRow);
                 case 4:
                     int recordCount = 0;
                     if (entry != null) {
                         recordCount = entry.recordCount;
                     }
                     else {
-                        String recordCountString = row.dataSet.getHints().get("recordCount");
+                        String recordCountString = hubRow.dataSet.getHints().get("recordCount");
                         if (recordCountString != null) {
                             recordCount = Integer.parseInt(recordCountString);
                         }
@@ -572,26 +594,26 @@ public class DataSetHubFrame extends FrameBase {
             throw new RuntimeException();
         }
 
-        private String schemaVersionsString(Row row) {
-            if (row.getSchemaVersions() == null) return "?";
+        private String schemaVersionsString(HubRow hubRow) {
+            if (hubRow.getSchemaVersions() == null) return "?";
             StringBuilder out = new StringBuilder();
-            Iterator<SchemaVersion> walk = row.getSchemaVersions().iterator();
+            Iterator<SchemaVersion> walk = hubRow.getSchemaVersions().iterator();
             while (walk.hasNext()) {
                 SchemaVersion schemaVersion = walk.next();
                 out.append(schemaVersion.toString());
-                out.append(" (").append(row.getDataSetState(schemaVersion)).append(")");
+                out.append(" (").append(hubRow.getDataSetState(schemaVersion)).append(")");
                 if (walk.hasNext()) out.append(", ");
             }
             return out.toString();
         }
     }
 
-    private class Row implements Comparable<Row> {
-        private NetworkClient.DataSetEntry dataSetEntry;
+    private class HubRow implements Comparable<HubRow> {
+        private DataSetEntry dataSetEntry;
         private DataSet dataSet;
         private State previousState;
 
-        private Row(NetworkClient.DataSetEntry dataSetEntry, DataSet dataSet) {
+        private HubRow(DataSetEntry dataSetEntry, DataSet dataSet) {
             this.dataSetEntry = dataSetEntry;
             this.dataSet = dataSet;
             this.previousState = getState();
@@ -605,7 +627,7 @@ public class DataSetHubFrame extends FrameBase {
             return dataSetEntry != null ? dataSetEntry.spec : dataSet.getSpec();
         }
 
-        public NetworkClient.DataSetEntry getDataSetEntry() {
+        public DataSetEntry getDataSetEntry() {
             return dataSetEntry;
         }
 
@@ -631,7 +653,7 @@ public class DataSetHubFrame extends FrameBase {
             }
             else if (dataSetEntry.schemaVersions != null) {
                 List<SchemaVersion> list = new ArrayList<SchemaVersion>();
-                for (NetworkClient.SchemaVersionTag schemaVersionTag : dataSetEntry.schemaVersions) {
+                for (SchemaVersionTag schemaVersionTag : dataSetEntry.schemaVersions) {
                     list.add(new SchemaVersion(schemaVersionTag.prefix, schemaVersionTag.version));
                 }
                 return list;
@@ -678,8 +700,8 @@ public class DataSetHubFrame extends FrameBase {
         }
 
         @Override
-        public int compareTo(Row row) {
-            return getSpec().compareTo(row.getSpec());
+        public int compareTo(HubRow hubRow) {
+            return getSpec().compareTo(hubRow.getSpec());
         }
 
         public boolean hasStateChanged() {

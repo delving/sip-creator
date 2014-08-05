@@ -89,7 +89,7 @@ public class UploadAction extends AbstractAction {
 
     private void initiateUpload(String url, String email, String apiKey) {
         try {
-            networkClient.uploadFiles(sipModel.getDataSetModel().getDataSet(), url, email, apiKey, new Swing() {
+            networkClient.uploadNarthex(sipModel.getDataSetModel().getDataSet(), url, email, apiKey, new Swing() {
                 @Override
                 public void run() {
                     setEnabled(true);

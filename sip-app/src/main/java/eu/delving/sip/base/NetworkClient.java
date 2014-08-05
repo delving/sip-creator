@@ -31,7 +31,6 @@ import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
 import org.apache.amber.oauth2.common.exception.OAuthProblemException;
 import org.apache.amber.oauth2.common.exception.OAuthSystemException;
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -39,7 +38,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.AbstractHttpEntity;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
 import java.io.File;
@@ -47,8 +45,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
@@ -111,30 +107,42 @@ public class NetworkClient {
 
     }
 
-    public interface ListReceiveListener {
+    public interface HubListListener {
 
         void listReceived(List<DataSetEntry> entries);
 
         void failed(Exception e);
     }
 
-    public void fetchDataSetList(ListReceiveListener listReceiveListener) {
-        sipModel.exec(new ListFetcher(1, listReceiveListener));
+    public void fetchHubDatasetList(HubListListener hubListListener) {
+        sipModel.exec(new HubListFetcher(1, hubListListener));
     }
 
     public interface UnlockListener {
         void unlockComplete(boolean successful);
     }
 
-    public void unlockDataSet(DataSet dataSet, UnlockListener unlockListener) {
+    public void unlockHubDataset(DataSet dataSet, UnlockListener unlockListener) {
         sipModel.exec(new Unlocker(1, dataSet, unlockListener));
     }
 
-    public void downloadDataSet(DataSet dataSet, Swing finished) {
-        sipModel.exec(new DataSetDownloader(1, dataSet, finished));
+    public void downloadHubDataset(DataSet dataSet, Swing finished) {
+        sipModel.exec(new HubDatasetDownloader(1, dataSet, finished));
     }
 
-    public void uploadFiles(DataSet dataSet, String url, String email, String apiKey, Swing finished) throws StorageException {
+    public interface NarthexListListener {
+
+        void listReceived(List<Sip> entries);
+
+        void failed(Exception e);
+    }
+
+
+    public void fetchNarthexSipList(NarthexListListener narthexListListener, String url, String email, String apiKey) {
+        sipModel.exec(new NarthexListFetcher(1, narthexListListener, url, email, apiKey));
+    }
+
+    public void uploadNarthex(DataSet dataSet, String url, String email, String apiKey, Swing finished) throws StorageException {
         sipModel.exec(new DataUploader(1, dataSet, url, email, apiKey, finished));
     }
 
@@ -162,18 +170,18 @@ public class NetworkClient {
         }
     }
 
-    private class ListFetcher extends Attempt {
-        private ListReceiveListener listReceiveListener;
+    private class HubListFetcher extends Attempt {
+        private HubListListener hubListListener;
 
-        public ListFetcher(int attempt, ListReceiveListener listReceiveListener) {
+        public HubListFetcher(int attempt, HubListListener hubListListener) {
             super(attempt);
-            this.listReceiveListener = listReceiveListener;
+            this.hubListListener = hubListListener;
         }
 
         @Override
         public void run() {
             try {
-                HttpGet get = createListRequest();
+                HttpGet get = createHubListRequest();
                 get.setHeader("Accept", "text/xml");
                 HttpResponse response = httpClient.execute(get);
                 Code code = Code.from(response);
@@ -182,16 +190,16 @@ public class NetworkClient {
                     switch (code) {
                         case OK:
                             DataSetList dataSetList = (DataSetList) XStreamFactory.getStreamFor(DataSetList.class).fromXML(entity.getContent());
-                            listReceiveListener.listReceived(dataSetList.list);
+                            hubListListener.listReceived(dataSetList.list);
                             break;
                         case UNAUTHORIZED:
-                            if (!reactToUnauthorized(new ListFetcher(attempt + 1, listReceiveListener))) {
-                                listReceiveListener.failed(new Exception("Unable to fetch list"));
+                            if (!reactToUnauthorized(new HubListFetcher(attempt + 1, hubListListener))) {
+                                hubListListener.failed(new Exception("Unable to fetch list"));
                             }
                             break;
                         default:
                             reportResponse(code, response.getStatusLine());
-                            listReceiveListener.failed(new Exception(String.format(
+                            hubListListener.failed(new Exception(String.format(
                                     "Response was %s. Status: [%d] %s",
                                     code,
                                     response.getStatusLine().getStatusCode(),
@@ -208,17 +216,93 @@ public class NetworkClient {
             }
             catch (OAuthProblemException e) {
                 reportOAuthProblem(e);
-                listReceiveListener.failed(e);
+                hubListListener.failed(e);
             }
             catch (Exception e) {
                 feedback().alert("Error fetching list from hub", e);
-                listReceiveListener.failed(e);
+                hubListListener.failed(e);
             }
         }
 
         @Override
         public Job getJob() {
             return Job.FETCH_LIST;
+        }
+
+        private HttpGet createHubListRequest() throws OAuthSystemException, OAuthProblemException {
+            return createHubGet("list");
+        }
+
+    }
+
+    private class NarthexListFetcher extends Attempt {
+        private NarthexListListener narthexListListener;
+        private String url, email, apiKey;
+
+        public NarthexListFetcher(int attempt, NarthexListListener narthexListListener, String url, String email, String apiKey) {
+            super(attempt);
+            this.narthexListListener = narthexListListener;
+            this.url = url;
+            this.email = email;
+            this.apiKey = apiKey;
+        }
+
+        @Override
+        public void run() {
+            try {
+                HttpGet get = createNarthexListRequest();
+                get.setHeader("Accept", "text/xml");
+                HttpResponse response = httpClient.execute(get);
+                Code code = Code.from(response);
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    switch (code) {
+                        case OK:
+                            SipList sipList = (SipList) XStreamFactory.getStreamFor(SipList.class).fromXML(entity.getContent());
+                            narthexListListener.listReceived(sipList.list);
+                            break;
+                        case UNAUTHORIZED:
+                            if (!reactToUnauthorized(new NarthexListFetcher(attempt + 1, narthexListListener, url, email, apiKey))) {
+                                narthexListListener.failed(new Exception("Unable to fetch list"));
+                            }
+                            break;
+                        default:
+                            reportResponse(code, response.getStatusLine());
+                            narthexListListener.failed(new Exception(String.format(
+                                    "Response was %s. Status: [%d] %s",
+                                    code,
+                                    response.getStatusLine().getStatusCode(),
+                                    response.getStatusLine().getReasonPhrase()
+                            )));
+                            oauthClient.invalidateTokens();
+                            break;
+                    }
+                    EntityUtils.consume(entity);
+                }
+                else {
+                    throw new IOException("Response was empty");
+                }
+            }
+//            catch (OAuthProblemException e) {
+//                reportOAuthProblem(e);
+//                narthexListListener.failed(e);
+//            }
+            catch (Exception e) {
+                feedback().alert("Error fetching list from Narthex", e);
+                narthexListListener.failed(e);
+            }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.FETCH_LIST;
+        }
+
+        private HttpGet createNarthexListRequest() {
+            return new HttpGet(String.format(
+                    "%s/sip-creator/%s/%s/sip-zip",
+                    url, apiKey, email.replace("@", "_")
+            ));
         }
     }
 
@@ -276,12 +360,12 @@ public class NetworkClient {
         }
     }
 
-    private class DataSetDownloader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
+    private class HubDatasetDownloader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
         private DataSet dataSet;
         private ProgressListener progressListener;
         private Swing finished;
 
-        private DataSetDownloader(int attempt, DataSet dataSet, Swing finished) {
+        private HubDatasetDownloader(int attempt, DataSet dataSet, Swing finished) {
             super(attempt);
             this.dataSet = dataSet;
             this.finished = finished;
@@ -303,7 +387,7 @@ public class NetworkClient {
                             success = true;
                             break;
                         case UNAUTHORIZED:
-                            if (reactToUnauthorized(new DataSetDownloader(attempt + 1, dataSet, finished))) {
+                            if (reactToUnauthorized(new HubDatasetDownloader(attempt + 1, dataSet, finished))) {
                                 finished = null;
                             }
                             else {
@@ -552,12 +636,8 @@ public class NetworkClient {
         }
     }
 
-    private HttpGet createListRequest() throws OAuthSystemException, OAuthProblemException {
-        return createGet("list");
-    }
-
     private HttpGet createDownloadRequest(DataSet dataSet) throws OAuthSystemException, OAuthProblemException {
-        HttpGet get = createGet(String.format(
+        HttpGet get = createHubGet(String.format(
                 "fetch/%s/%s-sip.zip",
                 dataSet.getOrganization(), dataSet.getSpec()
         ));
@@ -566,7 +646,7 @@ public class NetworkClient {
     }
 
     private HttpGet createUnlockRequest(DataSet dataSet) throws OAuthSystemException, OAuthProblemException {
-        HttpGet get = createGet(String.format(
+        HttpGet get = createHubGet(String.format(
                 "unlock/%s/%s",
                 dataSet.getOrganization(), dataSet.getSpec()
         ));
@@ -574,18 +654,8 @@ public class NetworkClient {
         return get;
     }
 
-    private HttpGet createGet(String path) throws OAuthSystemException, OAuthProblemException {
+    private HttpGet createHubGet(String path) throws OAuthSystemException, OAuthProblemException {
         return new HttpGet(String.format("%s/%s?accessKey=%s", getServerUrl(), path, oauthClient.getToken()));
-    }
-
-    private HttpEntity createListEntityFiles(List<File> uploadFiles) throws UnsupportedEncodingException {
-        List<String> names = new ArrayList<String>(uploadFiles.size());
-        for (File file : uploadFiles) names.add(file.getName());
-        return createListEntityStrings(names);
-    }
-
-    private HttpEntity createListEntityStrings(List<String> uploadFiles) throws UnsupportedEncodingException {
-        return new StringEntity(StringUtils.join(uploadFiles, '\n'));
     }
 
     private void reportResponse(Code code, StatusLine statusLine) {
@@ -673,5 +743,26 @@ public class NetworkClient {
     public static class SchemaVersionTag {
         public String prefix;
         public String version;
+    }
+
+    @XStreamAlias("sip-list")
+    public static class SipList {
+        @XStreamImplicit
+        public List<Sip> list;
+    }
+
+    @XStreamAlias("sip")
+    public static class Sip {
+        public String file;
+        public Facts facts;
+    }
+
+    @XStreamAlias("facts")
+    public static class Facts {
+        public String name;
+        public String dataProvider;
+        public String country;
+        public String orgId;
+        public List<SchemaVersionTag> schemaVersions;
     }
 }
