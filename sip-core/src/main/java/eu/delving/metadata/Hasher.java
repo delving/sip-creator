@@ -23,7 +23,14 @@ package eu.delving.metadata;
 
 import org.apache.commons.io.FileUtils;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -77,6 +84,20 @@ public class Hasher {
             if (hashedFile.exists()) FileUtils.deleteQuietly(hashedFile);
             FileUtils.moveFile(file, hashedFile);
             return hashedFile;
+        }
+    }
+
+    public static File ensureFileNotHashed(File file) throws IOException {
+        if (file.getName().contains(SEPARATOR)) {
+            int sep = file.getName().indexOf(SEPARATOR);
+            String noHash = file.getName().substring(sep + SEPARATOR.length());
+            File noHashFile = new File(file.getParentFile(), noHash);
+            if (noHashFile.exists()) FileUtils.deleteQuietly(noHashFile);
+            FileUtils.moveFile(file, noHashFile);
+            return noHashFile;
+        }
+        else {
+            return file;
         }
     }
 

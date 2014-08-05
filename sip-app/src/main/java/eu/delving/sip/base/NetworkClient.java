@@ -378,17 +378,28 @@ public class NetworkClient {
         public void run() {
             try {
                 for (File file : dataSet.getUploadFiles()) {
-                    HttpPost upload = createUploadRequest(file, progressListener);
-                    FileEntity fileEntity = (FileEntity) upload.getEntity();
-                    feedback().info("Uploading " + file);
-                    HttpResponse uploadResponse = httpClient.execute(upload);
-                    System.out.println(EntityUtils.toString(uploadResponse.getEntity()));
-                    Code code = Code.from(uploadResponse);
+                    HttpPost outputPost = createOutputUploadRequest(file, progressListener);
+                    FileEntity fileEntity = (FileEntity) outputPost.getEntity();
+                    feedback().info("Uploading Output " + file);
+                    HttpResponse outputResponse = httpClient.execute(outputPost);
+                    System.out.println(EntityUtils.toString(outputResponse.getEntity())); // otherwise consume!
+                    Code code = Code.from(outputResponse);
                     if (code != Code.OK && !fileEntity.abort) {
                         oauthClient.invalidateTokens();
-                        reportResponse(Code.from(uploadResponse), uploadResponse.getStatusLine());
+                        reportResponse(Code.from(outputResponse), outputResponse.getStatusLine());
                         return;
                     }
+                }
+                File sipZip = dataSet.toSipZip();
+                feedback().info("Uploading SIP-Zip " + sipZip.getName());
+                HttpPost sipZipPost = createSipZipUploadRequest(sipZip, progressListener);
+                FileEntity fileEntity = (FileEntity) sipZipPost.getEntity();
+                HttpResponse sipZipResponse = httpClient.execute(sipZipPost);
+                System.out.println(EntityUtils.toString(sipZipResponse.getEntity())); // otherwise consume!
+                Code code = Code.from(sipZipResponse);
+                if (code != Code.OK && !fileEntity.abort) {
+                    oauthClient.invalidateTokens();
+                    reportResponse(Code.from(sipZipResponse), sipZipResponse.getStatusLine());
                 }
             }
             catch (OAuthProblemException e) {
@@ -415,12 +426,22 @@ public class NetworkClient {
         @Override
         public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
-            progressListener.setProgressMessage("Uploading to the hub");
+            progressListener.setProgressMessage("Uploading to the Narthex");
         }
 
-        private HttpPost createUploadRequest(File file, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
+        private HttpPost createOutputUploadRequest(File file, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
             HttpPost post = new HttpPost(String.format(
-                    "%s/api/%s/%s/sip-creator-upload/%s",
+                    "%s/sip-creator/%s/%s/upload/%s",
+                    url, apiKey, email.replace("@", "_"), file.getName()
+            ));
+            FileEntity fileEntity = new FileEntity(file, progressListener);
+            post.setEntity(fileEntity);
+            return post;
+        }
+
+        private HttpPost createSipZipUploadRequest(File file, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
+            HttpPost post = new HttpPost(String.format(
+                    "%s/sip-creator/%s/%s/sip-zip/%s",
                     url, apiKey, email.replace("@", "_"), file.getName()
             ));
             FileEntity fileEntity = new FileEntity(file, progressListener);
@@ -452,6 +473,9 @@ public class NetworkClient {
         }
         else if (name.endsWith(".txt")) {
             return "text/plain";
+        }
+        else if (name.endsWith(".zip")) {
+            return "application/zip";
         }
         else if (name.endsWith(".xml")) {
             return "text/xml";

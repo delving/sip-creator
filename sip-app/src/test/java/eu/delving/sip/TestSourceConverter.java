@@ -383,6 +383,11 @@ public class TestSourceConverter {
         }
 
         @Override
+        public File toSipZip() throws StorageException {
+            return null;
+        }
+
+        @Override
         public void remove() throws StorageException {
           
         }

@@ -35,11 +35,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -59,6 +61,7 @@ import static eu.delving.sip.files.Storage.FileType.*;
 
 public class StorageHelper {
     static final int BLOCK_SIZE = 4096;
+    static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy_MM_dd_HH_mm");
 
     static File createDataSetDirectory(File home, String spec, String organization) {
         return new File(home, String.format("%s_%s", spec, organization));
@@ -210,6 +213,21 @@ public class StorageHelper {
         return new File(dir, sourceFormat ? SOURCE_STATS.getName() : IMPORT_STATS.getName());
     }
 
+    static File sipZip(File dir, String spec) {
+        String part = String.format("%s__%s", spec, DATE_FORMAT.format(new Date()));
+        return new File(dir, SIP_ZIP.getName(part));
+    }
+
+    static List<File> sipZips(File dir) {
+        File[] files = dir.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return file.isFile() && file.getName().startsWith(SIP_ZIP.getPrefix());
+            }
+        });
+        return new ArrayList<File>(Arrays.asList(files));
+    }
+
     static File findOrCreate(File directory, Storage.FileType fileType) {
         if (fileType.getName() == null) throw new RuntimeException("Expected name");
         File file = findOrNull(directory, 0, new NameFileFilter(fileType.getName()), fileType);
@@ -235,11 +253,11 @@ public class StorageHelper {
         return getRecent(files, which, fileType);
     }
 
-    static void addLatestHashed(File dir, FileType fileType, String prefix, List<File> list) throws StorageException {
+    static void addLatestNoHash(File dir, FileType fileType, String prefix, List<File> list) throws StorageException {
         File latestFile = findLatestFile(dir, fileType, prefix);
         if (!latestFile.exists()) return;
         try {
-            list.add(Hasher.ensureFileHashed(latestFile));
+            list.add(Hasher.ensureFileNotHashed(latestFile));
         }
         catch (IOException e) {
             throw new StorageException("Unable to hash file " + latestFile);

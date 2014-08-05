@@ -54,7 +54,8 @@ public interface Storage {
         MAPPING(null, "mapping_", ".xml", "mapping_%s.xml", 30),
         REPORT(null, "report_", null, "report_%s.txt", 1),
         REPORT_INDEX(null, "report_", null, "report_%s.long", 1),
-        LINKS(null, "links_", null, "links_%s.csv.gz", 1);
+        LINKS(null, "links_", null, "links_%s.csv.gz", 1),
+        SIP_ZIP(null, "sip_", ".zip", "sip_%s.zip", 1);
 
         private String name, prefix, suffix, pattern;
         private int historySize = 1;
@@ -75,9 +76,9 @@ public interface Storage {
             return name;
         }
 
-        public String getName(String prefix) {
+        public String getName(String sub) {
             if (pattern == null) throw new RuntimeException("No pattern");
-            return String.format(pattern, prefix);
+            return String.format(pattern, sub);
         }
 
         public String getPrefix() {

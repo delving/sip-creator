@@ -64,6 +64,7 @@ import java.util.TreeMap;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import static eu.delving.schema.SchemaType.RECORD_DEFINITION;
 import static eu.delving.schema.SchemaType.VALIDATION_SCHEMA;
@@ -510,7 +511,6 @@ public class StorageImpl implements Storage {
                 while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                     String fileName = zipEntry.getName();
                     if (fileName.equals(unzippedName)) {
-                        Hasher hasher = new Hasher();
                         File source = new File(here, FileType.SOURCE.getName());
                         GZIPOutputStream outputStream = null;
                         try {
@@ -518,18 +518,10 @@ public class StorageImpl implements Storage {
                             while (-1 != (bytesRead = zipInputStream.read(buffer))) {
                                 outputStream.write(buffer, 0, bytesRead);
                                 progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE));
-                                hasher.update(buffer, bytesRead);
                             }
                         }
                         finally {
                             IOUtils.closeQuietly(outputStream);
-                        }
-                        File hashedSource = new File(here, hasher.prefixFileName(FileType.SOURCE.getName()));
-                        if (hashedSource.exists()) {
-                            FileUtils.deleteQuietly(source); // already got it
-                        }
-                        else {
-                            FileUtils.moveFile(source, hashedSource);
                         }
                     }
                     else {
@@ -551,6 +543,43 @@ public class StorageImpl implements Storage {
             }
             catch (IOException e) {
                 throw new StorageException("Unable to accept SipZip file", e);
+            }
+        }
+
+        @Override
+        public File toSipZip() throws StorageException {
+            try {
+                List<File> files = new ArrayList<File>();
+                files.add(hintsFile(here));
+                files.add(factsFile(here));
+                for (SchemaVersion schemaVersion : getSchemaVersions()) {
+                    addLatestNoHash(here, MAPPING, schemaVersion.getPrefix(), files);
+                    File recDef = new File(here, schemaVersion.getFullFileName(RECORD_DEFINITION));
+                    if (recDef.exists()) files.add(recDef);
+                    File valSchema = new File(here, schemaVersion.getFullFileName(VALIDATION_SCHEMA));
+                    if (valSchema.exists()) files.add(valSchema);
+                }
+                files.add(sourceFile(here));
+                for (File file : sipZips(here)) delete(file);
+                File sipZip = sipZip(here, getSpec());
+                FileOutputStream fos = new FileOutputStream(sipZip);
+                ZipOutputStream zos = new ZipOutputStream(fos);
+                byte[] buffer = new byte[1024];
+                for (File file : files) {
+                    FileInputStream fis = new FileInputStream(file);
+                    zos.putNextEntry(new ZipEntry(file.getName()));
+                    int length;
+                    while ((length = fis.read(buffer)) > 0) {
+                        zos.write(buffer, 0, length);
+                    }
+                    zos.closeEntry();
+                    fis.close();
+                }
+                zos.close();
+                return sipZip;
+            }
+            catch (IOException e) {
+                throw new StorageException("Unable to collect files for sip zip", e);
             }
         }
 
@@ -581,6 +610,59 @@ public class StorageImpl implements Storage {
         public int compareTo(DataSet dataSet) {
             return getSpec().compareTo(dataSet.getSpec());
         }
+
+        private RecDef recDef(SchemaVersion schemaVersion) throws StorageException {
+            String fileName = schemaVersion.getFullFileName(RECORD_DEFINITION);
+            try {
+                File file = new File(here, fileName);
+                if (!file.exists()) {
+                    SchemaResponse recDefResponse = schemaRepository.getSchema(schemaVersion, RECORD_DEFINITION);
+                    if (recDefResponse == null) {
+                        throw new StorageException("No rec-def found for " + schemaVersion);
+                    }
+                    if (recDefResponse.isValidated()) {
+                        FileUtils.write(file, recDefResponse.getSchemaText(), "UTF-8");
+                    }
+                    return RecDef.read(new ByteArrayInputStream(recDefResponse.getSchemaText().getBytes("UTF-8")));
+                }
+                else {
+                    return RecDef.read(new FileInputStream(file));
+                }
+            }
+            catch (IOException e) {
+                throw new StorageException("Unable to load " + fileName, e);
+            }
+        }
+
+
+        private synchronized Validator validator(SchemaVersion schemaVersion) throws StorageException {
+            String fileName = schemaVersion.getFullFileName(VALIDATION_SCHEMA);
+            try {
+                File file = new File(here, fileName);
+                SchemaFactory schemaFactory = schemaFactory(schemaVersion.getPrefix());
+                if (!file.exists()) {
+                    SchemaResponse valResponse = schemaRepository.getSchema(schemaVersion, VALIDATION_SCHEMA);
+                    if (valResponse == null) {
+                        throw new StorageException("No validation XSD foudn for " + schemaVersion);
+                    }
+                    if (valResponse.isValidated()) {
+                        FileUtils.write(file, valResponse.getSchemaText(), "UTF-8");
+                    }
+                    StreamSource source = new StreamSource(new StringReader(valResponse.getSchemaText()));
+                    return schemaFactory.newSchema(source).newValidator();
+                }
+                else {
+                    return schemaFactory.newSchema(file).newValidator();
+                }
+            }
+            catch (SAXException e) {
+                throw new StorageException("Unable to create a validator: " + schemaVersion, e);
+            }
+            catch (IOException e) {
+                throw new StorageException("Unable to load " + fileName, e);
+            }
+        }
+
     }
 
     private SchemaFactory schemaFactory(String prefix) {
@@ -589,57 +671,6 @@ public class StorageImpl implements Storage {
             if (resolver != null) schemaFactory.setResourceResolver(resolver);
         }
         return schemaFactory;
-    }
-
-    private RecDef recDef(SchemaVersion schemaVersion) throws StorageException {
-        String fileName = schemaVersion.getFullFileName(RECORD_DEFINITION);
-        try {
-            File file = cache(fileName);
-            if (!file.exists()) {
-                SchemaResponse recDefResponse = schemaRepository.getSchema(schemaVersion, RECORD_DEFINITION);
-                if (recDefResponse == null) {
-                    throw new StorageException("No rec-def found for " + schemaVersion);
-                }
-                if (recDefResponse.isValidated()) {
-                    FileUtils.write(file, recDefResponse.getSchemaText(), "UTF-8");
-                }
-                return RecDef.read(new ByteArrayInputStream(recDefResponse.getSchemaText().getBytes("UTF-8")));
-            }
-            else {
-                return RecDef.read(new FileInputStream(file));
-            }
-        }
-        catch (IOException e) {
-            throw new StorageException("Unable to load " + fileName, e);
-        }
-    }
-
-    private synchronized Validator validator(SchemaVersion schemaVersion) throws StorageException {
-        String fileName = schemaVersion.getFullFileName(VALIDATION_SCHEMA);
-        try {
-            File file = cache(fileName);
-            SchemaFactory schemaFactory = schemaFactory(schemaVersion.getPrefix());
-            if (!file.exists()) {
-                SchemaResponse valResponse = schemaRepository.getSchema(schemaVersion, VALIDATION_SCHEMA);
-                if (valResponse == null) {
-                    throw new StorageException("No validation XSD foudn for " + schemaVersion);
-                }
-                if (valResponse.isValidated()) {
-                    FileUtils.write(file, valResponse.getSchemaText(), "UTF-8");
-                }
-                StreamSource source = new StreamSource(new StringReader(valResponse.getSchemaText()));
-                return schemaFactory.newSchema(source).newValidator();
-            }
-            else {
-                return schemaFactory.newSchema(file).newValidator();
-            }
-        }
-        catch (SAXException e) {
-            throw new StorageException("Unable to create a validator: " + schemaVersion, e);
-        }
-        catch (IOException e) {
-            throw new StorageException("Unable to load " + fileName, e);
-        }
     }
 
 }
