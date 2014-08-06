@@ -138,12 +138,12 @@ public class NetworkClient {
     }
 
 
-    public void fetchNarthexSipList(NarthexListListener narthexListListener, String url, String email, String apiKey) {
-        sipModel.exec(new NarthexListFetcher(1, narthexListListener, url, email, apiKey));
+    public void fetchNarthexSipList(NarthexListListener narthexListListener, String url, String apiKey) {
+        sipModel.exec(new NarthexListFetcher(1, narthexListListener, url, apiKey));
     }
 
-    public void uploadNarthex(DataSet dataSet, String url, String email, String apiKey, Swing finished) throws StorageException {
-        sipModel.exec(new DataUploader(1, dataSet, url, email, apiKey, finished));
+    public void uploadNarthex(DataSet dataSet, String url, String apiKey, Swing finished) throws StorageException {
+        sipModel.exec(new DataUploader(1, dataSet, url, apiKey, finished));
     }
 
     private abstract class Attempt implements Work {
@@ -237,13 +237,12 @@ public class NetworkClient {
 
     private class NarthexListFetcher extends Attempt {
         private NarthexListListener narthexListListener;
-        private String url, email, apiKey;
+        private String url, apiKey;
 
-        public NarthexListFetcher(int attempt, NarthexListListener narthexListListener, String url, String email, String apiKey) {
+        public NarthexListFetcher(int attempt, NarthexListListener narthexListListener, String url, String apiKey) {
             super(attempt);
             this.narthexListListener = narthexListListener;
             this.url = url;
-            this.email = email;
             this.apiKey = apiKey;
         }
 
@@ -262,7 +261,7 @@ public class NetworkClient {
                             narthexListListener.listReceived(sipList.list);
                             break;
                         case UNAUTHORIZED:
-                            if (!reactToUnauthorized(new NarthexListFetcher(attempt + 1, narthexListListener, url, email, apiKey))) {
+                            if (!reactToUnauthorized(new NarthexListFetcher(attempt + 1, narthexListListener, url, apiKey))) {
                                 narthexListListener.failed(new Exception("Unable to fetch list"));
                             }
                             break;
@@ -300,8 +299,8 @@ public class NetworkClient {
 
         private HttpGet createNarthexListRequest() {
             return new HttpGet(String.format(
-                    "%s/sip-creator/%s/%s/sip-zip",
-                    url, apiKey, email.replace("@", "_")
+                    "%s/sip-creator/%s/sip-zip",
+                    url, apiKey
             ));
         }
     }
@@ -444,16 +443,14 @@ public class NetworkClient {
     private class DataUploader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
         private final DataSet dataSet;
         private final String url;
-        private final String email;
         private final String apiKey;
         private ProgressListener progressListener;
         private Swing finished;
 
-        DataUploader(int attempt, DataSet dataSet, String url, String email, String apiKey, Swing finished) throws StorageException {
+        DataUploader(int attempt, DataSet dataSet, String url, String apiKey, Swing finished) throws StorageException {
             super(attempt);
             this.dataSet = dataSet;
             this.url = url;
-            this.email = email;
             this.apiKey = apiKey;
             this.finished = finished;
         }
@@ -515,8 +512,8 @@ public class NetworkClient {
 
         private HttpPost createOutputUploadRequest(File file, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
             HttpPost post = new HttpPost(String.format(
-                    "%s/sip-creator/%s/%s/upload/%s",
-                    url, apiKey, email.replace("@", "_"), file.getName()
+                    "%s/sip-creator/%s/upload/%s",
+                    url, apiKey, file.getName()
             ));
             FileEntity fileEntity = new FileEntity(file, progressListener);
             post.setEntity(fileEntity);
@@ -525,8 +522,8 @@ public class NetworkClient {
 
         private HttpPost createSipZipUploadRequest(File file, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
             HttpPost post = new HttpPost(String.format(
-                    "%s/sip-creator/%s/%s/sip-zip/%s",
-                    url, apiKey, email.replace("@", "_"), file.getName()
+                    "%s/sip-creator/%s/sip-zip/%s",
+                    url, apiKey, file.getName()
             ));
             FileEntity fileEntity = new FileEntity(file, progressListener);
             post.setEntity(fileEntity);

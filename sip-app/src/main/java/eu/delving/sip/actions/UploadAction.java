@@ -58,27 +58,22 @@ public class UploadAction extends AbstractAction {
         if (sipModel.getDataSetModel().isEmpty()) return;
         Preferences prefs = sipModel.getPreferences();
         String narthexUrl = prefs.get(Storage.NARTHEX_URL, "");
-        String narthexEmail = prefs.get(Storage.NARTHEX_EMAIL, "");
         String narthexApiKey = prefs.get(Storage.NARTHEX_API_KEY, "");
         JTextField urlField = new JTextField(narthexUrl, 45);
-        JTextField emailField = new JTextField(narthexEmail);
         JTextField apiKeyField = new JTextField(narthexApiKey);
         if (!sipModel.getFeedback().form(
                 "Narthex details",
                 "Server", urlField,
-                "EMail", emailField,
                 "API Key", apiKeyField
         )) return;
         if (!StringUtils.isEmpty(urlField.getText())) {
             try {
                 new URL(urlField.getText());
                 narthexUrl = urlField.getText().trim();
-                narthexEmail = emailField.getText().trim();
                 narthexApiKey = apiKeyField.getText().trim();
                 prefs.put(Storage.NARTHEX_URL, narthexUrl);
-                prefs.put(Storage.NARTHEX_EMAIL, narthexEmail);
                 prefs.put(Storage.NARTHEX_API_KEY, narthexApiKey);
-                initiateUpload(narthexUrl, narthexEmail, narthexApiKey);
+                initiateUpload(narthexUrl, narthexApiKey);
             }
             catch (MalformedURLException e) {
                 sipModel.getFeedback().alert("Malformed URL: " + urlField);
@@ -87,9 +82,9 @@ public class UploadAction extends AbstractAction {
 
     }
 
-    private void initiateUpload(String url, String email, String apiKey) {
+    private void initiateUpload(String url,  String apiKey) {
         try {
-            networkClient.uploadNarthex(sipModel.getDataSetModel().getDataSet(), url, email, apiKey, new Swing() {
+            networkClient.uploadNarthex(sipModel.getDataSetModel().getDataSet(), url, apiKey, new Swing() {
                 @Override
                 public void run() {
                     setEnabled(true);

@@ -28,7 +28,6 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
-import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
@@ -63,7 +62,10 @@ import static eu.delving.sip.base.KeystrokeHelper.SPACE;
 import static eu.delving.sip.base.KeystrokeHelper.UP;
 import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
 import static eu.delving.sip.base.KeystrokeHelper.attachAccelerator;
-import static eu.delving.sip.base.NetworkClient.*;
+import static eu.delving.sip.base.NetworkClient.DataSetEntry;
+import static eu.delving.sip.base.NetworkClient.HubListListener;
+import static eu.delving.sip.base.NetworkClient.SchemaVersionTag;
+import static eu.delving.sip.base.NetworkClient.UnlockListener;
 import static eu.delving.sip.base.SwingHelper.ICON_DOWNLOAD;
 import static eu.delving.sip.base.SwingHelper.ICON_HUH;
 import static eu.delving.sip.base.SwingHelper.ICON_OWNED;
@@ -225,24 +227,23 @@ public class DataSetHubFrame extends FrameBase {
             });
 
 //            todo: Just a test
-            networkClient.fetchNarthexSipList(
-                    new NarthexListListener() {
-                        @Override
-                        public void listReceived(List<NetworkClient.Sip> entries) {
-                            for (Sip sip : entries) {
-                                System.out.println("Narthex: " + sip.file.trim());
-                            }
-                        }
-
-                        @Override
-                        public void failed(Exception e) {
-                            sipModel.getFeedback().alert("Unable to fetch data set list", e);
-                        }
-                    },
-                    sipModel.getPreferences().get(Storage.NARTHEX_URL, ""),
-                    sipModel.getPreferences().get(Storage.NARTHEX_EMAIL, ""),
-                    sipModel.getPreferences().get(Storage.NARTHEX_API_KEY, "")
-            );
+//            networkClient.fetchNarthexSipList(
+//                    new NarthexListListener() {
+//                        @Override
+//                        public void listReceived(List<NetworkClient.Sip> entries) {
+//                            for (Sip sip : entries) {
+//                                System.out.println("Narthex: " + sip.file.trim());
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void failed(Exception e) {
+//                            sipModel.getFeedback().alert("Unable to fetch data set list", e);
+//                        }
+//                    },
+//                    sipModel.getPreferences().get(Storage.NARTHEX_URL, ""),
+//                    sipModel.getPreferences().get(Storage.NARTHEX_API_KEY, "")
+//            );
         }
     }
 
