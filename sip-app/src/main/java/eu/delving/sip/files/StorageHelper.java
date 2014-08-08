@@ -174,8 +174,7 @@ public class StorageHelper {
     }
 
     static File targetFile(File dir, Map<String,String> facts, String prefix) {
-        String name = facts.get("name").replaceAll(" ", "_");
-        String fileName = String.format("%s__%s.xml.gz", name, prefix.toUpperCase());
+        String fileName = String.format("%s__%s.xml.gz", facts.get("spec"), prefix);
         return new File(dir, fileName);
     }
 
