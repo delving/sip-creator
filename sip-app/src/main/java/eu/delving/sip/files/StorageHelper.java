@@ -212,8 +212,8 @@ public class StorageHelper {
         return new File(dir, sourceFormat ? SOURCE_STATS.getName() : IMPORT_STATS.getName());
     }
 
-    static File sipZip(File dir, String spec) {
-        String part = String.format("%s__%s", spec, DATE_FORMAT.format(new Date()));
+    static File sipZip(File dir, String spec, String user) {
+        String part = String.format("%s__%s__%s", spec, DATE_FORMAT.format(new Date()), user);
         return new File(dir, SIP_ZIP.getName(part));
     }
 

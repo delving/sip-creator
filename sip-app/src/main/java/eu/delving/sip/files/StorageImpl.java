@@ -561,7 +561,7 @@ public class StorageImpl implements Storage {
                 }
                 files.add(sourceFile(here));
                 for (File file : sipZips(here)) delete(file);
-                File sipZip = sipZip(here, getSpec());
+                File sipZip = sipZip(here, getSpec(), StorageFinder.getUser(home));
                 FileOutputStream fos = new FileOutputStream(sipZip);
                 ZipOutputStream zos = new ZipOutputStream(fos);
                 byte[] buffer = new byte[1024];
