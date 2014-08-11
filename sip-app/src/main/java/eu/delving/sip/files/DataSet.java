@@ -105,7 +105,9 @@ public interface DataSet extends Comparable<DataSet> {
 
     List<File> getUploadFiles() throws StorageException;
 
-    void fromSipZip(InputStream inputStream, long streamLength, ProgressListener progressListener) throws IOException, StorageException;
+    File sipZipFile(String fileName) throws StorageException;
+
+    void fromSipZip(File sipZipFile, ProgressListener progressListener) throws IOException, StorageException;
 
     File toSipZip() throws StorageException;
 

@@ -61,6 +61,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -121,19 +122,22 @@ public class StorageImpl implements Storage {
         if (list != null) {
             for (File directory : list) {
                 if (!directory.isDirectory()) continue;
-                // todo: use a regex to make sure you get only the right datasets
                 if (narthex) {
-                    // todo: get only the narthex ones
+                    Matcher matcher = NARTHEX_DATASET_PATTERN.matcher(directory.getName());
+                    if (!matcher.matches()) continue;
+                    DataSetImpl impl = new DataSetImpl(directory);
+                    map.put(impl.getSpec(), impl);
                 }
                 else {
-                    // todo: get only the hub ones
-                    if (directory.getName().equals(CACHE_DIR)) continue;
-                    boolean hasFiles = false;
+                    Matcher matcher = HUB_DATASET_PATTERN.matcher(directory.getName());
+                    if (!matcher.matches()) continue;
+                    boolean hasFiles = false; // empty ones will not appear
                     File[] files = directory.listFiles();
                     if (files != null) {
                         for (File file : files) if (file.isFile()) hasFiles = true;
                         if (!hasFiles) continue;
-                        map.put(directory.getName(), new DataSetImpl(directory));
+                        DataSetImpl impl = new DataSetImpl(directory);
+                        map.put(impl.getSpec(), impl);
                     }
                 }
             }
@@ -506,47 +510,56 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public void fromSipZip(InputStream inputStream, long streamLength, ProgressListener progressListener) throws StorageException {
-            ZipEntry zipEntry;
-            byte[] buffer = new byte[BLOCK_SIZE];
-            int bytesRead;
-            progressListener.prepareFor((int) (streamLength / BLOCK_SIZE));
-            CountingInputStream counting = new CountingInputStream(inputStream);
-            ZipInputStream zipInputStream = new ZipInputStream(counting);
-            String unzippedName = FileType.SOURCE.getName().substring(0, FileType.SOURCE.getName().length() - ".gz".length());
+        public File sipZipFile(String fileName) throws StorageException {
+            return new File(here, fileName);
+        }
+
+        @Override
+        public void fromSipZip(File sipZipFile, ProgressListener progressListener) throws StorageException {
+            long streamLength = sipZipFile.length();
             try {
-                while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                    String fileName = zipEntry.getName();
-                    if (fileName.equals(unzippedName)) {
-                        File source = new File(here, FileType.SOURCE.getName());
-                        GZIPOutputStream outputStream = null;
-                        try {
-                            outputStream = new GZIPOutputStream(new FileOutputStream(source));
-                            while (-1 != (bytesRead = zipInputStream.read(buffer))) {
-                                outputStream.write(buffer, 0, bytesRead);
-                                progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE));
+                InputStream inputStream = new FileInputStream(sipZipFile);
+                ZipEntry zipEntry;
+                byte[] buffer = new byte[BLOCK_SIZE];
+                int bytesRead;
+                progressListener.prepareFor((int) (streamLength / BLOCK_SIZE));
+                CountingInputStream counting = new CountingInputStream(inputStream);
+                ZipInputStream zipInputStream = new ZipInputStream(counting);
+                String unzippedName = FileType.SOURCE.getName().substring(0, FileType.SOURCE.getName().length() - ".gz".length());
+                try {
+                    while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                        String fileName = zipEntry.getName();
+                        if (fileName.equals(unzippedName)) {
+                            File source = new File(here, FileType.SOURCE.getName());
+                            GZIPOutputStream outputStream = null;
+                            try {
+                                outputStream = new GZIPOutputStream(new FileOutputStream(source));
+                                while (-1 != (bytesRead = zipInputStream.read(buffer))) {
+                                    outputStream.write(buffer, 0, bytesRead);
+                                    progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE));
+                                }
+                            }
+                            finally {
+                                IOUtils.closeQuietly(outputStream);
                             }
                         }
-                        finally {
-                            IOUtils.closeQuietly(outputStream);
+                        else {
+                            File file = new File(here, fileName);
+                            OutputStream output = null;
+                            try {
+                                output = new FileOutputStream(file);
+                                IOUtils.copy(zipInputStream, output);
+                            }
+                            finally {
+                                IOUtils.closeQuietly(output);
+                            }
+                            progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE));
                         }
-                    }
-                    else {
-                        File file = new File(here, fileName);
-                        OutputStream output = null;
-                        try {
-                            output = new FileOutputStream(file);
-                            IOUtils.copy(zipInputStream, output);
-                        }
-                        finally {
-                            IOUtils.closeQuietly(output);
-                        }
-                        progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE));
                     }
                 }
-            }
-            catch (CancelException e) {
-                throw new StorageException("Cancellation", e);
+                catch (CancelException e) {
+                    throw new StorageException("Cancellation", e);
+                }
             }
             catch (IOException e) {
                 throw new StorageException("Unable to accept SipZip file", e);

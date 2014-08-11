@@ -141,9 +141,10 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets(true);
         if (list != null) {
             for (NetworkClient.Sip incoming : list) {
-                DataSet dataSet = dataSets.get(incoming.facts.spec); // todo: the spec?
+                String spec = incoming.facts.spec;
+                DataSet dataSet = dataSets.get(spec);
                 freshRows.add(new NarthexDataSetTableRow(sipModel, incoming, dataSet));
-                if (dataSet != null) dataSets.remove(incoming.facts.spec); // remove used ones
+                if (dataSet != null) dataSets.remove(spec); // remove used ones
             }
         }
         for (DataSet dataSet : dataSets.values()) { // remaining ones
@@ -285,7 +286,7 @@ class NarthexDataSetTableModel extends AbstractTableModel {
     private class RefreshAction extends AbstractAction {
 
         private RefreshAction() {
-            super("Refresh list from the culture hub");
+            super("Refresh list from Narthex");
             putValue(Action.SMALL_ICON, SwingHelper.ICON_FETCH_LIST);
         }
 

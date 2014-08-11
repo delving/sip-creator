@@ -25,6 +25,7 @@ import eu.delving.metadata.Path;
 
 import java.io.File;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * This interface describes how files are maintained by the SIP-Creator
@@ -120,6 +121,8 @@ public interface Storage {
     String FRAME_ARRANGEMENTS_FILE = "frame-arrangements.xml";
     Path RECORD_ROOT = Path.create(String.format("/%s/%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG));
     Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/@%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG, UNIQUE_ATTR));
-//    Path CONSTANT_PATH = Path.create(String.format("/%s", CONSTANT_TAG)); doesn't seem to be used
     long MAPPING_FREEZE_INTERVAL = 60000;
+    String NARTHEX_DATASET_PREFIX = "narthex__";
+    Pattern HUB_DATASET_PATTERN = Pattern.compile("([^_]+)_([^_]+)"); // geheugen-van-nederland_dimcon
+    Pattern NARTHEX_DATASET_PATTERN = Pattern.compile("narthex__([^_]+)_([^_]+)"); // narthex__bronbeek_dimcon
 }

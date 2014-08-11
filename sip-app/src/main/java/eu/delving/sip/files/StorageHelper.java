@@ -65,23 +65,33 @@ public class StorageHelper {
 
     static File createDataSetDirectory(File home, boolean narthex, String spec, String organization) {
         if (narthex) {
-            return new File(home, String.format("narthex_%s_%s", spec, organization));
+            return new File(home, String.format("narthex__%s_%s", spec, organization));
         }
         else {
             return new File(home, String.format("%s_%s", spec, organization));
         }
     }
 
+    private static String stripNarthex(File directory) {
+        String name = directory.getName();
+        if (name.startsWith(NARTHEX_DATASET_PREFIX)) {
+            name = name.substring(NARTHEX_DATASET_PREFIX.length());
+        }
+        return name;
+    }
+
     static String getSpecFromDirectory(File directory) {
-        int underscore = directory.getName().indexOf("_");
+        String name = stripNarthex(directory);
+        int underscore = name.indexOf("_");
         if (underscore < 0) throw new IllegalStateException("Directory must be in the form spec_organization");
-        return directory.getName().substring(0, underscore);
+        return name.substring(0, underscore);
     }
 
     static String getOrganizationFromDirectory(File directory) {
-        int underscore = directory.getName().indexOf("_");
+        String name = stripNarthex(directory);
+        int underscore = name.indexOf("_");
         if (underscore < 0) throw new IllegalStateException("Directory must be in the form spec_organization");
-        return directory.getName().substring(underscore + 1);
+        return name.substring(underscore + 1);
     }
 
     public static Path getRecordRoot(Map<String, String> hints) throws StorageException {

@@ -378,8 +378,13 @@ public class TestSourceConverter {
         }
 
         @Override
-        public void fromSipZip(InputStream inputStream, long streamLength, ProgressListener progressListener) throws IOException, StorageException {
-          
+        public File sipZipFile(String fileName) throws StorageException {
+            return null;
+        }
+
+        @Override
+        public void fromSipZip(File sipZipFile, ProgressListener progressListener) throws IOException, StorageException {
+
         }
 
         @Override

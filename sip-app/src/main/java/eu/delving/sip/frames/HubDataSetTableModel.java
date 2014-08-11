@@ -81,7 +81,7 @@ class HubDataSetTableModel extends AbstractTableModel {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) return;
-                ListSelectionModel selectionModel = (ListSelectionModel)e.getSource();
+                ListSelectionModel selectionModel = (ListSelectionModel) e.getSource();
                 selectedRow = null;
                 for (int index = e.getFirstIndex(); index <= e.getLastIndex(); index++) {
                     if (selectionModel.isSelectedIndex(index)) {
@@ -158,9 +158,10 @@ class HubDataSetTableModel extends AbstractTableModel {
         Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets(false);
         if (list != null) {
             for (NetworkClient.DataSetEntry incoming : list) {
-                DataSet dataSet = dataSets.get(incoming.getDirectoryName());
+                String spec = incoming.spec;
+                DataSet dataSet = dataSets.get(spec);
                 freshHubRows.add(new HubDataSetTableRow(sipModel, incoming, dataSet));
-                if (dataSet != null) dataSets.remove(incoming.getDirectoryName()); // remove used ones
+                if (dataSet != null) dataSets.remove(spec); // remove used ones
             }
         }
         for (DataSet dataSet : dataSets.values()) { // remaining ones
@@ -338,7 +339,7 @@ class HubDataSetTableModel extends AbstractTableModel {
     private class RefreshAction extends AbstractAction {
 
         private RefreshAction() {
-            super("Refresh list from the culture hub");
+            super("Refresh list from the CultureHub");
             putValue(Action.SMALL_ICON, SwingHelper.ICON_FETCH_LIST);
         }
 
@@ -487,7 +488,7 @@ class HubDataSetTableModel extends AbstractTableModel {
             setEnabled(false);
             try {
                 DataSet dataSet = sipModel.getStorage().createDataSet(false, selectedRow.getSpec(), selectedRow.getOrganization());
-                networkClient.downloadHubDataset(dataSet, new Swing() {
+                networkClient.downloadHubDataset("culture-hub-sip.zip", dataSet, new Swing() {
                     @Override
                     public void run() {
                         setEnabled(true);

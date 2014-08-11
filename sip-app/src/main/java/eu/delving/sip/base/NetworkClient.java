@@ -42,6 +42,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -126,8 +127,8 @@ public class NetworkClient {
         sipModel.exec(new HubRelease(1, dataSet, releaseListener));
     }
 
-    public void downloadHubDataset(DataSet dataSet, Swing finished) {
-        sipModel.exec(new HubDownloader(1, dataSet, finished));
+    public void downloadHubDataset(String fileName, DataSet dataSet, Swing finished) {
+        sipModel.exec(new HubDownloader(1, fileName, dataSet, finished));
     }
 
     public interface NarthexListListener {
@@ -305,12 +306,14 @@ public class NetworkClient {
     }
 
     private class HubDownloader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
-        private DataSet dataSet;
+        private final String fileName;
+        private final DataSet dataSet;
         private ProgressListener progressListener;
         private Swing finished;
 
-        private HubDownloader(int attempt, DataSet dataSet, Swing finished) {
+        private HubDownloader(int attempt, String fileName, DataSet dataSet, Swing finished) {
             super(attempt);
+            this.fileName = fileName;
             this.dataSet = dataSet;
             this.finished = finished;
         }
@@ -327,11 +330,24 @@ public class NetworkClient {
                     switch (code) {
                         case OK:
                             dataSet.remove();
-                            dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
+                            File sipZipFile = dataSet.sipZipFile(fileName);
+                            FileOutputStream output = new FileOutputStream(sipZipFile);
+                            progressListener.prepareFor((int)(entity.getContentLength()/BLOCK_SIZE));
+                            InputStream input = entity.getContent();
+                            byte[] buffer = new byte[BLOCK_SIZE];
+                            int count = 0;
+                            int bytesRead = 0;
+                            while (-1 != (bytesRead = input.read(buffer))) {
+                                output.write(buffer, 0, bytesRead);
+                                count++;
+                                progressListener.setProgress(count);
+                            }
+                            output.close();
+                            dataSet.fromSipZip(sipZipFile, progressListener);
                             success = true;
                             break;
                         case UNAUTHORIZED:
-                            if (reactToUnauthorized(new HubDownloader(attempt + 1, dataSet, finished))) {
+                            if (reactToUnauthorized(new HubDownloader(attempt + 1, fileName, dataSet, finished))) {
                                 finished = null;
                             }
                             else {
@@ -495,11 +511,24 @@ public class NetworkClient {
                     switch (code) {
                         case OK:
                             dataSet.remove();
-                            dataSet.fromSipZip(entity.getContent(), entity.getContentLength(), progressListener);
+                            File sipZipFile = dataSet.sipZipFile(fileName);
+                            FileOutputStream output = new FileOutputStream(sipZipFile);
+                            progressListener.prepareFor((int)(entity.getContentLength()/BLOCK_SIZE));
+                            InputStream input = entity.getContent();
+                            byte[] buffer = new byte[BLOCK_SIZE];
+                            int count = 0;
+                            int bytesRead = 0;
+                            while (-1 != (bytesRead = input.read(buffer))) {
+                                output.write(buffer, 0, bytesRead);
+                                count++;
+                                progressListener.setProgress(count);
+                            }
+                            output.close();
+                            dataSet.fromSipZip(sipZipFile, progressListener);
                             success = true;
                             break;
                         case UNAUTHORIZED:
-                            if (reactToUnauthorized(new HubDownloader(attempt + 1, dataSet, finished))) {
+                            if (reactToUnauthorized(new NarthexDatasetDownloader(attempt + 1, fileName, dataSet, url, apiKey, finished))) {
                                 finished = null;
                             }
                             else {
@@ -807,9 +836,9 @@ public class NetworkClient {
         public CreatedBy createdBy;
         public List<SchemaVersionTag> schemaVersions;
 
-        public String getDirectoryName() {
-            return String.format("%s_%s", spec, orgId);
-        }
+//        public String getDirectoryName() {
+//            return String.format("%s_%s", spec, orgId);
+//        }
 
         public int getRecordCount() {
             return recordCount;
