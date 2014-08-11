@@ -63,8 +63,13 @@ public class StorageHelper {
     static final int BLOCK_SIZE = 4096;
     static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy_MM_dd_HH_mm");
 
-    static File createDataSetDirectory(File home, String spec, String organization) {
-        return new File(home, String.format("%s_%s", spec, organization));
+    static File createDataSetDirectory(File home, boolean narthex, String spec, String organization) {
+        if (narthex) {
+            return new File(home, String.format("narthex_%s_%s", spec, organization));
+        }
+        else {
+            return new File(home, String.format("%s_%s", spec, organization));
+        }
     }
 
     static String getSpecFromDirectory(File directory) {

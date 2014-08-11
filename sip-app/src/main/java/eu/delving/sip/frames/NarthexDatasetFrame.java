@@ -43,18 +43,13 @@ import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -62,7 +57,6 @@ import java.util.regex.Pattern;
 
 import static eu.delving.sip.base.KeystrokeHelper.SPACE;
 import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
-import static eu.delving.sip.base.SwingHelper.scrollV;
 
 /**
  * Provide an form interface for creating datasets
@@ -70,7 +64,7 @@ import static eu.delving.sip.base.SwingHelper.scrollV;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-public class DataSetStandaloneFrame extends FrameBase {
+public class NarthexDatasetFrame extends FrameBase {
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 26);
     private static final Pattern SPEC_PATTERN = Pattern.compile("[A-Za-z0-9-]{3,40}");
     private static final String UNSELECTED = "<select>";
@@ -80,48 +74,25 @@ public class DataSetStandaloneFrame extends FrameBase {
     private SchemaRepository schemaRepository;
     private List<FactDefinition> factDefinitions;
     private Map<String, FieldComponent> fieldComponents = new TreeMap<String, FieldComponent>();
-    private DataSetListModel listModel = new DataSetListModel();
-    private JList<DataSet> dataSetList = new JList<DataSet>(listModel);
     private JPanel fieldPanel = new JPanel();
     private EditAction editAction = new EditAction();
 
-    public DataSetStandaloneFrame(SipModel sipModel, SchemaRepository schemaRepository) {
+    public NarthexDatasetFrame(SipModel sipModel, SchemaRepository schemaRepository) {
         super(Which.DATA_SET, sipModel, "Data set facts");
         this.schemaRepository = schemaRepository;
         fieldPanel.add(EMPTY_LABEL);
         sipModel.exec(createFactDefFetcher());
-        dataSetList.setFont(MONOSPACED);
-        dataSetList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        dataSetList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent listSelectionEvent) {
-                if (listSelectionEvent.getValueIsAdjusting()) return;
-                DataSet dataSet = dataSetList.getSelectedValue();
-                Map<String, String> facts = dataSet == null ? null : dataSet.getDataSetFacts();
-                setFacts(facts);
-                editAction.setEnabled(dataSet != null);
-            }
-        });
-        dataSetList.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() > 1 && editAction.isEnabled()) {
-                    if (dataSetList.getSelectedIndex() != dataSetList.locationToIndex(e.getPoint())) return;
-                    editAction.actionPerformed(null);
-                }
-            }
-        });
         addKeyboardAction(editAction, SPACE, (JComponent) getContentPane());
     }
 
     @Override
     protected void onOpen(boolean opened) {
-        if (opened) Swing.Exec.later(new Swing() {
-            @Override
-            public void run() {
-                dataSetList.requestFocus();
-            }
-        });
+//        if (opened) Swing.Exec.later(new Swing() {
+//            @Override
+//            public void run() {
+//                dataSetList.requestFocus();
+//            }
+//        });
     }
 
     @Override
@@ -130,12 +101,11 @@ public class DataSetStandaloneFrame extends FrameBase {
         content.add(createRight(), BorderLayout.EAST);
         content.add(createCenter(), BorderLayout.CENTER);
         sipModel.exec(createFormBuilder());
-        listModel.refresh();
     }
 
     private JPanel createCenter() {
         JPanel p = new JPanel(new BorderLayout());
-        p.add(scrollV("Data sets", dataSetList), BorderLayout.CENTER);
+//        p.add(scrollV("Data sets", dataSetList), BorderLayout.CENTER);
         p.add(new JButton(editAction), BorderLayout.SOUTH);
         return p;
     }
@@ -363,49 +333,6 @@ public class DataSetStandaloneFrame extends FrameBase {
         }
     }
 
-    private class DataSetListModel extends AbstractListModel<DataSet> {
-        private List<DataSet> dataSets;
-
-        public void refresh() {
-            List<DataSet> freshDataSets = new ArrayList<DataSet>();
-            freshDataSets.addAll(sipModel.getStorage().getDataSets().values());
-            Collections.sort(freshDataSets);
-            if (getSize() > 0) {
-                int sizeWas = getSize();
-                dataSets = null;
-                fireIntervalRemoved(this, 0, sizeWas);
-            }
-            dataSets = freshDataSets;
-            fireIntervalAdded(this, 0, getSize());
-        }
-
-        public boolean exists(String spec) {
-            if (dataSets != null) for (DataSet dataSet : dataSets) {
-                if (spec.equals(dataSet.getSpec())) return true;
-            }
-            return false;
-        }
-
-        @Override
-        public int getSize() {
-            return dataSets == null ? 0 : dataSets.size();
-        }
-
-        @Override
-        public DataSet getElementAt(int i) {
-            return dataSets == null ? null : dataSets.get(i);
-        }
-
-        public int indexOf(DataSet dataSet) {
-            int index = 0;
-            if (dataSets != null) for (DataSet member : dataSets) {
-                if (dataSet.getSpec().equals(member.getSpec())) return index;
-                index++;
-            }
-            return -1;
-        }
-    }
-
     private class CreateAction extends AbstractAction {
         private String spec;
 
@@ -434,10 +361,10 @@ public class DataSetStandaloneFrame extends FrameBase {
                         ));
                         return;
                     }
-                    if (listModel.exists(chosenSpec)) {
-                        sipModel.getFeedback().alert(String.format("The spec '%s' already exists.", chosenSpec));
-                        return;
-                    }
+//                    if (listModel.exists(chosenSpec)) {
+//                        sipModel.getFeedback().alert(String.format("The spec '%s' already exists.", chosenSpec));
+//                        return;
+//                    }
                     spec = chosenSpec;
                     clearFacts(spec);
                     refresh();
@@ -445,13 +372,13 @@ public class DataSetStandaloneFrame extends FrameBase {
             }
             else {
                 try {
-                    DataSet dataSet = sipModel.getStorage().createDataSet(spec, "standalone");
+                    DataSet dataSet = sipModel.getStorage().createDataSet(true, spec, "standalone");
                     Map<String, String> facts = getFacts();
                     if (facts == null) return;
                     dataSet.setDataSetFacts(facts);
-                    listModel.refresh();
-                    int index = listModel.indexOf(dataSet);
-                    dataSetList.setSelectedIndex(index);
+//                    listModel.refresh();
+//                    int index = listModel.indexOf(dataSet);
+//                    dataSetList.setSelectedIndex(index);
                     spec = null;
                     refresh();
                 }
@@ -472,7 +399,8 @@ public class DataSetStandaloneFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            DataSet dataSet = (DataSet) dataSetList.getSelectedValue();
+            DataSet dataSet = null;
+//            DataSet dataSet = (DataSet) dataSetList.getSelectedValue();
             if (dataSet == null) return;
             List<SchemaVersion> schemaVersions = dataSet.getSchemaVersions();
             if (schemaVersions == null || schemaVersions.isEmpty()) return;

@@ -54,7 +54,7 @@ public class TestStorage {
         SchemaRepository repo = new SchemaRepository(localFetcher);
         Storage storage = new StorageImpl(storageDir, repo, null);
         File zip = new File(getClass().getResource("/zip/ZipImport.xml.zip").getFile());
-        final DataSet dataSet = storage.createDataSet("spek", "orgy");
+        final DataSet dataSet = storage.createDataSet(false, "spek", "orgy");
         FileUtils.write(new File(dataSet.importedOutput().getParent(), "dataset_facts.txt"),
                 "schemaVersions=ese_3.4.0\n"
         );

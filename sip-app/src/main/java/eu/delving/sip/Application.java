@@ -45,9 +45,8 @@ import eu.delving.sip.files.StorageException;
 import eu.delving.sip.files.StorageFinder;
 import eu.delving.sip.files.StorageImpl;
 import eu.delving.sip.frames.AllFrames;
-import eu.delving.sip.frames.DataSetHubFrame;
-import eu.delving.sip.frames.DataSetStandaloneFrame;
 import eu.delving.sip.frames.LogFrame;
+import eu.delving.sip.frames.RemoteDataSetFrame;
 import eu.delving.sip.menus.ExpertMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.MappingModel;
@@ -85,7 +84,6 @@ import static eu.delving.sip.base.HttpClientFactory.createHttpClient;
 import static eu.delving.sip.base.KeystrokeHelper.MENU_W;
 import static eu.delving.sip.base.KeystrokeHelper.attachAccelerator;
 import static eu.delving.sip.files.DataSetState.*;
-import static eu.delving.sip.files.StorageFinder.isStandalone;
 
 /**
  * The main application, based on the SipModel and bringing everything together in a big frame with a central
@@ -153,8 +151,8 @@ public class Application {
         context.setStorage(storage);
         context.setHttpClient(httpClient);
         sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, preferences);
-        NetworkClient networkClient = isStandalone(storageDir) ? null : new NetworkClient(sipModel, httpClient);
-        if (networkClient != null) uploadAction = new UploadAction(sipModel, networkClient);
+        NetworkClient networkClient = new NetworkClient(sipModel, httpClient);
+        uploadAction = new UploadAction(sipModel, networkClient);
         expertMenu = new ExpertMenu(desktop, sipModel, networkClient, allFrames);
         statusPanel = new StatusPanel(sipModel);
         home = new JFrame(titleString());
@@ -166,7 +164,7 @@ public class Application {
         });
         JPanel content = (JPanel) home.getContentPane();
         content.setFocusable(true);
-        FrameBase dataSetFrame = networkClient != null ? new DataSetHubFrame(sipModel, networkClient) : new DataSetStandaloneFrame(sipModel, schemaRepository);
+        FrameBase dataSetFrame = new RemoteDataSetFrame(sipModel, networkClient);
         LogFrame logFrame = new LogFrame(sipModel);
         feedback.setLog(logFrame.getLog());
         allFrames = new AllFrames(sipModel, content, dataSetFrame, logFrame);

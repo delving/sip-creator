@@ -115,19 +115,26 @@ public class StorageImpl implements Storage {
     }
 
     @Override
-    public Map<String, DataSet> getDataSets() {
+    public Map<String, DataSet> getDataSets(boolean narthex) {
         Map<String, DataSet> map = new TreeMap<String, DataSet>();
         File[] list = home.listFiles();
         if (list != null) {
             for (File directory : list) {
                 if (!directory.isDirectory()) continue;
-                if (directory.getName().equals(CACHE_DIR)) continue;
-                boolean hasFiles = false;
-                File[] files = directory.listFiles();
-                if (files != null) {
-                    for (File file : files) if (file.isFile()) hasFiles = true;
-                    if (!hasFiles) continue;
-                    map.put(directory.getName(), new DataSetImpl(directory));
+                // todo: use a regex to make sure you get only the right datasets
+                if (narthex) {
+                    // todo: get only the narthex ones
+                }
+                else {
+                    // todo: get only the hub ones
+                    if (directory.getName().equals(CACHE_DIR)) continue;
+                    boolean hasFiles = false;
+                    File[] files = directory.listFiles();
+                    if (files != null) {
+                        for (File file : files) if (file.isFile()) hasFiles = true;
+                        if (!hasFiles) continue;
+                        map.put(directory.getName(), new DataSetImpl(directory));
+                    }
                 }
             }
         }
@@ -135,8 +142,8 @@ public class StorageImpl implements Storage {
     }
 
     @Override
-    public DataSet createDataSet(String spec, String organization) throws StorageException {
-        File directory = createDataSetDirectory(home, spec, organization);
+    public DataSet createDataSet(boolean narthex, String spec, String organization) throws StorageException {
+        File directory = createDataSetDirectory(home, narthex, spec, organization);
         if (!directory.exists() && !directory.mkdirs()) {
             throw new StorageException(String.format("Unable to create data set directory %s", directory.getAbsolutePath()));
         }

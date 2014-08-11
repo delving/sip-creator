@@ -40,9 +40,9 @@ public interface Storage {
 
     File cache(String fileName);
 
-    Map<String, DataSet> getDataSets();
+    Map<String, DataSet> getDataSets(boolean narthex);
 
-    DataSet createDataSet(String spec, String organization) throws StorageException;
+    DataSet createDataSet(boolean narthex, String spec, String organization) throws StorageException;
 
     enum FileType {
         IMPORTED("imported.xml.gz"),
@@ -118,7 +118,6 @@ public interface Storage {
     String MEDIA_DIR = "Media";
     String INDEX_FILE = "media-files.xml";
     String FRAME_ARRANGEMENTS_FILE = "frame-arrangements.xml";
-    String STANDALONE_DIR = "StandaloneDataSets";
     Path RECORD_ROOT = Path.create(String.format("/%s/%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG));
     Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/@%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG, UNIQUE_ATTR));
 //    Path CONSTANT_PATH = Path.create(String.format("/%s", CONSTANT_TAG)); doesn't seem to be used

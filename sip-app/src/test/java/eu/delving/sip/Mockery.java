@@ -25,7 +25,12 @@ import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.MetadataRecord;
-import eu.delving.metadata.*;
+import eu.delving.metadata.CachedResourceResolver;
+import eu.delving.metadata.MetadataException;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.util.FileSystemFetcher;
 import eu.delving.sip.files.Storage;
@@ -74,7 +79,7 @@ public class Mockery {
 
     public void prepareDataset(String prefix, String recordRootPath, String uniqueElementPath) throws StorageException, IOException, MetadataException {
         this.prefix = prefix;
-        storage.createDataSet(prefix, ORG);
+        storage.createDataSet(false, prefix, ORG);
         dataSetDir = new File(root, String.format("%s_%s", prefix, ORG));
         hints.clear();
         hints.put(Storage.RECORD_ROOT_PATH, recordRootPath);
@@ -82,7 +87,7 @@ public class Mockery {
         File factsSourceDir = new File(getClass().getResource(String.format("/test/%s/dataset", prefix)).getFile());
         if (!factsSourceDir.isDirectory()) throw new RuntimeException();
         FileUtils.copyDirectory(factsSourceDir, dataSetDir);
-        dataSetModel.setDataSet(storage.getDataSets().get(dataSetDir.getName()), prefix);
+        dataSetModel.setDataSet(storage.getDataSets(false).get(dataSetDir.getName()), prefix);
         recMapping = dataSetModel.getMappingModel().getRecMapping();
 //        FileUtils.writeStringToFile(new File("/tmp/EAD-paths.txt"), recMapping.getRecDefTree().getPathsList());
     }

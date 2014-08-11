@@ -21,14 +21,17 @@
 
 package eu.delving.sip.base;
 
-import eu.delving.sip.files.StorageFinder;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 import java.io.File;
-import java.net.*;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.ProxySelector;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static eu.delving.sip.files.StorageFinder.getHostPort;
@@ -48,10 +51,8 @@ public class HttpClientFactory {
     public static HttpClient createHttpClient(File storageDirectory) {
         HttpClientBuilder builder = HttpClientBuilder.create().disableAutomaticRetries();
         builder.setConnectionManager(new PoolingHttpClientConnectionManager());
-        if (!StorageFinder.isStandalone(storageDirectory)) {
-            String serverUrl = String.format("http://%s", getHostPort(storageDirectory));
-            handleProxy(serverUrl, builder);
-        }
+        String serverUrl = String.format("http://%s", getHostPort(storageDirectory));
+        handleProxy(serverUrl, builder);
         return builder.build();
     }
 
