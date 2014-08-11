@@ -47,7 +47,9 @@ class NarthexDataSetTableRow implements Comparable<NarthexDataSetTableRow> {
     }
 
     public boolean isDownloadable() {
-        return true; // check if the local file is the same one
+        if (dataSet == null) return true;
+//        System.out.println(String.format("[%s][%s]", dataSet.getNarthexSipZipName(), sip.file));
+        return !dataSet.getNarthexSipZipName().equals(sip.file);
     }
 
     public String getFileName() {

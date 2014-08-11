@@ -126,7 +126,7 @@ public class StorageImpl implements Storage {
                     Matcher matcher = NARTHEX_DATASET_PATTERN.matcher(directory.getName());
                     if (!matcher.matches()) continue;
                     DataSetImpl impl = new DataSetImpl(directory);
-                    map.put(impl.getSpec(), impl);
+                    map.put(impl.getNarthexSipZipName(), impl);
                 }
                 else {
                     Matcher matcher = HUB_DATASET_PATTERN.matcher(directory.getName());
@@ -683,6 +683,15 @@ public class StorageImpl implements Storage {
             }
         }
 
+        public String getNarthexSipZipName() {
+            List<File> zips = sipZips(here);
+            if (zips.isEmpty()) {
+                return getSpec();
+            }
+            else {
+                return zips.get(0).getName();
+            }
+        }
     }
 
     private SchemaFactory schemaFactory(String prefix) {

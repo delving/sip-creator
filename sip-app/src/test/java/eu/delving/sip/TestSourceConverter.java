@@ -393,6 +393,11 @@ public class TestSourceConverter {
         }
 
         @Override
+        public String getNarthexSipZipName() {
+            return null;
+        }
+
+        @Override
         public void remove() throws StorageException {
           
         }

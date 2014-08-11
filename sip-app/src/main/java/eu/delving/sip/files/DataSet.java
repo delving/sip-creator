@@ -111,6 +111,8 @@ public interface DataSet extends Comparable<DataSet> {
 
     File toSipZip() throws StorageException;
 
+    String getNarthexSipZipName();
+
     void remove() throws StorageException;
 
 }

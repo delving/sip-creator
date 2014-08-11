@@ -75,6 +75,7 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         createSchemaVersionsColumn();
         createUploadDateColumn();
         createUploadedByColumn();
+        createDownloadableColumn();
     }
 
 
@@ -141,10 +142,9 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets(true);
         if (list != null) {
             for (NetworkClient.Sip incoming : list) {
-                String spec = incoming.facts.spec;
-                DataSet dataSet = dataSets.get(spec);
+                DataSet dataSet = dataSets.get(incoming.file);
                 freshRows.add(new NarthexDataSetTableRow(sipModel, incoming, dataSet));
-                if (dataSet != null) dataSets.remove(spec); // remove used ones
+                if (dataSet != null) dataSets.remove(incoming.file); // remove used ones
             }
         }
         for (DataSet dataSet : dataSets.values()) { // remaining ones
@@ -225,6 +225,10 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         addColumn("Name", "A big dataset name");
     }
 
+    private void createDownloadableColumn() {
+        addColumn("Downloadable", "false");
+    }
+
     private TableColumn addColumn(String title, String prototype) {
         JLabel label = new JLabel(prototype);
         int width = label.getPreferredSize().width;
@@ -250,6 +254,8 @@ class NarthexDataSetTableModel extends AbstractTableModel {
                 return row.getDateTime();
             case 4:
                 return row.getUploadedBy();
+            case 5:
+                return row.isDownloadable();
 //            case 4:
 //                int recordCount = 0;
 //                if (entry != null) {
@@ -365,7 +371,7 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         }
 
         public void checkEnabled() {
-            this.setEnabled(selectedRow != null); // maybe only if it's not the one you've got: && selectedRow.getState().selectable
+            this.setEnabled(selectedRow != null && !selectedRow.isDownloadable());
         }
 
         @Override
