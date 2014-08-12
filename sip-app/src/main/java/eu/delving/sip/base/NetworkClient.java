@@ -890,8 +890,11 @@ public class NetworkClient {
         public String spec;
         public String name;
         public String dataProvider;
+        public String provider;
         public String country;
         public String orgId;
+        public String uploadedBy;
+        public String uploadedOn;
         public List<SchemaVersionTag> schemaVersions;
     }
 }

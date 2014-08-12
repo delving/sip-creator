@@ -29,7 +29,6 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
-import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -77,7 +76,7 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         createNameColumn();
         createDownloadableColumn();
         createSchemaVersionsColumn();
-        createUploadDateColumn();
+        createUploadedOnColumn();
         createUploadedByColumn();
     }
 
@@ -201,17 +200,8 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         });
     }
 
-    private void createUploadDateColumn() {
-        TableColumn tc = addColumn("Upload Date", "yyyy-mm-dd hh:mm:ss etc");
-        tc.setCellRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                DateTime dateTime = (DateTime) value;
-                label.setText(DATE_FORMAT.print(dateTime));
-                return label;
-            }
-        });
+    private void createUploadedOnColumn() {
+        TableColumn tc = addColumn("Uploaded On", "yyyy-mm-dd hh:mm:ss ...etc");
 //        tc.setHeaderValue("State");
 //            tc.setMinWidth(100);
     }
@@ -273,7 +263,7 @@ class NarthexDataSetTableModel extends AbstractTableModel {
             case 3:
                 return schemaVersionsString(row);
             case 4:
-                return row.getDateTime();
+                return row.getUploadedOn();
             case 5:
                 return row.getUploadedBy();
 //            case 4:

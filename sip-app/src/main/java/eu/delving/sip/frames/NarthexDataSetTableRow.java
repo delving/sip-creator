@@ -26,7 +26,6 @@ import eu.delving.sip.base.NetworkClient;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.SipModel;
-import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,12 +79,12 @@ class NarthexDataSetTableRow implements Comparable<NarthexDataSetTableRow> {
         return sip.facts.orgId;
     }
 
-    public DateTime getDateTime() {
-        return new DateTime(); // todo: get it from the parse
+    public String getUploadedOn() {
+        return sip.facts.uploadedOn;
     }
 
     public String getUploadedBy() {
-        return "Gumby"; // todo: get it from parse
+        return sip.facts.uploadedBy;
     }
 
     public List<SchemaVersion> getSchemaVersions() {
@@ -111,7 +110,7 @@ class NarthexDataSetTableRow implements Comparable<NarthexDataSetTableRow> {
 
     @Override
     public int compareTo(NarthexDataSetTableRow row) {
-        return -getDateTime().compareTo(row.getDateTime());
+        return -getUploadedOn().compareTo(row.getUploadedOn());
     }
 
     public String toString() {
