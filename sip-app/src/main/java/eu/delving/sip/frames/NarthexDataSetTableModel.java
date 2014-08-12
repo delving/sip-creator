@@ -52,6 +52,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static eu.delving.sip.base.SwingHelper.ICON_DOWNLOAD;
+import static eu.delving.sip.base.SwingHelper.ICON_OWNED;
+
 /**
  * @author Gerald de Jong <gerald@delving.eu>
  */
@@ -72,10 +75,10 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         this.networkClient = networkClient;
         createSpecColumn();
         createNameColumn();
+        createDownloadableColumn();
         createSchemaVersionsColumn();
         createUploadDateColumn();
         createUploadedByColumn();
-        createDownloadableColumn();
     }
 
 
@@ -226,7 +229,24 @@ class NarthexDataSetTableModel extends AbstractTableModel {
     }
 
     private void createDownloadableColumn() {
-        addColumn("Downloadable", "false");
+        TableColumn tc = addColumn("Downloadable", "boolean with icon");
+        tc.setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                Boolean downloadable = (Boolean) value;
+                if (downloadable) {
+                    label.setIcon(ICON_DOWNLOAD);
+                    label.setText("Downloadable");
+                }
+                else {
+                    label.setIcon(ICON_OWNED);
+                    label.setText("Yours");
+                }
+                return label;
+            }
+        });
+
     }
 
     private TableColumn addColumn(String title, String prototype) {
@@ -249,13 +269,13 @@ class NarthexDataSetTableModel extends AbstractTableModel {
             case 1:
                 return row.getDataSetName();
             case 2:
-                return schemaVersionsString(row);
-            case 3:
-                return row.getDateTime();
-            case 4:
-                return row.getUploadedBy();
-            case 5:
                 return row.isDownloadable();
+            case 3:
+                return schemaVersionsString(row);
+            case 4:
+                return row.getDateTime();
+            case 5:
+                return row.getUploadedBy();
 //            case 4:
 //                int recordCount = 0;
 //                if (entry != null) {
@@ -327,7 +347,7 @@ class NarthexDataSetTableModel extends AbstractTableModel {
 
         private DownloadAction() {
             super("Download from Narthex");
-            putValue(Action.SMALL_ICON, SwingHelper.ICON_DOWNLOAD);
+            putValue(Action.SMALL_ICON, ICON_DOWNLOAD);
         }
 
         public void checkEnabled() {
