@@ -46,9 +46,7 @@ class NarthexDataSetTableRow implements Comparable<NarthexDataSetTableRow> {
     }
 
     public boolean isDownloadable() {
-        if (dataSet == null) return true;
-//        System.out.println(String.format("[%s][%s]", dataSet.getNarthexSipZipName(), sip.file));
-        return !dataSet.getNarthexSipZipName().equals(sip.file);
+        return dataSet == null || sip != null && !dataSet.getNarthexSipZipName().equals(sip.file);
     }
 
     public String getFileName() {
@@ -56,6 +54,7 @@ class NarthexDataSetTableRow implements Comparable<NarthexDataSetTableRow> {
     }
 
     public String getSpec() {
+        if (sip == null) return dataSet.getSpec();
         return sip.facts.spec;
     }
 
@@ -80,10 +79,12 @@ class NarthexDataSetTableRow implements Comparable<NarthexDataSetTableRow> {
     }
 
     public String getUploadedOn() {
+        if (sip == null) return "local";
         return sip.facts.uploadedOn;
     }
 
     public String getUploadedBy() {
+        if (sip == null) return "local";
         return sip.facts.uploadedBy;
     }
 
