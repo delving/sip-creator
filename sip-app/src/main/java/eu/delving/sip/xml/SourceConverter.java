@@ -249,12 +249,13 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
                                         }
                                     }
                                 }
-                                else {
-                                    if (eventBuffer.get(eventBuffer.size() - 1).isStartElement()) {
-                                        eventBuffer.remove(eventBuffer.size() - 1); // remove the start event
-                                        addEndTag = false;
-                                    }
-                                }
+// this code was eliminating empty tags:
+//                                else {
+//                                    if (eventBuffer.get(eventBuffer.size() - 1).isStartElement()) {
+//                                        eventBuffer.remove(eventBuffer.size() - 1); // remove the start event
+//                                        addEndTag = false;
+//                                    }
+//                                }
                                 lines.clear();
                                 if (addEndTag) {
                                     eventBuffer.add(end);
