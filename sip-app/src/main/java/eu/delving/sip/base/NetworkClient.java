@@ -101,7 +101,7 @@ public class NetworkClient {
                 new OAuthClient.PasswordRequest() {
                     @Override
                     public String getPassword() {
-                        return feedback().getPassword();
+                        return feedback().getHubPassword();
                     }
                 }
         );

@@ -21,6 +21,7 @@
 
 package eu.delving.sip.base;
 
+import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.Feedback;
 import org.apache.commons.lang.StringUtils;
 
@@ -36,6 +37,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.prefs.Preferences;
 
 import static javax.swing.JOptionPane.*;
@@ -49,11 +52,13 @@ import static javax.swing.JOptionPane.*;
 public class VisualFeedback implements Feedback {
     private JDesktopPane desktop;
     private Log log;
+    private Preferences preferences;
     private PasswordFetcher passwordFetcher;
 
     public VisualFeedback(JFrame frame, JDesktopPane desktop, Preferences preferences) {
         this.desktop = desktop;
-        this.passwordFetcher = new PasswordFetcher(frame, preferences);
+        this.preferences = preferences;
+        this.passwordFetcher = new PasswordFetcher(frame);
     }
 
     public void setLog(Log log) {
@@ -128,8 +133,35 @@ public class VisualFeedback implements Feedback {
     }
 
     @Override
-    public String getPassword() {
+    public String getHubPassword() {
         return passwordFetcher.getPassword();
+    }
+
+    @Override
+    public boolean getNarthexCredentials() {
+        String narthexUrl = preferences.get(Storage.NARTHEX_URL, "");
+        String narthexApiKey = preferences.get(Storage.NARTHEX_API_KEY, "");
+        JTextField urlField = new JTextField(narthexUrl, 45);
+        JTextField apiKeyField = new JTextField(narthexApiKey);
+        if (!form(
+                "Narthex details",
+                "Server", urlField,
+                "API Key", apiKeyField
+        )) return false;
+        if (!StringUtils.isEmpty(urlField.getText())) {
+            try {
+                new URL(urlField.getText());
+                narthexUrl = urlField.getText().trim();
+                narthexApiKey = apiKeyField.getText().trim();
+                preferences.put(Storage.NARTHEX_URL, narthexUrl);
+                preferences.put(Storage.NARTHEX_API_KEY, narthexApiKey);
+                return true;
+            }
+            catch (MalformedURLException e) {
+                alert("Malformed URL: " + urlField);
+            }
+        }
+        return false;
     }
 
     private void inYourFace(String message, Throwable throwable) {
@@ -208,15 +240,13 @@ public class VisualFeedback implements Feedback {
     private class PasswordFetcher implements OAuthClient.PasswordRequest, ActionListener {
         private static final String PASSWORD = "Password";
         private JDialog dialog;
-        private Preferences preferences;
         private JPasswordField passwordField = new JPasswordField(15);
         private JCheckBox savePassword = new JCheckBox("Save password");
         private StringBuilder password = new StringBuilder();
         private JButton ok = new JButton("Ok");
 
-        private PasswordFetcher(JFrame frame, Preferences preferences) {
+        private PasswordFetcher(JFrame frame) {
             this.dialog = new JDialog(frame, "Culture Hub", true);
-            this.preferences = preferences;
             // We disable the submit button by default and if the content != empty
             ok.addActionListener(this);
             ok.setEnabled(false);

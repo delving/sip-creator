@@ -300,9 +300,17 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             setEnabled(false);
+            if (sipModel.getFeedback().getNarthexCredentials()) {
+                String narthexUrl = sipModel.getPreferences().get(Storage.NARTHEX_URL, "");
+                String narthexApiKey = sipModel.getPreferences().get(Storage.NARTHEX_API_KEY, "");
+                fetchList(narthexUrl, narthexApiKey);
+            }
+        }
+
+        private void fetchList(String narthexUrl, String narthexApiKey) {
             networkClient.fetchNarthexSipList(
-                    sipModel.getPreferences().get(Storage.NARTHEX_URL, ""),
-                    sipModel.getPreferences().get(Storage.NARTHEX_API_KEY, ""),
+                    narthexUrl,
+                    narthexApiKey,
                     new NetworkClient.NarthexListListener() {
                         @Override
                         public void listReceived(List<NetworkClient.Sip> entries) {

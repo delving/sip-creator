@@ -44,7 +44,14 @@ public interface Feedback {
 
     boolean form(String title, Object ... components);
 
-    String getPassword();
+    String getHubPassword();
+
+    boolean getNarthexCredentials();
+
+    public static class NarthexCredentials {
+        public String narthexUrl;
+        public String narthexApiKey;
+    }
 
     public interface Log {
         void log(String message, Throwable throwable);

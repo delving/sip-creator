@@ -103,8 +103,13 @@ public class MockProgressListener implements ProgressListener {
         }
 
         @Override
-        public String getPassword() {
+        public String getHubPassword() {
             return "pw";
+        }
+
+        @Override
+        public boolean getNarthexCredentials() {
+            return false;
         }
     }
 }

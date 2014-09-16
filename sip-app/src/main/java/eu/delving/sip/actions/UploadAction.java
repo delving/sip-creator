@@ -27,13 +27,9 @@ import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
-import org.apache.commons.lang.StringUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.prefs.Preferences;
 
 /**
  * Upload what is necessary to the culture hub
@@ -56,30 +52,11 @@ public class UploadAction extends AbstractAction {
     public void actionPerformed(ActionEvent actionEvent) {
         setEnabled(false);
         if (sipModel.getDataSetModel().isEmpty()) return;
-        Preferences prefs = sipModel.getPreferences();
-        String narthexUrl = prefs.get(Storage.NARTHEX_URL, "");
-        String narthexApiKey = prefs.get(Storage.NARTHEX_API_KEY, "");
-        JTextField urlField = new JTextField(narthexUrl, 45);
-        JTextField apiKeyField = new JTextField(narthexApiKey);
-        if (!sipModel.getFeedback().form(
-                "Narthex details",
-                "Server", urlField,
-                "API Key", apiKeyField
-        )) return;
-        if (!StringUtils.isEmpty(urlField.getText())) {
-            try {
-                new URL(urlField.getText());
-                narthexUrl = urlField.getText().trim();
-                narthexApiKey = apiKeyField.getText().trim();
-                prefs.put(Storage.NARTHEX_URL, narthexUrl);
-                prefs.put(Storage.NARTHEX_API_KEY, narthexApiKey);
-                initiateUpload(narthexUrl, narthexApiKey);
-            }
-            catch (MalformedURLException e) {
-                sipModel.getFeedback().alert("Malformed URL: " + urlField);
-            }
+        if (sipModel.getFeedback().getNarthexCredentials()) {
+            String narthexUrl = sipModel.getPreferences().get(Storage.NARTHEX_URL, "");
+            String narthexApiKey = sipModel.getPreferences().get(Storage.NARTHEX_API_KEY, "");
+            initiateUpload(narthexUrl, narthexApiKey);
         }
-
     }
 
     private void initiateUpload(String url,  String apiKey) {
