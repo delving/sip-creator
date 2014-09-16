@@ -31,7 +31,6 @@ import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -93,8 +92,7 @@ public class RemoteDataSetFrame extends FrameBase {
 
     private JTable createHubTable() {
         JTable table = new JTable(hubTableModel, hubTableModel.getColumnModel());
-        table.setFont(table.getFont().deriveFont(Font.PLAIN, 10));
-        table.setRowHeight(25);
+        table.setRowHeight(45);
         table.setIntercellSpacing(new Dimension(12, 4));
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getSelectionModel().addListSelectionListener(hubTableModel.getSelectionListener());
@@ -112,8 +110,7 @@ public class RemoteDataSetFrame extends FrameBase {
 
     private JTable createNarthexTable() {
         JTable table = new JTable(narthexTableModel, narthexTableModel.getColumnModel());
-        table.setFont(table.getFont().deriveFont(Font.PLAIN, 10));
-        table.setRowHeight(25);
+        table.setRowHeight(45);
         table.setIntercellSpacing(new Dimension(12, 4));
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getSelectionModel().addListSelectionListener(narthexTableModel.getSelectionListener());

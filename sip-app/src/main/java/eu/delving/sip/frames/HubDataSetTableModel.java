@@ -38,14 +38,12 @@ import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -68,8 +66,7 @@ class HubDataSetTableModel extends AbstractTableModel {
         this.sipModel = sipModel;
         this.networkClient = networkClient;
         setStateCheckDelay(500);
-        createSpecColumn();
-        createNameColumn();
+        createSpecNameColumn();
         createStateColumn();
         createSchemaVersionsColumn();
         createRecordCountColumn();
@@ -199,16 +196,22 @@ class HubDataSetTableModel extends AbstractTableModel {
         return false;
     }
 
-    private void createSpecColumn() {
-        TableColumn tc = addColumn("Spec", "this is spec");
+    private void createSpecNameColumn() {
+        TableColumn tc = addColumn("Name/Spec", "a rather wide spec can take up space");
         tc.setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                String spec = (String) value;
+                String specName = (String) value;
+                String[] part = specName.split(":::");
+                String name = part[0];
+                String spec = part[1];
                 DataSet dataSet = sipModel.getDataSetModel().getDataSet();
-                if (dataSet != null && dataSet.getSpec().equals(spec))
-                    label.setFont(label.getFont().deriveFont(Font.BOLD, 12));
+                boolean isCurrentDataset = dataSet != null && dataSet.getSpec().equals(spec);
+                label.setText(String.format(
+                        "<html>%s<b>%s</b><br/>(%s)",
+                        isCurrentDataset ? ">>>" : "", name, spec
+                ));
                 return label;
             }
         });
@@ -247,11 +250,20 @@ class HubDataSetTableModel extends AbstractTableModel {
     }
 
     private void createSchemaVersionsColumn() {
-        addColumn("Schemas", "seve_ralsc, schm_versions");
-    }
-
-    private void createNameColumn() {
-        addColumn("Name", "A big dataset name");
+        TableColumn tc = addColumn("Schemas", "schemaname_1.0.0");
+        tc.setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                SchemaVersion[] list = (SchemaVersion[]) value;
+                StringBuilder out = new StringBuilder("<html>");
+                for (SchemaVersion sv : list) {
+                    out.append(sv).append("<br/>");
+                }
+                label.setText(out.toString());
+                return label;
+            }
+        });
     }
 
     private TableColumn addColumn(String title, String prototype) {
@@ -272,14 +284,15 @@ class HubDataSetTableModel extends AbstractTableModel {
         NetworkClient.DataSetEntry entry = hubRow.getDataSetEntry();
         switch (columnIndex) {
             case 0:
-                return hubRow.getSpec();
+                return hubRow.getDataSetName() + ":::" + hubRow.getSpec();
             case 1:
-                return hubRow.getDataSetName();
-            case 2:
                 return hubDataSetState;
+            case 2:
+                List<SchemaVersion> schemaVersions = hubRow.getSchemaVersions();
+                if (schemaVersions == null) return new SchemaVersion[0];
+                SchemaVersion[] array = new SchemaVersion[schemaVersions.size()];
+                return schemaVersions.toArray(array);
             case 3:
-                return schemaVersionsString(hubRow);
-            case 4:
                 int recordCount = 0;
                 if (entry != null) {
                     recordCount = entry.recordCount;
@@ -291,26 +304,13 @@ class HubDataSetTableModel extends AbstractTableModel {
                     }
                 }
                 return String.format(" %11d ", recordCount);
-            case 5:
+            case 4:
                 return entry == null || entry.lockedBy == null ? "" : entry.lockedBy;
         }
         throw new RuntimeException();
     }
 
-    private String schemaVersionsString(HubDataSetTableRow hubRow) {
-        if (hubRow.getSchemaVersions() == null) return "?";
-        StringBuilder out = new StringBuilder();
-        Iterator<SchemaVersion> walk = hubRow.getSchemaVersions().iterator();
-        while (walk.hasNext()) {
-            SchemaVersion schemaVersion = walk.next();
-            out.append(schemaVersion.toString());
-            out.append(" (").append(hubRow.getDataSetState(schemaVersion)).append(")");
-            if (walk.hasNext()) out.append(", ");
-        }
-        return out.toString();
-    }
-
-//    private class UpDownAction extends AbstractAction {
+    //    private class UpDownAction extends AbstractAction {
 //        private boolean down = false;
 //
 //        private UpDownAction(boolean down) {

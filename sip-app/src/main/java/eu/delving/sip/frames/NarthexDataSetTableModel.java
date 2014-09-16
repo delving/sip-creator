@@ -41,13 +41,11 @@ import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -72,14 +70,11 @@ class NarthexDataSetTableModel extends AbstractTableModel {
     public NarthexDataSetTableModel(SipModel sipModel, NetworkClient networkClient) {
         this.sipModel = sipModel;
         this.networkClient = networkClient;
-        createSpecColumn();
-        createNameColumn();
+        createSpecNameColumn();
         createDownloadableColumn();
         createSchemaVersionsColumn();
-        createUploadedOnColumn();
-        createUploadedByColumn();
+        createUploadedColumn();
     }
-
 
     public ListSelectionListener getSelectionListener() {
         return new ListSelectionListener() {
@@ -185,37 +180,61 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         return false;
     }
 
-    private void createSpecColumn() {
-        TableColumn tc = addColumn("Spec", "this is spec");
+    private void createSpecNameColumn() {
+        TableColumn tc = addColumn("Name/Spec", "a rather wide spec can take up space");
         tc.setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                String spec = (String) value;
+                String specName = (String) value;
+                String[] part = specName.split(":::");
+                String name = part[0];
+                String spec = part[1];
                 DataSet dataSet = sipModel.getDataSetModel().getDataSet();
-                if (dataSet != null && dataSet.getSpec().equals(spec))
-                    label.setFont(label.getFont().deriveFont(Font.BOLD, 12));
+                boolean isCurrentDataset = dataSet != null && dataSet.getSpec().equals(spec);
+                label.setText(String.format(
+                        "<html>%s<b>%s</b><br/>(%s)",
+                        isCurrentDataset ? ">>>" : "", name, spec
+                ));
                 return label;
             }
         });
     }
 
-    private void createUploadedOnColumn() {
-        TableColumn tc = addColumn("Uploaded On", "yyyy-mm-dd hh:mm:ss ...etc");
-//        tc.setHeaderValue("State");
-//            tc.setMinWidth(100);
-    }
-
-    private void createUploadedByColumn() {
-        addColumn("Uploaded By", "someusername");
-    }
-
     private void createSchemaVersionsColumn() {
-        addColumn("Schemas", "seve_ralsc, schm_versions");
+        TableColumn tc = addColumn("Schemas", "schemaname_1.0.0");
+        tc.setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                SchemaVersion[] list = (SchemaVersion[]) value;
+                StringBuilder out = new StringBuilder("<html>");
+                for (SchemaVersion sv : list) {
+                    out.append(sv).append("<br/>");
+                }
+                label.setText(out.toString());
+                return label;
+            }
+        });
     }
 
-    private void createNameColumn() {
-        addColumn("Name", "A big dataset name");
+    private void createUploadedColumn() {
+        TableColumn tc = addColumn("Uploaded", "long timestamp string is the widest");
+        tc.setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                String whenWho = (String) value;
+                String[] part = whenWho.split(":::");
+                String when = part[0];
+                String who = part[1];
+                label.setText(String.format(
+                        "<html>%s<br/>%s",
+                        when, who
+                ));
+                return label;
+            }
+        });
     }
 
     private void createDownloadableColumn() {
@@ -255,46 +274,18 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         NarthexDataSetTableRow row = getRow(rowIndex);
         switch (columnIndex) {
             case 0:
-                return row.getSpec();
+                return row.getDataSetName() + ":::" + row.getSpec();
             case 1:
-                return row.getDataSetName();
-            case 2:
                 return row.isDownloadable();
+            case 2:
+                List<SchemaVersion> schemaVersions = row.getSchemaVersions();
+                if (schemaVersions == null) return new SchemaVersion[0];
+                SchemaVersion[] array = new SchemaVersion[schemaVersions.size()];
+                return schemaVersions.toArray(array);
             case 3:
-                return schemaVersionsString(row);
-            case 4:
-                return row.getUploadedOn();
-            case 5:
-                return row.getUploadedBy();
-//            case 4:
-//                int recordCount = 0;
-//                if (entry != null) {
-//                    recordCount = entry.recordCount;
-//                }
-//                else {
-//                    String recordCountString = row.getDataSet().getHints().get("recordCount");
-//                    if (recordCountString != null) {
-//                        recordCount = Integer.parseInt(recordCountString);
-//                    }
-//                }
-//                return String.format(" %11d ", recordCount);
-//            case 5:
-//                return entry == null || entry.lockedBy == null ? "" : entry.lockedBy;
+                return row.getUploadedOn() + ":::" + row.getUploadedBy();
         }
         throw new RuntimeException();
-    }
-
-    private String schemaVersionsString(NarthexDataSetTableRow row) {
-        if (row.getSchemaVersions() == null) return "?";
-        StringBuilder out = new StringBuilder();
-        Iterator<SchemaVersion> walk = row.getSchemaVersions().iterator();
-        while (walk.hasNext()) {
-            SchemaVersion schemaVersion = walk.next();
-            out.append(schemaVersion.toString());
-            out.append(" (").append(row.getDataSetState(schemaVersion)).append(")");
-            if (walk.hasNext()) out.append(", ");
-        }
-        return out.toString();
     }
 
     public final Action REFRESH_ACTION = new RefreshAction();
