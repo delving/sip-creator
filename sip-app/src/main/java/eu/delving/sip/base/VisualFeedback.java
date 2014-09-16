@@ -211,7 +211,7 @@ public class VisualFeedback implements Feedback {
 
     private static String sanitizeHtml(String string) {
         if (string == null) return null;
-        return string.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
+        return string.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll("\n", "<br/>");
     }
 
     private void execWait(final Runnable runnable) {

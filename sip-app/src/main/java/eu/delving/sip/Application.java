@@ -53,6 +53,7 @@ import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.StatusPanel;
 import eu.delving.sip.panels.WorkPanel;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -78,6 +79,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.util.List;
+import java.util.Properties;
 import java.util.prefs.Preferences;
 
 import static eu.delving.sip.base.HttpClientFactory.createHttpClient;
@@ -95,6 +99,7 @@ import static eu.delving.sip.files.DataSetState.*;
 public class Application {
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
+    private static String version;
     private SipModel sipModel;
     private Action importAction;
     private Action validateAction;
@@ -261,8 +266,12 @@ public class Application {
     }
 
     private String titleString() {
-        long megabytes = Runtime.getRuntime().maxMemory() / 1024 / 1024;
-        return "Delving SIP Creator (" + megabytes + "Mb)";
+        if (version != null) {
+            return String.format("SIP-Creator %s", version);
+        }
+        else {
+            return "SIP Creator Test";
+        }
     }
 
     private JPanel createStatePanel() {
@@ -411,6 +420,9 @@ public class Application {
                 application = new Application(storageDirectory);
                 application.home.setVisible(true);
                 application.allFrames.initiate();
+                if (version != null && !isLatestVersion(version)) {
+                    application.feedback.alert("New SIP-Creator version available at http://sip-creator.delving.eu/");
+                }
             }
             catch (StorageException e) {
                 JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
@@ -478,11 +490,40 @@ public class Application {
         dialog.setVisible(true);
     }
 
+    private static String getPomVersion() {
+        URL resource = Application.class.getResource("/META-INF/maven/eu.delving/sip-app/pom.properties");
+        if (resource != null) {
+            try {
+                Properties pomProperties = new Properties();
+                pomProperties.load(resource.openStream());
+                return pomProperties.getProperty("version");
+            }
+            catch (Exception e) {
+                System.err.println("Cannot read maven resource");
+            }
+        }
+        return null;
+    }
+
+    private static boolean isLatestVersion(String version) {
+        try {
+            URL site = new URL("http://sip-creator.delving.eu/version.txt");
+            List<String> pageLines = IOUtils.readLines(site.openStream());
+            for (String line: pageLines) {
+                if (line.equals(version)) return true;
+            }
+        }
+        catch (Exception e) {
+            System.err.println("Problem checking version: "+e);
+        }
+        return false;
+    }
+
     public static void main(final String[] args) throws StorageException {
+        version = getPomVersion();
         storageFinder.setArgs(args);
         Runtime rt = Runtime.getRuntime();
         int totalMemory = (int) (rt.totalMemory() / 1024 / 1024);
-        System.out.println("Total memory: " + totalMemory);
         if (totalMemory < 900) {
             memoryNotConfigured();
         }

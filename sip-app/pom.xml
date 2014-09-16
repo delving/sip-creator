@@ -30,7 +30,7 @@
     <artifactId>sip-app</artifactId>
     <packaging>jar</packaging>
     <name>SIP-App</name>
-    <version>14.09-SNAPSHOT</version>
+    <version>14-09C</version>
     <inceptionYear>2008</inceptionYear>
 
     <organization>
@@ -73,7 +73,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.4.1</version>
                 <configuration>
                     <archive>
                         <manifest>

@@ -56,6 +56,7 @@ public class ExpertMenu extends JMenu {
         add(new ReloadMappingAction());
         add(new DeleteCachesAction());
         add(new ToggleFrameArrangements());
+        add(new ShowMemory());
 //        add(new MediaImportAction(desktop, sipModel));
 //        if (cultureHubClient != null) add(new UploadMediaAction(cultureHubClient));
 //        int anonRecords = Integer.parseInt(System.getProperty(SourceConverter.ANONYMOUS_RECORDS_PROPERTY, "0"));
@@ -178,6 +179,27 @@ public class ExpertMenu extends JMenu {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             for (FrameBase frame : allFrames.getFrames()) frame.toggleEditMenu();
+        }
+    }
+
+
+    private class ShowMemory extends AbstractAction {
+        public ShowMemory() {
+            super("Memory Capacity");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            Runtime r = Runtime.getRuntime();
+            sipModel.getFeedback().alert(
+                    show("Total Memory", r.totalMemory()) +
+                            show("Max Memory", r.maxMemory()) +
+                            show("Free Memory", r.freeMemory())
+            );
+        }
+
+        private String show(String name, long value) {
+            return String.format("%s: %dMb\n", name, value / 1024 / 1024);
         }
     }
 
