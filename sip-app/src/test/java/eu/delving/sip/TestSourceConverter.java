@@ -153,6 +153,7 @@ public class TestSourceConverter {
                 "<a:boo>http://somewhere.com/anurl/path/gumby.jpg</a:boo>",
                 "<b:shh>deathly quiet</b:shh>",
                 "<a:unique>0404040404</a:unique>",
+                "<empty/>",
                 "<c:long lang=\"stupid\">this is very much</c:long>",
                 "<c:long lang=\"stupid\">a multi-line field</c:long>",
                 "<c:long lang=\"stupid\">it even contains strange spaces</c:long>",

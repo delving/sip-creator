@@ -237,7 +237,6 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
                                 if (!uniqueElementPath.peek().isAttribute() && path.equals(uniqueElementPath)) {
                                     unique = StringUtils.join(lines, "");
                                 }
-                                boolean addEndTag = true;
                                 if (linesAvailable()) {
                                     Iterator<String> walk = lines.iterator();
                                     while (walk.hasNext()) {
@@ -249,18 +248,9 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
                                         }
                                     }
                                 }
-// this code was eliminating empty tags:
-//                                else {
-//                                    if (eventBuffer.get(eventBuffer.size() - 1).isStartElement()) {
-//                                        eventBuffer.remove(eventBuffer.size() - 1); // remove the start event
-//                                        addEndTag = false;
-//                                    }
-//                                }
                                 lines.clear();
-                                if (addEndTag) {
-                                    eventBuffer.add(end);
-                                    eventBuffer.add(eventFactory.createCharacters("\n"));
-                                }
+                                eventBuffer.add(end);
+                                eventBuffer.add(eventFactory.createCharacters("\n"));
                             }
                         }
                         start = null;

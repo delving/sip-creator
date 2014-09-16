@@ -45,7 +45,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import javax.xml.xpath.XPathExpressionException;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -137,7 +136,7 @@ public class StorageImpl implements Storage {
                         for (File file : files) if (file.isFile()) hasFiles = true;
                         if (!hasFiles) continue;
                         DataSetImpl impl = new DataSetImpl(directory);
-                        map.put(impl.getSpec(), impl);
+                        map.put(directory.getName(), impl);
                     }
                 }
             }
@@ -640,14 +639,9 @@ public class StorageImpl implements Storage {
                     if (recDefResponse == null) {
                         throw new StorageException("No rec-def found for " + schemaVersion);
                     }
-                    if (recDefResponse.isValidated()) {
-                        FileUtils.write(file, recDefResponse.getSchemaText(), "UTF-8");
-                    }
-                    return RecDef.read(new ByteArrayInputStream(recDefResponse.getSchemaText().getBytes("UTF-8")));
+                    FileUtils.write(file, recDefResponse.getSchemaText(), "UTF-8");
                 }
-                else {
-                    return RecDef.read(new FileInputStream(file));
-                }
+                return RecDef.read(new FileInputStream(file));
             }
             catch (IOException e) {
                 throw new StorageException("Unable to load " + fileName, e);

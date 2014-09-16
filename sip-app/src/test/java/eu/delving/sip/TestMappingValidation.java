@@ -178,33 +178,36 @@ public class TestMappingValidation {
     }
 
     private String runFullCycle(int expectedRecords) throws Exception {
-        assertEquals(String.valueOf(Arrays.asList(mock.files())), 2, mock.fileCount());
+
+        int fileCount = 3;
+
+        assertEquals(String.valueOf(Arrays.asList(mock.files())), fileCount++, mock.fileCount());
 
         Work.LongTermWork importer = new FileImporter(mock.sampleInputFile(), dataSet(), null);
         importer.setProgressListener(PROGRESS_LISTENER);
         importer.run();
 
-        assertEquals(3, mock.fileCount());
+        assertEquals(fileCount++, mock.fileCount());
         assertEquals(IMPORTED, state());
 
         performAnalysis();
-        assertEquals(4, mock.fileCount());
+        assertEquals(fileCount++, mock.fileCount());
         assertEquals(ANALYZED_IMPORT, state());
 
         assertEquals(String.valueOf(expectedRecords), mock.hints().get(Storage.RECORD_COUNT));
         dataSet().setHints(mock.hints());
-        assertEquals(5, mock.fileCount());
+        assertEquals(fileCount++, mock.fileCount());
         assertEquals(DELIMITED, state());
 
         assertFalse(dataSet().getLatestStats().sourceFormat);
         Work.LongTermWork sourceImporter = new SourceConverter(dataSet(), null);
         sourceImporter.setProgressListener(PROGRESS_LISTENER);
         sourceImporter.run();
-        assertEquals(6, mock.fileCount());
+        assertEquals(fileCount++, mock.fileCount());
         assertEquals(SOURCED, state());
 
         performAnalysis();
-        assertEquals(7, mock.fileCount());
+        assertEquals(fileCount, mock.fileCount());
         Stats stats = dataSet().getLatestStats();
         assertTrue(stats.sourceFormat);
         SourceTreeNode tree = SourceTreeNode.create(stats.fieldValueMap, dataSet().getDataSetFacts());

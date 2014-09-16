@@ -33,6 +33,7 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.util.FileSystemFetcher;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.files.StorageImpl;
@@ -87,7 +88,9 @@ public class Mockery {
         File factsSourceDir = new File(getClass().getResource(String.format("/test/%s/dataset", prefix)).getFile());
         if (!factsSourceDir.isDirectory()) throw new RuntimeException();
         FileUtils.copyDirectory(factsSourceDir, dataSetDir);
-        dataSetModel.setDataSet(storage.getDataSets(false).get(dataSetDir.getName()), prefix);
+        DataSet dataSet = storage.getDataSets(false).get(dataSetDir.getName());
+        if (dataSet == null) throw new RuntimeException("No dataset called: "+dataSetDir);
+        dataSetModel.setDataSet(dataSet, prefix);
         recMapping = dataSetModel.getMappingModel().getRecMapping();
 //        FileUtils.writeStringToFile(new File("/tmp/EAD-paths.txt"), recMapping.getRecDefTree().getPathsList());
     }
