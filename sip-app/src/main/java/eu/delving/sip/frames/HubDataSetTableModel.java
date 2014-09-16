@@ -158,10 +158,9 @@ class HubDataSetTableModel extends AbstractTableModel {
         Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets(false);
         if (list != null) {
             for (NetworkClient.DataSetEntry incoming : list) {
-                String spec = incoming.spec;
-                DataSet dataSet = dataSets.get(spec);
+                DataSet dataSet = dataSets.get(incoming.getDirectoryName());
                 freshHubRows.add(new HubDataSetTableRow(sipModel, incoming, dataSet));
-                if (dataSet != null) dataSets.remove(spec); // remove used ones
+                if (dataSet != null) dataSets.remove(incoming.getDirectoryName()); // remove used ones
             }
         }
         for (DataSet dataSet : dataSets.values()) { // remaining ones

@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.delving</groupId>
     <artifactId>sip-creator</artifactId>
-    <version>14.09A-SNAPSHOT</version>
+    <version>14.09-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>SIP-Creator</name>
     <description>
@@ -67,18 +67,18 @@
         <!--</repository>-->
     <!--</repositories>-->
 
-    <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <name>Delving Nexus</name>
-            <url>http://nexus.delving.org/nexus/content/repositories/releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>Delving Nexus</name>
-            <url>http://nexus.delving.org/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
+    <!--<distributionManagement>-->
+        <!--<repository>-->
+            <!--<id>releases</id>-->
+            <!--<name>Delving Nexus</name>-->
+            <!--<url>http://nexus.delving.org/nexus/content/repositories/releases</url>-->
+        <!--</repository>-->
+        <!--<snapshotRepository>-->
+            <!--<id>snapshots</id>-->
+            <!--<name>Delving Nexus</name>-->
+            <!--<url>http://nexus.delving.org/nexus/content/repositories/snapshots</url>-->
+        <!--</snapshotRepository>-->
+    <!--</distributionManagement>-->
 
     <build>
         <plugins>
@@ -158,11 +158,6 @@
                 <groupId>org.codehaus.woodstox</groupId>
                 <artifactId>woodstox-core-asl</artifactId>
                 <version>4.0.9</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.amber</groupId>
-                <artifactId>oauth2-client</artifactId>
-                <version>0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>

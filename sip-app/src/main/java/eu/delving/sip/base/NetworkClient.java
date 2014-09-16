@@ -836,9 +836,9 @@ public class NetworkClient {
         public CreatedBy createdBy;
         public List<SchemaVersionTag> schemaVersions;
 
-//        public String getDirectoryName() {
-//            return String.format("%s_%s", spec, orgId);
-//        }
+        public String getDirectoryName() {
+            return String.format("%s_%s", spec, orgId);
+        }
 
         public int getRecordCount() {
             return recordCount;

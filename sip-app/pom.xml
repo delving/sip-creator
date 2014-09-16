@@ -30,7 +30,7 @@
     <artifactId>sip-app</artifactId>
     <packaging>jar</packaging>
     <name>SIP-App</name>
-    <version>14.09A-SNAPSHOT</version>
+    <version>14.09-SNAPSHOT</version>
     <inceptionYear>2008</inceptionYear>
 
     <organization>
@@ -65,7 +65,7 @@
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-creator</artifactId>
-        <version>14.09A-SNAPSHOT</version>
+        <version>14.09-SNAPSHOT</version>
     </parent>
 
     <build>
@@ -99,17 +99,13 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.apache.amber</groupId>
-            <artifactId>oauth2-client</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
         <dependency>
             <groupId>eu.delving</groupId>
             <artifactId>sip-core</artifactId>
-            <version>14.09A-SNAPSHOT</version>
+            <version>14.09-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.jgoodies</groupId>
@@ -136,9 +132,18 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.amber</groupId>
+            <artifactId>oauth2-client</artifactId>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
+        <!--todo: maybe time to move on:-->
         <!--<dependency>-->
-            <!--<groupId>org.apache.poi</groupId>-->
-            <!--<artifactId>poi</artifactId>-->
+        <!--<groupId>com.google.oauth-client</groupId>-->
+        <!--<artifactId>google-oauth-client</artifactId>-->
+        <!--<version>1.19.0</version>-->
         <!--</dependency>-->
+
     </dependencies>
 </project>
