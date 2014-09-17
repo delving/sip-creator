@@ -51,6 +51,13 @@
         </developer>
     </developers>
 
+    <repositories>
+        <repository>
+            <id>releases</id>
+            <name>stott</name>
+            <url>http://repository.mygrid.org.uk/artifactory/mygrid-all</url>
+        </repository>
+    </repositories>
     <!--<repositories>-->
         <!--<repository>-->
             <!--<id>releases</id>-->

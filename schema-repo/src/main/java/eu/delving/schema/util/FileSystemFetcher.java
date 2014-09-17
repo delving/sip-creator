@@ -72,16 +72,12 @@ public class FileSystemFetcher implements Fetcher {
         String here = new File(".").getAbsolutePath();
         schemas = new File(here.substring(0, here.length() - 1)); // remove the dot
         while (true) {
-            System.out.println("!!! CHECKING: "+ schemas.getAbsolutePath());
             String schemasPath = schemas.getAbsolutePath();
             if (schemasPath.length() > 1) {
                 File[] schemaDirectory = schemas.listFiles(new SchemaFilter());
                 if (schemaDirectory.length == 1) {
                     schemas = schemaDirectory[0];
                     break;
-                }
-                else {
-                    System.out.println("!!! LENGTH NOT ONE!: "+schemaDirectory.length);
                 }
             }
             schemas = schemas.getParentFile();
@@ -91,14 +87,7 @@ public class FileSystemFetcher implements Fetcher {
     private class SchemaFilter implements FileFilter {
         @Override
         public boolean accept(File directory) {
-            boolean yes = directory.isDirectory() && directory.getName().equals("schemas.delving.eu");
-            if (yes) {
-                System.out.println("!!! Approved: "+directory.getAbsolutePath());
-            }
-            else {
-                System.out.println("!!! Not approved: "+directory.getAbsolutePath());
-            }
-            return yes;
+            return directory.isDirectory() && directory.getName().equals("schemas.delving.eu");
         }
     }
 }
