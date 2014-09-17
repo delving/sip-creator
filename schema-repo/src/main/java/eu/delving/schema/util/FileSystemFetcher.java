@@ -88,7 +88,14 @@ public class FileSystemFetcher implements Fetcher {
     private class SchemaFilter implements FileFilter {
         @Override
         public boolean accept(File directory) {
-            return directory.isDirectory() && directory.getName().equals("schemas.delving.eu");
+            boolean yes = directory.isDirectory() && directory.getName().equals("schemas.delving.eu");
+            if (yes) {
+                System.out.println("!!! Approved: "+directory.getAbsolutePath());
+            }
+            else {
+                System.out.println("!!! Not approved: "+directory.getAbsolutePath());
+            }
+            return yes;
         }
     }
 }
