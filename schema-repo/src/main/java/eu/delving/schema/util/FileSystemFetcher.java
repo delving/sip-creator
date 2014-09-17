@@ -80,6 +80,9 @@ public class FileSystemFetcher implements Fetcher {
                     schemas = schemaDirectory[0];
                     break;
                 }
+                else {
+                    System.out.println("!!! LENGTH NOT ONE!: "+schemaDirectory.length);
+                }
             }
             schemas = schemas.getParentFile();
         }
