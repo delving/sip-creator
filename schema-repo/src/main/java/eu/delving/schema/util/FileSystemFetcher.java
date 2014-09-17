@@ -72,7 +72,7 @@ public class FileSystemFetcher implements Fetcher {
         String here = new File(".").getAbsolutePath();
         schemas = new File(here.substring(0, here.length() - 1)); // remove the dot
         while (true) {
-            System.out.println("!!! CHECKING "+ schemas.getAbsolutePath());
+            System.out.println("!!! CHECKING: "+ schemas.getAbsolutePath());
             String schemasPath = schemas.getAbsolutePath();
             if (schemasPath.length() > 1) {
                 File[] schemaDirectory = schemas.listFiles(new SchemaFilter());
