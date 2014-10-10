@@ -433,28 +433,39 @@ public class SipModel {
         }));
     }
 
+    private class Generator implements FileProcessor.UriGenerator {
+        private final String narthexUrl;
+        private final String spec;
+        private final String prefix;
+        private final Matcher matcher;
+
+        private Generator(String narthexUrl, String spec, String prefix) {
+            this.narthexUrl = narthexUrl;
+            this.spec = spec;
+            this.prefix = prefix;
+            this.matcher = Pattern.compile("(https?://[^/]+).*").matcher(narthexUrl);
+            if (!matcher.matches()) {
+                throw new RuntimeException("Unable to get URL base from Narthex URL: " + narthexUrl);
+            }
+        }
+
+        @Override
+        public String generateUri(String id) {
+            try {
+                return String.format(
+                        "%s/resource/document/%s_%s/%s",
+                        matcher.group(1), spec, prefix, URLEncoder.encode(id, "UTF-8")
+                );
+            }
+            catch (UnsupportedEncodingException e) {
+                throw new RuntimeException("Unable to encode "+id);
+            }
+        }
+    }
+
     public void processFile(boolean allowInvalid, FileProcessor.Listener listener) {
         final DataSet dataSet = getDataSetModel().getDataSet();
         final String narthexUrl = getPreferences().get(Storage.NARTHEX_URL, "");
-        final Matcher matcher = Pattern.compile("(https?://[^/]+).*").matcher(narthexUrl);
-        if (!matcher.matches()) {
-            feedback.alert("Unable to get URL base from Narthex URL: " + narthexUrl);
-            return;
-        }
-        final FileProcessor.UriGenerator uriGenerator = new FileProcessor.UriGenerator() {
-            @Override
-            public String generateUri(String id) {
-                try {
-                    return String.format(
-                            "%s/resource/document/%s/%s",
-                            matcher.group(1), dataSet.getSpec(), URLEncoder.encode(id, "UTF-8")
-                    );
-                }
-                catch (UnsupportedEncodingException e) {
-                    throw new RuntimeException("Unable to encode "+id);
-                }
-            }
-        };
         if (allowInvalid) {
             for (SchemaVersion schemaVersion : dataSet.getSchemaVersions()) {
                 try {
@@ -472,7 +483,7 @@ public class SipModel {
                             recMapping,
                             true,
                             groovyCodeResource,
-                            uriGenerator,
+                            new Generator(narthexUrl, dataSet.getSpec(), schemaVersion.getPrefix()),
                             listener
                     ));
                 }
@@ -489,7 +500,7 @@ public class SipModel {
                     getMappingModel().getRecMapping(),
                     false,
                     groovyCodeResource,
-                    uriGenerator,
+                    new Generator(narthexUrl, dataSet.getSpec(), getMappingModel().getPrefix()),
                     listener
             ));
         }
