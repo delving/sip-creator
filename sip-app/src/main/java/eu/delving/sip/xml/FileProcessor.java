@@ -39,6 +39,7 @@ import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.ReportWriter;
 import eu.delving.sip.model.Feedback;
+import eu.delving.sip.model.SipModel;
 import eu.delving.stats.Stats;
 import org.w3c.dom.Node;
 
@@ -63,14 +64,13 @@ import java.util.concurrent.TransferQueue;
  */
 
 public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork {
-    private Feedback feedback;
+    private SipModel sipModel;
     private DataSet dataSet;
     private RecMapping recMapping;
     private GroovyCodeResource groovyCodeResource;
+    private UriGenerator uriGenerator;
     private ProgressListener progressListener;
     private boolean allowInvalid;
-    private int recordCount;
-    private int maxUniqueValueLength;
     private TransferQueue<MetadataRecord> recordSource = new LinkedTransferQueue<MetadataRecord>();
     private Stats stats;
     private Termination termination;
@@ -84,24 +84,26 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         void succeeded(FileProcessor fileProcessor);
     }
 
+    public interface UriGenerator {
+        String generateUri(String id);
+    }
+
     public FileProcessor(
-            Feedback feedback,
+            SipModel sipModel,
             DataSet dataSet,
             RecMapping recMapping,
-            int maxUniqueValueLength,
-            int recordCount,
             boolean allowInvalid,
             GroovyCodeResource groovyCodeResource,
+            UriGenerator uriGenerator,
             Listener listener
     ) {
-        this.maxUniqueValueLength = maxUniqueValueLength;
-        this.recordCount = recordCount;
-        this.feedback = feedback;
+        this.sipModel = sipModel;
         this.dataSet = dataSet;
         this.recMapping = recMapping;
         this.allowInvalid = allowInvalid;
         this.groovyCodeResource = groovyCodeResource;
-        this.termination = new Termination(this, feedback, listener);
+        this.uriGenerator = uriGenerator;
+        this.termination = new Termination(this, sipModel.getFeedback(), listener);
     }
 
     public String getSpec() {
@@ -117,7 +119,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     }
 
     public int getRecordCount() {
-        return recordCount;
+        return sipModel.getStatsModel().getRecordCount();
     }
 
     private RecDef recDef() {
@@ -214,8 +216,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         public void record(ReportWriter reportWriter, XmlOutput xmlOutput) {
             try {
                 if (exception == null) {
-                    reportWriter.valid(metadataRecord.getId(), mappingResult);
-                    xmlOutput.write(metadataRecord.getId(), mappingResult.rootAugmented());
+                    reportWriter.valid(mappingResult.getLocalId(), mappingResult);
+                    xmlOutput.write(mappingResult.getLocalId(), mappingResult.rootAugmented());
                 }
                 else if (exception instanceof DiscardRecordException) {
                     reportWriter.discarded(metadataRecord, exception.getMessage());
@@ -289,7 +291,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     @Override
     public void run() {
         try {
-            MetadataParser parser = new MetadataParser(getDataSet().openSourceInputStream(), recordCount);
+            MetadataParser parser = new MetadataParser(getDataSet().openSourceInputStream(), sipModel.getStatsModel().getRecordCount());
             parser.setProgressListener(progressListener);
             ReportWriter reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
             XmlOutput xmlOutput = new XmlOutput(getDataSet().targetOutput(getPrefix()), recDef().getNamespaceMap());
@@ -313,11 +315,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
         catch (Exception e) {
             termination.dueToException(e);
-            feedback.alert("File processing setup problem", e);
+            sipModel.getFeedback().alert("File processing setup problem", e);
         }
     }
 
-    private static class MappingEngine implements Runnable {
+    private class MappingEngine implements Runnable {
         private final BlockingQueue<MetadataRecord> recordSource;
         private final MappingRunner mappingRunner;
         private final Validator validator;
@@ -360,7 +362,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     try {
 //                        timer("mapping", true);
                         Node node = mappingRunner.runMapping(record);
-                        MappingResult result = new MappingResultImpl(serializer, record.getId(), node, mappingRunner.getRecDefTree()).resolve();
+                        MappingResult result = new MappingResultImpl(serializer, uriGenerator.generateUri(record.getId()), node, mappingRunner.getRecDefTree()).resolve();
                         try {
                             Source source = new DOMSource(node);
                             validator.validate(source);
@@ -399,7 +401,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         stats.prefix = recMapping.getPrefix();
         Map<String, String> facts = dataSet.getDataSetFacts();
         stats.name = facts.get("name");
-        stats.maxUniqueValueLength = maxUniqueValueLength;
+        stats.maxUniqueValueLength = sipModel.getStatsModel().getMaxUniqueValueLength();
         return stats;
     }
 

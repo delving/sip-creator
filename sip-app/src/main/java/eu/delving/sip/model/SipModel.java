@@ -49,10 +49,14 @@ import eu.delving.stats.Stats;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.prefs.Preferences;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
 
@@ -431,6 +435,26 @@ public class SipModel {
 
     public void processFile(boolean allowInvalid, FileProcessor.Listener listener) {
         final DataSet dataSet = getDataSetModel().getDataSet();
+        final String narthexUrl = getPreferences().get(Storage.NARTHEX_URL, "");
+        final Matcher matcher = Pattern.compile("(https?://[^/]+).*").matcher(narthexUrl);
+        if (!matcher.matches()) {
+            feedback.alert("Unable to get URL base from Narthex URL: " + narthexUrl);
+            return;
+        }
+        final FileProcessor.UriGenerator uriGenerator = new FileProcessor.UriGenerator() {
+            @Override
+            public String generateUri(String id) {
+                try {
+                    return String.format(
+                            "%s/resource/document/%s/%s",
+                            matcher.group(1), dataSet.getSpec(), URLEncoder.encode(id, "UTF-8")
+                    );
+                }
+                catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException("Unable to encode "+id);
+                }
+            }
+        };
         if (allowInvalid) {
             for (SchemaVersion schemaVersion : dataSet.getSchemaVersions()) {
                 try {
@@ -443,13 +467,12 @@ public class SipModel {
                         dataSet.setRecMapping(recMapping, true);
                     }
                     exec(new FileProcessor(
-                            feedback,
+                            this,
                             dataSet,
                             recMapping,
-                            statsModel.getMaxUniqueValueLength(),
-                            statsModel.getRecordCount(),
                             true,
                             groovyCodeResource,
+                            uriGenerator,
                             listener
                     ));
                 }
@@ -461,13 +484,12 @@ public class SipModel {
         else {
             getMappingModel().setLocked(true);
             exec(new FileProcessor(
-                    feedback,
+                    this,
                     dataSet,
                     getMappingModel().getRecMapping(),
-                    statsModel.getMaxUniqueValueLength(),
-                    statsModel.getRecordCount(),
                     false,
                     groovyCodeResource,
+                    uriGenerator,
                     listener
             ));
         }

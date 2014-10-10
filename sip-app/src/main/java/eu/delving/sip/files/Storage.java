@@ -98,8 +98,6 @@ public interface Storage {
     String HARVEST_TAG = "delving-harvest";
     String SOURCE_ROOT_TAG = "delving-sip-source";
     String SOURCE_RECORD_TAG = "input";
-    String TARGET_ROOT_TAG = "delving-sip-target";
-    String TARGET_RECORD_TAG = "output";
     String TEXT_TAG = "text_chunk";
     String FACTS_TAG = "facts";
     String CONSTANT_TAG = "constant";

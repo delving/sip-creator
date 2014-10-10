@@ -48,11 +48,6 @@ public interface Feedback {
 
     boolean getNarthexCredentials();
 
-    public static class NarthexCredentials {
-        public String narthexUrl;
-        public String narthexApiKey;
-    }
-
     public interface Log {
         void log(String message, Throwable throwable);
     }

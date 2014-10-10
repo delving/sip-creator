@@ -42,10 +42,9 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.zip.GZIPOutputStream;
-
-import static eu.delving.sip.files.Storage.TARGET_RECORD_TAG;
-import static eu.delving.sip.files.Storage.TARGET_ROOT_TAG;
 
 /**
  * Create an output file with our standard record wrapping from a file of otherwise wrapped records, given by
@@ -55,6 +54,22 @@ import static eu.delving.sip.files.Storage.TARGET_ROOT_TAG;
  */
 
 public class XmlOutput {
+    private static final String RDF_ROOT_TAG = "RDF";
+    private static final String RDF_RECORD_TAG = "Description";
+    private static final String RDF_ID_ATTRIBUTE = "about";
+    private static final String RDF_PREFIX = "rdf";
+    private static final String RDF_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    private static final String [][] NAMESPACES = {
+            { RDF_PREFIX, RDF_URI },
+            { "geo", "http://www.w3.org/2003/01/geo/wgs84_pos#" },
+            { "skos", "http://www.w3.org/2004/02/skos/core#" },
+            { "rdfs", "http://www.w3.org/2000/01/rdf-schema#" },
+            { "cc", "http://creativecommons.org/ns#" },
+            { "owl", "http://www.w3.org/2002/07/owl#" },
+            { "foaf", "http://xmlns.com/foaf/0.1/" },
+            { "dbpedia-owl", "http://dbpedia.org/ontology/" },
+            { "dbprop", "http://dbpedia.org/property/" }
+    };
     private File outputZipFile;
     private XMLEventFactory eventFactory = XMLToolFactory.xmlEventFactory();
     private GZIPOutputStream outputStream;
@@ -68,33 +83,45 @@ public class XmlOutput {
         out.add(eventFactory.createCharacters("\n"));
         StringBuilder schemaLocation = new StringBuilder();
         List<Namespace> namespaceList = new ArrayList<Namespace>();
+        Set<String> prefixes = new TreeSet<String>();
         for (RecDef.Namespace namespace : namespaces.values()) {
+            prefixes.add(namespace.prefix);
             namespaceList.add(eventFactory.createNamespace(namespace.prefix, namespace.uri));
             if (namespace.schema != null) {
                 schemaLocation.append(namespace.uri).append(' ').append(namespace.schema).append(' ');
             }
         }
+        for (String [] pair : NAMESPACES) {
+            if (prefixes.contains(pair[0])) continue;
+            namespaceList.add(eventFactory.createNamespace(pair[0], pair[1]));
+        }
         List<Attribute> attributes = new ArrayList<Attribute>();
         attributes.add(eventFactory.createAttribute("xsi:schemaLocation", schemaLocation.toString()));
-        out.add(eventFactory.createStartElement("", "", TARGET_ROOT_TAG, attributes.iterator(), namespaceList.iterator()));
+        out.add(eventFactory.createStartElement(RDF_PREFIX, RDF_URI, RDF_ROOT_TAG, attributes.iterator(), namespaceList.iterator()));
     }
 
     public void write(String identifier, Node node) throws XMLStreamException {
         List<Attribute> attributes = new ArrayList<Attribute>();
-        attributes.add(eventFactory.createAttribute("", "", "id", identifier));
+        attributes.add(eventFactory.createAttribute(RDF_PREFIX, RDF_URI, RDF_ID_ATTRIBUTE, identifier));
         out.add(eventFactory.createCharacters("\n"));
-        out.add(eventFactory.createStartElement("","", TARGET_RECORD_TAG, attributes.iterator(), null));
+        out.add(eventFactory.createStartElement(RDF_PREFIX,RDF_URI, RDF_RECORD_TAG, attributes.iterator(), null));
         Element element = (Element) node;
         element.removeAttribute("xsi:schemaLocation");
-        writeElement(element, 1);
+        // skip the root tag, which would have been this: writeElement(element, 1);
+        NodeList kids = element.getChildNodes();
+        for (int walk = 0; walk < kids.getLength(); walk++) {
+            Node kid = kids.item(walk);
+            if (kid.getNodeType() != Node.ELEMENT_NODE) continue;
+            writeElement((Element) kid, 1);
+        }
         out.add(eventFactory.createCharacters("\n"));
-        out.add(eventFactory.createEndElement("", "", TARGET_RECORD_TAG));
+        out.add(eventFactory.createEndElement(RDF_PREFIX, RDF_URI, RDF_RECORD_TAG));
     }
 
     public void finish(boolean aborted) {
         try {
             out.add(eventFactory.createCharacters("\n"));
-            out.add(eventFactory.createEndElement("", "", TARGET_ROOT_TAG));
+            out.add(eventFactory.createEndElement(RDF_PREFIX, RDF_URI, RDF_ROOT_TAG));
             out.add(eventFactory.createCharacters("\n"));
             out.add(eventFactory.createEndDocument());
             out.flush();
