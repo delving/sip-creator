@@ -187,15 +187,20 @@ class NarthexDataSetTableModel extends AbstractTableModel {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 String specName = (String) value;
-                String[] part = specName.split(":::");
-                String name = part[0];
-                String spec = part[1];
-                DataSet dataSet = sipModel.getDataSetModel().getDataSet();
-                boolean isCurrentDataset = dataSet != null && dataSet.getSpec().equals(spec);
-                label.setText(String.format(
-                        "<html>%s<b>%s</b><br/>(%s)",
-                        isCurrentDataset ? ">>>" : "", name, spec
-                ));
+                if (specName == null) {
+                    label.setText("<html><b>?</b>");
+                }
+                else {
+                    String[] part = specName.split(":::");
+                    String name = part[0];
+                    String spec = part[1];
+                    DataSet dataSet = sipModel.getDataSetModel().getDataSet();
+                    boolean isCurrentDataset = dataSet != null && dataSet.getSpec().equals(spec);
+                    label.setText(String.format(
+                            "<html>%s<b>%s</b><br/>(%s)",
+                            isCurrentDataset ? ">>>" : "", name, spec
+                    ));
+                }
                 return label;
             }
         });
