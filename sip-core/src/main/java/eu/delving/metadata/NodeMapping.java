@@ -25,11 +25,20 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
 
 import static eu.delving.metadata.NodeMappingChange.CODE;
 import static eu.delving.metadata.NodeMappingChange.DOCUMENTATION;
-import static eu.delving.metadata.StringUtil.*;
+import static eu.delving.metadata.StringUtil.getConstantFromGroovyCode;
+import static eu.delving.metadata.StringUtil.isSimilarCode;
+import static eu.delving.metadata.StringUtil.linesToString;
+import static eu.delving.metadata.StringUtil.stringToLines;
 
 /**
  * This class describes how one node is transformed into another, which is part of mapping
@@ -48,6 +57,13 @@ import static eu.delving.metadata.StringUtil.*;
 
 @XStreamAlias("node-mapping")
 public class NodeMapping {
+
+    public static NodeMapping forConstant(String value) {
+        NodeMapping nm = new NodeMapping();
+        nm.setInputPath(Path.create().child(Tag.element("constant")));
+        nm.setGroovyCode(String.format("'%s'", value));
+        return nm;
+    }
 
     @XStreamAsAttribute
     public Path inputPath;

@@ -21,7 +21,11 @@
 
 package eu.delving.metadata;
 
-import com.thoughtworks.xstream.annotations.*;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 import eu.delving.XStreamFactory;
 import eu.delving.schema.SchemaVersion;
@@ -30,7 +34,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * This class defines the structure of a record definition, and it involves a lot of recursion.
@@ -387,6 +395,12 @@ public class RecDef {
         public boolean hidden;
 
         @XStreamAsAttribute
+        public String initialValue;
+
+        @XStreamAlias("node-mapping")
+        public NodeMapping nodeMapping;
+
+        @XStreamAsAttribute
         public String fieldType;
 
         @XStreamOmitField
@@ -481,6 +495,9 @@ public class RecDef {
 
         @XStreamAsAttribute
         public Operator operator;
+
+        @XStreamAsAttribute
+        public String initialValue;
 
         public Assertion assertion;
 

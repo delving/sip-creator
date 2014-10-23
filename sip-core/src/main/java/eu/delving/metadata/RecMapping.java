@@ -28,7 +28,13 @@ import eu.delving.schema.SchemaVersion;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static eu.delving.XStreamFactory.getStreamFor;
 
@@ -81,6 +87,8 @@ public class RecMapping {
         this.prefix = recDefTree.getRecDef().prefix;
         this.schemaVersion = recDefTree.getRecDef().version;
         this.recDefTree = recDefTree;
+        // add the node mappings harvest from the record definition
+        recDefTree.getRoot().collectNodeMappings(nodeMappings);
     }
 
     public String getPrefix() {

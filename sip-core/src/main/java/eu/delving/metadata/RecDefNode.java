@@ -21,7 +21,11 @@
 
 package eu.delving.metadata;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import static eu.delving.metadata.OptRole.CHILD;
 import static eu.delving.metadata.OptRole.ROOT;
@@ -87,10 +91,23 @@ public class RecDefNode implements Comparable<RecDefNode> {
                     addSubNode(element, rootOpt ? optBox.createDescendant() : optBox);
                 }
             }
-            if (elem.nodeMapping != null) { // a default node mapping inside of an element
+            if (elem.initialValue != null) {
+                elem.nodeMapping = NodeMapping.forConstant(elem.initialValue);
+            }
+            if (elem.nodeMapping != null && !nodeMappings.containsKey(elem.nodeMapping.inputPath)) { // a default node mapping inside of an element
                 nodeMappings.put(elem.nodeMapping.inputPath, elem.nodeMapping);
                 elem.nodeMapping.recDefNode = this;
                 elem.nodeMapping.outputPath = getPath();
+            }
+        }
+        else { // attr != null
+            if (attr.initialValue != null) {
+                attr.nodeMapping = NodeMapping.forConstant(attr.initialValue);
+            }
+            if (attr.nodeMapping != null && !nodeMappings.containsKey(attr.nodeMapping.inputPath)) { // a default node mapping inside of an attribute
+                nodeMappings.put(attr.nodeMapping.inputPath, attr.nodeMapping);
+                attr.nodeMapping.recDefNode = this;
+                attr.nodeMapping.outputPath = getPath();
             }
         }
     }
@@ -271,13 +288,8 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public NodeMapping addNodeMapping(NodeMapping nodeMapping) {
         nodeMapping.attachTo(this);
-        if (!nodeMappings.containsKey(nodeMapping.inputPath)) {
-            nodeMappings.put(nodeMapping.inputPath, nodeMapping);
-            listener.nodeMappingAdded(this, nodeMapping);
-        }
-        else {
-            throw new RuntimeException("Node mapping already exists for " + nodeMapping.inputPath);
-        }
+        nodeMappings.put(nodeMapping.inputPath, nodeMapping);
+        listener.nodeMappingAdded(this, nodeMapping);
         return nodeMapping;
     }
 

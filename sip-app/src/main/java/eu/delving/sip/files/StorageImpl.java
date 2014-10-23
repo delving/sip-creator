@@ -659,9 +659,7 @@ public class StorageImpl implements Storage {
                     if (valResponse == null) {
                         throw new StorageException("No validation XSD foudn for " + schemaVersion);
                     }
-                    if (valResponse.isValidated()) {
-                        FileUtils.write(file, valResponse.getSchemaText(), "UTF-8");
-                    }
+                    FileUtils.write(file, valResponse.getSchemaText(), "UTF-8");
                     StreamSource source = new StreamSource(new StringReader(valResponse.getSchemaText()));
                     return schemaFactory.newSchema(source).newValidator();
                 }
