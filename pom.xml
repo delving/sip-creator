@@ -67,6 +67,19 @@
         </repository>
     </repositories>
 
+    <distributionManagement>
+        <repository>
+            <id>artifactory.delving.org</id>
+            <name>artifactory.delving.org-releases</name>
+            <url>http://artifactory.delving.org/artifactory/delving</url>
+        </repository>
+        <snapshotRepository>
+            <id>artifactory.delving.org</id>
+            <name>artifactory.delving.org-snapshots</name>
+            <url>http://artifactory.delving.org/artifactory/delving</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <build>
         <plugins>
             <plugin>
