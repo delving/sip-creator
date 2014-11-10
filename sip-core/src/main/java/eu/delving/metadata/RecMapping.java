@@ -215,6 +215,14 @@ public class RecMapping {
         return recMapping;
     }
 
+    public static RecMapping read(InputStream is, RecDefTree recDefTree) throws UnsupportedEncodingException {
+        Reader reader = new InputStreamReader(is, "UTF-8");
+        RecMapping recMapping = (RecMapping) getStreamFor(RecMapping.class).fromXML(reader);
+        recMapping.recDefTree = recDefTree;
+        recMapping.resolve();
+        return recMapping;
+    }
+
     public static RecMapping read(File file, RecDefModel recDefModel) throws MetadataException {
         InputStream is = null;
         try {
