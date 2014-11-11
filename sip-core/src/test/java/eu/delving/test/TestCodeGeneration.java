@@ -21,8 +21,21 @@
 
 package eu.delving.test;
 
-import eu.delving.groovy.*;
-import eu.delving.metadata.*;
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.MappingException;
+import eu.delving.groovy.MappingRunner;
+import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.MetadataRecordFactory;
+import eu.delving.groovy.XmlSerializer;
+import eu.delving.metadata.MetadataException;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.NodeMappingChange;
+import eu.delving.metadata.RecDef;
+import eu.delving.metadata.RecDefModel;
+import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.RecDefNodeListener;
+import eu.delving.metadata.RecDefTree;
+import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaVersion;
 import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
@@ -80,7 +93,7 @@ public class TestCodeGeneration {
     private MetadataRecord createInputRecord() throws IOException, XMLStreamException {
         Map<String, String> ns = new TreeMap<String, String>();
         ns.put("test", "http://testicles.org");
-        return new MetadataRecordFactory(ns).metadataRecordFrom("ideee", input);
+        return new MetadataRecordFactory(ns).metadataRecordFrom("ideee", input, true);
     }
 
     private static RecDefModel recDefModel() {

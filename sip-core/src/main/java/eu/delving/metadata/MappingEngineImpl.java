@@ -23,7 +23,12 @@ package eu.delving.metadata;
 
 import eu.delving.MappingEngine;
 import eu.delving.MappingResult;
-import eu.delving.groovy.*;
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.MappingException;
+import eu.delving.groovy.MappingRunner;
+import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.MetadataRecordFactory;
+import eu.delving.groovy.XmlSerializer;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -55,7 +60,7 @@ public class MappingEngineImpl implements MappingEngine {
 
     public MappingResult execute(String id, String recordXML) throws XMLStreamException, MappingException, IOException, SAXException {
         if (mappingRunner != null) {
-            MetadataRecord metadataRecord = metadataRecordFactory.metadataRecordFrom(id, recordXML);
+            MetadataRecord metadataRecord = metadataRecordFactory.metadataRecordFrom(id, recordXML, true);
             return new MappingResultImpl(serializer, id, mappingRunner.runMapping(metadataRecord), mappingRunner.getRecDefTree()).resolve();
         }
         else {

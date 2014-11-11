@@ -57,7 +57,8 @@ public class MetadataRecordFactory {
         this.namespaces = namespaces;
         try {
             documentBuilder = XMLToolFactory.documentBuilderFactory().newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
+        }
+        catch (ParserConfigurationException e) {
             throw new RuntimeException("Parser config?", e);
         }
     }
@@ -72,10 +73,12 @@ public class MetadataRecordFactory {
         return document.getDocumentElement();
     }
 
-    public MetadataRecord metadataRecordFrom(String id, String recordContents) throws XMLStreamException {
-        String recordString = createCompleteRecordString(id, recordContents, true);
+    public MetadataRecord metadataRecordFrom(String id, String recordContents, boolean wrap) throws XMLStreamException {
+        if (wrap) {
+            recordContents = createCompleteRecordString(id, recordContents, true);
+        }
         try {
-            Reader reader = new StringReader(recordString);
+            Reader reader = new StringReader(recordContents);
             XMLStreamReader2 input = (XMLStreamReader2) inputFactory.createXMLStreamReader(reader);
             GroovyNode rootNode = null, node = null;
             StringBuilder value = new StringBuilder();
@@ -86,7 +89,8 @@ public class MetadataRecordFactory {
                     case XMLEvent.START_ELEMENT:
                         if (node == null) {
                             rootNode = node = new GroovyNode(null, "input");
-                        } else {
+                        }
+                        else {
                             node = new GroovyNode(node, input.getNamespaceURI(), input.getLocalName(), input.getPrefix());
                         }
                         if (input.getAttributeCount() > 0) {
@@ -94,7 +98,8 @@ public class MetadataRecordFactory {
                                 QName attributeName = input.getAttributeName(walk);
                                 if (attributeName.getPrefix() == null || attributeName.getPrefix().isEmpty()) {
                                     node.attributes().put(attributeName.getLocalPart(), input.getAttributeValue(walk));
-                                } else {
+                                }
+                                else {
                                     node.attributes().put(String.format("%s:%s", attributeName.getPrefix(), attributeName.getLocalPart()), input.getAttributeValue(walk));
                                 }
                             }
@@ -124,8 +129,9 @@ public class MetadataRecordFactory {
                 input.next();
             }
             return MetadataRecord.create(rootNode, -1, -1);
-        } catch (WstxParsingException e) {
-            throw new XMLStreamException("Problem parsing record:\n" + recordString, e);
+        }
+        catch (WstxParsingException e) {
+            throw new XMLStreamException("Problem parsing record:\n" + recordContents, e);
         }
     }
 
@@ -136,7 +142,8 @@ public class MetadataRecordFactory {
             for (Map.Entry<String, String> namespace : namespaces.entrySet()) {
                 if (namespace.getKey().isEmpty()) {
                     out.append(String.format(" xmlns=\"%s\"", namespace.getValue()));
-                } else {
+                }
+                else {
                     out.append(String.format(" xmlns:%s=\"%s\"", namespace.getKey(), namespace.getValue()));
                 }
             }
