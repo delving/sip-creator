@@ -48,9 +48,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.prefs.Preferences;
 
 import static eu.delving.sip.base.SwingHelper.ICON_DOWNLOAD;
 import static eu.delving.sip.base.SwingHelper.ICON_OWNED;
+import static eu.delving.sip.files.Storage.NARTHEX_API_KEY;
+import static eu.delving.sip.files.Storage.NARTHEX_URL;
 
 /**
  * @author Gerald de Jong <gerald@delving.eu>
@@ -305,10 +309,14 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             setEnabled(false);
-            if (sipModel.getFeedback().getNarthexCredentials()) {
-                String narthexUrl = sipModel.getPreferences().get(Storage.NARTHEX_URL, "");
-                String narthexApiKey = sipModel.getPreferences().get(Storage.NARTHEX_API_KEY, "");
-                fetchList(narthexUrl, narthexApiKey);
+            Preferences preferences = sipModel.getPreferences();
+            Map<String,String> fields = new TreeMap<String, String>();
+            fields.put(NARTHEX_URL, preferences.get(NARTHEX_URL, ""));
+            fields.put(NARTHEX_API_KEY, preferences.get(NARTHEX_API_KEY, ""));
+            if (sipModel.getFeedback().getNarthexCredentials(fields)) {
+                preferences.put(NARTHEX_URL, fields.get(NARTHEX_URL));
+                preferences.put(NARTHEX_API_KEY, fields.get(NARTHEX_API_KEY));
+                fetchList(fields.get(NARTHEX_URL), fields.get(NARTHEX_API_KEY));
             }
         }
 

@@ -374,11 +374,6 @@ public class TestSourceConverter {
         }
 
         @Override
-        public List<File> getUploadFiles() throws StorageException {
-            return null;
-        }
-
-        @Override
         public File sipZipFile(String fileName) throws StorageException {
             return null;
         }

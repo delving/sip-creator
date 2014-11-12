@@ -147,8 +147,8 @@ public class NetworkClient {
         sipModel.exec(new NarthexDatasetDownloader(1, fileName, dataSet, url, apiKey, finished));
     }
 
-    public void uploadNarthex(DataSet dataSet, String url, String apiKey, Swing finished) throws StorageException {
-        sipModel.exec(new NarthexUploader(1, dataSet, url, apiKey, finished));
+    public void uploadNarthex(DataSet dataSet, String url, String apiKey, String datasetName, Swing finished) throws StorageException {
+        sipModel.exec(new NarthexUploader(1, dataSet, url, apiKey, datasetName, finished));
     }
 
     private abstract class Attempt implements Work {
@@ -593,47 +593,32 @@ public class NetworkClient {
         private final DataSet dataSet;
         private final String url;
         private final String apiKey;
+        private final String datasetName;
         private ProgressListener progressListener;
         private Swing finished;
 
-        NarthexUploader(int attempt, DataSet dataSet, String url, String apiKey, Swing finished) throws StorageException {
+        NarthexUploader(int attempt, DataSet dataSet, String url, String apiKey, String datasetName, Swing finished) throws StorageException {
             super(attempt);
             this.dataSet = dataSet;
             this.url = url;
             this.apiKey = apiKey;
+            this.datasetName = datasetName;
             this.finished = finished;
         }
 
         @Override
         public void run() {
             try {
-                for (File file : dataSet.getUploadFiles()) {
-                    HttpPost outputPost = createNarthexUploadRequest(file, progressListener);
-                    FileEntity fileEntity = (FileEntity) outputPost.getEntity();
-                    feedback().info("Uploading Output " + file);
-                    HttpResponse outputResponse = httpClient.execute(outputPost);
-                    System.out.println(EntityUtils.toString(outputResponse.getEntity())); // otherwise consume!
-                    Code code = Code.from(outputResponse);
-                    if (code != Code.OK && !fileEntity.abort) {
-                        oauthClient.invalidateTokens();
-                        reportResponse(Code.from(outputResponse), outputResponse.getStatusLine());
-                        return;
-                    }
-                }
                 File sipZip = dataSet.toSipZip();
-                feedback().info("Uploading SIP-Zip " + sipZip.getName());
+                feedback().info("Uploading SIP-Zip " + sipZip.getName() + " to Narthex dataset "+ datasetName);
                 HttpPost sipZipPost = createSipZipUploadRequest(sipZip, progressListener);
                 FileEntity fileEntity = (FileEntity) sipZipPost.getEntity();
                 HttpResponse sipZipResponse = httpClient.execute(sipZipPost);
                 System.out.println(EntityUtils.toString(sipZipResponse.getEntity())); // otherwise consume!
                 Code code = Code.from(sipZipResponse);
                 if (code != Code.OK && !fileEntity.abort) {
-                    oauthClient.invalidateTokens();
                     reportResponse(Code.from(sipZipResponse), sipZipResponse.getStatusLine());
                 }
-            }
-            catch (OAuthProblemException e) {
-                reportOAuthProblem(e);
             }
             catch (Exception e) {
                 feedback().alert("Problem connecting", e);
@@ -659,20 +644,10 @@ public class NetworkClient {
             progressListener.setProgressMessage("Uploading to the Narthex");
         }
 
-        private HttpPost createNarthexUploadRequest(File file, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
+        private HttpPost createSipZipUploadRequest(File file, ProgressListener progressListener) {
             HttpPost post = new HttpPost(String.format(
-                    "%s/sip-creator/%s/upload/%s",
-                    url, apiKey, file.getName()
-            ));
-            FileEntity fileEntity = new FileEntity(file, progressListener);
-            post.setEntity(fileEntity);
-            return post;
-        }
-
-        private HttpPost createSipZipUploadRequest(File file, ProgressListener progressListener) throws OAuthSystemException, OAuthProblemException {
-            HttpPost post = new HttpPost(String.format(
-                    "%s/sip-creator/%s/sip-zip/%s",
-                    url, apiKey, file.getName()
+                    "%s/sip-creator/%s/%s/%s",
+                    url, apiKey, datasetName, file.getName()
             ));
             FileEntity fileEntity = new FileEntity(file, progressListener);
             post.setEntity(fileEntity);

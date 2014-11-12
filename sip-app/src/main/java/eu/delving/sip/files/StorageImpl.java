@@ -498,17 +498,6 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public List<File> getUploadFiles() throws StorageException {
-            List<File> files = new ArrayList<File>();
-            for (SchemaVersion schemaVersion : getSchemaVersions()) {
-                String prefix = schemaVersion.getPrefix();
-                File targetFile = targetOutput(prefix);
-                if (targetFile.exists()) files.add(targetFile);
-            }
-            return files;
-        }
-
-        @Override
         public File sipZipFile(String fileName) throws StorageException {
             return new File(here, fileName);
         }
@@ -568,17 +557,31 @@ public class StorageImpl implements Storage {
         @Override
         public File toSipZip() throws StorageException {
             try {
+                // check if the dataset is based on a harvest
+                Map<String, String> hints = getHints();
+                String harvestUrl = hints.get(Storage.HARVEST_URL);
+                boolean harvestBased = harvestUrl != null && !harvestUrl.trim().isEmpty();
+                // gather the files together
                 List<File> files = new ArrayList<File>();
                 files.add(hintsFile(here));
                 files.add(factsFile(here));
+                // if there's no harvest, we give Narthex source so it can be downloaded by somebody else
+                if (!harvestBased) files.add(sourceFile(here));
+                // for each mapping....
                 for (SchemaVersion schemaVersion : getSchemaVersions()) {
-                    addLatestNoHash(here, MAPPING, schemaVersion.getPrefix(), files);
+                    String prefix = schemaVersion.getPrefix();
+                    addLatestNoHash(here, MAPPING, prefix, files);
                     File recDef = new File(here, schemaVersion.getFullFileName(RECORD_DEFINITION));
                     if (recDef.exists()) files.add(recDef);
                     File valSchema = new File(here, schemaVersion.getFullFileName(VALIDATION_SCHEMA));
                     if (valSchema.exists()) files.add(valSchema);
+                    // if there's no harvest, we will give Narthex our output
+                    if (!harvestBased) {
+                        File targetFile = targetOutput(prefix);
+                        if (targetFile.exists()) files.add(targetFile);
+                    }
                 }
-                files.add(sourceFile(here));
+                // replace the current sipZip with a fresh one
                 for (File file : sipZips(here)) delete(file);
                 File sipZip = sipZip(here, getSpec(), StorageFinder.getUser(home));
                 FileOutputStream fos = new FileOutputStream(sipZip);
@@ -588,9 +591,7 @@ public class StorageImpl implements Storage {
                     FileInputStream fis = new FileInputStream(file);
                     zos.putNextEntry(new ZipEntry(file.getName()));
                     int length;
-                    while ((length = fis.read(buffer)) > 0) {
-                        zos.write(buffer, 0, length);
-                    }
+                    while ((length = fis.read(buffer)) > 0) zos.write(buffer, 0, length);
                     zos.closeEntry();
                     fis.close();
                 }

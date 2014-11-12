@@ -30,7 +30,7 @@
     <artifactId>sip-app</artifactId>
     <packaging>jar</packaging>
     <name>SIP-App</name>
-    <version>14-10B</version>
+    <version>14-11A</version>
     <inceptionYear>2008</inceptionYear>
 
     <organization>

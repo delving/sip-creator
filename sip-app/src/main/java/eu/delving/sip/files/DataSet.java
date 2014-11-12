@@ -103,8 +103,6 @@ public interface DataSet extends Comparable<DataSet> {
 
     void deleteSource();
 
-    List<File> getUploadFiles() throws StorageException;
-
     File sipZipFile(String fileName) throws StorageException;
 
     void fromSipZip(File sipZipFile, ProgressListener progressListener) throws IOException, StorageException;

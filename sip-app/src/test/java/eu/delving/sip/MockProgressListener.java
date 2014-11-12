@@ -26,6 +26,7 @@ import eu.delving.sip.model.Feedback;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Pretend to be a progress listener
@@ -108,7 +109,7 @@ public class MockProgressListener implements ProgressListener {
         }
 
         @Override
-        public boolean getNarthexCredentials() {
+        public boolean getNarthexCredentials(Map<String,String> fields) {
             return false;
         }
     }

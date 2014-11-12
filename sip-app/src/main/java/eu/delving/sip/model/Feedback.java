@@ -21,6 +21,8 @@
 
 package eu.delving.sip.model;
 
+import java.util.Map;
+
 /**
  * Through this interface, the code can interact with the user.  Pop-up dialogs can give alerts or ask questions
  * in a number of ways.
@@ -46,7 +48,7 @@ public interface Feedback {
 
     String getHubPassword();
 
-    boolean getNarthexCredentials();
+    boolean getNarthexCredentials(Map<String,String> fields);
 
     public interface Log {
         void log(String message, Throwable throwable);

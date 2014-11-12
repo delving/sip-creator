@@ -21,9 +21,7 @@
 
 package eu.delving.sip.base;
 
-import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.Feedback;
-import org.apache.commons.lang.StringUtils;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -39,9 +37,15 @@ import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import java.util.prefs.Preferences;
 
+import static eu.delving.sip.files.Storage.NARTHEX_API_KEY;
+import static eu.delving.sip.files.Storage.NARTHEX_DATASET_NAME;
+import static eu.delving.sip.files.Storage.NARTHEX_URL;
 import static javax.swing.JOptionPane.*;
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang.StringUtils.isWhitespace;
 
 /**
  * Give the user feedback in different ways, with pop-up alerts and various kinds of question dialogs.
@@ -138,27 +142,48 @@ public class VisualFeedback implements Feedback {
     }
 
     @Override
-    public boolean getNarthexCredentials() {
-        String narthexUrl = preferences.get(Storage.NARTHEX_URL, "");
-        String narthexApiKey = preferences.get(Storage.NARTHEX_API_KEY, "");
-        JTextField urlField = new JTextField(narthexUrl, 45);
-        JTextField apiKeyField = new JTextField(narthexApiKey);
-        if (!form(
-                "Narthex details",
-                "Server", urlField,
-                "API Key", apiKeyField
-        )) return false;
-        if (!StringUtils.isEmpty(urlField.getText())) {
-            try {
-                new URL(urlField.getText());
-                narthexUrl = urlField.getText().trim();
-                narthexApiKey = apiKeyField.getText().trim();
-                preferences.put(Storage.NARTHEX_URL, narthexUrl);
-                preferences.put(Storage.NARTHEX_API_KEY, narthexApiKey);
-                return true;
+    public boolean getNarthexCredentials(Map<String, String> fields) {
+        if (fields.containsKey(NARTHEX_DATASET_NAME)) {
+            JTextField urlField = new JTextField(fields.get(NARTHEX_URL), 45);
+            JTextField apiKeyField = new JTextField(fields.get(NARTHEX_API_KEY));
+            JTextField datasetField = new JTextField(fields.get(NARTHEX_DATASET_NAME));
+            if (!form(
+                    "Narthex details",
+                    "Server", urlField,
+                    "API Key", apiKeyField,
+                    "Dataset", datasetField
+            )) return false;
+            if (!(isEmpty(urlField.getText()) || isEmpty(apiKeyField.getText()) || isEmpty(datasetField.getText()))) {
+                try {
+                    new URL(urlField.getText().trim());
+                    fields.put(NARTHEX_URL, urlField.getText().trim());
+                    fields.put(NARTHEX_API_KEY, apiKeyField.getText().trim());
+                    fields.put(NARTHEX_DATASET_NAME, datasetField.getText().trim());
+                    return true;
+                }
+                catch (MalformedURLException e) {
+                    alert("Malformed URL: " + urlField);
+                }
             }
-            catch (MalformedURLException e) {
-                alert("Malformed URL: " + urlField);
+        }
+        else {
+            JTextField urlField = new JTextField(fields.get(NARTHEX_URL), 45);
+            JTextField apiKeyField = new JTextField(fields.get(NARTHEX_API_KEY));
+            if (!form(
+                    "Narthex details",
+                    "Server", urlField,
+                    "API Key", apiKeyField
+            )) return false;
+            if (!(isEmpty(urlField.getText()) || isEmpty(apiKeyField.getText()))) {
+                try {
+                    new URL(urlField.getText().trim());
+                    fields.put(NARTHEX_URL, urlField.getText().trim());
+                    fields.put(NARTHEX_API_KEY, apiKeyField.getText().trim());
+                    return true;
+                }
+                catch (MalformedURLException e) {
+                    alert("Malformed URL: " + urlField);
+                }
             }
         }
         return false;
@@ -256,7 +281,7 @@ public class VisualFeedback implements Feedback {
             passwordField.getDocument().addDocumentListener(new DocumentListener() {
                 @Override
                 public void insertUpdate(DocumentEvent documentEvent) {
-                    ok.setEnabled(!StringUtils.isWhitespace(new String(passwordField.getPassword())));
+                    ok.setEnabled(!isWhitespace(new String(passwordField.getPassword())));
                 }
 
                 @Override

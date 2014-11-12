@@ -24,12 +24,19 @@ package eu.delving.sip.actions;
 import eu.delving.sip.base.NetworkClient;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
-import eu.delving.sip.files.Storage;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.prefs.Preferences;
+
+import static eu.delving.sip.files.Storage.NARTHEX_API_KEY;
+import static eu.delving.sip.files.Storage.NARTHEX_DATASET_NAME;
+import static eu.delving.sip.files.Storage.NARTHEX_URL;
 
 /**
  * Upload what is necessary to the culture hub
@@ -52,16 +59,33 @@ public class UploadAction extends AbstractAction {
     public void actionPerformed(ActionEvent actionEvent) {
         setEnabled(false);
         if (sipModel.getDataSetModel().isEmpty()) return;
-        if (sipModel.getFeedback().getNarthexCredentials()) {
-            String narthexUrl = sipModel.getPreferences().get(Storage.NARTHEX_URL, "");
-            String narthexApiKey = sipModel.getPreferences().get(Storage.NARTHEX_API_KEY, "");
-            initiateUpload(narthexUrl, narthexApiKey);
+        Preferences preferences = sipModel.getPreferences();
+        DataSet dataSet = sipModel.getDataSetModel().getDataSet();
+        Map<String, String> hints = dataSet.getHints();
+        String narthexDatasetName = hints.get(NARTHEX_DATASET_NAME);
+        if (narthexDatasetName == null) narthexDatasetName = "";
+        Map<String,String> fields = new TreeMap<String, String>();
+        fields.put(NARTHEX_URL, preferences.get(NARTHEX_URL, ""));
+        fields.put(NARTHEX_API_KEY, preferences.get(NARTHEX_API_KEY, ""));
+        fields.put(NARTHEX_DATASET_NAME, narthexDatasetName);
+        boolean narthexUploadInfo = sipModel.getFeedback().getNarthexCredentials(fields);
+        if (narthexUploadInfo) {
+            preferences.put(NARTHEX_URL, fields.get(NARTHEX_URL));
+            preferences.put(NARTHEX_API_KEY, fields.get(NARTHEX_API_KEY));
+            hints.put(NARTHEX_DATASET_NAME, fields.get(NARTHEX_DATASET_NAME));
+            try {
+                dataSet.setHints(hints);
+                initiateUpload(fields.get(NARTHEX_URL), fields.get(NARTHEX_API_KEY), fields.get(NARTHEX_DATASET_NAME));
+            }
+            catch (StorageException e) {
+                sipModel.getFeedback().alert("Unable to set dataset hints", e);
+            }
         }
     }
 
-    private void initiateUpload(String url,  String apiKey) {
+    private void initiateUpload(String url, String apiKey, String datasetName) {
         try {
-            networkClient.uploadNarthex(sipModel.getDataSetModel().getDataSet(), url, apiKey, new Swing() {
+            networkClient.uploadNarthex(sipModel.getDataSetModel().getDataSet(), url, apiKey, datasetName, new Swing() {
                 @Override
                 public void run() {
                     setEnabled(true);
