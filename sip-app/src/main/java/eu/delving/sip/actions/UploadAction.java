@@ -36,6 +36,7 @@ import java.util.prefs.Preferences;
 
 import static eu.delving.sip.files.Storage.NARTHEX_API_KEY;
 import static eu.delving.sip.files.Storage.NARTHEX_DATASET_NAME;
+import static eu.delving.sip.files.Storage.NARTHEX_PREFIX;
 import static eu.delving.sip.files.Storage.NARTHEX_URL;
 
 /**
@@ -64,18 +65,27 @@ public class UploadAction extends AbstractAction {
         Map<String, String> hints = dataSet.getHints();
         String narthexDatasetName = hints.get(NARTHEX_DATASET_NAME);
         if (narthexDatasetName == null) narthexDatasetName = "";
+        String narthexPrefix = hints.get(NARTHEX_PREFIX);
+        if (narthexPrefix == null) narthexPrefix = "";
         Map<String,String> fields = new TreeMap<String, String>();
         fields.put(NARTHEX_URL, preferences.get(NARTHEX_URL, ""));
         fields.put(NARTHEX_API_KEY, preferences.get(NARTHEX_API_KEY, ""));
         fields.put(NARTHEX_DATASET_NAME, narthexDatasetName);
+        fields.put(NARTHEX_PREFIX, narthexPrefix);
         boolean narthexUploadInfo = sipModel.getFeedback().getNarthexCredentials(fields);
         if (narthexUploadInfo) {
             preferences.put(NARTHEX_URL, fields.get(NARTHEX_URL));
             preferences.put(NARTHEX_API_KEY, fields.get(NARTHEX_API_KEY));
             hints.put(NARTHEX_DATASET_NAME, fields.get(NARTHEX_DATASET_NAME));
+            hints.put(NARTHEX_PREFIX, fields.get(NARTHEX_PREFIX));
             try {
                 dataSet.setHints(hints);
-                initiateUpload(fields.get(NARTHEX_URL), fields.get(NARTHEX_API_KEY), fields.get(NARTHEX_DATASET_NAME));
+                initiateUpload(
+                        fields.get(NARTHEX_URL),
+                        fields.get(NARTHEX_API_KEY),
+                        fields.get(NARTHEX_DATASET_NAME),
+                        fields.get(NARTHEX_PREFIX)
+                );
             }
             catch (StorageException e) {
                 sipModel.getFeedback().alert("Unable to set dataset hints", e);
@@ -83,9 +93,9 @@ public class UploadAction extends AbstractAction {
         }
     }
 
-    private void initiateUpload(String url, String apiKey, String datasetName) {
+    private void initiateUpload(String url, String apiKey, String datasetName, String prefix) {
         try {
-            networkClient.uploadNarthex(sipModel.getDataSetModel().getDataSet(), url, apiKey, datasetName, new Swing() {
+            networkClient.uploadNarthex(sipModel.getDataSetModel().getDataSet(), url, apiKey, datasetName, prefix, new Swing() {
                 @Override
                 public void run() {
                     setEnabled(true);

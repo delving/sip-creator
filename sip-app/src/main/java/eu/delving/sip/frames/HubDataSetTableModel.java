@@ -80,9 +80,14 @@ class HubDataSetTableModel extends AbstractTableModel {
                 if (e.getValueIsAdjusting()) return;
                 ListSelectionModel selectionModel = (ListSelectionModel) e.getSource();
                 selectedRow = null;
-                for (int index = e.getFirstIndex(); index <= e.getLastIndex(); index++) {
-                    if (selectionModel.isSelectedIndex(index)) {
-                        selectedRow = rows.get(index);
+                for (int walk = e.getFirstIndex(); walk <= e.getLastIndex(); walk++) {
+                    if (selectionModel.isSelectedIndex(walk)) {
+                        if (index != null) {
+                            selectedRow = rows.get(index.get(walk));
+                        }
+                        else {
+                            selectedRow = rows.get(walk);
+                        }
                     }
                 }
                 checkEnabled();

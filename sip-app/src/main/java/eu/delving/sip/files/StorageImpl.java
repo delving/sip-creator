@@ -555,7 +555,7 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public File toSipZip() throws StorageException {
+        public File toSipZip(String prefix) throws StorageException {
             try {
                 // check if the dataset is based on a harvest
                 Map<String, String> hints = getHints();
@@ -563,24 +563,27 @@ public class StorageImpl implements Storage {
                 boolean harvestBased = harvestUrl != null && !harvestUrl.trim().isEmpty();
                 // gather the files together
                 List<File> files = new ArrayList<File>();
-                files.add(hintsFile(here));
-                files.add(factsFile(here));
                 // if there's no harvest, we give Narthex source so it can be downloaded by somebody else
                 if (!harvestBased) files.add(sourceFile(here));
-                // for each mapping....
-                for (SchemaVersion schemaVersion : getSchemaVersions()) {
-                    String prefix = schemaVersion.getPrefix();
-                    addLatestNoHash(here, MAPPING, prefix, files);
+                // narthexFacts take only the chosen SCHEMA_VERSIONS
+                Map<String,String> narthexFacts = new TreeMap<String, String>(dataSetFacts);
+                // for the mapping matching the prefix
+                for (SchemaVersion schemaVersion : getSchemaVersions()) if (schemaVersion.getPrefix().equals(prefix)){
+                    narthexFacts.put(SCHEMA_VERSIONS, schemaVersion.toString());
+                    addLatestNoHash(here, MAPPING, schemaVersion.getPrefix(), files);
                     File recDef = new File(here, schemaVersion.getFullFileName(RECORD_DEFINITION));
                     if (recDef.exists()) files.add(recDef);
                     File valSchema = new File(here, schemaVersion.getFullFileName(VALIDATION_SCHEMA));
                     if (valSchema.exists()) files.add(valSchema);
                     // if there's no harvest, we will give Narthex our output
                     if (!harvestBased) {
-                        File targetFile = targetOutput(prefix);
+                        File targetFile = targetOutput(schemaVersion.getPrefix());
                         if (targetFile.exists()) files.add(targetFile);
                     }
                 }
+                files.add(hintsFile(here));
+                writeFacts(narthexFactsFile(here), narthexFacts);
+                files.add(narthexFactsFile(here));
                 // replace the current sipZip with a fresh one
                 for (File file : sipZips(here)) delete(file);
                 File sipZip = sipZip(here, getSpec(), StorageFinder.getUser(home));

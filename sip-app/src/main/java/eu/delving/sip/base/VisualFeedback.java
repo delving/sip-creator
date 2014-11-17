@@ -42,6 +42,7 @@ import java.util.prefs.Preferences;
 
 import static eu.delving.sip.files.Storage.NARTHEX_API_KEY;
 import static eu.delving.sip.files.Storage.NARTHEX_DATASET_NAME;
+import static eu.delving.sip.files.Storage.NARTHEX_PREFIX;
 import static eu.delving.sip.files.Storage.NARTHEX_URL;
 import static javax.swing.JOptionPane.*;
 import static org.apache.commons.lang.StringUtils.isEmpty;
@@ -147,18 +148,21 @@ public class VisualFeedback implements Feedback {
             JTextField urlField = new JTextField(fields.get(NARTHEX_URL), 45);
             JTextField apiKeyField = new JTextField(fields.get(NARTHEX_API_KEY));
             JTextField datasetField = new JTextField(fields.get(NARTHEX_DATASET_NAME));
+            JTextField prefixField = new JTextField(fields.get(NARTHEX_PREFIX));
             if (!form(
                     "Narthex details",
                     "Server", urlField,
                     "API Key", apiKeyField,
-                    "Dataset", datasetField
+                    "Dataset", datasetField,
+                    "Prefix", prefixField
             )) return false;
-            if (!(isEmpty(urlField.getText()) || isEmpty(apiKeyField.getText()) || isEmpty(datasetField.getText()))) {
+            if (!(isEmpty(urlField.getText()) || isEmpty(apiKeyField.getText()) || isEmpty(datasetField.getText()) || isEmpty(prefixField.getText()))) {
                 try {
                     new URL(urlField.getText().trim());
                     fields.put(NARTHEX_URL, urlField.getText().trim());
                     fields.put(NARTHEX_API_KEY, apiKeyField.getText().trim());
                     fields.put(NARTHEX_DATASET_NAME, datasetField.getText().trim());
+                    fields.put(NARTHEX_PREFIX, prefixField.getText().trim());
                     return true;
                 }
                 catch (MalformedURLException e) {

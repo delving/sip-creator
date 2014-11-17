@@ -147,8 +147,8 @@ public class NetworkClient {
         sipModel.exec(new NarthexDatasetDownloader(1, fileName, dataSet, url, apiKey, finished));
     }
 
-    public void uploadNarthex(DataSet dataSet, String url, String apiKey, String datasetName, Swing finished) throws StorageException {
-        sipModel.exec(new NarthexUploader(1, dataSet, url, apiKey, datasetName, finished));
+    public void uploadNarthex(DataSet dataSet, String url, String apiKey, String datasetName, String prefix, Swing finished) throws StorageException {
+        sipModel.exec(new NarthexUploader(1, dataSet, url, apiKey, datasetName, prefix, finished));
     }
 
     private abstract class Attempt implements Work {
@@ -332,7 +332,7 @@ public class NetworkClient {
                             dataSet.remove();
                             File sipZipFile = dataSet.sipZipFile(fileName);
                             FileOutputStream output = new FileOutputStream(sipZipFile);
-                            progressListener.prepareFor((int)(entity.getContentLength()/BLOCK_SIZE));
+                            progressListener.prepareFor((int) (entity.getContentLength() / BLOCK_SIZE));
                             InputStream input = entity.getContent();
                             byte[] buffer = new byte[BLOCK_SIZE];
                             int count = 0;
@@ -513,7 +513,7 @@ public class NetworkClient {
                             dataSet.remove();
                             File sipZipFile = dataSet.sipZipFile(fileName);
                             FileOutputStream output = new FileOutputStream(sipZipFile);
-                            progressListener.prepareFor((int)(entity.getContentLength()/BLOCK_SIZE));
+                            progressListener.prepareFor((int) (entity.getContentLength() / BLOCK_SIZE));
                             InputStream input = entity.getContent();
                             byte[] buffer = new byte[BLOCK_SIZE];
                             int count = 0;
@@ -594,23 +594,25 @@ public class NetworkClient {
         private final String url;
         private final String apiKey;
         private final String datasetName;
+        private final String prefix;
         private ProgressListener progressListener;
         private Swing finished;
 
-        NarthexUploader(int attempt, DataSet dataSet, String url, String apiKey, String datasetName, Swing finished) throws StorageException {
+        NarthexUploader(int attempt, DataSet dataSet, String url, String apiKey, String datasetName, String prefix, Swing finished) throws StorageException {
             super(attempt);
             this.dataSet = dataSet;
             this.url = url;
             this.apiKey = apiKey;
             this.datasetName = datasetName;
+            this.prefix = prefix;
             this.finished = finished;
         }
 
         @Override
         public void run() {
             try {
-                File sipZip = dataSet.toSipZip();
-                feedback().info("Uploading SIP-Zip " + sipZip.getName() + " to Narthex dataset "+ datasetName);
+                File sipZip = dataSet.toSipZip(prefix);
+                feedback().info("Uploading SIP-Zip " + sipZip.getName() + " to Narthex dataset " + datasetName + " with prefix " + prefix);
                 HttpPost sipZipPost = createSipZipUploadRequest(sipZip, progressListener);
                 FileEntity fileEntity = (FileEntity) sipZipPost.getEntity();
                 HttpResponse sipZipResponse = httpClient.execute(sipZipPost);

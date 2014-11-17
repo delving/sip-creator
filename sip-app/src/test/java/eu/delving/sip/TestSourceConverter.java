@@ -384,7 +384,7 @@ public class TestSourceConverter {
         }
 
         @Override
-        public File toSipZip() throws StorageException {
+        public File toSipZip(String prefix) throws StorageException {
             return null;
         }
 

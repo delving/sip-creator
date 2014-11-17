@@ -114,6 +114,7 @@ public interface Storage {
     String NARTHEX_URL = "narthexUrl";
     String NARTHEX_API_KEY = "narthexApiKey";
     String NARTHEX_DATASET_NAME = "narthexDatasetName";
+    String NARTHEX_PREFIX = "narthexPrefix";
     String CACHE_DIR = "Cache";
     String MEDIA_DIR = "Media";
     String INDEX_FILE = "media-files.xml";

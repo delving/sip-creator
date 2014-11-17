@@ -172,6 +172,10 @@ public class StorageHelper {
         return findOrCreate(dir, FACTS);
     }
 
+    static File narthexFactsFile(File dir) {
+        return new File(dir, "narthex_facts.txt");
+    }
+
     static File hintsFile(File dir) {
         return findOrCreate(dir, HINTS);
     }
