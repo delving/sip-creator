@@ -575,11 +575,6 @@ public class StorageImpl implements Storage {
                     if (recDef.exists()) files.add(recDef);
                     File valSchema = new File(here, schemaVersion.getFullFileName(VALIDATION_SCHEMA));
                     if (valSchema.exists()) files.add(valSchema);
-                    // if there's no harvest, we will give Narthex our output
-                    if (!harvestBased) {
-                        File targetFile = targetOutput(schemaVersion.getPrefix());
-                        if (targetFile.exists()) files.add(targetFile);
-                    }
                 }
                 files.add(hintsFile(here));
                 writeFacts(narthexFactsFile(here), narthexFacts);
