@@ -115,19 +115,12 @@ public class StorageImpl implements Storage {
     }
 
     @Override
-    public Map<String, DataSet> getDataSets(boolean narthex) {
+    public Map<String, DataSet> getDataSets() {
         Map<String, DataSet> map = new TreeMap<String, DataSet>();
         File[] list = home.listFiles();
         if (list != null) {
             for (File directory : list) {
                 if (!directory.isDirectory()) continue;
-                if (narthex) {
-                    Matcher matcher = NARTHEX_DATASET_PATTERN.matcher(directory.getName());
-                    if (!matcher.matches()) continue;
-                    DataSetImpl impl = new DataSetImpl(directory);
-                    map.put(impl.getNarthexSipZipName(), impl);
-                }
-                else {
                     Matcher matcher = HUB_DATASET_PATTERN.matcher(directory.getName());
                     if (!matcher.matches()) continue;
                     boolean hasFiles = false; // empty ones will not appear
@@ -138,7 +131,6 @@ public class StorageImpl implements Storage {
                         DataSetImpl impl = new DataSetImpl(directory);
                         map.put(directory.getName(), impl);
                     }
-                }
             }
         }
         return map;
@@ -568,20 +560,25 @@ public class StorageImpl implements Storage {
                 // narthexFacts take only the chosen SCHEMA_VERSIONS
                 Map<String,String> narthexFacts = new TreeMap<String, String>(dataSetFacts);
                 // for the mapping matching the prefix
+                boolean prefixFound = false;
                 for (SchemaVersion schemaVersion : getSchemaVersions()) if (schemaVersion.getPrefix().equals(prefix)){
                     narthexFacts.put(SCHEMA_VERSIONS, schemaVersion.toString());
+                    prefixFound = true;
                     addLatestNoHash(here, MAPPING, schemaVersion.getPrefix(), files);
                     File recDef = new File(here, schemaVersion.getFullFileName(RECORD_DEFINITION));
                     if (recDef.exists()) files.add(recDef);
                     File valSchema = new File(here, schemaVersion.getFullFileName(VALIDATION_SCHEMA));
                     if (valSchema.exists()) files.add(valSchema);
                 }
+                if (!prefixFound) {
+                    throw new StorageException("Cannot prepare a SIP-Zip file from this dataset with prefix: "+prefix);
+                }
                 files.add(hintsFile(here));
                 writeFacts(narthexFactsFile(here), narthexFacts);
                 files.add(narthexFactsFile(here));
-                // replace the current sipZip with a fresh one
-                for (File file : sipZips(here)) delete(file);
-                File sipZip = sipZip(here, getSpec(), StorageFinder.getUser(home));
+                File sipZipsDirectory = new File(home, SIP_ZIPS_DIR);
+                sipZipsDirectory.mkdir();
+                File sipZip = sipZip(sipZipsDirectory, getSpec(), prefix);
                 FileOutputStream fos = new FileOutputStream(sipZip);
                 ZipOutputStream zos = new ZipOutputStream(fos);
                 byte[] buffer = new byte[1024];
@@ -671,16 +668,6 @@ public class StorageImpl implements Storage {
             }
             catch (IOException e) {
                 throw new StorageException("Unable to load " + fileName, e);
-            }
-        }
-
-        public String getNarthexSipZipName() {
-            List<File> zips = sipZips(here);
-            if (zips.isEmpty()) {
-                return getSpec();
-            }
-            else {
-                return zips.get(0).getName();
             }
         }
     }

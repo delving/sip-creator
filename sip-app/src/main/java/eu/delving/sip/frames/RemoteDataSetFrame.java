@@ -46,16 +46,13 @@ import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
 
 public class RemoteDataSetFrame extends FrameBase {
     private final HubDataSetTableModel hubTableModel;
-    private final NarthexDataSetTableModel narthexTableModel;
-    private final JTable hubTable, narthexTable;
+    private final JTable hubTable;
 
     public RemoteDataSetFrame(final SipModel sipModel, NetworkClient networkClient) {
         super(Which.DATA_SET, sipModel, "Data Sets");
         this.hubTableModel = new HubDataSetTableModel(sipModel, networkClient);
         this.hubTable = createHubTable();
         hubTableModel.checkEnabled();
-        this.narthexTableModel = new NarthexDataSetTableModel(sipModel, networkClient);
-        this.narthexTable = createNarthexTable();
     }
 
     @Override
@@ -70,24 +67,8 @@ public class RemoteDataSetFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Narthex", createNarthexTabPanel());
-        tabs.addTab("Culture Hub", createHubTabPanel());
-        content.add(tabs, BorderLayout.CENTER);
-    }
-
-    private JPanel createNarthexTabPanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.add(SwingHelper.scrollV("Narthex Sip Zips", narthexTable), BorderLayout.CENTER);
-        p.add(createNarthexTableSouth(narthexTableModel.getPatternField()), BorderLayout.SOUTH);
-        return p;
-    }
-
-    private JPanel createHubTabPanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.add(SwingHelper.scrollV("Hub Data Sets", hubTable), BorderLayout.CENTER);
-        p.add(createHubTableSouth(hubTableModel.getPatternField()), BorderLayout.SOUTH);
-        return p;
+        content.add(SwingHelper.scrollV("Hub Data Sets", hubTable), BorderLayout.CENTER);
+        content.add(createHubTableSouth(hubTableModel.getPatternField()), BorderLayout.SOUTH);
     }
 
     private JTable createHubTable() {
@@ -108,24 +89,6 @@ public class RemoteDataSetFrame extends FrameBase {
         return table;
     }
 
-    private JTable createNarthexTable() {
-        JTable table = new JTable(narthexTableModel, narthexTableModel.getColumnModel());
-        table.setRowHeight(45);
-        table.setIntercellSpacing(new Dimension(12, 4));
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.getSelectionModel().addListSelectionListener(narthexTableModel.getSelectionListener());
-//        table.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                if (e.getClickCount() > 1 && narthexTableModel.EDIT_ACTION.isEnabled()) {
-//                    if (narthexTableModel.getSelectedRow() != hubTable.rowAtPoint(e.getPoint())) return;
-//                    narthexTableModel.EDIT_ACTION.actionPerformed(null);
-//                }
-//            }
-//        });
-        return table;
-    }
-
     private JPanel createHubTableSouth(JTextField patternField) {
         JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
         p.setBorder(BorderFactory.createTitledBorder("Actions"));
@@ -137,16 +100,6 @@ public class RemoteDataSetFrame extends FrameBase {
 //        addKeyboardAction(new UpDownAction(true), DOWN, (JComponent) getContentPane());
         p.add(button(hubTableModel.DOWNLOAD_ACTION));
         p.add(button(hubTableModel.RELEASE_ACTION));
-        return p;
-    }
-
-    private JPanel createNarthexTableSouth(JTextField patternField) {
-        JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
-        p.setBorder(BorderFactory.createTitledBorder("Actions"));
-        p.add(button(narthexTableModel.REFRESH_ACTION));
-        p.add(createFilter(patternField));
-        p.add(button(narthexTableModel.EDIT_ACTION));
-        p.add(button(narthexTableModel.DOWNLOAD_ACTION));
         return p;
     }
 
@@ -169,11 +122,11 @@ public class RemoteDataSetFrame extends FrameBase {
 
     @Override
     public void refresh() {
-//        Swing.Exec.later(new Swing() {
-//            @Override
-//            public void run() {
-//                hubTableModel.setHubEntries(null);
-//            }
-//        });
+        Swing.Exec.later(new Swing() {
+            @Override
+            public void run() {
+                hubTableModel.REFRESH_ACTION.actionPerformed(null);
+            }
+        });
     }
 }

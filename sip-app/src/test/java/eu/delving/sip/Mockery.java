@@ -88,7 +88,7 @@ public class Mockery {
         File factsSourceDir = new File(getClass().getResource(String.format("/test/%s/dataset", prefix)).getFile());
         if (!factsSourceDir.isDirectory()) throw new RuntimeException();
         FileUtils.copyDirectory(factsSourceDir, dataSetDir);
-        DataSet dataSet = storage.getDataSets(false).get(dataSetDir.getName());
+        DataSet dataSet = storage.getDataSets().get(dataSetDir.getName());
         if (dataSet == null) throw new RuntimeException("No dataset called: "+dataSetDir);
         dataSetModel.setDataSet(dataSet, prefix);
         recMapping = dataSetModel.getMappingModel().getRecMapping();

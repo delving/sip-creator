@@ -157,7 +157,7 @@ class HubDataSetTableModel extends AbstractTableModel {
     public void setHubEntries(List<NetworkClient.DataSetEntry> list) {
         fetchNeeded = list == null;
         List<HubDataSetTableRow> freshHubRows = new ArrayList<HubDataSetTableRow>();
-        Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets(false);
+        Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets();
         if (list != null) {
             for (NetworkClient.DataSetEntry incoming : list) {
                 DataSet dataSet = dataSets.get(incoming.getDirectoryName());

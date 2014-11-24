@@ -140,7 +140,7 @@ class NarthexDataSetTableModel extends AbstractTableModel {
     public void setNarthexEntries(List<NetworkClient.Sip> list) {
         fetchNeeded = list == null;
         List<NarthexDataSetTableRow> freshRows = new ArrayList<NarthexDataSetTableRow>();
-        Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets(true);
+        Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets(); // todo: was "true" arg, but who cares
         if (list != null) {
             for (NetworkClient.Sip incoming : list) {
                 DataSet dataSet = dataSets.get(incoming.file);

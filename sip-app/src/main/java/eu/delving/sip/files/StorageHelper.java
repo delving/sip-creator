@@ -72,23 +72,15 @@ public class StorageHelper {
         }
     }
 
-    private static String stripNarthex(File directory) {
-        String name = directory.getName();
-        if (name.startsWith(NARTHEX_DATASET_PREFIX)) {
-            name = name.substring(NARTHEX_DATASET_PREFIX.length());
-        }
-        return name;
-    }
-
     static String getSpecFromDirectory(File directory) {
-        String name = stripNarthex(directory);
+        String name = directory.getName();
         int underscore = name.indexOf("_");
         if (underscore < 0) throw new IllegalStateException("Directory must be in the form spec_organization");
         return name.substring(0, underscore);
     }
 
     static String getOrganizationFromDirectory(File directory) {
-        String name = stripNarthex(directory);
+        String name = directory.getName();
         int underscore = name.indexOf("_");
         if (underscore < 0) throw new IllegalStateException("Directory must be in the form spec_organization");
         return name.substring(underscore + 1);
@@ -231,19 +223,9 @@ public class StorageHelper {
         return new File(dir, sourceFormat ? SOURCE_STATS.getName() : IMPORT_STATS.getName());
     }
 
-    static File sipZip(File dir, String spec, String user) {
-        String part = String.format("%s__%s__%s", spec, DATE_FORMAT.format(new Date()), user);
-        return new File(dir, SIP_ZIP.getName(part));
-    }
-
-    static List<File> sipZips(File dir) {
-        File[] files = dir.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.isFile() && file.getName().startsWith(SIP_ZIP.getPrefix());
-            }
-        });
-        return new ArrayList<File>(Arrays.asList(files));
+    static File sipZip(File dir, String spec, String prefix) {
+        String name = String.format("%s__%s__%s.sip.zip", spec, DATE_FORMAT.format(new Date()), prefix);
+        return new File(dir, name);
     }
 
     static File findOrCreate(File directory, Storage.FileType fileType) {

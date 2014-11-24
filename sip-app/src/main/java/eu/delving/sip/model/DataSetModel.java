@@ -37,6 +37,7 @@ import javax.swing.*;
 import javax.xml.validation.Validator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -92,6 +93,10 @@ public class DataSetModel implements RecDefModel {
 
     public String getPrefix() {
         return mappingModel.getPrefix();
+    }
+
+    public File createSipZip() throws StorageException {
+        return dataSet.toSipZip(getPrefix());
     }
 
     public Validator newValidator() throws MetadataException {

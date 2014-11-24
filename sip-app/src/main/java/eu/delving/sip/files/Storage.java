@@ -41,7 +41,7 @@ public interface Storage {
 
     File cache(String fileName);
 
-    Map<String, DataSet> getDataSets(boolean narthex);
+    Map<String, DataSet> getDataSets();
 
     DataSet createDataSet(boolean narthex, String spec, String organization) throws StorageException;
 
@@ -55,8 +55,7 @@ public interface Storage {
         MAPPING(null, "mapping_", ".xml", "mapping_%s.xml", 30),
         REPORT(null, "report_", null, "report_%s.txt", 1),
         REPORT_INDEX(null, "report_", null, "report_%s.long", 1),
-        LINKS(null, "links_", null, "links_%s.csv.gz", 1),
-        SIP_ZIP(null, "sip_", ".zip", "sip_%s.zip", 1);
+        LINKS(null, "links_", null, "links_%s.csv.gz", 1);
 
         private String name, prefix, suffix, pattern;
         private int historySize = 1;
@@ -116,13 +115,14 @@ public interface Storage {
     String NARTHEX_DATASET_NAME = "narthexDatasetName";
     String NARTHEX_PREFIX = "narthexPrefix";
     String CACHE_DIR = "Cache";
+    String SIP_ZIPS_DIR = "SipZips";
     String MEDIA_DIR = "Media";
     String INDEX_FILE = "media-files.xml";
     String FRAME_ARRANGEMENTS_FILE = "frame-arrangements.xml";
     Path RECORD_ROOT = Path.create(String.format("/%s/%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG));
     Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/@%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG, UNIQUE_ATTR));
     long MAPPING_FREEZE_INTERVAL = 60000;
-    String NARTHEX_DATASET_PREFIX = "narthex__";
+//    String NARTHEX_DATASET_PREFIX = "narthex__";
     Pattern HUB_DATASET_PATTERN = Pattern.compile("([^_]+)_([^_]+)"); // geheugen-van-nederland_dimcon
-    Pattern NARTHEX_DATASET_PATTERN = Pattern.compile("narthex__([^_]+)_([^_]+)"); // narthex__bronbeek_dimcon
+//    Pattern NARTHEX_DATASET_PATTERN = Pattern.compile("narthex__([^_]+)_([^_]+)"); // narthex__bronbeek_dimcon
 }

@@ -22,11 +22,11 @@
 package eu.delving.sip.actions;
 
 import eu.delving.sip.base.NetworkClient;
-import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -94,17 +94,18 @@ public class UploadAction extends AbstractAction {
     }
 
     private void initiateUpload(String url, String apiKey, String datasetName, String prefix) {
-        try {
-            networkClient.uploadNarthex(sipModel.getDataSetModel().getDataSet(), url, apiKey, datasetName, prefix, new Swing() {
-                @Override
-                public void run() {
-                    setEnabled(true);
-                }
-            });
-        }
-        catch (final StorageException e) {
-            sipModel.getFeedback().alert("Unable to complete uploading", e);
-            setEnabled(true);
-        }
+//        try {
+//            networkClient.uploadNarthex(sipModel.getDataSetModel().getDataSet(), url, apiKey, datasetName, prefix, new Swing() {
+//                @Override
+//                public void run() {
+//                    setEnabled(true);
+//                }
+//            });
+//        }
+//        catch (final StorageException e) {
+//            sipModel.getFeedback().alert("Unable to complete uploading", e);
+//            setEnabled(true);
+//        }
+        throw new NotImplementedException();
     }
 }

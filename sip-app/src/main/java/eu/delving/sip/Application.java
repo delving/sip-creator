@@ -28,10 +28,10 @@ import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.schema.SchemaRepository;
+import eu.delving.sip.actions.CreateSipZipAction;
 import eu.delving.sip.actions.ImportAction;
 import eu.delving.sip.actions.SelectAnotherMappingAction;
 import eu.delving.sip.actions.UnlockMappingAction;
-import eu.delving.sip.actions.UploadAction;
 import eu.delving.sip.actions.ValidateAction;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.NetworkClient;
@@ -110,7 +110,7 @@ public class Application {
     private StatusPanel statusPanel;
     private Timer resizeTimer;
     private ExpertMenu expertMenu;
-    private UploadAction uploadAction;
+    private CreateSipZipAction createSipZipAction;
     private UnlockMappingAction unlockMappingAction;
     private SelectAnotherMappingAction selectAnotherMappingAction;
 
@@ -157,7 +157,7 @@ public class Application {
         context.setHttpClient(httpClient);
         sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, preferences);
         NetworkClient networkClient = new NetworkClient(sipModel, httpClient);
-        uploadAction = new UploadAction(sipModel, networkClient);
+        createSipZipAction = new CreateSipZipAction(sipModel);
         expertMenu = new ExpertMenu(desktop, sipModel, networkClient, allFrames);
         statusPanel = new StatusPanel(sipModel);
         home = new JFrame(titleString());
@@ -283,12 +283,7 @@ public class Application {
         statusPanel.setReaction(SOURCED, new InputAnalyzer());
         statusPanel.setReaction(ANALYZED_SOURCE, allFrames.prepareForMapping(desktop));
         statusPanel.setReaction(MAPPING, validateAction);
-        if (uploadAction == null) {
-            statusPanel.setReaction(PROCESSED, allFrames.prepareForNothing());
-        }
-        else {
-            statusPanel.setReaction(PROCESSED, uploadAction);
-        }
+        statusPanel.setReaction(PROCESSED, createSipZipAction);
         JPanel p = new JPanel(new GridLayout(1, 0, 6, 6));
         p.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createBevelBorder(0),

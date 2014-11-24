@@ -36,7 +36,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.util.EntityUtils;
 
@@ -147,9 +146,9 @@ public class NetworkClient {
         sipModel.exec(new NarthexDatasetDownloader(1, fileName, dataSet, url, apiKey, finished));
     }
 
-    public void uploadNarthex(DataSet dataSet, String url, String apiKey, String datasetName, String prefix, Swing finished) throws StorageException {
-        sipModel.exec(new NarthexUploader(1, dataSet, url, apiKey, datasetName, prefix, finished));
-    }
+//    public void uploadNarthex(DataSet dataSet, String url, String apiKey, String datasetName, String prefix, Swing finished) throws StorageException {
+//        sipModel.exec(new NarthexUploader(1, dataSet, url, apiKey, datasetName, prefix, finished));
+//    }
 
     private abstract class Attempt implements Work {
         protected int attempt;
@@ -589,74 +588,74 @@ public class NetworkClient {
         }
     }
 
-    private class NarthexUploader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
-        private final DataSet dataSet;
-        private final String url;
-        private final String apiKey;
-        private final String datasetName;
-        private final String prefix;
-        private ProgressListener progressListener;
-        private Swing finished;
-
-        NarthexUploader(int attempt, DataSet dataSet, String url, String apiKey, String datasetName, String prefix, Swing finished) throws StorageException {
-            super(attempt);
-            this.dataSet = dataSet;
-            this.url = url;
-            this.apiKey = apiKey;
-            this.datasetName = datasetName;
-            this.prefix = prefix;
-            this.finished = finished;
-        }
-
-        @Override
-        public void run() {
-            try {
-                File sipZip = dataSet.toSipZip(prefix);
-                feedback().info("Uploading SIP-Zip " + sipZip.getName() + " to Narthex dataset " + datasetName + " with prefix " + prefix);
-                HttpPost sipZipPost = createSipZipUploadRequest(sipZip, progressListener);
-                FileEntity fileEntity = (FileEntity) sipZipPost.getEntity();
-                HttpResponse sipZipResponse = httpClient.execute(sipZipPost);
-                System.out.println(EntityUtils.toString(sipZipResponse.getEntity())); // otherwise consume!
-                Code code = Code.from(sipZipResponse);
-                if (code != Code.OK && !fileEntity.abort) {
-                    reportResponse(Code.from(sipZipResponse), sipZipResponse.getStatusLine());
-                }
-            }
-            catch (Exception e) {
-                feedback().alert("Problem connecting", e);
-            }
-            finally {
-                if (finished != null) Swing.Exec.later(finished);
-            }
-        }
-
-        @Override
-        public Job getJob() {
-            return Job.UPLOAD;
-        }
-
-        @Override
-        public DataSet getDataSet() {
-            return dataSet;
-        }
-
-        @Override
-        public void setProgressListener(ProgressListener progressListener) {
-            this.progressListener = progressListener;
-            progressListener.setProgressMessage("Uploading to the Narthex");
-        }
-
-        private HttpPost createSipZipUploadRequest(File file, ProgressListener progressListener) {
-            HttpPost post = new HttpPost(String.format(
-                    "%s/sip-creator/%s/%s/%s",
-                    url, apiKey, datasetName, file.getName()
-            ));
-            FileEntity fileEntity = new FileEntity(file, progressListener);
-            post.setEntity(fileEntity);
-            return post;
-        }
-
-    }
+//    private class NarthexUploader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
+//        private final DataSet dataSet;
+//        private final String url;
+//        private final String apiKey;
+//        private final String datasetName;
+//        private final String prefix;
+//        private ProgressListener progressListener;
+//        private Swing finished;
+//
+//        NarthexUploader(int attempt, DataSet dataSet, String url, String apiKey, String datasetName, String prefix, Swing finished) throws StorageException {
+//            super(attempt);
+//            this.dataSet = dataSet;
+//            this.url = url;
+//            this.apiKey = apiKey;
+//            this.datasetName = datasetName;
+//            this.prefix = prefix;
+//            this.finished = finished;
+//        }
+//
+//        @Override
+//        public void run() {
+//            try {
+//                File sipZip = dataSet.toSipZip(prefix);
+//                feedback().info("Uploading SIP-Zip " + sipZip.getName() + " to Narthex dataset " + datasetName + " with prefix " + prefix);
+//                HttpPost sipZipPost = createSipZipUploadRequest(sipZip, progressListener);
+//                FileEntity fileEntity = (FileEntity) sipZipPost.getEntity();
+//                HttpResponse sipZipResponse = httpClient.execute(sipZipPost);
+//                System.out.println(EntityUtils.toString(sipZipResponse.getEntity())); // otherwise consume!
+//                Code code = Code.from(sipZipResponse);
+//                if (code != Code.OK && !fileEntity.abort) {
+//                    reportResponse(Code.from(sipZipResponse), sipZipResponse.getStatusLine());
+//                }
+//            }
+//            catch (Exception e) {
+//                feedback().alert("Problem connecting", e);
+//            }
+//            finally {
+//                if (finished != null) Swing.Exec.later(finished);
+//            }
+//        }
+//
+//        @Override
+//        public Job getJob() {
+//            return Job.UPLOAD;
+//        }
+//
+//        @Override
+//        public DataSet getDataSet() {
+//            return dataSet;
+//        }
+//
+//        @Override
+//        public void setProgressListener(ProgressListener progressListener) {
+//            this.progressListener = progressListener;
+//            progressListener.setProgressMessage("Uploading to the Narthex");
+//        }
+//
+//        private HttpPost createSipZipUploadRequest(File file, ProgressListener progressListener) {
+//            HttpPost post = new HttpPost(String.format(
+//                    "%s/sip-creator/%s/%s/%s",
+//                    url, apiKey, datasetName, file.getName()
+//            ));
+//            FileEntity fileEntity = new FileEntity(file, progressListener);
+//            post.setEntity(fileEntity);
+//            return post;
+//        }
+//
+//    }
 
     private void reportOAuthProblem(OAuthProblemException e) {
         OAuthClient.Problem problem = OAuthClient.getProblem(e);
