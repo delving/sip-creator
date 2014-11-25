@@ -29,7 +29,6 @@ import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.sip.actions.CreateSipZipAction;
-import eu.delving.sip.actions.ImportAction;
 import eu.delving.sip.actions.SelectAnotherMappingAction;
 import eu.delving.sip.actions.UnlockMappingAction;
 import eu.delving.sip.actions.ValidateAction;
@@ -101,7 +100,6 @@ public class Application {
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
     private static String version;
     private SipModel sipModel;
-    private Action importAction;
     private Action validateAction;
     private JFrame home;
     private JDesktopPane desktop;
@@ -206,8 +204,6 @@ public class Application {
             public void populationChanged(MappingModel mappingModel, RecDefNode node) {
             }
         });
-        importAction = new ImportAction(desktop, sipModel);
-        attachAccelerator(importAction, home);
         validateAction = new ValidateAction(sipModel, allFrames.prepareForInvestigation(desktop));
         unlockMappingAction = new UnlockMappingAction(sipModel);
         attachAccelerator(unlockMappingAction, home);
@@ -276,7 +272,6 @@ public class Application {
 
     private JPanel createStatePanel() {
         statusPanel.setReaction(ABSENT, allFrames.prepareForNothing());
-        statusPanel.setReaction(NO_DATA, importAction);
         statusPanel.setReaction(IMPORTED, new InputAnalyzer());
         statusPanel.setReaction(ANALYZED_IMPORT, allFrames.prepareForDelimiting());
         statusPanel.setReaction(DELIMITED, new ConvertPerformer());
@@ -303,8 +298,6 @@ public class Application {
         p.add(b = new JButton(unlockMappingAction));
         b.setHorizontalAlignment(JButton.LEFT);
         p.add(b = new JButton(selectAnotherMappingAction));
-        b.setHorizontalAlignment(JButton.LEFT);
-        p.add(b = new JButton(importAction));
         b.setHorizontalAlignment(JButton.LEFT);
         return p;
     }

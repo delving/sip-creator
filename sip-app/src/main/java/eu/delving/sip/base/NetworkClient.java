@@ -36,6 +36,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.util.EntityUtils;
 
@@ -107,29 +108,6 @@ public class NetworkClient {
 
     }
 
-    public interface HubListListener {
-
-        void listReceived(List<DataSetEntry> entries);
-
-        void failed(Exception e);
-    }
-
-    public void fetchHubDatasetList(HubListListener hubListListener) {
-        sipModel.exec(new HubListFetcher(1, hubListListener));
-    }
-
-    public interface ReleaseListener {
-        void unlockComplete(boolean successful);
-    }
-
-    public void unlockHubDataset(DataSet dataSet, ReleaseListener releaseListener) {
-        sipModel.exec(new HubRelease(1, dataSet, releaseListener));
-    }
-
-    public void downloadHubDataset(String fileName, DataSet dataSet, Swing finished) {
-        sipModel.exec(new HubDownloader(1, fileName, dataSet, finished));
-    }
-
     public interface NarthexListListener {
 
         void listReceived(List<Sip> entries);
@@ -146,9 +124,10 @@ public class NetworkClient {
         sipModel.exec(new NarthexDatasetDownloader(1, fileName, dataSet, url, apiKey, finished));
     }
 
-//    public void uploadNarthex(DataSet dataSet, String url, String apiKey, String datasetName, String prefix, Swing finished) throws StorageException {
-//        sipModel.exec(new NarthexUploader(1, dataSet, url, apiKey, datasetName, prefix, finished));
-//    }
+    // todo: use this
+    public void uploadNarthex(DataSet dataSet, String url, String apiKey, String datasetName, String prefix, Swing finished) throws StorageException {
+        sipModel.exec(new NarthexUploader(1, dataSet, url, apiKey, datasetName, prefix, finished));
+    }
 
     private abstract class Attempt implements Work {
         protected int attempt;
@@ -171,241 +150,6 @@ public class NetworkClient {
             else {
                 return false;
             }
-        }
-    }
-
-    // HUB ============================
-
-    private class HubListFetcher extends Attempt {
-        private HubListListener hubListListener;
-
-        public HubListFetcher(int attempt, HubListListener hubListListener) {
-            super(attempt);
-            this.hubListListener = hubListListener;
-        }
-
-        @Override
-        public void run() {
-            try {
-                HttpGet get = createHubListRequest();
-                get.setHeader("Accept", "text/xml");
-                HttpResponse response = httpClient.execute(get);
-                Code code = Code.from(response);
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    switch (code) {
-                        case OK:
-                            DataSetList dataSetList = (DataSetList) XStreamFactory.getStreamFor(DataSetList.class).fromXML(entity.getContent());
-                            hubListListener.listReceived(dataSetList.list);
-                            break;
-                        case UNAUTHORIZED:
-                            if (!reactToUnauthorized(new HubListFetcher(attempt + 1, hubListListener))) {
-                                hubListListener.failed(new Exception("Unable to fetch list"));
-                            }
-                            break;
-                        default:
-                            reportResponse(code, response.getStatusLine());
-                            hubListListener.failed(new Exception(String.format(
-                                    "Response was %s. Status: [%d] %s",
-                                    code,
-                                    response.getStatusLine().getStatusCode(),
-                                    response.getStatusLine().getReasonPhrase()
-                            )));
-                            oauthClient.invalidateTokens();
-                            break;
-                    }
-                    EntityUtils.consume(entity);
-                }
-                else {
-                    throw new IOException("Response was empty");
-                }
-            }
-            catch (OAuthProblemException e) {
-                reportOAuthProblem(e);
-                hubListListener.failed(e);
-            }
-            catch (Exception e) {
-                feedback().alert("Error fetching list from hub", e);
-                hubListListener.failed(e);
-            }
-        }
-
-        @Override
-        public Job getJob() {
-            return Job.FETCH_LIST;
-        }
-
-        private HttpGet createHubListRequest() throws OAuthSystemException, OAuthProblemException {
-            return createHubGet("list");
-        }
-
-    }
-
-    private class HubRelease extends Attempt implements Work.DataSetWork {
-        private DataSet dataSet;
-        private ReleaseListener releaseListener;
-
-        public HubRelease(int attempt, DataSet dataSet, ReleaseListener releaseListener) {
-            super(attempt);
-            this.dataSet = dataSet;
-            this.releaseListener = releaseListener;
-        }
-
-        @Override
-        public void run() {
-            try {
-                HttpGet get = createUnlockRequest(dataSet);
-                HttpResponse response = httpClient.execute(get);
-                EntityUtils.consume(response.getEntity());
-                Code code = Code.from(response);
-                switch (code) {
-                    case OK:
-                        releaseListener.unlockComplete(true);
-                        break;
-                    case UNAUTHORIZED:
-                        if (!reactToUnauthorized(new HubRelease(attempt + 1, dataSet, releaseListener))) {
-                            releaseListener.unlockComplete(false);
-                        }
-                        break;
-                    default:
-                        releaseListener.unlockComplete(false);
-                        oauthClient.invalidateTokens();
-                        reportResponse(code, response.getStatusLine());
-                        break;
-                }
-            }
-            catch (OAuthProblemException e) {
-                reportOAuthProblem(e);
-                releaseListener.unlockComplete(false);
-            }
-            catch (Exception e) {
-                feedback().alert("Error unlocking dataset", e);
-                releaseListener.unlockComplete(false);
-            }
-        }
-
-        @Override
-        public Job getJob() {
-            return Job.UNLOCK;
-        }
-
-        @Override
-        public DataSet getDataSet() {
-            return dataSet;
-        }
-
-        private HttpGet createUnlockRequest(DataSet dataSet) throws OAuthSystemException, OAuthProblemException {
-            HttpGet get = createHubGet(String.format(
-                    "unlock/%s/%s",
-                    dataSet.getOrganization(), dataSet.getSpec()
-            ));
-            get.setHeader("Accept", "text/xml");
-            return get;
-        }
-    }
-
-    private class HubDownloader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
-        private final String fileName;
-        private final DataSet dataSet;
-        private ProgressListener progressListener;
-        private Swing finished;
-
-        private HubDownloader(int attempt, String fileName, DataSet dataSet, Swing finished) {
-            super(attempt);
-            this.fileName = fileName;
-            this.dataSet = dataSet;
-            this.finished = finished;
-        }
-
-        @Override
-        public void run() {
-            boolean success = false;
-            try {
-                HttpGet get = createHubDownloadRequest(dataSet);
-                HttpResponse response = httpClient.execute(get);
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    Code code = Code.from(response);
-                    switch (code) {
-                        case OK:
-                            dataSet.remove();
-                            File sipZipFile = dataSet.sipZipFile(fileName);
-                            FileOutputStream output = new FileOutputStream(sipZipFile);
-                            progressListener.prepareFor((int) (entity.getContentLength() / BLOCK_SIZE));
-                            InputStream input = entity.getContent();
-                            byte[] buffer = new byte[BLOCK_SIZE];
-                            int count = 0;
-                            int bytesRead = 0;
-                            while (-1 != (bytesRead = input.read(buffer))) {
-                                output.write(buffer, 0, bytesRead);
-                                count++;
-                                progressListener.setProgress(count);
-                            }
-                            output.close();
-                            dataSet.fromSipZip(sipZipFile, progressListener);
-                            success = true;
-                            break;
-                        case UNAUTHORIZED:
-                            if (reactToUnauthorized(new HubDownloader(attempt + 1, fileName, dataSet, finished))) {
-                                finished = null;
-                            }
-                            else {
-                                success = false;
-                            }
-                            break;
-                        default:
-                            oauthClient.invalidateTokens();
-                            reportResponse(code, response.getStatusLine());
-                            break;
-                    }
-                    EntityUtils.consume(entity);
-                }
-                else {
-                    throw new IOException("Empty entity");
-                }
-            }
-            catch (OAuthProblemException e) {
-                reportOAuthProblem(e);
-            }
-            catch (Exception e) {
-                feedback().alert("Unable to download data set", e);
-            }
-            finally {
-                if (!success) {
-                    try {
-                        dataSet.remove();
-                    }
-                    catch (StorageException e1) {
-                        feedback().alert("Unable to remove local data set");
-                    }
-                }
-                if (finished != null) Swing.Exec.later(finished);
-            }
-        }
-
-        @Override
-        public Job getJob() {
-            return Job.DOWNLOAD;
-        }
-
-        @Override
-        public DataSet getDataSet() {
-            return dataSet;
-        }
-
-        @Override
-        public void setProgressListener(ProgressListener progressListener) {
-            this.progressListener = progressListener;
-            progressListener.setProgressMessage("Downloading from the hub.");
-        }
-
-        private HttpGet createHubDownloadRequest(DataSet dataSet) throws OAuthSystemException, OAuthProblemException {
-            HttpGet get = createHubGet(String.format(
-                    "fetch/%s/%s-sip.zip",
-                    dataSet.getOrganization(), dataSet.getSpec()
-            ));
-            get.setHeader("Accept", "application/zip");
-            return get;
         }
     }
 
@@ -588,74 +332,74 @@ public class NetworkClient {
         }
     }
 
-//    private class NarthexUploader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
-//        private final DataSet dataSet;
-//        private final String url;
-//        private final String apiKey;
-//        private final String datasetName;
-//        private final String prefix;
-//        private ProgressListener progressListener;
-//        private Swing finished;
-//
-//        NarthexUploader(int attempt, DataSet dataSet, String url, String apiKey, String datasetName, String prefix, Swing finished) throws StorageException {
-//            super(attempt);
-//            this.dataSet = dataSet;
-//            this.url = url;
-//            this.apiKey = apiKey;
-//            this.datasetName = datasetName;
-//            this.prefix = prefix;
-//            this.finished = finished;
-//        }
-//
-//        @Override
-//        public void run() {
-//            try {
-//                File sipZip = dataSet.toSipZip(prefix);
-//                feedback().info("Uploading SIP-Zip " + sipZip.getName() + " to Narthex dataset " + datasetName + " with prefix " + prefix);
-//                HttpPost sipZipPost = createSipZipUploadRequest(sipZip, progressListener);
-//                FileEntity fileEntity = (FileEntity) sipZipPost.getEntity();
-//                HttpResponse sipZipResponse = httpClient.execute(sipZipPost);
-//                System.out.println(EntityUtils.toString(sipZipResponse.getEntity())); // otherwise consume!
-//                Code code = Code.from(sipZipResponse);
-//                if (code != Code.OK && !fileEntity.abort) {
-//                    reportResponse(Code.from(sipZipResponse), sipZipResponse.getStatusLine());
-//                }
-//            }
-//            catch (Exception e) {
-//                feedback().alert("Problem connecting", e);
-//            }
-//            finally {
-//                if (finished != null) Swing.Exec.later(finished);
-//            }
-//        }
-//
-//        @Override
-//        public Job getJob() {
-//            return Job.UPLOAD;
-//        }
-//
-//        @Override
-//        public DataSet getDataSet() {
-//            return dataSet;
-//        }
-//
-//        @Override
-//        public void setProgressListener(ProgressListener progressListener) {
-//            this.progressListener = progressListener;
-//            progressListener.setProgressMessage("Uploading to the Narthex");
-//        }
-//
-//        private HttpPost createSipZipUploadRequest(File file, ProgressListener progressListener) {
-//            HttpPost post = new HttpPost(String.format(
-//                    "%s/sip-creator/%s/%s/%s",
-//                    url, apiKey, datasetName, file.getName()
-//            ));
-//            FileEntity fileEntity = new FileEntity(file, progressListener);
-//            post.setEntity(fileEntity);
-//            return post;
-//        }
-//
-//    }
+    private class NarthexUploader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
+        private final DataSet dataSet;
+        private final String url;
+        private final String apiKey;
+        private final String datasetName;
+        private final String prefix;
+        private ProgressListener progressListener;
+        private Swing finished;
+
+        NarthexUploader(int attempt, DataSet dataSet, String url, String apiKey, String datasetName, String prefix, Swing finished) throws StorageException {
+            super(attempt);
+            this.dataSet = dataSet;
+            this.url = url;
+            this.apiKey = apiKey;
+            this.datasetName = datasetName;
+            this.prefix = prefix;
+            this.finished = finished;
+        }
+
+        @Override
+        public void run() {
+            try {
+                File sipZip = dataSet.toSipZip(prefix);
+                feedback().info("Uploading SIP-Zip " + sipZip.getName() + " to Narthex dataset " + datasetName + " with prefix " + prefix);
+                HttpPost sipZipPost = createSipZipUploadRequest(sipZip, progressListener);
+                FileEntity fileEntity = (FileEntity) sipZipPost.getEntity();
+                HttpResponse sipZipResponse = httpClient.execute(sipZipPost);
+                System.out.println(EntityUtils.toString(sipZipResponse.getEntity())); // otherwise consume!
+                Code code = Code.from(sipZipResponse);
+                if (code != Code.OK && !fileEntity.abort) {
+                    reportResponse(Code.from(sipZipResponse), sipZipResponse.getStatusLine());
+                }
+            }
+            catch (Exception e) {
+                feedback().alert("Problem connecting", e);
+            }
+            finally {
+                if (finished != null) Swing.Exec.later(finished);
+            }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.UPLOAD;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return dataSet;
+        }
+
+        @Override
+        public void setProgressListener(ProgressListener progressListener) {
+            this.progressListener = progressListener;
+            progressListener.setProgressMessage("Uploading to the Narthex");
+        }
+
+        private HttpPost createSipZipUploadRequest(File file, ProgressListener progressListener) {
+            HttpPost post = new HttpPost(String.format(
+                    "%s/sip-creator/%s/%s/%s",
+                    url, apiKey, datasetName, file.getName()
+            ));
+            FileEntity fileEntity = new FileEntity(file, progressListener);
+            post.setEntity(fileEntity);
+            return post;
+        }
+
+    }
 
     private void reportOAuthProblem(OAuthProblemException e) {
         OAuthClient.Problem problem = OAuthClient.getProblem(e);

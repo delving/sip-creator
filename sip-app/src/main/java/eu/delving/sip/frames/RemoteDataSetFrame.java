@@ -45,14 +45,13 @@ import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
  */
 
 public class RemoteDataSetFrame extends FrameBase {
-    private final HubDataSetTableModel hubTableModel;
-    private final JTable hubTable;
+    private final NarthexDataSetTableModel narthexTableModel;
+    private final JTable narthexTable;
 
     public RemoteDataSetFrame(final SipModel sipModel, NetworkClient networkClient) {
         super(Which.DATA_SET, sipModel, "Data Sets");
-        this.hubTableModel = new HubDataSetTableModel(sipModel, networkClient);
-        this.hubTable = createHubTable();
-        hubTableModel.checkEnabled();
+        this.narthexTableModel = new NarthexDataSetTableModel(sipModel, networkClient);
+        this.narthexTable = createNarthexTable();
     }
 
     @Override
@@ -60,29 +59,29 @@ public class RemoteDataSetFrame extends FrameBase {
         if (opened) Swing.Exec.later(new Swing() {
             @Override
             public void run() {
-                hubTable.requestFocus();
+                narthexTable.requestFocus();
             }
         });
     }
 
     @Override
     protected void buildContent(Container content) {
-        content.add(SwingHelper.scrollV("Hub Data Sets", hubTable), BorderLayout.CENTER);
-        content.add(createHubTableSouth(hubTableModel.getPatternField()), BorderLayout.SOUTH);
+        content.add(SwingHelper.scrollV("Narthex Data Sets", narthexTable), BorderLayout.CENTER);
+        content.add(createHubTableSouth(narthexTableModel.getPatternField()), BorderLayout.SOUTH);
     }
 
-    private JTable createHubTable() {
-        JTable table = new JTable(hubTableModel, hubTableModel.getColumnModel());
+    private JTable createNarthexTable() {
+        JTable table = new JTable(narthexTableModel, narthexTableModel.getColumnModel());
         table.setRowHeight(45);
         table.setIntercellSpacing(new Dimension(12, 4));
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.getSelectionModel().addListSelectionListener(hubTableModel.getSelectionListener());
+        table.getSelectionModel().addListSelectionListener(narthexTableModel.getSelectionListener());
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() > 1 && hubTableModel.EDIT_ACTION.isEnabled()) {
-                    if (hubTable.getSelectedRow() != hubTable.rowAtPoint(e.getPoint())) return;
-                    hubTableModel.EDIT_ACTION.actionPerformed(null);
+                if (e.getClickCount() > 1 && narthexTableModel.EDIT_ACTION.isEnabled()) {
+                    if (narthexTable.getSelectedRow() != narthexTable.rowAtPoint(e.getPoint())) return;
+                    narthexTableModel.EDIT_ACTION.actionPerformed(null);
                 }
             }
         });
@@ -92,14 +91,13 @@ public class RemoteDataSetFrame extends FrameBase {
     private JPanel createHubTableSouth(JTextField patternField) {
         JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
         p.setBorder(BorderFactory.createTitledBorder("Actions"));
-        p.add(button(hubTableModel.REFRESH_ACTION));
+        p.add(button(narthexTableModel.REFRESH_ACTION));
         p.add(createFilter(patternField));
-        p.add(button(hubTableModel.EDIT_ACTION));
-        addKeyboardAction(hubTableModel.EDIT_ACTION, SPACE, (JComponent) getContentPane());
+        p.add(button(narthexTableModel.EDIT_ACTION));
+        addKeyboardAction(narthexTableModel.EDIT_ACTION, SPACE, (JComponent) getContentPane());
 //        addKeyboardAction(new UpDownAction(false), UP, (JComponent) getContentPane());
 //        addKeyboardAction(new UpDownAction(true), DOWN, (JComponent) getContentPane());
-        p.add(button(hubTableModel.DOWNLOAD_ACTION));
-        p.add(button(hubTableModel.RELEASE_ACTION));
+        p.add(button(narthexTableModel.DOWNLOAD_ACTION));
         return p;
     }
 
@@ -125,7 +123,7 @@ public class RemoteDataSetFrame extends FrameBase {
         Swing.Exec.later(new Swing() {
             @Override
             public void run() {
-                hubTableModel.REFRESH_ACTION.actionPerformed(null);
+                narthexTableModel.REFRESH_ACTION.actionPerformed(null);
             }
         });
     }

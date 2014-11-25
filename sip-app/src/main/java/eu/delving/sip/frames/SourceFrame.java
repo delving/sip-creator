@@ -51,7 +51,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -70,12 +69,8 @@ import static eu.delving.sip.base.SwingHelper.scrollVH;
  */
 
 public class SourceFrame extends FrameBase {
-    private JButton recordRootButton = new JButton("Select Record Root ");
-    private JButton uniqueElementButton = new JButton("Select Unique Element");
     private JTree sourceTree;
-    private boolean delimited = false;
     private JPanel treePanel = new JPanel(new BorderLayout());
-    private JPanel selectButtonPanel = new JPanel(new GridLayout(1, 0, 5, 5));
     private JPanel filterPanel = new JPanel(new BorderLayout(10, 10));
     private JTextField filterField = new JTextField();
     private JCheckBox autoFoldBox = new JCheckBox("Auto-Fold");
@@ -107,10 +102,6 @@ public class SourceFrame extends FrameBase {
         sourceTree.setRowHeight(0);
         timer.setRepeats(false);
         treePanel.add(scrollVH(sourceTree), BorderLayout.CENTER);
-        recordRootButton.setEnabled(false);
-        selectButtonPanel.add(recordRootButton);
-        uniqueElementButton.setEnabled(false);
-        selectButtonPanel.add(uniqueElementButton);
         filterPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
         filterPanel.add(new JLabel("Filter:", JLabel.RIGHT), BorderLayout.WEST);
         filterPanel.add(filterField, BorderLayout.CENTER);
@@ -120,20 +111,12 @@ public class SourceFrame extends FrameBase {
 
     private void reactToState(DataSetState state) {
         if (!state.atLeast(DataSetState.ANALYZED_IMPORT)) sipModel.getStatsModel().setStatistics(null);
-        boolean newDelimited = state.atLeast(DataSetState.SOURCED);
-        if (newDelimited != delimited) {
-            delimited = newDelimited;
-            getContentPane().removeAll();
-            buildContent(getContentPane());
-            getContentPane().validate();
-        }
     }
 
     @Override
     protected void buildContent(Container content) {
         content.add(filterPanel, BorderLayout.NORTH);
         content.add(treePanel, BorderLayout.CENTER);
-        if (!delimited) content.add(selectButtonPanel, BorderLayout.SOUTH);
     }
 
     private void wireUp() {
@@ -223,7 +206,7 @@ public class SourceFrame extends FrameBase {
                         treePanel.setBorder(BorderFactory.createEtchedBorder());
                         break;
                     default:
-                        String kind = delimited ? "Source" : "Imported";
+                        String kind = "Source"; // todo
                         treePanel.setBorder(BorderFactory.createTitledBorder(String.format(
                                 "%s Data for \"%s\"",
                                 kind, model.getDataSet().getSpec()
@@ -247,25 +230,16 @@ public class SourceFrame extends FrameBase {
                         nodeList.add(node);
                     }
                 }
-                if (nodeList.size() == 1 && !delimited) {
-                    SourceTreeNode node = nodeList.iterator().next();
-                    recordRootButton.setEnabled(node.couldBeRecordRoot());
-                    uniqueElementButton.setEnabled(node.couldBeUniqueElement());
-                }
-                else {
-                    recordRootButton.setEnabled(false);
-                    uniqueElementButton.setEnabled(false);
-                    if (!nodeList.isEmpty()) {
-                        Path parentPath = null;
-                        for (SourceTreeNode node : nodeList) {
-                            if (parentPath == null) {
-                                parentPath = node.getPath(true).takeFirst();
-                            }
-                            else {
-                                if (!parentPath.equals(node.getPath(true).takeFirst())) {
-                                    sourceTree.clearSelection();
-                                    return;
-                                }
+                if (!nodeList.isEmpty()) {
+                    Path parentPath = null;
+                    for (SourceTreeNode node : nodeList) {
+                        if (parentPath == null) {
+                            parentPath = node.getPath(true).takeFirst();
+                        }
+                        else {
+                            if (!parentPath.equals(node.getPath(true).takeFirst())) {
+                                sourceTree.clearSelection();
+                                return;
                             }
                         }
                     }
@@ -289,31 +263,6 @@ public class SourceFrame extends FrameBase {
 //                if (mouseEvent.getClickCount() == 2) onDoubleClick();
 //            }
 //        });
-        recordRootButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                TreePath path = sourceTree.getSelectionPath();
-                SourceTreeNode node = (SourceTreeNode) path.getLastPathComponent();
-                Path recordRoot = node.getPath(true);
-                if (recordRoot != null) {
-                    sipModel.getStatsModel().setRecordRoot(recordRoot);
-                }
-            }
-        });
-        uniqueElementButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                TreePath path = sourceTree.getSelectionPath();
-                SourceTreeNode node = (SourceTreeNode) path.getLastPathComponent();
-                if (!node.getStats().isUnique()) {
-                    if (!sipModel.getFeedback().confirm(
-                            "Unique Element",
-                            "This element is not verified to be unique. Multiples will be discarded"
-                    )) return;
-                }
-                sipModel.getStatsModel().setUniqueElement(node.getPath(true));
-            }
-        });
     }
 
     private void showPath(SourceTreeNode node) {
