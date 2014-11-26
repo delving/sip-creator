@@ -38,10 +38,10 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.VisualFeedback;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.HomeDirectory;
 import eu.delving.sip.files.SchemaFetcher;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
-import eu.delving.sip.files.StorageFinder;
 import eu.delving.sip.files.StorageImpl;
 import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.frames.LogFrame;
@@ -141,7 +141,9 @@ public class Application {
         });
         Preferences preferences = Preferences.userNodeForPackage(SipModel.class);
         feedback = new VisualFeedback(home, desktop, preferences);
-        HttpClient httpClient = createHttpClient(storageDir);
+        // todo: be sure to set this
+        String serverUrl = preferences.get("serverUrl", "http://localhost:9000/narthex");
+        HttpClient httpClient = createHttpClient(serverUrl);
         SchemaRepository schemaRepository;
         try {
             schemaRepository = new SchemaRepository(new SchemaFetcher(httpClient));
@@ -154,7 +156,7 @@ public class Application {
         context.setStorage(storage);
         context.setHttpClient(httpClient);
         sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, preferences);
-        NetworkClient networkClient = new NetworkClient(sipModel, httpClient);
+        NetworkClient networkClient = new NetworkClient(sipModel, httpClient, serverUrl);
         createSipZipAction = new CreateSipZipAction(sipModel);
         expertMenu = new ExpertMenu(desktop, sipModel, networkClient, allFrames);
         statusPanel = new StatusPanel(sipModel);
@@ -391,21 +393,14 @@ public class Application {
         }
     }
 
-    private static StorageFinder storageFinder = new StorageFinder();
-
     private static class LaunchAction implements Runnable {
         private Application application;
 
         @Override
         public void run() {
-            File storageDirectory;
             if (application != null) application.destroy();
-            storageDirectory = storageFinder.getStorageDirectory();
-            if (storageDirectory == null) {
-                System.exit(0);
-            }
             try {
-                application = new Application(storageDirectory);
+                application = new Application(HomeDirectory.WORK_DIR);
                 application.home.setVisible(true);
                 application.allFrames.initiate();
                 if (version != null && !isLatestVersion(version)) {
@@ -509,7 +504,6 @@ public class Application {
 
     public static void main(final String[] args) throws StorageException {
         version = getPomVersion();
-        storageFinder.setArgs(args);
         Runtime rt = Runtime.getRuntime();
         int totalMemory = (int) (rt.totalMemory() / 1024 / 1024);
         if (totalMemory < 900) {

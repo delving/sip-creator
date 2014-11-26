@@ -61,9 +61,9 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 public class NetworkClient {
     private static final int BLOCK_SIZE = 1024;
-    private SipModel sipModel;
-    private HttpClient httpClient;
-    private OAuthClient oauthClient;
+    private final String serverUrl;
+    private final SipModel sipModel;
+    private final HttpClient httpClient;
 
     public enum Code {
         OK(SC_OK, "All is well"),
@@ -91,21 +91,10 @@ public class NetworkClient {
         }
     }
 
-    public NetworkClient(SipModel sipModel, HttpClient httpClient) {
+    public NetworkClient(SipModel sipModel, HttpClient httpClient, String serverUrl) {
         this.sipModel = sipModel;
         this.httpClient = httpClient;
-        oauthClient = new OAuthClient(
-                httpClient,
-                sipModel.getStorage().getHostPort(),
-                sipModel.getStorage().getUsername(),
-                new OAuthClient.PasswordRequest() {
-                    @Override
-                    public String getPassword() {
-                        return feedback().getHubPassword();
-                    }
-                }
-        );
-
+        this.serverUrl = serverUrl;
     }
 
     public interface NarthexListListener {
@@ -143,7 +132,6 @@ public class NetworkClient {
         protected boolean reactToUnauthorized(Work retry) {
             if (shouldRetry()) {
                 feedback().alert("Authorization failed, retrying...");
-                oauthClient.invalidateTokens();
                 sipModel.exec(retry);
                 return true;
             }
@@ -193,7 +181,6 @@ public class NetworkClient {
                                     response.getStatusLine().getStatusCode(),
                                     response.getStatusLine().getReasonPhrase()
                             )));
-                            oauthClient.invalidateTokens();
                             break;
                     }
                     EntityUtils.consume(entity);
@@ -279,7 +266,6 @@ public class NetworkClient {
                             }
                             break;
                         default:
-                            oauthClient.invalidateTokens();
                             reportResponse(code, response.getStatusLine());
                             break;
                     }
@@ -288,9 +274,6 @@ public class NetworkClient {
                 else {
                     throw new IOException("Empty entity");
                 }
-            }
-            catch (OAuthProblemException e) {
-                reportOAuthProblem(e);
             }
             catch (Exception e) {
                 feedback().alert("Unable to download data set", e);
@@ -401,21 +384,6 @@ public class NetworkClient {
 
     }
 
-    private void reportOAuthProblem(OAuthProblemException e) {
-        OAuthClient.Problem problem = OAuthClient.getProblem(e);
-        switch (problem) {
-            case EXPIRED_TOKEN:
-                feedback().alert(String.format("Expired token for user %s, please try again", sipModel.getStorage().getUsername()));
-                break;
-            case INVALID_GRANT:
-                feedback().alert(String.format("Invalid password for user %s", sipModel.getStorage().getUsername()));
-                break;
-            default:
-                feedback().alert("Authorization problem: " + e);
-                break;
-        }
-    }
-
     private static String deriveContentType(File file) {
         String name = Hasher.extractFileName(file);
         if (name.endsWith(".gz")) {
@@ -502,10 +470,6 @@ public class NetworkClient {
         }
     }
 
-    private HttpGet createHubGet(String path) throws OAuthSystemException, OAuthProblemException {
-        return new HttpGet(String.format("%s/%s?accessKey=%s", getServerUrl(), path, oauthClient.getToken()));
-    }
-
     private void reportResponse(Code code, StatusLine statusLine) {
         feedback().alert(String.format(
                 "Problem communicating with server: %s. Status [%d] %s",
@@ -517,10 +481,6 @@ public class NetworkClient {
 
     private Feedback feedback() {
         return sipModel.getFeedback();
-    }
-
-    private String getServerUrl() {
-        return String.format("http://%s/api/sip-creator", sipModel.getStorage().getHostPort());
     }
 
     @XStreamAlias("data-set-list")

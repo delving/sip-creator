@@ -26,15 +26,12 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
-import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-
-import static eu.delving.sip.files.StorageFinder.getHostPort;
 
 /**
  * Create the HttpClient correctly
@@ -48,10 +45,9 @@ public class HttpClientFactory {
         return HttpClientBuilder.create().disableAutomaticRetries().build();
     }
 
-    public static HttpClient createHttpClient(File storageDirectory) {
+    public static HttpClient createHttpClient(String serverUrl) {
         HttpClientBuilder builder = HttpClientBuilder.create().disableAutomaticRetries();
         builder.setConnectionManager(new PoolingHttpClientConnectionManager());
-        String serverUrl = String.format("http://%s", getHostPort(storageDirectory));
         handleProxy(serverUrl, builder);
         return builder.build();
     }
