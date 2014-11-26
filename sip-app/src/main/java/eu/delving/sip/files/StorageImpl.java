@@ -127,8 +127,8 @@ public class StorageImpl implements Storage {
     }
 
     @Override
-    public DataSet createDataSet(boolean narthex, String spec, String organization) throws StorageException {
-        File directory = createDataSetDirectory(home, narthex, spec, organization);
+    public DataSet createDataSet(String spec) throws StorageException {
+        File directory = createDataSetDirectory(home, spec);
         if (!directory.exists() && !directory.mkdirs()) {
             throw new StorageException(String.format("Unable to create data set directory %s", directory.getAbsolutePath()));
         }

@@ -29,7 +29,6 @@ import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.sip.actions.CreateSipZipAction;
-import eu.delving.sip.actions.SelectAnotherMappingAction;
 import eu.delving.sip.actions.UnlockMappingAction;
 import eu.delving.sip.actions.ValidateAction;
 import eu.delving.sip.base.FrameBase;
@@ -110,7 +109,6 @@ public class Application {
     private ExpertMenu expertMenu;
     private CreateSipZipAction createSipZipAction;
     private UnlockMappingAction unlockMappingAction;
-    private SelectAnotherMappingAction selectAnotherMappingAction;
 
     private Application(final File storageDir) throws StorageException {
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
@@ -209,8 +207,6 @@ public class Application {
         validateAction = new ValidateAction(sipModel, allFrames.prepareForInvestigation(desktop));
         unlockMappingAction = new UnlockMappingAction(sipModel);
         attachAccelerator(unlockMappingAction, home);
-        selectAnotherMappingAction = new SelectAnotherMappingAction(sipModel);
-        attachAccelerator(selectAnotherMappingAction, home);
         content.add(createStatePanel(), BorderLayout.SOUTH);
         content.add(allFrames.getSidePanel(), BorderLayout.WEST);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -298,8 +294,6 @@ public class Application {
         JPanel p = new JPanel(new GridLayout(0, 1));
         JButton b;
         p.add(b = new JButton(unlockMappingAction));
-        b.setHorizontalAlignment(JButton.LEFT);
-        p.add(b = new JButton(selectAnotherMappingAction));
         b.setHorizontalAlignment(JButton.LEFT);
         return p;
     }

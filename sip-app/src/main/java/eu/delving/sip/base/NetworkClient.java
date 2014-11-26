@@ -22,7 +22,6 @@
 package eu.delving.sip.base;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import eu.delving.XStreamFactory;
 import eu.delving.metadata.Hasher;
 import eu.delving.sip.files.DataSet;
@@ -99,7 +98,7 @@ public class NetworkClient {
 
     public interface NarthexListListener {
 
-        void listReceived(List<Sip> entries);
+        void listReceived(SipZips sipZips);
 
         void failed(Exception e);
     }
@@ -165,8 +164,8 @@ public class NetworkClient {
                 if (entity != null) {
                     switch (code) {
                         case OK:
-                            SipList sipList = (SipList) XStreamFactory.getStreamFor(SipList.class).fromXML(entity.getContent());
-                            narthexListListener.listReceived(sipList.list);
+                            SipZips sipZips = (SipZips) XStreamFactory.getStreamFor(SipZips.class).fromXML(entity.getContent());
+                            narthexListListener.listReceived(sipZips);
                             break;
                         case UNAUTHORIZED:
                             if (!reactToUnauthorized(new NarthexListFetcher(attempt + 1, narthexListListener, url, apiKey))) {
@@ -189,10 +188,6 @@ public class NetworkClient {
                     throw new IOException("Response was empty");
                 }
             }
-//            catch (OAuthProblemException e) {
-//                reportOAuthProblem(e);
-//                narthexListListener.failed(e);
-//            }
             catch (Exception e) {
                 feedback().alert("Error fetching list from Narthex", e);
                 narthexListListener.failed(e);
@@ -206,7 +201,7 @@ public class NetworkClient {
 
         private HttpGet createNarthexListRequest() {
             return new HttpGet(String.format(
-                    "%s/sip-creator/%s/sip-zip",
+                    "%s/sip-creator/%s",
                     url, apiKey
             ));
         }
@@ -483,98 +478,48 @@ public class NetworkClient {
         return sipModel.getFeedback();
     }
 
-    @XStreamAlias("data-set-list")
-    public static class DataSetList {
-        @XStreamImplicit
-        public List<DataSetEntry> list;
+    /*
+    <sip-zips>
+<available>
+<sip-zip>
+<dataset>frans_hals_museum</dataset>
+<file>frans_hals_museum.sip.zip</file>
+<date>2014-11-26T14:39:17</date>
+</sip-zip>
+</available>
+<uploaded>
+<sip-zip>
+<dataset>frans_hals_museum</dataset>
+<file>frans-hals-museum__2014_11_24_16_19__icn.sip.zip</file>
+<date>2014-11-24T16:19:00</date>
+</sip-zip>
+<sip-zip>
+<dataset>prent</dataset>
+<file>brabant-collectie-prent__2014_11_17_15_33.sip.zip</file>
+<date>2014-11-17T15:33:00</date>
+</sip-zip>
+<sip-zip>
+<dataset>uu</dataset>
+<file>uu-collection__2014_11_20_16_52.sip.zip</file>
+<date>2014-11-20T16:52:00</date>
+</sip-zip>
+</uploaded>
+</sip-zips>
+     */
 
-        public String toString() {
-            StringBuilder out = new StringBuilder("data-set-list");
-            if (list == null || list.isEmpty()) {
-                out.append(" (empty)");
-            }
-            else {
-                out.append('\n');
-                for (DataSetEntry entry : list) {
-                    out.append('\t');
-                    out.append(entry);
-                    out.append('\n');
-                }
-            }
-            return out.toString();
-        }
+    @XStreamAlias("sip-zips")
+    public static class SipZips {
+        public List<SipEntry> available;
+
+        public List<SipEntry> uploaded;
     }
 
-    @XStreamAlias("data-set")
-    public static class DataSetEntry {
-        public String spec;
-        public String name;
-        public String orgId;
-        public String state;
-        public int recordCount;
-        public LockedBy lockedBy;
-        public CreatedBy createdBy;
-        public List<SchemaVersionTag> schemaVersions;
-
-        public String getDirectoryName() {
-            return String.format("%s_%s", spec, orgId);
-        }
-
-        public int getRecordCount() {
-            return recordCount;
-        }
-
-        public String toString() {
-            return "data-set spec=" + spec;
-        }
-    }
-
-    @XStreamAlias("lockedBy")
-    public static class LockedBy {
-        public String username;
-        public String fullname;
-        public String email;
-
-        public String toString() {
-            return String.format("%s <%s>", fullname, email);
-        }
-    }
-
-    @XStreamAlias("createdBy")
-    public static class CreatedBy {
-        public String username;
-        public String fullname;
-        public String email;
-    }
-
-    @XStreamAlias("schemaVersion")
-    public static class SchemaVersionTag {
-        public String prefix;
-        public String version;
-    }
-
-    @XStreamAlias("sip-list")
-    public static class SipList {
-        @XStreamImplicit
-        public List<Sip> list;
-    }
-
-    @XStreamAlias("sip")
-    public static class Sip {
+    @XStreamAlias("sip-zip")
+    public static class SipEntry{
+        public String dataset;
         public String file;
-        public Facts facts;
+        public String date;
     }
 
-    @XStreamAlias("facts")
-    public static class Facts {
-        public String spec;
-        public String name;
-        public String dataProvider;
-        public String provider;
-        public String country;
-        public String orgId;
-        public String uploadedBy;
-        public String uploadedOn;
-        public List<SchemaVersionTag> schemaVersions;
-    }
+
 }

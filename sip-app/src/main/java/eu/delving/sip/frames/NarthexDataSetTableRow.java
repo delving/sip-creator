@@ -27,92 +27,41 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.model.SipModel;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-class NarthexDataSetTableRow implements Comparable<NarthexDataSetTableRow> {
+class NarthexDataSetTableRow {
     private final SipModel sipModel;
-    private final NetworkClient.Sip sip;
+    private final NetworkClient.SipEntry sipEntry;
     private DataSet dataSet;
 
-    NarthexDataSetTableRow(SipModel sipModel, NetworkClient.Sip sip, DataSet dataSet) {
+    NarthexDataSetTableRow(SipModel sipModel, NetworkClient.SipEntry sipEntry, DataSet dataSet) {
         this.sipModel = sipModel;
-        this.sip = sip;
+        this.sipEntry = sipEntry;
         this.dataSet = dataSet;
     }
 
     public boolean isDownloadable() {
-        return false;
-//        return dataSet == null || sip != null && !dataSet.getNarthexSipZipName().equals(sip.file);
+        return sipEntry == null;
     }
 
     public String getFileName() {
-        return sip.file;
+        return sipEntry.file;
     }
 
     public String getSpec() {
-        if (sip == null) return dataSet.getSpec();
-        return sip.facts.spec;
+        if (sipEntry == null) return dataSet.getSpec();
+        return sipEntry.dataset;
     }
 
     public DataSet getDataSet() {
         return dataSet;
     }
 
-    public String getDataSetName() {
-        String name;
-        if (dataSet != null) {
-            name = dataSet.getDataSetFacts().get("name");
-        }
-        else {
-            name = sip.facts.name;
-        }
-        if (name == null) name = "";
-        return name;
-    }
-
-    public String getOrganization() {
-        return sip.facts.orgId;
-    }
-
-    public String getUploadedOn() {
-        if (sip == null) return "local";
-        return sip.facts.uploadedOn;
-    }
-
-    public String getUploadedBy() {
-        if (sip == null) return "local";
-        return sip.facts.uploadedBy;
-    }
-
-    public List<SchemaVersion> getSchemaVersions() {
-        if (dataSet != null) {
-            return dataSet.getSchemaVersions();
-        }
-        else if (sip.facts.schemaVersions != null) {
-            List<SchemaVersion> list = new ArrayList<SchemaVersion>();
-            for (NetworkClient.SchemaVersionTag schemaVersionTag : sip.facts.schemaVersions) {
-                list.add(new SchemaVersion(schemaVersionTag.prefix, schemaVersionTag.version));
-            }
-            return list;
-        }
-        else {
-            return null;
-        }
-    }
-
     public String getDataSetState(SchemaVersion schemaVersion) {
         if (dataSet == null) return DataSetState.NO_DATA.toString();
         return dataSet.getState(schemaVersion.getPrefix()).toString();
-    }
-
-    @Override
-    public int compareTo(NarthexDataSetTableRow row) {
-        return -getUploadedOn().compareTo(row.getUploadedOn());
     }
 
     public String toString() {

@@ -80,7 +80,7 @@ public class Mockery {
 
     public void prepareDataset(String prefix, String recordRootPath, String uniqueElementPath) throws StorageException, IOException, MetadataException {
         this.prefix = prefix;
-        storage.createDataSet(false, prefix, ORG);
+        storage.createDataSet(prefix);
         dataSetDir = new File(root, String.format("%s_%s", prefix, ORG));
         hints.clear();
         hints.put(Storage.RECORD_ROOT_PATH, recordRootPath);

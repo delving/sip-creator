@@ -293,29 +293,22 @@ public class SipModel {
         return fieldCompileModel;
     }
 
-    public void setDataSetPrefix(DataSet dataSet, String prefix, Swing success) {
-        exec(new DataSetPrefixLoader(dataSet, prefix, success));
+    public void setDataSet(DataSet dataSet, Swing success) {
+        exec(new DatasetLoader(dataSet, success));
     }
 
-    private class DataSetPrefixLoader implements Work.DataSetPrefixWork {
+    private class DatasetLoader implements Work.DataSetWork {
         private DataSet dataSet;
-        private String prefix;
         private Swing success;
 
-        private DataSetPrefixLoader(DataSet dataSet, String prefix, Swing success) {
+        private DatasetLoader(DataSet dataSet, Swing success) {
             this.dataSet = dataSet;
-            this.prefix = prefix;
             this.success = success;
         }
 
         @Override
         public Job getJob() {
             return Job.SET_DATASET;
-        }
-
-        @Override
-        public String getPrefix() {
-            return prefix;
         }
 
         @Override
@@ -330,6 +323,8 @@ public class SipModel {
                 final Map<String, String> facts = dataSet.getDataSetFacts();
                 final Map<String, String> hints = dataSet.getHints();
                 final List<SchemaVersion> schemaVersions = dataSet.getSchemaVersions();
+                // todo: should be singular in the dataset now
+                String prefix = schemaVersions.get(0).getPrefix();
                 dataSetModel.setDataSet(dataSet, prefix);
                 final RecMapping recMapping = dataSetModel.getRecMapping();
                 dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());

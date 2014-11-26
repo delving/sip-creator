@@ -94,7 +94,7 @@ public class ValidateAction extends AbstractAction {
                         sipModel.getMappingModel().setLocked(false);
                         setEnabled(true);
                         if (isNotCurrent(fileProcessor)) {
-                            sipModel.setDataSetPrefix(fileProcessor.getDataSet(), fileProcessor.getPrefix(), new Swing() {
+                            sipModel.setDataSet(fileProcessor.getDataSet(), new Swing() {
                                 @Override
                                 public void run() {
 //                                    dataSetMenu.refreshAndChoose(fileProcessor.getDataSet(), fileProcessor.getPrefix());
