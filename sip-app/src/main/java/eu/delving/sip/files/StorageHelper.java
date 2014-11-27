@@ -25,6 +25,7 @@ import eu.delving.metadata.Hasher;
 import eu.delving.metadata.Path;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
+import org.joda.time.DateTime;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -43,6 +44,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -159,7 +162,7 @@ public class StorageHelper {
         return findOrNull(dir, 0, new PrefixFileFilter(MAPPING), MAPPING);
     }
 
-    static File targetFile(File dir, Map<String,String> facts, String prefix) {
+    static File targetFile(File dir, Map<String, String> facts, String prefix) {
         String fileName = String.format("%s__%s.xml.gz", facts.get("spec"), prefix);
         return new File(dir, fileName);
     }
@@ -202,6 +205,31 @@ public class StorageHelper {
         String name = String.format("%s__%s__%s.sip.zip", spec, DATE_FORMAT.format(new Date()), prefix);
         return new File(dir, name);
     }
+
+    public static String datasetNameFromSipZip(File file) {
+        String n = file.getName();
+        int uu = n.indexOf("__");
+        if (uu < 0) throw new RuntimeException("No dataset name contained in " + n);
+        return n.substring(0, uu);
+    }
+
+    public static DateTime dateTimeFromSipZip(File file) {
+        String n = file.getName();
+        Matcher matcher = EXTRACT_DATE.matcher(n);
+        if (matcher.matches()) {
+            int year = Integer.parseInt(matcher.group(1));
+            int month = Integer.parseInt(matcher.group(2));
+            int day = Integer.parseInt(matcher.group(3));
+            int hour = Integer.parseInt(matcher.group(4));
+            int minute = Integer.parseInt(matcher.group(5));
+            return new DateTime(year, month, day, hour, minute);
+        }
+        else {
+            return new DateTime();
+        }
+    }
+
+    static Pattern EXTRACT_DATE = Pattern.compile(".*(\\d{4})_(\\d{2})_(\\d{2})_(\\d{2})_(\\d{2}).*");
 
     static File findOrCreate(File directory, Storage.FileType fileType) {
         if (fileType.getName() == null) throw new RuntimeException("Expected name");

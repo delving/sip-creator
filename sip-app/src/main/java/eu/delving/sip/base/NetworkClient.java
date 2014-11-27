@@ -113,9 +113,8 @@ public class NetworkClient {
         sipModel.exec(new NarthexDatasetDownloader(fileName, dataSet, url, apiKey, finished));
     }
 
-    // todo: use this
-    public void uploadNarthex(DataSet dataSet, String url, String apiKey, String datasetName, Swing finished) throws StorageException {
-        sipModel.exec(new NarthexUploader(dataSet, url, apiKey, datasetName, finished));
+    public void uploadNarthex(File sipZipFile, String url, String apiKey, String datasetName, Swing finished) throws StorageException {
+        sipModel.exec(new NarthexUploader(sipZipFile, url, apiKey, datasetName, finished));
     }
 
     // NARTHEX ========================================
@@ -284,16 +283,16 @@ public class NetworkClient {
         }
     }
 
-    private class NarthexUploader implements Work.DataSetWork, Work.LongTermWork {
-        private final DataSet dataSet;
+    private class NarthexUploader implements Work.LongTermWork {
+        private final File sipZipFile;
         private final String url;
         private final String apiKey;
         private final String datasetName;
         private ProgressListener progressListener;
         private Swing finished;
 
-        NarthexUploader(DataSet dataSet, String url, String apiKey, String datasetName, Swing finished) throws StorageException {
-            this.dataSet = dataSet;
+        NarthexUploader(File sipZipFile, String url, String apiKey, String datasetName, Swing finished) throws StorageException {
+            this.sipZipFile = sipZipFile;
             this.url = url;
             this.apiKey = apiKey;
             this.datasetName = datasetName;
@@ -303,9 +302,8 @@ public class NetworkClient {
         @Override
         public void run() {
             try {
-                File sipZip = dataSet.toSipZip();
-                feedback().info("Uploading SIP-Zip " + sipZip.getName() + " to Narthex dataset " + datasetName);
-                HttpPost sipZipPost = createSipZipUploadRequest(sipZip, progressListener);
+                feedback().info("Uploading SIP-Zip " + sipZipFile.getName() + " to Narthex dataset " + datasetName);
+                HttpPost sipZipPost = createSipZipUploadRequest(sipZipFile, progressListener);
                 FileEntity fileEntity = (FileEntity) sipZipPost.getEntity();
                 HttpResponse sipZipResponse = httpClient.execute(sipZipPost);
                 System.out.println(EntityUtils.toString(sipZipResponse.getEntity())); // otherwise consume!
@@ -325,11 +323,6 @@ public class NetworkClient {
         @Override
         public Job getJob() {
             return Job.UPLOAD;
-        }
-
-        @Override
-        public DataSet getDataSet() {
-            return dataSet;
         }
 
         @Override

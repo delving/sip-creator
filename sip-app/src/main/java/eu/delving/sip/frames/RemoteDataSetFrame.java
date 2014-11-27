@@ -34,6 +34,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 
 import static eu.delving.sip.base.KeystrokeHelper.SPACE;
 import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
@@ -45,13 +46,19 @@ import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
  */
 
 public class RemoteDataSetFrame extends FrameBase {
-    private final DownloadTableModel narthexTableModel;
-    private final JTable narthexTable;
+    private final DownloadTableModel downloadTableModel;
+    private final JTable downloadTable;
+    private final JList<File> uploadList;
+    private final UploadListModel uploadListModel;
 
     public RemoteDataSetFrame(final SipModel sipModel, NetworkClient networkClient) {
         super(Which.DATA_SET, sipModel, "Data Sets");
-        this.narthexTableModel = new DownloadTableModel(sipModel, networkClient);
-        this.narthexTable = createNarthexTable();
+        this.downloadTableModel = new DownloadTableModel(sipModel, networkClient);
+        this.downloadTable = createDownloadTable();
+        this.uploadListModel = new UploadListModel(sipModel, networkClient);
+        this.uploadList = new JList<File>(uploadListModel);
+        this.uploadList.addListSelectionListener(uploadListModel.UPLOAD_SELECTION);
+        this.uploadList.setCellRenderer(uploadListModel.CELL_RENDERER);
     }
 
     @Override
@@ -59,45 +66,73 @@ public class RemoteDataSetFrame extends FrameBase {
         if (opened) Swing.Exec.later(new Swing() {
             @Override
             public void run() {
-                narthexTable.requestFocus();
+                downloadTable.requestFocus();
             }
         });
     }
 
     @Override
     protected void buildContent(Container content) {
-        content.add(SwingHelper.scrollV("Narthex Data Sets", narthexTable), BorderLayout.CENTER);
-        content.add(createHubTableSouth(narthexTableModel.getPatternField()), BorderLayout.SOUTH);
+        content.add(createCenter(), BorderLayout.CENTER);
     }
 
-    private JTable createNarthexTable() {
-        JTable table = new JTable(narthexTableModel, narthexTableModel.getColumnModel());
+    private JPanel createCenter() {
+        JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
+        p.add(createDownloadPanel());
+        p.add(createUploadPanel());
+        return p;
+    }
+
+    private JComponent createDownloadPanel() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.add(SwingHelper.scrollV("Narthex/Local Data Sets", downloadTable), BorderLayout.CENTER);
+        p.add(createDownloadSouth(downloadTableModel.getPatternField()), BorderLayout.SOUTH);
+        return p;
+    }
+
+    private JComponent createUploadPanel() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.add(SwingHelper.scrollV("Upload SIP Files", uploadList));
+        p.add(createUploadSouth(), BorderLayout.SOUTH);
+        return p;
+    }
+
+    private JTable createDownloadTable() {
+        JTable table = new JTable(downloadTableModel, downloadTableModel.getColumnModel());
         table.setRowHeight(45);
         table.setIntercellSpacing(new Dimension(12, 4));
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.getSelectionModel().addListSelectionListener(narthexTableModel.getSelectionListener());
+        table.getSelectionModel().addListSelectionListener(downloadTableModel.getSelectionListener());
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() > 1 && narthexTableModel.EDIT_ACTION.isEnabled()) {
-                    if (narthexTable.getSelectedRow() != narthexTable.rowAtPoint(e.getPoint())) return;
-                    narthexTableModel.EDIT_ACTION.actionPerformed(null);
+                if (e.getClickCount() > 1 && downloadTableModel.EDIT_ACTION.isEnabled()) {
+                    if (downloadTable.getSelectedRow() != downloadTable.rowAtPoint(e.getPoint())) return;
+                    downloadTableModel.EDIT_ACTION.actionPerformed(null);
                 }
             }
         });
         return table;
     }
 
-    private JPanel createHubTableSouth(JTextField patternField) {
+    private JPanel createDownloadSouth(JTextField patternField) {
         JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
         p.setBorder(BorderFactory.createTitledBorder("Actions"));
-        p.add(button(narthexTableModel.REFRESH_ACTION));
+        p.add(button(downloadTableModel.REFRESH_ACTION));
         p.add(createFilter(patternField));
-        p.add(button(narthexTableModel.EDIT_ACTION));
-        addKeyboardAction(narthexTableModel.EDIT_ACTION, SPACE, (JComponent) getContentPane());
+        p.add(button(downloadTableModel.EDIT_ACTION));
+        addKeyboardAction(downloadTableModel.EDIT_ACTION, SPACE, (JComponent) getContentPane());
 //        addKeyboardAction(new UpDownAction(false), UP, (JComponent) getContentPane());
 //        addKeyboardAction(new UpDownAction(true), DOWN, (JComponent) getContentPane());
-        p.add(button(narthexTableModel.DOWNLOAD_ACTION));
+        p.add(button(downloadTableModel.DOWNLOAD_ACTION));
+        return p;
+    }
+
+    private JPanel createUploadSouth() {
+        JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
+        p.setBorder(BorderFactory.createTitledBorder("Actions"));
+        p.add(button(uploadListModel.REFRESH_ACTION));
+        p.add(button(uploadListModel.UPLOAD_ACTION));
         return p;
     }
 
@@ -123,8 +158,10 @@ public class RemoteDataSetFrame extends FrameBase {
         Swing.Exec.later(new Swing() {
             @Override
             public void run() {
-                narthexTableModel.fetchList();
+                downloadTableModel.fetchList();
+                uploadListModel.refresh();
             }
         });
     }
+
 }

@@ -5,7 +5,6 @@ import eu.delving.sip.files.DataSet;
 import static eu.delving.sip.base.Work.Kind.DATA_SET;
 import static eu.delving.sip.base.Work.Kind.DATA_SET_PREFIX;
 import static eu.delving.sip.base.Work.Kind.NETWORK;
-import static eu.delving.sip.base.Work.Kind.NETWORK_DATA_SET;
 import static eu.delving.sip.base.Work.Kind.SILENT;
 
 /**
@@ -81,10 +80,8 @@ public interface Work extends Runnable {
         FETCH_FACTS_DEF(NETWORK),
         FETCH_HELP(NETWORK),
 
-        HARVEST(NETWORK_DATA_SET),
-        UNLOCK(NETWORK_DATA_SET),
-        DOWNLOAD(NETWORK_DATA_SET),
-        UPLOAD(NETWORK_DATA_SET);
+        DOWNLOAD(NETWORK),
+        UPLOAD(NETWORK);
 
         private Kind kind;
 
