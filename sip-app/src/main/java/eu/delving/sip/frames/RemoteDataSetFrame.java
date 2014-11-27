@@ -45,12 +45,12 @@ import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
  */
 
 public class RemoteDataSetFrame extends FrameBase {
-    private final NarthexDataSetTableModel narthexTableModel;
+    private final DownloadTableModel narthexTableModel;
     private final JTable narthexTable;
 
     public RemoteDataSetFrame(final SipModel sipModel, NetworkClient networkClient) {
         super(Which.DATA_SET, sipModel, "Data Sets");
-        this.narthexTableModel = new NarthexDataSetTableModel(sipModel, networkClient);
+        this.narthexTableModel = new DownloadTableModel(sipModel, networkClient);
         this.narthexTable = createNarthexTable();
     }
 

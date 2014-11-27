@@ -56,7 +56,7 @@ public interface Work extends Runnable {
         COMPILE_NODE_MAPPING(DATA_SET_PREFIX),
         COMPILE_FUNCTION(DATA_SET_PREFIX),
 
-        SET_DATASET(DATA_SET_PREFIX),
+        SET_DATASET(DATA_SET),
         SAVE_MAPPING(DATA_SET_PREFIX),
         REVERT_MAPPING(DATA_SET_PREFIX),
 
@@ -65,10 +65,7 @@ public interface Work extends Runnable {
         SEEK_RESET(DATA_SET),
         SAVE_HINTS(DATA_SET),
 
-        IMPORT_SOURCE(DATA_SET),
-        IMPORT_MEDIA(DATA_SET),
         PARSE_ANALYZE(DATA_SET),
-        CONVERT_SOURCE(DATA_SET),
         SCAN_RECORDS(DATA_SET),
         PROCESS(DATA_SET_PREFIX),
         LOAD_REPORT(DATA_SET_PREFIX),

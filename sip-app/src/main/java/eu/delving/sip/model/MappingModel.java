@@ -21,7 +21,13 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.*;
+import eu.delving.metadata.MappingFunction;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.NodeMappingChange;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.RecDefNodeListener;
+import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaVersion;
 
 import javax.swing.tree.TreePath;
@@ -98,10 +104,8 @@ public class MappingModel implements RecDefNodeListener {
         recMapping.getFacts().putAll(map);
     }
 
-    public void setSchemaVersion(List<SchemaVersion> schemaVersions) {
-        for (SchemaVersion schemaVersion : schemaVersions) {
-            if (schemaVersion.getPrefix().equals(recMapping.getPrefix())) recMapping.setSchemaVersion(schemaVersion);
-        }
+    public void setSchemaVersion(SchemaVersion schemaVersion) {
+        if (schemaVersion.getPrefix().equals(recMapping.getPrefix())) recMapping.setSchemaVersion(schemaVersion);
     }
 
     public void notifyLockChanged(boolean locked) {

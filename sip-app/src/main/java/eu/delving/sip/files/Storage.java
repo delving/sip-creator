@@ -43,7 +43,7 @@ public interface Storage {
     enum FileType {
         SOURCE("source.xml.gz", null, null, null, 2),
         SOURCE_STATS("stats-source.xml.gz"),
-        FACTS("dataset_facts.txt"),
+        FACTS("narthex_facts.txt"),
         HINTS("hints.txt"),
         MAPPING(null, "mapping_", ".xml", "mapping_%s.xml", 30),
         REPORT(null, "report_", null, "report_%s.txt", 1),
@@ -87,9 +87,6 @@ public interface Storage {
         }
     }
 
-    String SOURCE_ROOT_TAG = "pockets";
-    String SOURCE_RECORD_TAG = "pocket";
-    String UNIQUE_ATTR = "id";
     String FACTS_TAG = "facts";
     String CONSTANT_TAG = "constant";
     String RECORD_ROOT_PATH = "recordRootPath";
@@ -106,6 +103,10 @@ public interface Storage {
     String CACHE_DIR = "__cache__";
     String SIP_ZIPS_DIR = "SipZips";
     String FRAME_ARRANGEMENTS_FILE = "frame-arrangements.xml";
+
+    String SOURCE_ROOT_TAG = "pockets";
+    String SOURCE_RECORD_TAG = "pocket";
+    String UNIQUE_ATTR = "id";
     Path RECORD_ROOT = Path.create(String.format("/%s/%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG));
     Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/@%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG, UNIQUE_ATTR));
     long MAPPING_FREEZE_INTERVAL = 60000;

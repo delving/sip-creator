@@ -21,14 +21,18 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.metadata.*;
+import eu.delving.metadata.MappingFunction;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.NodeMappingChange;
+import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 
-import javax.swing.Timer;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -109,7 +113,7 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
                         @Override
                         public void run() {
                             try {
-                                List<File> recMappingFiles = sipModel.getDataSetModel().getDataSet().getRecMappingFiles(recMapping.getPrefix());
+                                List<File> recMappingFiles = sipModel.getDataSetModel().getDataSet().getRecMappingFiles();
                                 listReceiver.mappingFileList(recMappingFiles);
                             }
                             catch (StorageException e) {

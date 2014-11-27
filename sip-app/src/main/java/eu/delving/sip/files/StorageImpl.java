@@ -38,6 +38,8 @@ import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CountingInputStream;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
 
@@ -55,7 +57,6 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -145,63 +146,52 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public List<SchemaVersion> getSchemaVersions() {
+        public String getTime() {
+            DateTime dateTime = new DateTime(factsFile(here).lastModified());
+            return ISODateTimeFormat.dateTimeNoMillis().print(dateTime.toLocalDateTime());
+        }
+
+        @Override
+        public SchemaVersion getSchemaVersion() {
             String fact = getDataSetFacts().get(SCHEMA_VERSIONS);
-            List<SchemaVersion> schemaVersions = new ArrayList<SchemaVersion>();
             if (fact == null) {
-                schemaVersions = temporarilyHackedSchemaVersions(here);
+                return new SchemaVersion("unknown", "0.0.0");
             }
-            else {
-                for (String sv : fact.split(" *, *")) {
-                    SchemaVersion schemaVersion = new SchemaVersion(sv);
-                    if ("raw".equals(schemaVersion.getPrefix())) continue;
-                    schemaVersions.add(schemaVersion);
-                }
-            }
-            Collections.sort(schemaVersions);
-            return schemaVersions;
+            return new SchemaVersion(fact);
         }
 
         @Override
-        public RecDef getRecDef(String prefix) throws StorageException {
-            for (SchemaVersion walk : getSchemaVersions()) {
-                if (!prefix.equals(walk.getPrefix())) continue;
-                return recDef(walk);
-            }
-            throw new StorageException("No record definition for prefix " + prefix);
+        public RecDef getRecDef() throws StorageException {
+            return recDef(getSchemaVersion());
         }
 
         @Override
-        public Validator newValidator(String prefix) throws StorageException {
-            for (SchemaVersion walk : getSchemaVersions()) {
-                if (!prefix.equals(walk.getPrefix())) continue;
-                return validator(walk);
-            }
-            throw new StorageException("No validation schema for prefix " + prefix);
+        public Validator newValidator() throws StorageException {
+            return validator(getSchemaVersion());
         }
 
         @Override
-        public boolean isProcessed(String prefix) throws StorageException {
-            return targetOutput(prefix).exists();
+        public boolean isProcessed() throws StorageException {
+            return targetOutput().exists();
         }
 
         @Override
-        public DataSetState getState(String prefix) {
+        public DataSetState getState() {
             File source = sourceFile(here);
             if (source.exists()) {
-                return postSourceState(source, prefix);
+                return postSourceState(source);
             }
             else {
                 return DataSetState.ABSENT;
             }
         }
 
-        private DataSetState postSourceState(File source, String prefix) {
+        private DataSetState postSourceState(File source) {
             File statistics = statsFile(here);
             if (statistics.exists() && statistics.lastModified() >= source.lastModified()) {
-                File mapping = findLatestFile(here, MAPPING, prefix);
+                File mapping = findLatestFile(here, MAPPING, getSchemaVersion().getPrefix());
                 if (mapping.exists()) {
-                    return targetOutput(prefix).exists() ? DataSetState.PROCESSED : DataSetState.MAPPING;
+                    return targetOutput().exists() ? DataSetState.PROCESSED : DataSetState.MAPPING;
                 }
                 else {
                     return DataSetState.ANALYZED_SOURCE;
@@ -220,17 +210,6 @@ public class StorageImpl implements Storage {
             }
             catch (IOException e) {
                 return new TreeMap<String, String>();
-            }
-        }
-
-        @Override
-        public void setDataSetFacts(Map<String, String> dataSetFacts) throws StorageException {
-            File factsFile = new File(here, FileType.FACTS.getName());
-            try {
-                writeFacts(factsFile, dataSetFacts);
-            }
-            catch (IOException e) {
-                throw new StorageException("Unable to set hints", e);
             }
         }
 
@@ -256,8 +235,8 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public boolean deleteTarget(String prefix) throws StorageException {
-            File targetFile = targetFile(here, dataSetFacts, prefix);
+        public boolean deleteTarget() throws StorageException {
+            File targetFile = targetFile(here, dataSetFacts, getSchemaVersion().getPrefix());
             boolean deleted = targetFile.exists();
             delete(targetFile);
             return deleted;
@@ -269,8 +248,8 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public File targetOutput(String prefix) {
-            return targetFile(here, dataSetFacts, prefix);
+        public File targetOutput() {
+            return targetFile(here, dataSetFacts, getSchemaVersion().getPrefix());
         }
 
         @Override
@@ -311,8 +290,8 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public RecMapping getRecMapping(String prefix, RecDefModel recDefModel) throws StorageException {
-            File file = findLatestFile(here, MAPPING, prefix);
+        public RecMapping getRecMapping(RecDefModel recDefModel) throws StorageException {
+            File file = findLatestFile(here, MAPPING, getSchemaVersion().getPrefix());
             if (file.exists()) {
                 try {
                     return RecMapping.read(file, recDefModel);
@@ -323,12 +302,7 @@ public class StorageImpl implements Storage {
             }
             else {
                 try {
-                    for (SchemaVersion schemaVersion : getSchemaVersions()) {
-                        if (prefix.equals(schemaVersion.getPrefix())) {
-                            return RecMapping.create(recDefModel.createRecDefTree(schemaVersion));
-                        }
-                    }
-                    throw new StorageException("Unable to find version for " + prefix);
+                    return RecMapping.create(recDefModel.createRecDefTree(getSchemaVersion()));
                 }
                 catch (MetadataException e) {
                     throw new StorageException("Unable to load record definition", e);
@@ -363,8 +337,8 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public List<File> getRecMappingFiles(String prefix) throws StorageException {
-            return findHashedPrefixFiles(here, MAPPING, prefix);
+        public List<File> getRecMappingFiles() throws StorageException {
+            return findHashedPrefixFiles(here, MAPPING, getSchemaVersion().getPrefix());
         }
 
         @Override
@@ -384,8 +358,9 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public ReportFile getReport(String prefix) throws StorageException {
+        public ReportFile getReport() throws StorageException {
             try {
+                String prefix = getSchemaVersion().getPrefix();
                 File reportFile = reportFile(here, prefix);
                 File reportIndexFile = reportIndexFile(here, prefix);
                 if (!(reportFile.exists() && reportIndexFile.exists())) return null;
@@ -454,7 +429,7 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public File toSipZip(String prefix) throws StorageException {
+        public File toSipZip() throws StorageException {
             try {
                 // check if the dataset is based on a harvest
                 Map<String, String> hints = getHints();
@@ -467,26 +442,17 @@ public class StorageImpl implements Storage {
                 // narthexFacts take only the chosen SCHEMA_VERSIONS
                 Map<String, String> narthexFacts = new TreeMap<String, String>(dataSetFacts);
                 // for the mapping matching the prefix
-                boolean prefixFound = false;
-                for (SchemaVersion schemaVersion : getSchemaVersions())
-                    if (schemaVersion.getPrefix().equals(prefix)) {
-                        narthexFacts.put(SCHEMA_VERSIONS, schemaVersion.toString());
-                        prefixFound = true;
-                        addLatestNoHash(here, MAPPING, schemaVersion.getPrefix(), files);
-                        File recDef = new File(here, schemaVersion.getFullFileName(RECORD_DEFINITION));
-                        if (recDef.exists()) files.add(recDef);
-                        File valSchema = new File(here, schemaVersion.getFullFileName(VALIDATION_SCHEMA));
-                        if (valSchema.exists()) files.add(valSchema);
-                    }
-                if (!prefixFound) {
-                    throw new StorageException("Cannot prepare a SIP-Zip file from this dataset with prefix: " + prefix);
-                }
+                SchemaVersion schemaVersion = getSchemaVersion();
+                narthexFacts.put(SCHEMA_VERSIONS, schemaVersion.toString());
+                addLatestNoHash(here, MAPPING, schemaVersion.getPrefix(), files);
+                File recDef = new File(here, schemaVersion.getFullFileName(RECORD_DEFINITION));
+                if (recDef.exists()) files.add(recDef);
+                File valSchema = new File(here, schemaVersion.getFullFileName(VALIDATION_SCHEMA));
+                if (valSchema.exists()) files.add(valSchema);
                 files.add(hintsFile(here));
                 writeFacts(narthexFactsFile(here), narthexFacts);
                 files.add(narthexFactsFile(here));
-                File sipZipsDirectory = new File(home, SIP_ZIPS_DIR);
-                sipZipsDirectory.mkdir();
-                File sipZip = sipZip(sipZipsDirectory, getSpec(), prefix);
+                File sipZip = sipZip(HomeDirectory.UP_DIR, getSpec(), getSchemaVersion().getPrefix());
                 FileOutputStream fos = new FileOutputStream(sipZip);
                 ZipOutputStream zos = new ZipOutputStream(fos);
                 byte[] buffer = new byte[1024];

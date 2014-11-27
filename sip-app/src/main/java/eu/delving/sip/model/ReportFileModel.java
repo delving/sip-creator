@@ -21,7 +21,6 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.HttpClientFactory;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.files.DataSet;
@@ -30,11 +29,10 @@ import eu.delving.sip.files.ReportFile;
 import eu.delving.sip.files.StorageException;
 import org.apache.http.client.HttpClient;
 
-import javax.swing.Timer;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A list model for showing the contents of the validation files, one for each mapping.  This class rather naively
@@ -47,7 +45,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ReportFileModel {
     private SipModel sipModel;
     private Listener listener;
-    private List<ReportFile> reportFiles = new CopyOnWriteArrayList<ReportFile>();
+    private ReportFile reportFile;
     private HttpClient httpClient;
 
     public interface Listener {
@@ -59,7 +57,7 @@ public class ReportFileModel {
         Timer timer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for (ReportFile reportFile : reportFiles) {
+                if (reportFile != null) {
                     List<ReportFile.Rec> fetch = reportFile.prepareFetch();
                     if (!fetch.isEmpty()) {
                         sipModel.exec(reportFile.fetchRecords(fetch, sipModel.getFeedback()));
@@ -76,36 +74,37 @@ public class ReportFileModel {
         this.listener = listener;
     }
 
-    public List<ReportFile> getReports() {
-        return reportFiles;
+    public ReportFile getReport() {
+        return reportFile;
     }
 
     public void refresh() {
         if (sipModel.getDataSetModel().isEmpty()) return;
-        for (ReportFile reportFile : reportFiles) reportFile.close();
-        reportFiles.clear();
-        DataSet dataSet = sipModel.getDataSetModel().getDataSet();
-        for (SchemaVersion schemaVersion : dataSet.getSchemaVersions()) {
+        if (reportFile != null) {
+            reportFile.close();
+            reportFile = null;
+            DataSet dataSet = sipModel.getDataSetModel().getDataSet();
             try {
-                ReportFile reportFile = dataSet.getReport(schemaVersion.getPrefix());
-                if (reportFile == null) continue;
-                reportFiles.add(reportFile);
-                reportFile.setLinkChecker(new LinkChecker(getHttpClient()));
+                ReportFile reportFile = dataSet.getReport();
+                if (reportFile != null) {
+                    ReportFileModel.this.reportFile = reportFile;
+                    reportFile.setLinkChecker(new LinkChecker(getHttpClient()));
+                }
             }
             catch (StorageException e) {
-                sipModel.getFeedback().alert("Cannot read report file for " + schemaVersion.getPrefix(), e);
+                sipModel.getFeedback().alert("Cannot read report file", e);
             }
+            sipModel.exec(new Swing() {
+                @Override
+                public void run() {
+                    listener.reportsUpdated(ReportFileModel.this);
+                }
+            });
         }
-        sipModel.exec(new Swing() {
-            @Override
-            public void run() {
-                listener.reportsUpdated(ReportFileModel.this);
-            }
-        });
     }
 
     public void shutdown() {
-        for (ReportFile reportFile : reportFiles) reportFile.close();
+        reportFile.close();
     }
 
     private synchronized HttpClient getHttpClient() {

@@ -21,7 +21,6 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.NetworkClient;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
@@ -31,12 +30,12 @@ import eu.delving.sip.model.SipModel;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-class NarthexDataSetTableRow {
+class DownloadDatasetRow {
     private final SipModel sipModel;
     private final NetworkClient.SipEntry sipEntry;
     private DataSet dataSet;
 
-    NarthexDataSetTableRow(SipModel sipModel, NetworkClient.SipEntry sipEntry, DataSet dataSet) {
+    DownloadDatasetRow(SipModel sipModel, NetworkClient.SipEntry sipEntry, DataSet dataSet) {
         this.sipModel = sipModel;
         this.sipEntry = sipEntry;
         this.dataSet = dataSet;
@@ -55,17 +54,27 @@ class NarthexDataSetTableRow {
         return sipEntry.dataset;
     }
 
+    public String getGeneratedTime() {
+        if (sipEntry == null) return "-";
+        return sipEntry.date;
+    }
+
     public DataSet getDataSet() {
         return dataSet;
     }
 
-    public String getDataSetState(SchemaVersion schemaVersion) {
+    public String getDataSetState() {
         if (dataSet == null) return DataSetState.ABSENT.toString();
-        return dataSet.getState(schemaVersion.getPrefix()).toString();
+        return dataSet.getState().toString();
+    }
+
+    public String getDownloadTime() {
+        if (dataSet == null) return "-";
+        return dataSet.getTime();
     }
 
     public String toString() {
-        return String.format("Narthex(%s)", getSpec());
+        return getSpec();
     }
 
     private boolean isBusy() {

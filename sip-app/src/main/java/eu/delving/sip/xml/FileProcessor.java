@@ -294,13 +294,13 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             MetadataParser parser = new MetadataParser(getDataSet().openSourceInputStream(), sipModel.getStatsModel().getRecordCount());
             parser.setProgressListener(progressListener);
             ReportWriter reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
-            XmlOutput xmlOutput = new XmlOutput(getDataSet().targetOutput(getPrefix()), recDef().getNamespaceMap());
+            XmlOutput xmlOutput = new XmlOutput(getDataSet().targetOutput(), recDef().getNamespaceMap());
             QueueFiller queueFiller = new QueueFiller(parser, recordSource, termination, groovyCodeResource);
             this.stats = createStats();
             Consumer consumer = new Consumer(reportWriter, xmlOutput, termination);
             int engineCount = Runtime.getRuntime().availableProcessors();
             for (int walk = 0; walk < engineCount; walk++) {
-                Validator validator = dataSet.newValidator(recDef().prefix);
+                Validator validator = dataSet.newValidator();
                 validator.setErrorHandler(null);
                 MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null, false);
                 List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);

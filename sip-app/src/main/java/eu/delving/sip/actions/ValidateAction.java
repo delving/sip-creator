@@ -65,27 +65,10 @@ public class ValidateAction extends AbstractAction {
         setEnabled(dataSetState.atLeast(MAPPING));
     }
 
-    private boolean allowInvalid() {
-        DataSetModel dsm = sipModel.getDataSetModel();
-        JRadioButton investigate = new JRadioButton(String.format(
-                "<html><b>Validate - Investigate</b> - Validate the %s mapping of data set %s, stopping when necessary",
-                dsm.getPrefix(), dsm.getDataSet().getSpec()
-        ));
-        JRadioButton validateAll = new JRadioButton(String.format(
-                "<html><b>Validate - All</b> - Validate all mappings of of data set %s, allowing invalid records",
-                dsm.getDataSet().getSpec()
-        ));
-        ButtonGroup bg = new ButtonGroup();
-        bg.add(investigate);
-        bg.add(validateAll);
-        investigate.setSelected(true);
-        return sipModel.getFeedback().form("How to validate?", investigate, validateAll) && validateAll.isSelected();
-    }
-
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         setEnabled(false);
-        sipModel.processFile(allowInvalid(), new FileProcessor.Listener() {
+        sipModel.processFile(new FileProcessor.Listener() {
             @Override
             public void failed(final FileProcessor fileProcessor) {
                 sipModel.exec(new Swing() {
@@ -122,7 +105,7 @@ public class ValidateAction extends AbstractAction {
                 });
                 DataSet dataSet = processor.getDataSet();
                 try {
-                    dataSet.deleteTarget(processor.getPrefix());
+                    dataSet.deleteTarget();
                 }
                 catch (StorageException e) {
                     sipModel.getFeedback().alert("Unable to remove validation results", e);

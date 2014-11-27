@@ -222,7 +222,7 @@ public class WorkModel {
                 if (context.isDone()) {
                     jobContexts.remove(context);
                 }
-                else {
+                else if (context.getWork().getJob() != Work.Job.CHECK_STATE) {
                     snapshot.add(context);
                 }
             }

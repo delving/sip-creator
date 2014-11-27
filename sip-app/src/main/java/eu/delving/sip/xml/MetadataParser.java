@@ -80,7 +80,11 @@ public class MetadataParser {
                     path = path.child(Tag.element(input.getName()));
                     if (node == null && path.equals(Storage.RECORD_ROOT)) {
                         node = new GroovyNode(null, "input");
-                        if (input.getAttributeCount() != 1 || !Storage.UNIQUE_ATTR.equals(input.getAttributeLocalName(0))) {
+                        int idIndex = -1;
+                        for (int walk = 0; walk < input.getAttributeCount(); walk++) {
+                            if (Storage.UNIQUE_ATTR.equals(input.getAttributeLocalName(walk))) idIndex = walk;
+                        }
+                        if (idIndex < 0) {
                             throw new IOException("Expected record root to have @id");
                         }
                         node.attributes().put(Storage.UNIQUE_ATTR, input.getAttributeValue(0));

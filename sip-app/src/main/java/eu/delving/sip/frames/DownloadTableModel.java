@@ -57,22 +57,25 @@ import static eu.delving.sip.files.Storage.NARTHEX_URL;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
-class NarthexDataSetTableModel extends AbstractTableModel {
+class DownloadTableModel extends AbstractTableModel {
     private static final DateTimeFormatter DATE_FORMAT = ISODateTimeFormat.dateTime();
     private final SipModel sipModel;
     private final NetworkClient networkClient;
     private DefaultTableColumnModel columnModel = new DefaultTableColumnModel();
-    private List<NarthexDataSetTableRow> rows = new ArrayList<NarthexDataSetTableRow>();
+    private List<DownloadDatasetRow> rows = new ArrayList<DownloadDatasetRow>();
     private Map<Integer, Integer> index;
     private boolean fetchNeeded;
     private JTextField patternField = new JTextField(6);
-    private NarthexDataSetTableRow selectedRow = null;
+    private DownloadDatasetRow selectedRow = null;
 
-    public NarthexDataSetTableModel(SipModel sipModel, NetworkClient networkClient) {
+    public DownloadTableModel(SipModel sipModel, NetworkClient networkClient) {
         this.sipModel = sipModel;
         this.networkClient = networkClient;
         createSpecNameColumn();
+        addColumn("Generated", "2014-11-26T14:39:17");
         createDownloadableColumn();
+        addColumn("Dataset State", "state string");
+        addColumn("Download time", "2014-11-26T14:39:17");
     }
 
     public ListSelectionListener getSelectionListener() {
@@ -120,7 +123,7 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         else {
             Map<Integer, Integer> map = new HashMap<Integer, Integer>();
             int actual = 0, virtual = 0;
-            for (NarthexDataSetTableRow hubRow : rows) {
+            for (DownloadDatasetRow hubRow : rows) {
                 if (hubRow.getSpec().contains(pattern)) {
                     map.put(virtual, actual);
                     virtual++;
@@ -134,23 +137,23 @@ class NarthexDataSetTableModel extends AbstractTableModel {
 
     public void setNarthexEntries(NetworkClient.SipZips sipZips) {
         fetchNeeded = sipZips == null;
-        List<NarthexDataSetTableRow> freshRows = new ArrayList<NarthexDataSetTableRow>();
+        List<DownloadDatasetRow> freshRows = new ArrayList<DownloadDatasetRow>();
         Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets();
         if (sipZips != null) {
             for (NetworkClient.SipEntry incoming : sipZips.available) {
                 DataSet dataSet = dataSets.get(incoming.dataset);
-                freshRows.add(new NarthexDataSetTableRow(sipModel, incoming, dataSet));
+                freshRows.add(new DownloadDatasetRow(sipModel, incoming, dataSet));
                 if (dataSet != null) dataSets.remove(incoming.dataset); // remove used ones
             }
         }
         for (DataSet dataSet : dataSets.values()) { // remaining ones
-            freshRows.add(new NarthexDataSetTableRow(sipModel, null, dataSet));
+            freshRows.add(new DownloadDatasetRow(sipModel, null, dataSet));
         }
         rows = freshRows;
         fireTableStructureChanged();
     }
 
-    public NarthexDataSetTableRow getRow(int rowIndex) {
+    public DownloadDatasetRow getRow(int rowIndex) {
         if (index != null) {
             Integer foundRow = index.get(rowIndex);
             if (foundRow != null) rowIndex = foundRow;
@@ -214,12 +217,24 @@ class NarthexDataSetTableModel extends AbstractTableModel {
                 }
                 else {
                     label.setIcon(ICON_OWNED);
-                    label.setText("Yours");
+                    label.setText("Local");
                 }
                 return label;
             }
         });
 
+    }
+
+    private void createStateColumn() {
+        TableColumn tc = addColumn("Dataset State", "state string");
+//        tc.setCellRenderer(new DefaultTableCellRenderer() {
+//            @Override
+//            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+//                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+//                label.setText(value.toString());
+//                return label;
+//            }
+//        });
     }
 
     private TableColumn addColumn(String title, String prototype) {
@@ -235,12 +250,18 @@ class NarthexDataSetTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        NarthexDataSetTableRow row = getRow(rowIndex);
+        DownloadDatasetRow row = getRow(rowIndex);
         switch (columnIndex) {
             case 0:
                 return row.getSpec();
             case 1:
+                return row.getGeneratedTime();
+            case 2:
                 return row.isDownloadable();
+            case 3:
+                return row.getDataSetState();
+            case 4:
+                return row.getDownloadTime();
         }
         throw new RuntimeException();
     }
@@ -293,7 +314,7 @@ class NarthexDataSetTableModel extends AbstractTableModel {
 
     public void fetchList() {
         Preferences preferences = sipModel.getPreferences();
-        REFRESH_ACTION.fetchList(preferences.get(NARTHEX_URL, ""),preferences.get(NARTHEX_API_KEY, ""));
+        REFRESH_ACTION.fetchList(preferences.get(NARTHEX_URL, ""), preferences.get(NARTHEX_API_KEY, ""));
     }
 
     public final DownloadAction DOWNLOAD_ACTION = new DownloadAction();
@@ -346,7 +367,7 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         }
 
         public void checkEnabled() {
-            this.setEnabled(selectedRow != null && !selectedRow.isDownloadable());
+            this.setEnabled(selectedRow != null && selectedRow.getDataSet() != null);
         }
 
         @Override

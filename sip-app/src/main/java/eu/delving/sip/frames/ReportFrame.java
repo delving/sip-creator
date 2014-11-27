@@ -36,8 +36,6 @@ import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.HtmlPanel;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
@@ -67,7 +65,6 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
     private static final int MAX_ACTIVE_CHECKS = 3;
     private static final JLabel EMPTY_LABEL = new JLabel("No reports available", JLabel.CENTER);
     private JPanel mainPanel = new JPanel(new BorderLayout());
-    private int chosenReport = 0;
 
     public ReportFrame(SipModel sipModel) {
         super(Which.REPORT, sipModel, "Report");
@@ -82,37 +79,19 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
 
     @Override
     public void reportsUpdated(ReportFileModel reportFileModel) {
-        List<ReportFile> reports = reportFileModel.getReports();
-        mainPanel.removeAll();
-        chosenReport = 0;
-        switch (reports.size()) {
-            case 0:
-                mainPanel.add(EMPTY_LABEL, BorderLayout.CENTER);
-                break;
-            case 1:
-                mainPanel.add(new ReportPanel(reports.get(0)), BorderLayout.CENTER);
-                break;
-            default:
-                final JTabbedPane tabs = new JTabbedPane();
-                for (ReportFile report : reports) {
-                    tabs.addTab(report.getPrefix().toUpperCase(), new ReportPanel(report));
-                }
-                mainPanel.add(tabs, BorderLayout.CENTER);
-                tabs.addChangeListener(new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        chosenReport = tabs.getSelectedIndex();
-                    }
-                });
-                break;
+        ReportFile reportFile = reportFileModel.getReport();
+        if (reportFile == null) {
+            mainPanel.add(EMPTY_LABEL, BorderLayout.CENTER);
+        }
+        else {
+            mainPanel.add(new ReportPanel(reportFile), BorderLayout.CENTER);
         }
         mainPanel.validate();
     }
 
     private void linkFile(boolean load, Swing finished) {
-        List<ReportFile> reports = sipModel.getReportFileModel().getReports();
-        if (chosenReport >= reports.size()) return;
-        ReportFile reportFile = reports.get(chosenReport);
+        ReportFile reportFile = sipModel.getReportFileModel().getReport();
+        if (reportFile == null) return;
         LinkFile linkFile = reportFile.getLinkFile();
         LinkChecker linkChecker = reportFile.getLinkChecker();
         Feedback feedback = sipModel.getFeedback();

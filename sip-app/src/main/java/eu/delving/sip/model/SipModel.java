@@ -202,9 +202,7 @@ public class SipModel {
     private void clearValidations() {
         try {
             DataSet dataSet = dataSetModel.getDataSet();
-            for (SchemaVersion schemaVersion : dataSet.getSchemaVersions()) {
-                dataSet.deleteTarget(schemaVersion.getPrefix());
-            }
+            dataSet.deleteTarget();
         }
         catch (StorageException e) {
             feedback.alert(String.format("Error while deleting validation files %s", e));
@@ -308,15 +306,15 @@ public class SipModel {
                 final Stats stats = dataSet.getStats();
                 final Map<String, String> facts = dataSet.getDataSetFacts();
                 final Map<String, String> hints = dataSet.getHints();
-                final List<SchemaVersion> schemaVersions = dataSet.getSchemaVersions();
+                final SchemaVersion schemaVersion = dataSet.getSchemaVersion();
                 // todo: should be singular in the dataset now
-                String prefix = schemaVersions.get(0).getPrefix();
+                String prefix = schemaVersion.getPrefix();
                 dataSetModel.setDataSet(dataSet, prefix);
                 final RecMapping recMapping = dataSetModel.getRecMapping();
                 dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
                 mappingHintsModel.initialize(prefix, dataSetModel);
                 dataSetModel.getMappingModel().setFacts(facts);
-                dataSetModel.getMappingModel().setSchemaVersion(schemaVersions);
+                dataSetModel.getMappingModel().setSchemaVersion(schemaVersion);
                 recordCompileModel.setValidator(dataSetModel.newValidator());
                 recordCompileModel.setAssertions(AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource));
                 exec(new Swing() {
@@ -406,52 +404,24 @@ public class SipModel {
                 );
             }
             catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Unable to encode "+id);
+                throw new RuntimeException("Unable to encode " + id);
             }
         }
     }
 
-    public void processFile(boolean allowInvalid, FileProcessor.Listener listener) {
+    public void processFile(FileProcessor.Listener listener) {
         final DataSet dataSet = getDataSetModel().getDataSet();
         final String narthexUrl = getPreferences().get(Storage.NARTHEX_URL, "");
-        if (allowInvalid) {
-            for (SchemaVersion schemaVersion : dataSet.getSchemaVersions()) {
-                try {
-                    RecMapping recMapping = dataSet.getRecMapping(schemaVersion.getPrefix(), dataSetModel);
-                    if (schemaVersion.getPrefix().equals(getMappingModel().getPrefix())) {
-                        getMappingModel().setLocked(true);
-                    }
-                    else {
-                        recMapping.setLocked(true);
-                        dataSet.setRecMapping(recMapping, true);
-                    }
-                    exec(new FileProcessor(
-                            this,
-                            dataSet,
-                            recMapping,
-                            true,
-                            groovyCodeResource,
-                            new Generator(narthexUrl, dataSet.getSpec(), schemaVersion.getPrefix()),
-                            listener
-                    ));
-                }
-                catch (StorageException e) {
-                    feedback.alert("Unable to get rec mapping for " + schemaVersion);
-                }
-            }
-        }
-        else {
-            getMappingModel().setLocked(true);
-            exec(new FileProcessor(
-                    this,
-                    dataSet,
-                    getMappingModel().getRecMapping(),
-                    false,
-                    groovyCodeResource,
-                    new Generator(narthexUrl, dataSet.getSpec(), getMappingModel().getPrefix()),
-                    listener
-            ));
-        }
+        getMappingModel().setLocked(true);
+        exec(new FileProcessor(
+                this,
+                dataSet,
+                getMappingModel().getRecMapping(),
+                false,
+                groovyCodeResource,
+                new Generator(narthexUrl, dataSet.getSpec(), getMappingModel().getPrefix()),
+                listener
+        ));
     }
 
     public void seekReset() {

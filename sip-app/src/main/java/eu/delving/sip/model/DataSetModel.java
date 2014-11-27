@@ -80,11 +80,11 @@ public class DataSetModel implements RecDefModel {
     }
 
     public DataSetState getDataSetState() {
-        return isEmpty() ? ABSENT : dataSet.getState(getPrefix());
+        return isEmpty() ? ABSENT : dataSet.getState();
     }
 
     public RecMapping getRecMapping() throws StorageException {
-        return getDataSet().getRecMapping(getPrefix(), this);
+        return getDataSet().getRecMapping(this);
     }
 
     public DataSet getDataSet() {
@@ -96,12 +96,12 @@ public class DataSetModel implements RecDefModel {
     }
 
     public File createSipZip() throws StorageException {
-        return dataSet.toSipZip(getPrefix());
+        return dataSet.toSipZip();
     }
 
     public Validator newValidator() throws MetadataException {
         try {
-            return dataSet.newValidator(getPrefix());
+            return dataSet.newValidator();
         }
         catch (StorageException e) {
             throw new MetadataException("Unable to get validator", e);
@@ -111,7 +111,7 @@ public class DataSetModel implements RecDefModel {
     @Override
     public RecDefTree createRecDefTree(SchemaVersion schemaVersion) throws MetadataException {
         try {
-            RecDef recDef = dataSet.getRecDef(schemaVersion.getPrefix());
+            RecDef recDef = dataSet.getRecDef();
             return RecDefTree.create(recDef);
         }
         catch (StorageException e) {
@@ -123,7 +123,7 @@ public class DataSetModel implements RecDefModel {
         this.dataSet = dataSet;
         this.currentState = null;
         if (dataSet != null) {
-            mappingModel.setRecMapping(dataSet.getRecMapping(prefix, this));
+            mappingModel.setRecMapping(dataSet.getRecMapping(this));
         }
         else {
             mappingModel.setRecMapping(null);
@@ -136,7 +136,7 @@ public class DataSetModel implements RecDefModel {
     }
 
     public boolean deleteValidation() throws StorageException {
-        return !isEmpty() && dataSet.deleteTarget(getPrefix());
+        return !isEmpty() && dataSet.deleteTarget();
     }
 
     private class StateCheckTimer implements Work, ActionListener, Work.DataSetWork {

@@ -45,51 +45,51 @@ public interface DataSet extends Comparable<DataSet> {
 
     String getSpec();
 
-    List<SchemaVersion> getSchemaVersions();
+    String getTime();
 
-    RecDef getRecDef(String prefix) throws StorageException;
+    SchemaVersion getSchemaVersion();
 
-    Validator newValidator(String prefix) throws StorageException;
+    RecDef getRecDef() throws StorageException;
 
-    boolean isProcessed(String prefix) throws StorageException;
+    Validator newValidator() throws StorageException;
 
-    DataSetState getState(String prefix);
+    boolean isProcessed() throws StorageException;
+
+    DataSetState getState();
 
     Map<String, String> getDataSetFacts();
-
-    void setDataSetFacts(Map<String, String> dataSetFacts) throws StorageException;
 
     Map<String, String> getHints();
 
     void setHints(Map<String, String> hints) throws StorageException;
 
-    boolean deleteTarget(String prefix) throws StorageException;
+    boolean deleteTarget() throws StorageException;
 
     InputStream openSourceInputStream() throws StorageException;
 
-    File targetOutput(String prefix);
+    File targetOutput();
 
     Stats getStats();
 
     void setStats(Stats stats) throws StorageException;
 
-    RecMapping getRecMapping(String prefix, RecDefModel recDefModel) throws StorageException;
+    RecMapping getRecMapping(RecDefModel recDefModel) throws StorageException;
 
     RecMapping revertRecMapping(File previousMappingFile, RecDefModel recDefModel) throws StorageException;
 
     void setRecMapping(RecMapping recMapping, boolean freeze) throws StorageException;
 
-    List<File> getRecMappingFiles(String prefix) throws StorageException;
+    List<File> getRecMappingFiles() throws StorageException;
 
     ReportWriter openReportWriter(RecDef recDef) throws StorageException;
 
-    ReportFile getReport(String prefix) throws StorageException;
+    ReportFile getReport() throws StorageException;
 
     void deleteSource();
 
     void fromSipZip(File sipZipFile, ProgressListener progressListener) throws IOException, StorageException;
 
-    File toSipZip(String prefix) throws StorageException;
+    File toSipZip() throws StorageException;
 
     void remove() throws StorageException;
 

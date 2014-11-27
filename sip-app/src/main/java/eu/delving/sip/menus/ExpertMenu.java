@@ -192,7 +192,7 @@ public class ExpertMenu extends JMenu {
                     try {
                         DataSet dataSet = dsm.getDataSet();
                         if (dataSet == null) return;
-                        dataSet.deleteTarget(getPrefix());
+                        dataSet.deleteTarget();
                     }
                     catch (StorageException e) {
                         sipModel.getFeedback().alert("Cannot delete caches", e);

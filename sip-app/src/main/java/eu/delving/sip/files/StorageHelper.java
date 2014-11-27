@@ -23,8 +23,6 @@ package eu.delving.sip.files;
 
 import eu.delving.metadata.Hasher;
 import eu.delving.metadata.Path;
-import eu.delving.metadata.RecMapping;
-import eu.delving.schema.SchemaVersion;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 
@@ -299,24 +297,6 @@ public class StorageHelper {
             String name = Hasher.extractFileName(file);
             return file.isFile() && name.startsWith(fileType.getPrefix());
         }
-    }
-
-    static List<SchemaVersion> temporarilyHackedSchemaVersions(File dir) {
-        File[] xsds = dir.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.isFile() && file.getName().endsWith("-validation.xsd");
-            }
-        });
-        List<SchemaVersion> hacked = new ArrayList<SchemaVersion>();
-        for (File xsd : xsds) {
-            String prefix = xsd.getName();
-            prefix = prefix.substring(0, prefix.indexOf("-"));
-            for (String[] hint : RecMapping.HACK_VERSION_HINTS) {
-                if (hint[0].equals(prefix)) hacked.add(new SchemaVersion(prefix, hint[1]));
-            }
-        }
-        return hacked;
     }
 
     static String extractName(File file, Storage.FileType fileType) {

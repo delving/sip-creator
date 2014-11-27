@@ -104,7 +104,7 @@ public class Mockery {
     }
 
     public Validator validator() throws StorageException {
-        return dataSetModel.getDataSet().newValidator(prefix);
+        return dataSetModel.getDataSet().newValidator();
     }
 
     public String mapping() throws UnsupportedEncodingException {
