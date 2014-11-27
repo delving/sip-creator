@@ -104,10 +104,10 @@ public interface Storage {
     String SIP_ZIPS_DIR = "SipZips";
     String FRAME_ARRANGEMENTS_FILE = "frame-arrangements.xml";
 
-    String SOURCE_ROOT_TAG = "pockets";
-    String SOURCE_RECORD_TAG = "pocket";
-    String UNIQUE_ATTR = "id";
-    Path RECORD_CONTAINER = Path.create(String.format("/%s/%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG));
-    Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/@%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG, UNIQUE_ATTR));
+    String POCKETS = "pockets";
+    String POCKET = "pocket";
+    String POCKET_ID = "id";
+    Path RECORD_CONTAINER = Path.create(String.format("/%s/%s", POCKETS, POCKET));
+    Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/@%s", POCKETS, POCKET, POCKET_ID));
     long MAPPING_FREEZE_INTERVAL = 60000;
 }

@@ -225,7 +225,7 @@ public class SourceFrame extends FrameBase {
                         SourceTreeNode node = (SourceTreeNode) path.getLastPathComponent();
                         if (autoFoldBox.isSelected()) showPath(node);
                         if (node.getTag().equals(Tag.attribute(Storage.FACTS_TAG))) continue;
-                        if (node.getTag().equals(Tag.attribute(Storage.SOURCE_ROOT_TAG))) continue;
+                        if (node.getTag().equals(Tag.attribute(Storage.POCKETS))) continue;
                         nodeList.add(node);
                     }
                 }
@@ -233,10 +233,10 @@ public class SourceFrame extends FrameBase {
                     Path parentPath = null;
                     for (SourceTreeNode node : nodeList) {
                         if (parentPath == null) {
-                            parentPath = node.getPath(true).takeFirst();
+                            parentPath = node.getPath().takeFirst();
                         }
                         else {
-                            if (!parentPath.equals(node.getPath(true).takeFirst())) {
+                            if (!parentPath.equals(node.getPath().takeFirst())) {
                                 sourceTree.clearSelection();
                                 return;
                             }
@@ -266,6 +266,6 @@ public class SourceFrame extends FrameBase {
 
     private void showPath(SourceTreeNode node) {
         SourceTreeNode root = (SourceTreeNode) sourceTree.getModel().getRoot();
-        root.showPath(sourceTree, node.getPath(true));
+        root.showPath(sourceTree, node.getPath());
     }
 }

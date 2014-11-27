@@ -298,7 +298,7 @@ public class CreateFrame extends FrameBase {
             if (sourceTreeNodes == null || recDefTreeNode == null) throw new RuntimeException("Expected raw materials");
             StringBuilder tooltip = new StringBuilder("<html><table cellpadding=10><tr><td><h3>From:</h3><ul>");
             for (SourceTreeNode node : sourceTreeNodes) {
-                tooltip.append("<li>").append(node.getPath(false).toString()).append("</li>");
+                tooltip.append("<li>").append(node.getUnwrappedPath().toString()).append("</li>");
             }
             tooltip.append("</ul><h3>To:</h3><ul>");
             tooltip.append("<li>").append(recDefTreeNode.getRecDefPath().getTagPath().toString()).append("</li>");

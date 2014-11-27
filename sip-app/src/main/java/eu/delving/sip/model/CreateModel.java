@@ -201,7 +201,7 @@ public class CreateModel {
             Iterator<SourceTreeNode> sourceIterator = sourceTreeNodes.iterator();
             for (Path inputPath : nodeMapping.getInputPaths()) { // do the sourceTreeNodes match those of one of the nodeMappings here?
                 if (!sourceIterator.hasNext()) continue nextNodeMapping; // mismatch
-                Path sourcePath = sourceIterator.next().getPath(false);
+                Path sourcePath = sourceIterator.next().getUnwrappedPath();
                 if (!inputPath.equals(sourcePath)) continue nextNodeMapping; // mismatch
             }
             return nodeMapping;

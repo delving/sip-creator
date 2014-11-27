@@ -83,12 +83,12 @@ public class MetadataParser {
                         node = new GroovyNode(null, "input");
                         int idIndex = -1;
                         for (int walk = 0; walk < input.getAttributeCount(); walk++) {
-                            if (Storage.UNIQUE_ATTR.equals(input.getAttributeLocalName(walk))) idIndex = walk;
+                            if (Storage.POCKET_ID.equals(input.getAttributeLocalName(walk))) idIndex = walk;
                         }
                         if (idIndex < 0) {
                             throw new IOException("Expected record root to have @id");
                         }
-                        node.attributes().put(Storage.UNIQUE_ATTR, input.getAttributeValue(0));
+                        node.attributes().put(Storage.POCKET_ID, input.getAttributeValue(0));
                     }
                     else if (node != null) {
                         node = new GroovyNode(node, input.getNamespaceURI(), input.getLocalName(), input.getPrefix());

@@ -48,6 +48,8 @@ import static eu.delving.sip.base.SwingHelper.FACT_COLOR;
 import static eu.delving.sip.base.SwingHelper.MAPPED_COLOR;
 import static eu.delving.sip.base.SwingHelper.setDelimitedColor;
 import static eu.delving.sip.base.SwingHelper.setSourceNodeColor;
+import static eu.delving.sip.files.Storage.POCKET;
+import static eu.delving.sip.files.Storage.POCKETS;
 import static eu.delving.sip.model.SourceTreeNode.NodeType.CONSTANT;
 import static eu.delving.sip.model.SourceTreeNode.NodeType.FACT;
 import static eu.delving.sip.model.SourceTreeNode.NodeType.NORMAL;
@@ -74,6 +76,21 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         NORMAL, RECORD_ROOT, UNIQUE_ELEMENT, CONSTANT, FACT
     }
 
+    public static void setStatsTreeNodes(final SortedSet<SourceTreeNode> nodes, final NodeMapping nodeMapping) {
+        List<Path> inputPaths = new ArrayList<Path>();
+        for (SourceTreeNode node : nodes) inputPaths.add(node.getUnwrappedPath());
+        nodeMapping.setStatsTreeNodes(nodes, inputPaths);
+        for (SourceTreeNode node : nodes) node.addMappedIn(nodeMapping);
+    }
+
+    public static void removeStatsTreeNodes(final NodeMapping nodeMapping) {
+        if (nodeMapping.hasSourceTreeNodes()) {
+            for (Object nodeObject : nodeMapping.getSourceTreeNodes()) {
+                ((SourceTreeNode) nodeObject).removeMappedIn(nodeMapping);
+            }
+        }
+    }
+
     public static SourceTreeNode create(String rootTag) {
         return new SourceTreeNode(rootTag, "<h3>Root</h3>");
     }
@@ -83,7 +100,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         if (root == null) {
             root = new SourceTreeNode("No statistics", "<h3>No statistics</h3>");
         }
-        else if (root.getTag().toString().equals(Storage.SOURCE_ROOT_TAG)) {
+        else if (root.getTag().toString().equals(POCKETS)) {
             SourceTreeNode factNode = new SourceTreeNode(root, Storage.FACTS_TAG, FACT, "<h3>Select a fact from here</h3>");
             root.getChildren().add(0, factNode);
             for (Map.Entry<String, String> entry : facts.entrySet()) new SourceTreeNode(factNode, FACT, entry);
@@ -123,8 +140,8 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
 
     public void setStats(Stats.ValueStats valueStats) {
         this.valueStats = valueStats;
-        this.htmlToolTip = SwingHelper.statsHTML(getPath(true), valueStats, false);
-        this.htmlDetails = SwingHelper.statsHTML(getPath(true), valueStats, true);
+        this.htmlToolTip = SwingHelper.statsHTML(getPath(), valueStats, false);
+        this.htmlDetails = SwingHelper.statsHTML(getPath(), valueStats, true);
     }
 
     public List<SourceTreeNode> getChildren() {
@@ -132,7 +149,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     }
 
     public void getPaths(Set<Path> sourcePaths) {
-        sourcePaths.add(getPath(false));
+        sourcePaths.add(getUnwrappedPath());
         for (SourceTreeNode child : children) child.getPaths(sourcePaths);
     }
 
@@ -144,27 +161,46 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         return nodeMappings;
     }
 
-    public TreePath getTreePath() {
-        List<SourceTreeNode> list = new ArrayList<SourceTreeNode>();
-        compilePathList(list, true);
-        return new TreePath(list.toArray());
-    }
-
     public Tag getTag() {
         return tag;
     }
 
-    public Path getPath(boolean fromRoot) {
+    public TreePath getTreePath() {
         List<SourceTreeNode> list = new ArrayList<SourceTreeNode>();
-        compilePathList(list, fromRoot);
+        nodePath(list);
+        return new TreePath(list.toArray());
+    }
+
+    public Path getPath() {
+        List<SourceTreeNode> nodes = new ArrayList<SourceTreeNode>();
+        nodePath(nodes);
         Path path = Path.create();
-        for (SourceTreeNode node : list) path = path.child(node.getTag());
+        for (SourceTreeNode node : nodes) path = path.child(node.getTag());
         return path;
     }
 
+    public Path getUnwrappedPath() {
+        List<SourceTreeNode> nodes = new ArrayList<SourceTreeNode>();
+        nodePath(nodes);
+        if (nodes.size() > 1 && nodes.get(0).getTag().getLocalName().equals(POCKETS)) {
+            nodes.remove(0);
+            if (nodes.size() > 1 && nodes.get(0).getTag().getLocalName().equals(POCKET)) {
+                nodes.remove(0);
+            }
+        }
+        Path path = Path.create();
+        for (SourceTreeNode node : nodes) path = path.child(node.getTag());
+        return path;
+    }
+
+    private void nodePath(List<SourceTreeNode> nodes) {
+        if (parent != null) parent.nodePath(nodes);
+        nodes.add(this);
+    }
+
     public int setRecordContainer(Path recordContainer) {
-        Path path = getPath(true);
-        boolean isAttribute= path.getTag().isAttribute();
+        Path path = getPath();
+        boolean isAttribute = path.getTag().isAttribute();
         Path parentPath = path.parent();
         if (recordContainer != null && !isAttribute && parentPath.equals(recordContainer)) {
             nodeType = RECORD_ROOT;
@@ -184,7 +220,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     }
 
     public void setUniqueElement(Path uniqueElement) {
-        if (uniqueElement != null && getPath(true).equals(uniqueElement)) {
+        if (uniqueElement != null && getPath().equals(uniqueElement)) {
             nodeType = UNIQUE_ELEMENT;
             fireChanged();
             return;
@@ -197,7 +233,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     }
 
     public void showPath(final JTree tree, final Path pathToShow) {
-        final Path here = getPath(true);
+        final Path here = getPath();
         Timer timer = new Timer(30, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -235,7 +271,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
 
     @Override
     public int compareTo(SourceTreeNode other) {
-        return getPath(true).compareTo(other.getPath(true));
+        return getPath().compareTo(other.getPath());
     }
 
     public String getHtmlToolTip() {
@@ -255,32 +291,6 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         }
         else {
             return tag.toString();
-        }
-    }
-
-    public static void setStatsTreeNodes(final SortedSet<SourceTreeNode> nodes, final NodeMapping nodeMapping) {
-        List<Path> inputPaths = new ArrayList<Path>();
-        for (SourceTreeNode node : nodes) inputPaths.add(node.getPath(false));
-        nodeMapping.setStatsTreeNodes(nodes, inputPaths);
-        for (SourceTreeNode node : nodes) node.addMappedIn(nodeMapping);
-    }
-
-    public static void removeStatsTreeNodes(final NodeMapping nodeMapping) {
-        if (nodeMapping.hasSourceTreeNodes()) {
-            for (Object nodeObject : nodeMapping.getSourceTreeNodes()) {
-                ((SourceTreeNode) nodeObject).removeMappedIn(nodeMapping);
-            }
-        }
-    }
-
-    private void compilePathList(List<SourceTreeNode> list, boolean fromRoot) {
-        if (fromRoot) {
-            if (parent != null) parent.compilePathList(list, fromRoot);
-            list.add(this);
-        }
-        else if (parent != null && parent.parent != null) { // only take nodes with parents
-            parent.compilePathList(list, fromRoot);
-            list.add(this);
         }
     }
 
