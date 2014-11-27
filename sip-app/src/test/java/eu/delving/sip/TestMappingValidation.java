@@ -61,6 +61,7 @@ import static org.junit.Assert.fail;
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
+@Ignore
 public class TestMappingValidation {
     private static final MockProgressListener PROGRESS_LISTENER = new MockProgressListener();
     private Logger log = Logger.getLogger(getClass());
