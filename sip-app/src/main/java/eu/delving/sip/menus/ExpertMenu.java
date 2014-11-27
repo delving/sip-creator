@@ -30,7 +30,6 @@ import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
-import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 
 import javax.swing.*;
@@ -52,7 +51,6 @@ public class ExpertMenu extends JMenu {
         this.sipModel = sipModel;
         this.allFrames = allFrames;
         add(new MaxUniqueValueLengthAction());
-        add(new UniqueConverterAction());
         add(new ReloadMappingAction());
         add(new DeleteCachesAction());
         add(new ToggleFrameArrangements());
@@ -84,47 +82,6 @@ public class ExpertMenu extends JMenu {
                 catch (NumberFormatException e) {
                     sipModel.getFeedback().alert("Not a number: " + answer);
                 }
-            }
-        }
-    }
-
-    private class UniqueConverterAction extends AbstractAction {
-
-        private UniqueConverterAction() {
-            super("Set Converter for the Unique value");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            String answer = sipModel.getFeedback().ask(
-                    String.format(
-                            "Enter a regular expression (executed by String.replaceFirst) in the form of 'from%sto'. \n" +
-                                    "At identifier conversion time all ':' are converted to '-', so keep that in mind \n" +
-                                    "while writing regular expressions.'",
-                            SourceConverter.CONVERTER_DELIMITER
-                    ),
-                    sipModel.getStatsModel().getUniqueValueConverter()
-            );
-            if (answer != null) {
-                answer = answer.trim();
-                sipModel.getStatsModel().setUniqueValueConverter(answer);
-                sipModel.exec(new Work.DataSetWork() {
-                    @Override
-                    public void run() {
-                        if (sipModel.getDataSetModel().isEmpty()) return;
-                        sipModel.getDataSetModel().getDataSet().deleteSource();
-                    }
-
-                    @Override
-                    public Job getJob() {
-                        return Job.DELETE_SOURCE;
-                    }
-
-                    @Override
-                    public DataSet getDataSet() {
-                        return sipModel.getDataSetModel().getDataSet();
-                    }
-                });
             }
         }
     }

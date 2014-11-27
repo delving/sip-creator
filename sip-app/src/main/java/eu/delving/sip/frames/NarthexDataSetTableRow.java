@@ -43,7 +43,7 @@ class NarthexDataSetTableRow {
     }
 
     public boolean isDownloadable() {
-        return sipEntry == null;
+        return sipEntry != null;
     }
 
     public String getFileName() {
@@ -60,7 +60,7 @@ class NarthexDataSetTableRow {
     }
 
     public String getDataSetState(SchemaVersion schemaVersion) {
-        if (dataSet == null) return DataSetState.NO_DATA.toString();
+        if (dataSet == null) return DataSetState.ABSENT.toString();
         return dataSet.getState(schemaVersion.getPrefix()).toString();
     }
 

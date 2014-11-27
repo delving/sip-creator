@@ -138,9 +138,9 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         Map<String, DataSet> dataSets = sipModel.getStorage().getDataSets();
         if (sipZips != null) {
             for (NetworkClient.SipEntry incoming : sipZips.available) {
-                DataSet dataSet = dataSets.get(incoming.file);
+                DataSet dataSet = dataSets.get(incoming.dataset);
                 freshRows.add(new NarthexDataSetTableRow(sipModel, incoming, dataSet));
-                if (dataSet != null) dataSets.remove(incoming.file); // remove used ones
+                if (dataSet != null) dataSets.remove(incoming.dataset); // remove used ones
             }
         }
         for (DataSet dataSet : dataSets.values()) { // remaining ones
@@ -245,7 +245,7 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         throw new RuntimeException();
     }
 
-    public final Action REFRESH_ACTION = new RefreshAction();
+    public final RefreshAction REFRESH_ACTION = new RefreshAction();
 
     private class RefreshAction extends AbstractAction {
 
@@ -258,7 +258,7 @@ class NarthexDataSetTableModel extends AbstractTableModel {
         public void actionPerformed(ActionEvent actionEvent) {
             setEnabled(false);
             Preferences preferences = sipModel.getPreferences();
-            Map<String,String> fields = new TreeMap<String, String>();
+            Map<String, String> fields = new TreeMap<String, String>();
             fields.put(NARTHEX_URL, preferences.get(NARTHEX_URL, ""));
             fields.put(NARTHEX_API_KEY, preferences.get(NARTHEX_API_KEY, ""));
             if (sipModel.getFeedback().getNarthexCredentials(fields)) {
@@ -268,7 +268,7 @@ class NarthexDataSetTableModel extends AbstractTableModel {
             }
         }
 
-        private void fetchList(String narthexUrl, String narthexApiKey) {
+        public void fetchList(String narthexUrl, String narthexApiKey) {
             networkClient.fetchNarthexSipList(
                     narthexUrl,
                     narthexApiKey,
@@ -289,6 +289,11 @@ class NarthexDataSetTableModel extends AbstractTableModel {
                     }
             );
         }
+    }
+
+    public void fetchList() {
+        Preferences preferences = sipModel.getPreferences();
+        REFRESH_ACTION.fetchList(preferences.get(NARTHEX_URL, ""),preferences.get(NARTHEX_API_KEY, ""));
     }
 
     public final DownloadAction DOWNLOAD_ACTION = new DownloadAction();

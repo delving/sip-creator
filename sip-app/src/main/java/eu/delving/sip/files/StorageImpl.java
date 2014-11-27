@@ -60,7 +60,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -68,9 +67,7 @@ import java.util.zip.ZipOutputStream;
 
 import static eu.delving.schema.SchemaType.RECORD_DEFINITION;
 import static eu.delving.schema.SchemaType.VALIDATION_SCHEMA;
-import static eu.delving.sip.files.Storage.FileType.IMPORTED;
 import static eu.delving.sip.files.Storage.FileType.MAPPING;
-import static eu.delving.sip.files.Storage.FileType.SOURCE;
 import static eu.delving.sip.files.StorageHelper.*;
 
 /**
@@ -110,17 +107,15 @@ public class StorageImpl implements Storage {
         File[] list = home.listFiles();
         if (list != null) {
             for (File directory : list) {
-                if (!directory.isDirectory()) continue;
-                    Matcher matcher = HUB_DATASET_PATTERN.matcher(directory.getName());
-                    if (!matcher.matches()) continue;
-                    boolean hasFiles = false; // empty ones will not appear
-                    File[] files = directory.listFiles();
-                    if (files != null) {
-                        for (File file : files) if (file.isFile()) hasFiles = true;
-                        if (!hasFiles) continue;
-                        DataSetImpl impl = new DataSetImpl(directory);
-                        map.put(directory.getName(), impl);
-                    }
+                if (!directory.isDirectory() || directory.getName().equals(CACHE_DIR)) continue;
+                boolean hasFiles = false; // empty ones will not appear
+                File[] files = directory.listFiles();
+                if (files != null) {
+                    for (File file : files) if (file.isFile()) hasFiles = true;
+                    if (!hasFiles) continue;
+                    DataSetImpl impl = new DataSetImpl(directory);
+                    map.put(directory.getName(), impl);
+                }
             }
         }
         return map;
@@ -146,17 +141,7 @@ public class StorageImpl implements Storage {
 
         @Override
         public String getSpec() {
-            return getSpecFromDirectory(here);
-        }
-
-        @Override
-        public String getOrganization() {
-            return getOrganizationFromDirectory(here);
-        }
-
-        @Override
-        public File getMediaDirectory() {
-            return new File(here, MEDIA_DIR);
+            return here.getName();
         }
 
         @Override
@@ -202,36 +187,17 @@ public class StorageImpl implements Storage {
 
         @Override
         public DataSetState getState(String prefix) {
-            File imported = importedFile(here);
             File source = sourceFile(here);
-            if (imported.exists()) {
-                if (source.exists() && source.lastModified() >= imported.lastModified()) {
-                    return postSourceState(source, prefix);
-                }
-                else {
-                    return importedState(imported);
-                }
-            }
-            else if (source.exists()) {
+            if (source.exists()) {
                 return postSourceState(source, prefix);
             }
             else {
-                return DataSetState.NO_DATA;
-            }
-        }
-
-        private DataSetState importedState(File imported) {
-            File statistics = statsFile(here, false);
-            if (statistics.exists() && statistics.lastModified() >= imported.lastModified()) {
-                return allHintsSet(getHints()) ? DataSetState.DELIMITED : DataSetState.ANALYZED_IMPORT;
-            }
-            else {
-                return DataSetState.IMPORTED;
+                return DataSetState.ABSENT;
             }
         }
 
         private DataSetState postSourceState(File source, String prefix) {
-            File statistics = statsFile(here, true);
+            File statistics = statsFile(here);
             if (statistics.exists() && statistics.lastModified() >= source.lastModified()) {
                 File mapping = findLatestFile(here, MAPPING, prefix);
                 if (mapping.exists()) {
@@ -290,38 +256,11 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public boolean isRecentlyImported() {
-            File importedFile = importedFile(here);
-            File sourceFile = sourceFile(here);
-            return importedFile.exists() && (!sourceFile.exists() || importedFile.lastModified() > sourceFile.lastModified());
-        }
-
-        @Override
-        public void deleteConverted() throws StorageException {
-            if (!isRecentlyImported()) delete(sourceFile(here));
-        }
-
-        @Override
         public boolean deleteTarget(String prefix) throws StorageException {
             File targetFile = targetFile(here, dataSetFacts, prefix);
             boolean deleted = targetFile.exists();
             delete(targetFile);
             return deleted;
-        }
-
-        @Override
-        public File importedOutput() {
-            return new File(here, IMPORTED.getName());
-        }
-
-        @Override
-        public InputStream openImportedInputStream() throws StorageException {
-            return zipIn(new File(here, IMPORTED.getName()));
-        }
-
-        @Override
-        public File sourceOutput() {
-            return new File(here, SOURCE.getName());
         }
 
         @Override
@@ -335,25 +274,8 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public Stats getLatestStats() {
-            File analysis = statsFile(here, false);
-            File source = statsFile(here, true);
-            if (analysis.exists()) {
-                if (source.exists()) {
-                    return getStats(source.lastModified() >= analysis.lastModified());
-                }
-                else {
-                    return getStats(false);
-                }
-            }
-            else {
-                return getStats(true);
-            }
-        }
-
-        @Override
-        public Stats getStats(boolean sourceFormat) {
-            File statsFile = statsFile(here, sourceFormat);
+        public Stats getStats() {
+            File statsFile = statsFile(here);
             if (statsFile.exists()) {
                 InputStream in = null;
                 try {
@@ -371,8 +293,8 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public void setStats(Stats stats, boolean sourceFormat) throws StorageException {
-            File statsFile = statsFile(here, sourceFormat);
+        public void setStats(Stats stats) throws StorageException {
+            File statsFile = statsFile(here);
             if (stats == null) {
                 delete(statsFile);
             }
@@ -480,11 +402,6 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public File sipZipFile(String fileName) throws StorageException {
-            return new File(here, fileName);
-        }
-
-        @Override
         public void fromSipZip(File sipZipFile, ProgressListener progressListener) throws StorageException {
             long streamLength = sipZipFile.length();
             try {
@@ -548,20 +465,21 @@ public class StorageImpl implements Storage {
                 // if there's no harvest, we give Narthex source so it can be downloaded by somebody else
                 if (!harvestBased) files.add(sourceFile(here));
                 // narthexFacts take only the chosen SCHEMA_VERSIONS
-                Map<String,String> narthexFacts = new TreeMap<String, String>(dataSetFacts);
+                Map<String, String> narthexFacts = new TreeMap<String, String>(dataSetFacts);
                 // for the mapping matching the prefix
                 boolean prefixFound = false;
-                for (SchemaVersion schemaVersion : getSchemaVersions()) if (schemaVersion.getPrefix().equals(prefix)){
-                    narthexFacts.put(SCHEMA_VERSIONS, schemaVersion.toString());
-                    prefixFound = true;
-                    addLatestNoHash(here, MAPPING, schemaVersion.getPrefix(), files);
-                    File recDef = new File(here, schemaVersion.getFullFileName(RECORD_DEFINITION));
-                    if (recDef.exists()) files.add(recDef);
-                    File valSchema = new File(here, schemaVersion.getFullFileName(VALIDATION_SCHEMA));
-                    if (valSchema.exists()) files.add(valSchema);
-                }
+                for (SchemaVersion schemaVersion : getSchemaVersions())
+                    if (schemaVersion.getPrefix().equals(prefix)) {
+                        narthexFacts.put(SCHEMA_VERSIONS, schemaVersion.toString());
+                        prefixFound = true;
+                        addLatestNoHash(here, MAPPING, schemaVersion.getPrefix(), files);
+                        File recDef = new File(here, schemaVersion.getFullFileName(RECORD_DEFINITION));
+                        if (recDef.exists()) files.add(recDef);
+                        File valSchema = new File(here, schemaVersion.getFullFileName(VALIDATION_SCHEMA));
+                        if (valSchema.exists()) files.add(valSchema);
+                    }
                 if (!prefixFound) {
-                    throw new StorageException("Cannot prepare a SIP-Zip file from this dataset with prefix: "+prefix);
+                    throw new StorageException("Cannot prepare a SIP-Zip file from this dataset with prefix: " + prefix);
                 }
                 files.add(hintsFile(here));
                 writeFacts(narthexFactsFile(here), narthexFacts);

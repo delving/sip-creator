@@ -25,7 +25,6 @@ import eu.delving.metadata.Path;
 
 import java.io.File;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * This interface describes how files are maintained by the SIP-Creator
@@ -42,9 +41,7 @@ public interface Storage {
     DataSet createDataSet(String spec) throws StorageException;
 
     enum FileType {
-        IMPORTED("imported.xml.gz"),
         SOURCE("source.xml.gz", null, null, null, 2),
-        IMPORT_STATS("stats-import.xml.gz"),
         SOURCE_STATS("stats-source.xml.gz"),
         FACTS("dataset_facts.txt"),
         HINTS("hints.txt"),
@@ -90,13 +87,11 @@ public interface Storage {
         }
     }
 
-    String HARVEST_TAG = "delving-harvest";
-    String SOURCE_ROOT_TAG = "delving-sip-source";
-    String SOURCE_RECORD_TAG = "input";
-    String TEXT_TAG = "text_chunk";
+    String SOURCE_ROOT_TAG = "pockets";
+    String SOURCE_RECORD_TAG = "pocket";
+    String UNIQUE_ATTR = "id";
     String FACTS_TAG = "facts";
     String CONSTANT_TAG = "constant";
-    String UNIQUE_ATTR = "id";
     String RECORD_ROOT_PATH = "recordRootPath";
     String RECORD_COUNT = "recordCount";
     String UNIQUE_ELEMENT_PATH = "uniqueElementPath";
@@ -104,21 +99,14 @@ public interface Storage {
     String UNIQUE_VALUE_CONVERTER = "uniqueValueConverter";
     String SCHEMA_VERSIONS = "schemaVersions";
     String HARVEST_URL = "harvestUrl";
-    String HARVEST_PREFIX = "harvestPrefix";
-    String HARVEST_SPEC = "harvestSpec";
     String NARTHEX_URL = "narthexUrl";
     String NARTHEX_API_KEY = "narthexApiKey";
     String NARTHEX_DATASET_NAME = "narthexDatasetName";
     String NARTHEX_PREFIX = "narthexPrefix";
-    String CACHE_DIR = "Cache";
+    String CACHE_DIR = "__cache__";
     String SIP_ZIPS_DIR = "SipZips";
-    String MEDIA_DIR = "Media";
-    String INDEX_FILE = "media-files.xml";
     String FRAME_ARRANGEMENTS_FILE = "frame-arrangements.xml";
     Path RECORD_ROOT = Path.create(String.format("/%s/%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG));
     Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/@%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG, UNIQUE_ATTR));
     long MAPPING_FREEZE_INTERVAL = 60000;
-//    String NARTHEX_DATASET_PREFIX = "narthex__";
-    Pattern HUB_DATASET_PATTERN = Pattern.compile("([^_]+)_([^_]+)"); // geheugen-van-nederland_dimcon
-//    Pattern NARTHEX_DATASET_PATTERN = Pattern.compile("narthex__([^_]+)_([^_]+)"); // narthex__bronbeek_dimcon
 }

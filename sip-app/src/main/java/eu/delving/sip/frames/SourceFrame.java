@@ -110,7 +110,7 @@ public class SourceFrame extends FrameBase {
     }
 
     private void reactToState(DataSetState state) {
-        if (!state.atLeast(DataSetState.ANALYZED_IMPORT)) sipModel.getStatsModel().setStatistics(null);
+        if (!state.atLeast(DataSetState.SOURCED)) sipModel.getStatsModel().setStatistics(null);
     }
 
     @Override
@@ -202,7 +202,6 @@ public class SourceFrame extends FrameBase {
             public void stateChanged(DataSetModel model, DataSetState state) {
                 switch (state) {
                     case ABSENT:
-                    case NO_DATA:
                         treePanel.setBorder(BorderFactory.createEtchedBorder());
                         break;
                     default:

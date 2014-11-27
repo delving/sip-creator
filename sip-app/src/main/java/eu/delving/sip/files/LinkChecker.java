@@ -62,11 +62,10 @@ public class LinkChecker {
         return map.get(url);
     }
 
-    public LinkCheck request(String url, RecDef.Check check, String spec, String orgId, String localId) throws IOException {
+    public LinkCheck request(String url, RecDef.Check check, String spec, String localId) throws IOException {
         LinkCheck linkCheck = linkCheckRequest(url);
         linkCheck.check = check;
         linkCheck.spec = spec;
-        linkCheck.orgId = orgId;
         linkCheck.localId = localId;
         if (check == RecDef.Check.DEEP_ZOOM && linkCheck.ok) {
             linkCheck.ok = "application/xml".equals(linkCheck.mimeType);

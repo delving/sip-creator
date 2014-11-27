@@ -29,10 +29,6 @@ package eu.delving.sip.files;
 
 public enum DataSetState {
     ABSENT("Clear", "No dataset selected", "Clear the screen"),
-    NO_DATA("Import", "Dataset has no data yet", "Import data into it"),
-    IMPORTED("Analyze Import", "Data has been imported", "Analyze the imported data"),
-    ANALYZED_IMPORT("Delimit", "Dataset has been analyzed", "Choose record root and unique element"),
-    DELIMITED("Convert", "Delimiters have been set", "Convert the data to source format"),
     SOURCED("Analyze Source","Source data is available", "Analyze the source data"),
     ANALYZED_SOURCE("Map", "Source data has been analyzed", "Building the mapping is now possible"),
     MAPPING("Validate", "There is a mapping", "Transform and validate all of the data"),

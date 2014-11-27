@@ -50,8 +50,8 @@ import static eu.delving.sip.files.LinkFile.FileSizeCategory.values;
 
 public class LinkFile {
     public static final String CSV_HEADER = "\"URL\", \"OK\", \"Check\", \"Spec\", \"Org ID\", \"Local ID\", \"Date\", \"HTTP Status\", \"File Size\", \"MIME Type\"";
-    public static final String LINE_FORMAT = "\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, \"%s\"";
-    public static final Pattern LINK_CHECK_PATTERN = Pattern.compile("\"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", (-?\\d+), (-?\\d+), \"([^\"]*)\"");
+    public static final String LINE_FORMAT = "\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, \"%s\"";
+    public static final Pattern LINK_CHECK_PATTERN = Pattern.compile("\"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", \"([^\"]*)\", (-?\\d+), (-?\\d+), \"([^\"]*)\"");
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private File file;
     private DataSet dataSet;
@@ -224,23 +224,22 @@ public class LinkFile {
             linkCheck.ok = Boolean.parseBoolean(matcher.group(2));
             linkCheck.check = RecDef.Check.valueOf(matcher.group(3));
             linkCheck.spec = matcher.group(4);
-            linkCheck.orgId = matcher.group(5);
-            linkCheck.localId = matcher.group(6);
+            linkCheck.localId = matcher.group(5);
             try {
-                linkCheck.time = DATE_FORMAT.parse(matcher.group(7)).getTime();
+                linkCheck.time = DATE_FORMAT.parse(matcher.group(6)).getTime();
             }
             catch (ParseException e) {
                 throw new RuntimeException("Cannot parse date");
             }
-            linkCheck.httpStatus = Integer.parseInt(matcher.group(8));
-            linkCheck.fileSize = Integer.parseInt(matcher.group(9));
-            linkCheck.mimeType = matcher.group(10);
+            linkCheck.httpStatus = Integer.parseInt(matcher.group(7));
+            linkCheck.fileSize = Integer.parseInt(matcher.group(8));
+            linkCheck.mimeType = matcher.group(9);
         }
 
         public String toLine() {
             return String.format(
                     LINE_FORMAT,
-                    url, linkCheck.ok, linkCheck.check, linkCheck.spec, linkCheck.orgId, linkCheck.localId,
+                    url, linkCheck.ok, linkCheck.check, linkCheck.spec, linkCheck.localId,
                     DATE_FORMAT.format(new Date(linkCheck.time)), linkCheck.httpStatus, linkCheck.fileSize, linkCheck.mimeType
             );
         }

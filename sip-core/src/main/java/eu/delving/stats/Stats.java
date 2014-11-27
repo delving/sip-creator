@@ -22,13 +22,31 @@
 package eu.delving.stats;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.annotations.*;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 import eu.delving.metadata.Path;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import static eu.delving.XStreamFactory.getStreamFor;
 
@@ -107,9 +125,6 @@ public class Stats {
 
     @XStreamAsAttribute
     public String name;
-
-    @XStreamAsAttribute
-    public boolean sourceFormat;
 
     @XStreamAsAttribute
     public String prefix;

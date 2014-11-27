@@ -33,8 +33,6 @@ import eu.delving.stats.ChartHelper;
 import eu.delving.stats.Stats;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
@@ -44,7 +42,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,10 +56,7 @@ import static eu.delving.sip.base.SwingHelper.scrollV;
  */
 
 public class StatsFrame extends FrameBase {
-    private StatsSet[] statsSets = {
-            new StatsSet("Import"),
-            new StatsSet("Source")
-    };
+    private StatsSet statsSet = new StatsSet("Source");
     private JPanel wordCountPanel = emptyPanel();
     private JPanel fieldFrequencyPanel = emptyPanel();
     private JPanel presencePanel = emptyPanel();
@@ -81,19 +75,11 @@ public class StatsFrame extends FrameBase {
     }
 
     private JComponent createWest() {
-        final JTabbedPane tabs = new JTabbedPane();
-        for (StatsSet statsSet : statsSets) tabs.addTab(statsSet.statsSetName, statsSet.treePanel);
-        tabs.setPreferredSize(new Dimension(300, 10));
-        tabs.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent changeEvent) {
-                int index = tabs.getSelectedIndex();
-                statsSets[index].select();
-
-            }
-        });
-        statsSets[0].select();
-        return tabs;
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createTitledBorder(statsSet.statsSetName));
+        p.add(statsSet.treePanel);
+        statsSet.select();
+        return p;
     }
 
     private JComponent createCenter() {
@@ -140,23 +126,15 @@ public class StatsFrame extends FrameBase {
                 DataSet dataSet = model.getDataSet();
                 switch (state) {
                     case ABSENT:
-                    case NO_DATA:
-                    case IMPORTED:
-                        for (StatsSet statsSet : statsSets) statsSet.setStats(null);
-                        break;
-                    case ANALYZED_IMPORT:
-                    case DELIMITED:
                     case SOURCED:
-                        statsSets[0].setStats(dataSet.getStats(false));
+                        statsSet.setStats(null);
                         break;
                     case MAPPING:
                     case ANALYZED_SOURCE:
-                        statsSets[0].setStats(dataSet.getStats(false));
-                        statsSets[1].setStats(dataSet.getStats(true));
+                        statsSet.setStats(dataSet.getStats());
                         break;
                     case PROCESSED:
-                        statsSets[0].setStats(dataSet.getStats(false));
-                        statsSets[1].setStats(dataSet.getStats(true));
+                        statsSet.setStats(dataSet.getStats());
                         break;
                 }
             }

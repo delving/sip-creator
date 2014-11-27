@@ -37,18 +37,15 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
-import eu.delving.sip.files.FileImporter;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.FileProcessor;
 import eu.delving.sip.xml.MetadataParser;
-import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 
 import javax.swing.*;
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
@@ -163,25 +160,14 @@ public class SipModel {
 
             @Override
             public void recordRootSet(Path recordRootPath) {
-                deleteSourceFile();
                 clearValidations();
             }
 
             @Override
             public void uniqueElementSet(Path uniqueElementPath) {
-                deleteSourceFile();
                 clearValidations();
             }
 
-            private void deleteSourceFile() {
-                DataSet dataSet = dataSetModel.getDataSet();
-                try {
-                    dataSet.deleteConverted();
-                }
-                catch (StorageException e) {
-                    feedback.alert("Unable to delete converted source file", e);
-                }
-            }
         });
     }
 
@@ -319,7 +305,7 @@ public class SipModel {
         @Override
         public void run() {
             try {
-                final Stats stats = dataSet.getLatestStats();
+                final Stats stats = dataSet.getStats();
                 final Map<String, String> facts = dataSet.getDataSetFacts();
                 final Map<String, String> hints = dataSet.getHints();
                 final List<SchemaVersion> schemaVersions = dataSet.getSchemaVersions();
@@ -366,32 +352,17 @@ public class SipModel {
 
     }
 
-    public void importSource(final File file, final Swing finished) {
-        clearValidations();
-        exec(new FileImporter(file, dataSetModel.getDataSet(), new Runnable() {
-            @Override
-            public void run() {
-                Swing.Exec.later(finished);
-            }
-        }));
-    }
-
     public void analyzeFields() {
         exec(new AnalysisParser(dataSetModel, statsModel.getMaxUniqueValueLength(), new AnalysisParser.Listener() {
             @Override
             public void success(final Stats stats) {
                 try {
-                    dataSetModel.getDataSet().setStats(stats, stats.sourceFormat);
+                    dataSetModel.getDataSet().setStats(stats);
                     exec(new Swing() {
                         @Override
                         public void run() {
                             statsModel.setStatistics(stats);
-                            if (stats.sourceFormat) {
-                                seekFirstRecord();
-                            }
-                            else {
-                                seekReset();
-                            }
+                            seekFirstRecord();
                         }
                     });
                 }
@@ -408,22 +379,6 @@ public class SipModel {
                 if (exception != null) {
                     feedback.alert(message, exception);
                 }
-            }
-        }));
-    }
-
-    public void convertSource() {
-        clearValidations();
-        exec(new SourceConverter(dataSetModel.getDataSet(), new Runnable() {
-            @Override
-            public void run() {
-                mappingHintsModel.refresh();
-                exec(new Swing() {
-                    @Override
-                    public void run() {
-                        seekFirstRecord();
-                    }
-                });
             }
         }));
     }

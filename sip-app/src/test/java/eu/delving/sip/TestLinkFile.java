@@ -37,7 +37,6 @@ public class TestLinkFile {
         LinkCheck c = new LinkCheck();
         c.check = RecDef.Check.LANDING_PAGE;
         c.spec = "spek";
-        c.orgId = "orgy";
         c.localId = "here";
         c.httpStatus = 1;
         c.time = 200000000000L;

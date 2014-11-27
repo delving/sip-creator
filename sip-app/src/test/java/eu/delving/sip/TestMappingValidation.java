@@ -26,17 +26,14 @@ import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
-import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
-import eu.delving.sip.files.FileImporter;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.FilterTreeModel;
 import eu.delving.sip.model.SourceTreeNode;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.MetadataParser;
-import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -52,13 +49,9 @@ import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static eu.delving.sip.files.DataSetState.ANALYZED_IMPORT;
-import static eu.delving.sip.files.DataSetState.DELIMITED;
-import static eu.delving.sip.files.DataSetState.IMPORTED;
 import static eu.delving.sip.files.DataSetState.MAPPING;
 import static eu.delving.sip.files.DataSetState.SOURCED;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -183,33 +176,11 @@ public class TestMappingValidation {
 
         assertEquals(String.valueOf(Arrays.asList(mock.files())), fileCount++, mock.fileCount());
 
-        Work.LongTermWork importer = new FileImporter(mock.sampleInputFile(), dataSet(), null);
-        importer.setProgressListener(PROGRESS_LISTENER);
-        importer.run();
-
-        assertEquals(fileCount++, mock.fileCount());
-        assertEquals(IMPORTED, state());
-
-        performAnalysis();
-        assertEquals(fileCount++, mock.fileCount());
-        assertEquals(ANALYZED_IMPORT, state());
-
-        assertEquals(String.valueOf(expectedRecords), mock.hints().get(Storage.RECORD_COUNT));
-        dataSet().setHints(mock.hints());
-        assertEquals(fileCount++, mock.fileCount());
-        assertEquals(DELIMITED, state());
-
-        assertFalse(dataSet().getLatestStats().sourceFormat);
-        Work.LongTermWork sourceImporter = new SourceConverter(dataSet(), null);
-        sourceImporter.setProgressListener(PROGRESS_LISTENER);
-        sourceImporter.run();
-        assertEquals(fileCount++, mock.fileCount());
         assertEquals(SOURCED, state());
-
         performAnalysis();
         assertEquals(fileCount, mock.fileCount());
-        Stats stats = dataSet().getLatestStats();
-        assertTrue(stats.sourceFormat);
+        Stats stats = dataSet().getStats();
+        // todo: use expectedRecords!
         SourceTreeNode tree = SourceTreeNode.create(stats.fieldValueMap, dataSet().getDataSetFacts());
         assertEquals(Tag.element(Storage.SOURCE_ROOT_TAG), tree.getTag());
         assertEquals(MAPPING, state());
@@ -243,16 +214,13 @@ public class TestMappingValidation {
                 try {
                     Path recordRoot = null;
                     switch (state()) {
-                        case IMPORTED:
-                            recordRoot = Path.create(mock.hints().get(Storage.RECORD_ROOT_PATH));
-                            break;
                         case SOURCED:
                             recordRoot = Storage.RECORD_ROOT;
                             break;
                         default:
                             Assert.fail("Unexpected state " + state());
                     }
-                    dataSet().setStats(stats, stats.sourceFormat);
+                    dataSet().setStats(stats);
                     sourceTree = SourceTreeNode.create(stats.fieldValueMap, dataSet().getDataSetFacts());
                     new FilterTreeModel(sourceTree);
                     int recordCount = sourceTree.setRecordRoot(recordRoot);

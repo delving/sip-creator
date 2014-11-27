@@ -40,7 +40,6 @@ public class LinkCheck implements Serializable {
 
     public RecDef.Check check;
     public String spec;
-    public String orgId;
     public String localId;
     public int httpStatus;
     public long time;

@@ -45,10 +45,6 @@ public interface DataSet extends Comparable<DataSet> {
 
     String getSpec();
 
-    String getOrganization();
-
-    File getMediaDirectory();
-
     List<SchemaVersion> getSchemaVersions();
 
     RecDef getRecDef(String prefix) throws StorageException;
@@ -67,27 +63,15 @@ public interface DataSet extends Comparable<DataSet> {
 
     void setHints(Map<String, String> hints) throws StorageException;
 
-    boolean isRecentlyImported();
-
-    void deleteConverted() throws StorageException;
-
     boolean deleteTarget(String prefix) throws StorageException;
-
-    File importedOutput();
-
-    InputStream openImportedInputStream() throws StorageException;
-
-    File sourceOutput();
 
     InputStream openSourceInputStream() throws StorageException;
 
     File targetOutput(String prefix);
 
-    Stats getLatestStats();
+    Stats getStats();
 
-    Stats getStats(boolean sourceFormat);
-
-    void setStats(Stats stats, boolean sourceFormat) throws StorageException;
+    void setStats(Stats stats) throws StorageException;
 
     RecMapping getRecMapping(String prefix, RecDefModel recDefModel) throws StorageException;
 
@@ -102,8 +86,6 @@ public interface DataSet extends Comparable<DataSet> {
     ReportFile getReport(String prefix) throws StorageException;
 
     void deleteSource();
-
-    File sipZipFile(String fileName) throws StorageException;
 
     void fromSipZip(File sipZipFile, ProgressListener progressListener) throws IOException, StorageException;
 

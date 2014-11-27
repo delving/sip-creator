@@ -25,6 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import eu.delving.XStreamFactory;
 import eu.delving.metadata.Hasher;
 import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.HomeDirectory;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
@@ -105,49 +106,25 @@ public class NetworkClient {
 
 
     public void fetchNarthexSipList(String url, String apiKey, NarthexListListener narthexListListener) {
-        sipModel.exec(new NarthexListFetcher(1, narthexListListener, url, apiKey));
+        sipModel.exec(new NarthexListFetcher(narthexListListener, url, apiKey));
     }
 
     public void downloadNarthexDataset(String fileName, DataSet dataSet, String url, String apiKey, Swing finished) {
-        sipModel.exec(new NarthexDatasetDownloader(1, fileName, dataSet, url, apiKey, finished));
+        sipModel.exec(new NarthexDatasetDownloader(fileName, dataSet, url, apiKey, finished));
     }
 
     // todo: use this
     public void uploadNarthex(DataSet dataSet, String url, String apiKey, String datasetName, String prefix, Swing finished) throws StorageException {
-        sipModel.exec(new NarthexUploader(1, dataSet, url, apiKey, datasetName, prefix, finished));
-    }
-
-    private abstract class Attempt implements Work {
-        protected int attempt;
-
-        protected Attempt(int attempt) {
-            this.attempt = attempt;
-        }
-
-        private boolean shouldRetry() {
-            return attempt <= 3;
-        }
-
-        protected boolean reactToUnauthorized(Work retry) {
-            if (shouldRetry()) {
-                feedback().alert("Authorization failed, retrying...");
-                sipModel.exec(retry);
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
+        sipModel.exec(new NarthexUploader(dataSet, url, apiKey, datasetName, prefix, finished));
     }
 
     // NARTHEX ========================================
 
-    private class NarthexListFetcher extends Attempt {
+    private class NarthexListFetcher implements Work {
         private NarthexListListener narthexListListener;
         private String url, apiKey;
 
-        public NarthexListFetcher(int attempt, NarthexListListener narthexListListener, String url, String apiKey) {
-            super(attempt);
+        public NarthexListFetcher(NarthexListListener narthexListListener, String url, String apiKey) {
             this.narthexListListener = narthexListListener;
             this.url = url;
             this.apiKey = apiKey;
@@ -168,9 +145,7 @@ public class NetworkClient {
                             narthexListListener.listReceived(sipZips);
                             break;
                         case UNAUTHORIZED:
-                            if (!reactToUnauthorized(new NarthexListFetcher(attempt + 1, narthexListListener, url, apiKey))) {
-                                narthexListListener.failed(new Exception("Unable to fetch list"));
-                            }
+                            narthexListListener.failed(new Exception("Unable to fetch list"));
                             break;
                         default:
                             reportResponse(code, response.getStatusLine());
@@ -200,14 +175,16 @@ public class NetworkClient {
         }
 
         private HttpGet createNarthexListRequest() {
-            return new HttpGet(String.format(
+            String requestUrl = String.format(
                     "%s/sip-creator/%s",
                     url, apiKey
-            ));
+            );
+            feedback().info("GET "+requestUrl);
+            return new HttpGet(requestUrl);
         }
     }
 
-    private class NarthexDatasetDownloader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
+    private class NarthexDatasetDownloader implements Work.DataSetWork, Work.LongTermWork {
         private final String apiKey;
         private final String url;
         private final DataSet dataSet;
@@ -215,8 +192,7 @@ public class NetworkClient {
         private Swing finished;
         private ProgressListener progressListener;
 
-        private NarthexDatasetDownloader(int attempt, String fileName, DataSet dataSet, String url, String apiKey, Swing finished) {
-            super(attempt);
+        private NarthexDatasetDownloader(String fileName, DataSet dataSet, String url, String apiKey, Swing finished) {
             this.fileName = fileName;
             this.dataSet = dataSet;
             this.url = url;
@@ -236,7 +212,7 @@ public class NetworkClient {
                     switch (code) {
                         case OK:
                             dataSet.remove();
-                            File sipZipFile = dataSet.sipZipFile(fileName);
+                            File sipZipFile = HomeDirectory.downFile(fileName);
                             FileOutputStream output = new FileOutputStream(sipZipFile);
                             progressListener.prepareFor((int) (entity.getContentLength() / BLOCK_SIZE));
                             InputStream input = entity.getContent();
@@ -253,12 +229,8 @@ public class NetworkClient {
                             success = true;
                             break;
                         case UNAUTHORIZED:
-                            if (reactToUnauthorized(new NarthexDatasetDownloader(attempt + 1, fileName, dataSet, url, apiKey, finished))) {
-                                finished = null;
-                            }
-                            else {
-                                success = false;
-                            }
+                            finished = null;
+                            success = false;
                             break;
                         default:
                             reportResponse(code, response.getStatusLine());
@@ -303,14 +275,16 @@ public class NetworkClient {
         }
 
         private HttpGet createSipZipDownloadRequest() throws OAuthSystemException, OAuthProblemException {
-            return new HttpGet(String.format(
-                    "%s/sip-creator/%s/sip-zip/%s",
-                    url, apiKey, fileName
-            ));
+            String requestUrl = String.format(
+                    "%s/sip-creator/%s/%s",
+                    url, apiKey, dataSet.getSpec()
+            );
+            feedback().info("GET "+requestUrl);
+            return new HttpGet(requestUrl);
         }
     }
 
-    private class NarthexUploader extends Attempt implements Work.DataSetWork, Work.LongTermWork {
+    private class NarthexUploader implements Work.DataSetWork, Work.LongTermWork {
         private final DataSet dataSet;
         private final String url;
         private final String apiKey;
@@ -319,8 +293,7 @@ public class NetworkClient {
         private ProgressListener progressListener;
         private Swing finished;
 
-        NarthexUploader(int attempt, DataSet dataSet, String url, String apiKey, String datasetName, String prefix, Swing finished) throws StorageException {
-            super(attempt);
+        NarthexUploader(DataSet dataSet, String url, String apiKey, String datasetName, String prefix, Swing finished) throws StorageException {
             this.dataSet = dataSet;
             this.url = url;
             this.apiKey = apiKey;
@@ -368,10 +341,12 @@ public class NetworkClient {
         }
 
         private HttpPost createSipZipUploadRequest(File file, ProgressListener progressListener) {
-            HttpPost post = new HttpPost(String.format(
+            String requestUrl = String.format(
                     "%s/sip-creator/%s/%s/%s",
                     url, apiKey, datasetName, file.getName()
-            ));
+            );
+            feedback().info("POST "+requestUrl);
+            HttpPost post = new HttpPost(requestUrl);
             FileEntity fileEntity = new FileEntity(file, progressListener);
             post.setEntity(fileEntity);
             return post;
@@ -515,7 +490,7 @@ public class NetworkClient {
     }
 
     @XStreamAlias("sip-zip")
-    public static class SipEntry{
+    public static class SipEntry {
         public String dataset;
         public String file;
         public String date;

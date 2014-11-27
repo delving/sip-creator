@@ -123,7 +123,7 @@ public class RemoteDataSetFrame extends FrameBase {
         Swing.Exec.later(new Swing() {
             @Override
             public void run() {
-                narthexTableModel.REFRESH_ACTION.actionPerformed(null);
+                narthexTableModel.fetchList();
             }
         });
     }

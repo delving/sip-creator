@@ -85,7 +85,11 @@ import java.util.prefs.Preferences;
 import static eu.delving.sip.base.HttpClientFactory.createHttpClient;
 import static eu.delving.sip.base.KeystrokeHelper.MENU_W;
 import static eu.delving.sip.base.KeystrokeHelper.attachAccelerator;
-import static eu.delving.sip.files.DataSetState.*;
+import static eu.delving.sip.files.DataSetState.ABSENT;
+import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
+import static eu.delving.sip.files.DataSetState.MAPPING;
+import static eu.delving.sip.files.DataSetState.PROCESSED;
+import static eu.delving.sip.files.DataSetState.SOURCED;
 
 /**
  * The main application, based on the SipModel and bringing everything together in a big frame with a central
@@ -270,9 +274,6 @@ public class Application {
 
     private JPanel createStatePanel() {
         statusPanel.setReaction(ABSENT, allFrames.prepareForNothing());
-        statusPanel.setReaction(IMPORTED, new InputAnalyzer());
-        statusPanel.setReaction(ANALYZED_IMPORT, allFrames.prepareForDelimiting());
-        statusPanel.setReaction(DELIMITED, new ConvertPerformer());
         statusPanel.setReaction(SOURCED, new InputAnalyzer());
         statusPanel.setReaction(ANALYZED_SOURCE, allFrames.prepareForMapping(desktop));
         statusPanel.setReaction(MAPPING, validateAction);
@@ -309,13 +310,6 @@ public class Application {
         @Override
         public void run() {
             sipModel.analyzeFields();
-        }
-    }
-
-    private class ConvertPerformer implements Swing {
-        @Override
-        public void run() {
-            sipModel.convertSource();
         }
     }
 

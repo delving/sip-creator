@@ -63,16 +63,11 @@ public class StatsModel {
     public void setStatistics(Stats stats) {
         if (stats != null) {
             sourceTree = SourceTreeNode.create(stats.fieldValueMap, sipModel.getDataSetFacts().getFacts());
-            if (stats.sourceFormat) {
-                setSourceTree(sourceTree, Storage.RECORD_ROOT, Storage.UNIQUE_ELEMENT);
-                if (sipModel.getMappingModel().hasRecMapping()) {
-                    for (NodeMapping nodeMapping : sipModel.getMappingModel().getRecMapping().getNodeMappings()) {
-                        findNodesForInputPaths(nodeMapping);
-                    }
+            setSourceTree(sourceTree, Storage.RECORD_ROOT, Storage.UNIQUE_ELEMENT);
+            if (sipModel.getMappingModel().hasRecMapping()) {
+                for (NodeMapping nodeMapping : sipModel.getMappingModel().getRecMapping().getNodeMappings()) {
+                    findNodesForInputPaths(nodeMapping);
                 }
-            }
-            else {
-                setSourceTree(sourceTree, getRecordRoot(), getUniqueElement());
             }
         }
         else {

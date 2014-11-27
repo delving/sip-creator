@@ -31,7 +31,6 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.stats.Stats;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.stax2.XMLStreamReader2;
 
@@ -93,13 +92,10 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
             if (dataSetModel.isEmpty()) return;
             try {
                 switch (dataSetModel.getDataSetState()) {
-                    case IMPORTED:
-                        inputStream = dataSetModel.getDataSet().openImportedInputStream();
-                        break;
                     case SOURCED:
                         inputStream = dataSetModel.getDataSet().openSourceInputStream();
+                        // todo: really necessary?
                         stats.setRecordRoot(Storage.RECORD_ROOT);
-                        stats.sourceFormat = true;
                         break;
                     default:
                         throw new IllegalStateException("Unexpected state: " + dataSetModel.getDataSetState());
@@ -156,10 +152,6 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
         }
         catch (Exception e) {
             switch (dataSetModel.getDataSetState()) {
-                case IMPORTED:
-                case DELIMITED:
-                    FileUtils.deleteQuietly(dataSetModel.getDataSet().importedOutput());
-                    break;
                 case SOURCED:
                     dataSetModel.getDataSet().deleteSource();
                     break;

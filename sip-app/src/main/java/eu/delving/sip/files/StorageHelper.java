@@ -67,20 +67,6 @@ public class StorageHelper {
         return new File(home, spec);
     }
 
-    static String getSpecFromDirectory(File directory) {
-        String name = directory.getName();
-        int underscore = name.indexOf("_");
-        if (underscore < 0) throw new IllegalStateException("Directory must be in the form spec_organization");
-        return name.substring(0, underscore);
-    }
-
-    static String getOrganizationFromDirectory(File directory) {
-        String name = directory.getName();
-        int underscore = name.indexOf("_");
-        if (underscore < 0) throw new IllegalStateException("Directory must be in the form spec_organization");
-        return name.substring(underscore + 1);
-    }
-
     public static Path getRecordRoot(Map<String, String> hints) throws StorageException {
         String recordRoot = hints.get(RECORD_ROOT_PATH);
         if (recordRoot == null) throw new StorageException("Must have record root path");
@@ -167,10 +153,6 @@ public class StorageHelper {
         return findOrCreate(dir, HINTS);
     }
 
-    static File importedFile(File dir) {
-        return findOrCreate(dir, IMPORTED);
-    }
-
     static File sourceFile(File dir) {
         return findOrCreate(dir, SOURCE);
     }
@@ -214,8 +196,8 @@ public class StorageHelper {
         return new File(dir, LINKS.getName(prefix));
     }
 
-    public static File statsFile(File dir, boolean sourceFormat) {
-        return new File(dir, sourceFormat ? SOURCE_STATS.getName() : IMPORT_STATS.getName());
+    public static File statsFile(File dir) {
+        return new File(dir, SOURCE_STATS.getName());
     }
 
     static File sipZip(File dir, String spec, String prefix) {
