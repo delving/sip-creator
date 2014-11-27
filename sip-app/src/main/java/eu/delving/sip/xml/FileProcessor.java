@@ -397,7 +397,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     private Stats createStats() {
         Stats stats = new Stats();
-        stats.setRecordRoot(recDefTree().getRoot().getPath());
+        stats.freshStats();
         stats.prefix = recMapping.getPrefix();
         Map<String, String> facts = dataSet.getDataSetFacts();
         stats.name = facts.get("name");

@@ -163,11 +163,6 @@ public class SipModel {
                 clearValidations();
             }
 
-            @Override
-            public void uniqueElementSet(Path uniqueElementPath) {
-                clearValidations();
-            }
-
         });
     }
 
@@ -307,7 +302,6 @@ public class SipModel {
                 final Map<String, String> facts = dataSet.getDataSetFacts();
                 final Map<String, String> hints = dataSet.getHints();
                 final SchemaVersion schemaVersion = dataSet.getSchemaVersion();
-                // todo: should be singular in the dataset now
                 String prefix = schemaVersion.getPrefix();
                 dataSetModel.setDataSet(dataSet, prefix);
                 final RecMapping recMapping = dataSetModel.getRecMapping();

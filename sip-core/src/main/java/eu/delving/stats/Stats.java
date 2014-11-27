@@ -96,9 +96,7 @@ public class Stats {
         namespaces.put(prefix, uri);
     }
 
-    public void setRecordRoot(Path recordRoot) {
-        this.recordRoot = recordRoot;
-        if (recordStats != null) throw new RuntimeException("Already known!");
+    public void freshStats() {
         recordStats = new RecordStats();
     }
 
@@ -108,14 +106,13 @@ public class Stats {
         valueStats.recordOccurrence();
         if (maxUniqueValueLength == 0) maxUniqueValueLength = DEFAULT_MAX_UNIQUE_VALUE_LENGTH;
         if (value != null) valueStats.recordValue(value.trim(), maxUniqueValueLength);
-        if (recordStats != null) {
-            if (path.equals(recordRoot)) {
-                recordStats.recordRecordEnd();
-            }
-            else if (value != null) {
-                recordStats.recordNonemptyOccurrence(path);
-            }
+        if (recordStats != null && value != null) {
+            recordStats.recordNonemptyOccurrence(path);
         }
+    }
+
+    public void recordRecordEnd() {
+        if (recordStats != null) recordStats.recordRecordEnd();
     }
 
     public void finish() {
@@ -128,9 +125,6 @@ public class Stats {
 
     @XStreamAsAttribute
     public String prefix;
-
-    @XStreamAsAttribute
-    public Path recordRoot;
 
     @XStreamAsAttribute
     public int maxUniqueValueLength;

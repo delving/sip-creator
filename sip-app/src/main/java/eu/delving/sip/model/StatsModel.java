@@ -41,7 +41,6 @@ import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static eu.delving.sip.files.Storage.MAX_UNIQUE_VALUE_LENGTH;
-import static eu.delving.sip.files.Storage.UNIQUE_VALUE_CONVERTER;
 
 /**
  * An observable hole to put the things related to analysis: statistics, analysis tree, some list models
@@ -63,7 +62,7 @@ public class StatsModel {
     public void setStatistics(Stats stats) {
         if (stats != null) {
             sourceTree = SourceTreeNode.create(stats.fieldValueMap, sipModel.getDataSetFacts().getFacts());
-            setSourceTree(sourceTree, Storage.RECORD_ROOT, Storage.UNIQUE_ELEMENT);
+            setSourceTree(sourceTree, Storage.RECORD_CONTAINER, Storage.UNIQUE_ELEMENT);
             if (sipModel.getMappingModel().hasRecMapping()) {
                 for (NodeMapping nodeMapping : sipModel.getMappingModel().getRecMapping().getNodeMappings()) {
                     findNodesForInputPaths(nodeMapping);
@@ -75,10 +74,10 @@ public class StatsModel {
         }
     }
 
-    private void setSourceTree(SourceTreeNode sourceTreeRoot, Path recordRoot, Path uniqueElement) {
+    private void setSourceTree(SourceTreeNode sourceTreeRoot, Path recordContainer, Path uniqueElement) {
         this.sourceTree = sourceTreeRoot;
         sourceTreeModel.setRoot(sourceTreeRoot);
-        setDelimiters(recordRoot, uniqueElement);
+        setDelimiters(recordContainer, uniqueElement);
     }
 
     public FactModel getHintsModel() {
@@ -89,9 +88,8 @@ public class StatsModel {
         return hintsModel.get(Storage.RECORD_ROOT_PATH) != null && !hintsModel.get(Storage.RECORD_ROOT_PATH).isEmpty();
     }
 
-    public void setRecordRoot(Path recordRoot) {
-        int recordCount = sourceTree.setRecordRoot(recordRoot);
-        hintsModel.set(Storage.RECORD_ROOT_PATH, recordRoot.toString());
+    public void setRecordContainer(Path recordContainer) {
+        int recordCount = sourceTree.setRecordContainer(recordContainer);
         hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
         fireRecordRootSet();
     }
@@ -105,12 +103,6 @@ public class StatsModel {
         return recordCount == null ? 0 : Integer.parseInt(recordCount);
     }
 
-    public void setUniqueElement(Path uniqueElement) {
-        sourceTree.setUniqueElement(uniqueElement);
-        hintsModel.set(Storage.UNIQUE_ELEMENT_PATH, uniqueElement.toString());
-        fireUniqueElementSet();
-    }
-
     public Path getUniqueElement() {
         return Path.create(hintsModel.get(Storage.UNIQUE_ELEMENT_PATH));
     }
@@ -122,14 +114,6 @@ public class StatsModel {
     public int getMaxUniqueValueLength() {
         String max = hintsModel.get(MAX_UNIQUE_VALUE_LENGTH);
         return max == null ? Stats.DEFAULT_MAX_UNIQUE_VALUE_LENGTH : Integer.parseInt(max);
-    }
-
-    public void setUniqueValueConverter(String converter) {
-        hintsModel.set(Storage.UNIQUE_VALUE_CONVERTER, converter);
-    }
-
-    public String getUniqueValueConverter() {
-        return hintsModel.get(UNIQUE_VALUE_CONVERTER);
     }
 
     public SourceTreeNode getSourceTree() {
@@ -158,9 +142,9 @@ public class StatsModel {
         return nodes.isEmpty() ? null : nodes;
     }
 
-    private void setDelimiters(Path recordRoot, Path uniqueElement) {
-        if (recordRoot != null) {
-            int recordCount = sourceTree.setRecordRoot(recordRoot);
+    private void setDelimiters(Path recordContainer, Path uniqueElement) {
+        if (recordContainer != null) {
+            int recordCount = sourceTree.setRecordContainer(recordContainer);
             hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
         }
         if (uniqueElement != null) sourceTree.setUniqueElement(uniqueElement);
@@ -168,6 +152,7 @@ public class StatsModel {
 
     private TreePath findNodeForInputPath(Path path, SourceTreeNode node) {
         Path nodePath = node.getPath(false);
+        System.out.println(nodePath + " =?= "+path);
         if (nodePath.equals(path)) return node.getTreePath();
         for (SourceTreeNode sub : node.getChildren()) {
             TreePath subPath = findNodeForInputPath(path, sub);
@@ -183,13 +168,6 @@ public class StatsModel {
         }
     }
 
-    private void fireUniqueElementSet() {
-        Path uniqueElement = getUniqueElement();
-        for (Listener listener : listeners) {
-            listener.uniqueElementSet(uniqueElement);
-        }
-    }
-
     private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
 
     public void addListener(Listener listener) {
@@ -201,7 +179,6 @@ public class StatsModel {
 
         void recordRootSet(Path recordRootPath);
 
-        void uniqueElementSet(Path uniqueElementPath);
     }
 
     private class HintSaveTimer implements FactModel.Listener, ActionListener, Work.DataSetWork {

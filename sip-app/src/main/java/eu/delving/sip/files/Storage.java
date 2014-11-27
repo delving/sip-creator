@@ -107,7 +107,7 @@ public interface Storage {
     String SOURCE_ROOT_TAG = "pockets";
     String SOURCE_RECORD_TAG = "pocket";
     String UNIQUE_ATTR = "id";
-    Path RECORD_ROOT = Path.create(String.format("/%s/%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG));
+    Path RECORD_CONTAINER = Path.create(String.format("/%s/%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG));
     Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/@%s", SOURCE_ROOT_TAG, SOURCE_RECORD_TAG, UNIQUE_ATTR));
     long MAPPING_FREEZE_INTERVAL = 60000;
 }

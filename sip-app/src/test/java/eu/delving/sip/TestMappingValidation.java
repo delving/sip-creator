@@ -212,10 +212,10 @@ public class TestMappingValidation {
             @Override
             public void success(Stats stats) {
                 try {
-                    Path recordRoot = null;
+                    Path recordContainer = null;
                     switch (state()) {
                         case SOURCED:
-                            recordRoot = Storage.RECORD_ROOT;
+                            recordContainer = Storage.RECORD_CONTAINER;
                             break;
                         default:
                             Assert.fail("Unexpected state " + state());
@@ -223,7 +223,7 @@ public class TestMappingValidation {
                     dataSet().setStats(stats);
                     sourceTree = SourceTreeNode.create(stats.fieldValueMap, dataSet().getDataSetFacts());
                     new FilterTreeModel(sourceTree);
-                    int recordCount = sourceTree.setRecordRoot(recordRoot);
+                    int recordCount = sourceTree.setRecordContainer(recordContainer);
                     mock.hints().put(Storage.RECORD_COUNT, String.valueOf(recordCount));
                 }
                 catch (StorageException e) {

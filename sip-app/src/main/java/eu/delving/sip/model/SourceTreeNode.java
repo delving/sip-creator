@@ -162,8 +162,11 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         return path;
     }
 
-    public int setRecordRoot(Path recordRoot) {
-        if (recordRoot != null && getPath(true).equals(recordRoot)) {
+    public int setRecordContainer(Path recordContainer) {
+        Path path = getPath(true);
+        boolean isAttribute= path.getTag().isAttribute();
+        Path parentPath = path.parent();
+        if (recordContainer != null && !isAttribute && parentPath.equals(recordContainer)) {
             nodeType = RECORD_ROOT;
             fireChanged();
             return getStats().total;
@@ -174,7 +177,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         }
         int childTotal = 0;
         for (SourceTreeNode child : children) {
-            int subtotal = child.setRecordRoot(recordRoot);
+            int subtotal = child.setRecordContainer(recordContainer);
             if (subtotal > 0) childTotal = subtotal;
         }
         return childTotal;
@@ -191,28 +194,6 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
             fireChanged();
         }
         for (SourceTreeNode child : children) child.setUniqueElement(uniqueElement);
-    }
-
-    public boolean isRecordRoot() {
-        return nodeType == RECORD_ROOT;
-    }
-
-    public boolean isUniqueElement() {
-        return nodeType == UNIQUE_ELEMENT;
-    }
-
-    public boolean couldBeRecordRoot() {
-        return valueStats != null && !valueStats.hasValues();
-    }
-
-    public boolean couldBeUniqueElement() {
-        if (valueStats == null || !valueStats.hasValues()) return false;
-        SourceTreeNode walk = parent;
-        while (walk != null) { // ancestor must be record root
-            if (walk.isRecordRoot()) return true;
-            walk = walk.parent;
-        }
-        return false;
     }
 
     public void showPath(final JTree tree, final Path pathToShow) {
@@ -297,7 +278,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
             if (parent != null) parent.compilePathList(list, fromRoot);
             list.add(this);
         }
-        else if (parent != null) { // only take nodes with parents
+        else if (parent != null && parent.parent != null) { // only take nodes with parents
             parent.compilePathList(list, fromRoot);
             list.add(this);
         }

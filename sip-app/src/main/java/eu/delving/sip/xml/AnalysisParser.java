@@ -28,7 +28,6 @@ import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.IOUtils;
@@ -94,8 +93,7 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
                 switch (dataSetModel.getDataSetState()) {
                     case SOURCED:
                         inputStream = dataSetModel.getDataSet().openSourceInputStream();
-                        // todo: really necessary?
-                        stats.setRecordRoot(Storage.RECORD_ROOT);
+                        stats.freshStats();
                         break;
                     default:
                         throw new IllegalStateException("Unexpected state: " + dataSetModel.getDataSetState());
@@ -132,6 +130,7 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
                             text.append(input.getText());
                             break;
                         case XMLEvent.END_ELEMENT:
+                            // todo: stats.recordRecordEnd()
                             stats.recordValue(path, text.toString().trim());
                             text.setLength(0);
                             path = path.parent();

@@ -110,6 +110,10 @@ public class Path implements Comparable<Path>, Serializable {
         }
     }
 
+    public Tag getTag() {
+        return tag;
+    }
+
     public Path withoutPrefixes() {
         if (parent.isEmpty()) {
             return parent.child(tag.withoutPrefix());
