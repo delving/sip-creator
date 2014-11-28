@@ -40,6 +40,8 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static eu.delving.sip.files.Storage.RECORD_CONTAINER;
+
 /**
  * Iterate through the xml file, producing groovy node trees wrapped in MetadataRecord instances.
  *
@@ -77,9 +79,9 @@ public class MetadataParser {
                 case XMLEvent.START_DOCUMENT:
                     break;
                 case XMLEvent.START_ELEMENT:
-                    boolean recordRoot = path.equals(Storage.RECORD_CONTAINER);
                     path = path.child(Tag.element(input.getName()));
-                    if (node == null && recordRoot) {
+                    boolean recordContainer = path.equals(RECORD_CONTAINER);
+                    if (node == null && recordContainer) {
                         node = new GroovyNode(null, "input");
                         int idIndex = -1;
                         for (int walk = 0; walk < input.getAttributeCount(); walk++) {
@@ -117,16 +119,15 @@ public class MetadataParser {
                     break;
                 case XMLEvent.END_ELEMENT:
                     if (node != null) {
-                        String valueString = value.toString().trim();
-                        value.setLength(0);
-                        if (!valueString.isEmpty()) node.setNodeValue(valueString);
-                        if (path.parent().equals(Storage.RECORD_CONTAINER)) {
-                            if (node.parent() != null) throw new RuntimeException("Expected to be at root node");
+                        if (path.equals(RECORD_CONTAINER)) {
                             metadataRecord = factory.fromGroovyNode(node, recordIndex++, recordCount);
                             progressListener.setProgress(recordIndex);
                             node = null;
                         }
                         else {
+                            String valueString = value.toString().trim();
+                            value.setLength(0);
+                            if (!valueString.isEmpty()) node.setNodeValue(valueString);
                             node = node.parent();
                         }
                     }

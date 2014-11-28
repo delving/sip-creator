@@ -180,15 +180,16 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
     }
 
     public Path getUnwrappedPath() {
+        Path path = Path.create();
         List<SourceTreeNode> nodes = new ArrayList<SourceTreeNode>();
         nodePath(nodes);
         if (nodes.size() > 1 && nodes.get(0).getTag().getLocalName().equals(POCKETS)) {
             nodes.remove(0);
             if (nodes.size() > 1 && nodes.get(0).getTag().getLocalName().equals(POCKET)) {
                 nodes.remove(0);
+                path = path.child(Tag.element("input"));
             }
         }
-        Path path = Path.create();
         for (SourceTreeNode node : nodes) path = path.child(node.getTag());
         return path;
     }

@@ -59,11 +59,41 @@ public class StatsModel {
         hintsModel.addListener(new HintSaveTimer());
     }
 
+    private TreePath findNodeForInputPath(Path path, SourceTreeNode node) {
+        Path nodePath = node.getUnwrappedPath();
+//        System.out.println(nodePath + " =?= "+path);
+        if (nodePath.equals(path)) return node.getTreePath();
+        for (SourceTreeNode sub : node.getChildren()) {
+            TreePath subPath = findNodeForInputPath(path, sub);
+            if (subPath != null) return subPath;
+        }
+        return null;
+    }
+
+    public SortedSet<SourceTreeNode> findNodesForInputPaths(NodeMapping nodeMapping) {
+        SortedSet<SourceTreeNode> nodes = new TreeSet<SourceTreeNode>();
+        nodeMapping.clearSourceTreeNodes();
+        if (sourceTreeModel.getRoot() instanceof SourceTreeNode) {
+            for (Path path : nodeMapping.getInputPaths()) {
+                TreePath treePath = findNodeForInputPath(path, (SourceTreeNode) sourceTreeModel.getRoot());
+                if (treePath != null) nodes.add((SourceTreeNode) treePath.getLastPathComponent());
+            }
+            if (nodes.isEmpty()) {
+                nodeMapping.clearSourceTreeNodes();
+            }
+            else {
+                SourceTreeNode.setStatsTreeNodes(nodes, nodeMapping);
+            }
+        }
+        return nodes.isEmpty() ? null : nodes;
+    }
+
     public void setStatistics(Stats stats) {
         if (stats != null) {
             sourceTree = SourceTreeNode.create(stats.fieldValueMap, sipModel.getDataSetFacts().getFacts());
             setSourceTree(sourceTree, Storage.RECORD_CONTAINER, Storage.UNIQUE_ELEMENT);
             if (sipModel.getMappingModel().hasRecMapping()) {
+                // merge the mapping into the source tree
                 for (NodeMapping nodeMapping : sipModel.getMappingModel().getRecMapping().getNodeMappings()) {
                     findNodesForInputPaths(nodeMapping);
                 }
@@ -124,41 +154,12 @@ public class StatsModel {
         return sourceTreeModel;
     }
 
-    public SortedSet<SourceTreeNode> findNodesForInputPaths(NodeMapping nodeMapping) {
-        SortedSet<SourceTreeNode> nodes = new TreeSet<SourceTreeNode>();
-        nodeMapping.clearSourceTreeNodes();
-        if (sourceTreeModel.getRoot() instanceof SourceTreeNode) {
-            for (Path path : nodeMapping.getInputPaths()) {
-                TreePath treePath = findNodeForInputPath(path, (SourceTreeNode) sourceTreeModel.getRoot());
-                if (treePath != null) nodes.add((SourceTreeNode) treePath.getLastPathComponent());
-            }
-            if (nodes.isEmpty()) {
-                nodeMapping.clearSourceTreeNodes();
-            }
-            else {
-                SourceTreeNode.setStatsTreeNodes(nodes, nodeMapping);
-            }
-        }
-        return nodes.isEmpty() ? null : nodes;
-    }
-
     private void setDelimiters(Path recordContainer, Path uniqueElement) {
         if (recordContainer != null) {
             int recordCount = sourceTree.setRecordContainer(recordContainer);
             hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
         }
         if (uniqueElement != null) sourceTree.setUniqueElement(uniqueElement);
-    }
-
-    private TreePath findNodeForInputPath(Path path, SourceTreeNode node) {
-        Path nodePath = node.getUnwrappedPath();
-//        System.out.println(nodePath + " =?= "+path);
-        if (nodePath.equals(path)) return node.getTreePath();
-        for (SourceTreeNode sub : node.getChildren()) {
-            TreePath subPath = findNodeForInputPath(path, sub);
-            if (subPath != null) return subPath;
-        }
-        return null;
     }
 
     private void fireRecordRootSet() {
