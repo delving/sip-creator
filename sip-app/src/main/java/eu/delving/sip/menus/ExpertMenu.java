@@ -33,7 +33,14 @@ import eu.delving.sip.model.SipModel;
 import eu.delving.stats.Stats;
 
 import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Special functions for experts, not to be spoken of in mixed company, or among people with potential heart
@@ -55,10 +62,7 @@ public class ExpertMenu extends JMenu {
         add(new DeleteCachesAction());
         add(new ToggleFrameArrangements());
         add(new ShowMemory());
-//        add(new MediaImportAction(desktop, sipModel));
-//        if (cultureHubClient != null) add(new UploadMediaAction(cultureHubClient));
-//        int anonRecords = Integer.parseInt(System.getProperty(SourceConverter.ANONYMOUS_RECORDS_PROPERTY, "0"));
-//        if (anonRecords > 0) add(new CreateSampleDataSetAction());
+        add(new ShowMemoryConfigAction());
     }
 
     private class MaxUniqueValueLengthAction extends AbstractAction {
@@ -140,27 +144,6 @@ public class ExpertMenu extends JMenu {
     }
 
 
-    private class ShowMemory extends AbstractAction {
-        public ShowMemory() {
-            super("Memory Capacity");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            Runtime r = Runtime.getRuntime();
-            sipModel.getFeedback().alert(
-                    show("Total Memory", r.totalMemory()) +
-                            show("Max Memory", r.maxMemory()) +
-                            show("Free Memory", r.freeMemory())
-            );
-        }
-
-        private String show(String name, long value) {
-            return String.format("%s: %dMb\n", name, value / 1024 / 1024);
-        }
-    }
-
-
     private class DeleteCachesAction extends AbstractAction {
         private DeleteCachesAction() {
             super("Delete cached items in this dataset");
@@ -202,5 +185,89 @@ public class ExpertMenu extends JMenu {
         }
     }
 
+    private class ShowMemory extends AbstractAction {
+        public ShowMemory() {
+            super("Memory Capacity");
+        }
 
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            Runtime r = Runtime.getRuntime();
+            sipModel.getFeedback().alert(
+                    show("Total Memory", r.totalMemory()) +
+                            show("Max Memory", r.maxMemory()) +
+                            show("Free Memory", r.freeMemory())
+            );
+        }
+
+        private String show(String name, long value) {
+            return String.format("%s: %dMb\n", name, value / 1024 / 1024);
+        }
+    }
+
+
+    private class ShowMemoryConfigAction extends AbstractAction {
+
+        private ShowMemoryConfigAction() {
+            super("Show how to configure more memory");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String os = System.getProperty("os.name");
+            Runtime rt = Runtime.getRuntime();
+            int totalMemory = (int) (rt.totalMemory() / 1024 / 1024);
+            StringBuilder out = new StringBuilder();
+            String JAR_NAME = "SIP-Creator-2014-XX-XX.jar";
+            if (os.startsWith("Windows")) {
+                out.append(":: SIP-Creator Startup Batch file for Windows (more memory than ").append(totalMemory).append("Mb)\n");
+                out.append("java -jar -Xms1024m -Xmx1024m ").append(JAR_NAME);
+            }
+            else if (os.startsWith("Mac")) {
+                out.append("# SIP-Creator Startup Script for Mac OSX (more memory than ").append(totalMemory).append("Mb)\n");
+                out.append("java -jar -Xms1024m -Xmx1024m ").append(JAR_NAME);
+            }
+            else {
+                System.out.println("Unrecognized OS: " + os);
+            }
+            String script = out.toString();
+            final JDialog dialog = new JDialog(null, "Memory Not Configured Yet!", Dialog.ModalityType.APPLICATION_MODAL);
+            JTextArea scriptArea = new JTextArea(3, 40);
+            scriptArea.setText(script);
+            scriptArea.setSelectionStart(0);
+            scriptArea.setSelectionEnd(script.length());
+            JPanel scriptPanel = new JPanel(new BorderLayout());
+            scriptPanel.setBorder(BorderFactory.createTitledBorder("Script File"));
+            scriptPanel.add(scriptArea, BorderLayout.CENTER);
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            buttonPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+            JButton ok = new JButton("OK");
+            ok.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    dialog.setVisible(false);
+                }
+            });
+            buttonPanel.add(ok);
+            JPanel centralPanel = new JPanel(new GridLayout(0, 1));
+            centralPanel.setBorder(BorderFactory.createEmptyBorder(15, 25, 15, 25));
+            centralPanel.add(new JLabel(
+                    "<html><b>The SIP-Creator started directly can have too little default memory allocated." +
+                            "<br>It should be started with the following script:</b>"
+            ));
+            centralPanel.add(scriptPanel);
+            centralPanel.add(new JLabel(
+                    "<html><b>Please copy the above text into a batch or script file and execute that instead.</b>"
+            ));
+            dialog.getContentPane().add(centralPanel, BorderLayout.CENTER);
+            dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+            dialog.pack();
+            Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+            int x = (int) ((dimension.getWidth() - dialog.getWidth()) / 2);
+            int y = (int) ((dimension.getHeight() - dialog.getHeight()) / 2);
+            dialog.setLocation(x, y);
+            dialog.setVisible(true);
+
+        }
+    }
 }

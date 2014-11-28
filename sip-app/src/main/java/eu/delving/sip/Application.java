@@ -51,7 +51,6 @@ import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.panels.StatusPanel;
 import eu.delving.sip.panels.WorkPanel;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -62,10 +61,8 @@ import org.apache.http.util.EntityUtils;
 import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -78,7 +75,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 import java.util.Properties;
 import java.util.prefs.Preferences;
 
@@ -391,9 +387,6 @@ public class Application {
                 application = new Application(HomeDirectory.WORK_DIR);
                 application.home.setVisible(true);
                 application.allFrames.initiate();
-                if (version != null && !isLatestVersion(version)) {
-                    application.feedback.alert("New SIP-Creator version available at http://sip-creator.delving.eu/");
-                }
             }
             catch (StorageException e) {
                 JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
@@ -403,63 +396,6 @@ public class Application {
     }
 
     private static LaunchAction LAUNCH = new LaunchAction();
-
-    private static void memoryNotConfigured() {
-        String os = System.getProperty("os.name");
-        Runtime rt = Runtime.getRuntime();
-        int totalMemory = (int) (rt.totalMemory() / 1024 / 1024);
-        StringBuilder out = new StringBuilder();
-        String JAR_NAME = "SIP-Creator-2014-XX-XX.jar";
-        if (os.startsWith("Windows")) {
-            out.append(":: SIP-Creator Startup Batch file for Windows (more memory than ").append(totalMemory).append("Mb)\n");
-            out.append("java -jar -Xms1024m -Xmx1024m ").append(JAR_NAME);
-        }
-        else if (os.startsWith("Mac")) {
-            out.append("# SIP-Creator Startup Script for Mac OSX (more memory than ").append(totalMemory).append("Mb)\n");
-            out.append("java -jar -Xms1024m -Xmx1024m ").append(JAR_NAME);
-        }
-        else {
-            System.out.println("Unrecognized OS: " + os);
-        }
-        String script = out.toString();
-        final JDialog dialog = new JDialog(null, "Memory Not Configured Yet!", Dialog.ModalityType.APPLICATION_MODAL);
-        JTextArea scriptArea = new JTextArea(3, 40);
-        scriptArea.setText(script);
-        scriptArea.setSelectionStart(0);
-        scriptArea.setSelectionEnd(script.length());
-        JPanel scriptPanel = new JPanel(new BorderLayout());
-        scriptPanel.setBorder(BorderFactory.createTitledBorder("Script File"));
-        scriptPanel.add(scriptArea, BorderLayout.CENTER);
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        JButton ok = new JButton("OK, Continue anyway");
-        ok.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.setVisible(false);
-                EventQueue.invokeLater(LAUNCH);
-            }
-        });
-        buttonPanel.add(ok);
-        JPanel centralPanel = new JPanel(new GridLayout(0, 1));
-        centralPanel.setBorder(BorderFactory.createEmptyBorder(15, 25, 15, 25));
-        centralPanel.add(new JLabel(
-                "<html><b>The SIP-Creator started directly can have too little default memory allocated." +
-                        "<br>It should be started with the following script:</b>"
-        ));
-        centralPanel.add(scriptPanel);
-        centralPanel.add(new JLabel(
-                "<html><b>Please copy the above text into a batch or script file and execute that instead.</b>"
-        ));
-        dialog.getContentPane().add(centralPanel, BorderLayout.CENTER);
-        dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
-        dialog.pack();
-        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-        int x = (int) ((dimension.getWidth() - dialog.getWidth()) / 2);
-        int y = (int) ((dimension.getHeight() - dialog.getHeight()) / 2);
-        dialog.setLocation(x, y);
-        dialog.setVisible(true);
-    }
 
     private static String getPomVersion() {
         URL resource = Application.class.getResource("/META-INF/maven/eu.delving/sip-app/pom.properties");
@@ -476,29 +412,8 @@ public class Application {
         return null;
     }
 
-    private static boolean isLatestVersion(String version) {
-        try {
-            URL site = new URL("http://sip-creator.delving.eu/version.txt");
-            List<String> pageLines = IOUtils.readLines(site.openStream());
-            for (String line: pageLines) {
-                if (line.equals(version)) return true;
-            }
-        }
-        catch (Exception e) {
-            System.err.println("Problem checking version: "+e);
-        }
-        return false;
-    }
-
     public static void main(final String[] args) throws StorageException {
         version = getPomVersion();
-        Runtime rt = Runtime.getRuntime();
-        int totalMemory = (int) (rt.totalMemory() / 1024 / 1024);
-        if (totalMemory < 900) {
-            memoryNotConfigured();
-        }
-        else {
-            EventQueue.invokeLater(LAUNCH);
-        }
+        EventQueue.invokeLater(LAUNCH);
     }
 }
