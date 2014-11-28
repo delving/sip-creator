@@ -41,6 +41,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,6 +77,31 @@ class DownloadTableModel extends AbstractTableModel {
         createDownloadableColumn();
         addColumn("Local State", "state string");
         addColumn("Download time", "2014-11-26T14:39:17");
+        patternField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String pattern = patternField.getText();
+                if (pattern.isEmpty()) {
+                    if (index != null) {
+                        index = null;
+                        fireTableStructureChanged();
+                    }
+                }
+                else {
+                    Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+                    int actual = 0, virtual = 0;
+                    for (DownloadDatasetRow hubRow : rows) {
+                        if (hubRow.getSpec().contains(pattern)) {
+                            map.put(virtual, actual);
+                            virtual++;
+                        }
+                        actual++;
+                    }
+                    index = map;
+                    fireTableStructureChanged();
+                }
+            }
+        });
     }
 
     public ListSelectionListener getSelectionListener() {
@@ -113,26 +139,6 @@ class DownloadTableModel extends AbstractTableModel {
     }
 
     public void setPattern() {
-        String pattern = "";
-        if (pattern.isEmpty()) {
-            if (index != null) {
-                index = null;
-                fireTableStructureChanged();
-            }
-        }
-        else {
-            Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-            int actual = 0, virtual = 0;
-            for (DownloadDatasetRow hubRow : rows) {
-                if (hubRow.getSpec().contains(pattern)) {
-                    map.put(virtual, actual);
-                    virtual++;
-                }
-                actual++;
-            }
-            index = map;
-            fireTableStructureChanged();
-        }
     }
 
     public void setNarthexEntries(NetworkClient.SipZips sipZips) {

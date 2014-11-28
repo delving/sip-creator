@@ -113,6 +113,7 @@ class UploadListModel extends AbstractListModel<File> {
                             new Swing() {
                                 @Override
                                 public void run() {
+                                    sipModel.getFeedback().alert("Uploaded "+selectedFile.getName()+" to Narthex");
                                     setEnabled(true);
                                 }
                             }
