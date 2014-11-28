@@ -24,10 +24,6 @@ package eu.delving.groovy;
 import com.ctc.wstx.exc.WstxParsingException;
 import eu.delving.XMLToolFactory;
 import org.codehaus.stax2.XMLStreamReader2;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -35,7 +31,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Map;
@@ -67,16 +62,7 @@ public class MetadataRecordFactory {
         return MetadataRecord.create(rootNode, recordNumber, recordCount);
     }
 
-    public Node nodeFromXml(String id, String recordContents) throws IOException, SAXException {
-        String recordString = createCompleteRecordString(id, recordContents, false);
-        Document document = documentBuilder.parse(new InputSource(new StringReader(recordString)));
-        return document.getDocumentElement();
-    }
-
-    public MetadataRecord metadataRecordFrom(String id, String recordContents, boolean wrap) throws XMLStreamException {
-        if (wrap) {
-            recordContents = createCompleteRecordString(id, recordContents, true);
-        }
+    public MetadataRecord metadataRecordFrom(String recordContents) throws XMLStreamException {
         try {
             Reader reader = new StringReader(recordContents);
             XMLStreamReader2 input = (XMLStreamReader2) inputFactory.createXMLStreamReader(reader);
@@ -90,9 +76,7 @@ public class MetadataRecordFactory {
                         if (node == null) {
                             rootNode = node = new GroovyNode(null, "input");
                         }
-                        else {
-                            node = new GroovyNode(node, input.getNamespaceURI(), input.getLocalName(), input.getPrefix());
-                        }
+                        node = new GroovyNode(node, input.getNamespaceURI(), input.getLocalName(), input.getPrefix());
                         if (input.getAttributeCount() > 0) {
                             for (int walk = 0; walk < input.getAttributeCount(); walk++) {
                                 QName attributeName = input.getAttributeName(walk);
@@ -135,23 +119,4 @@ public class MetadataRecordFactory {
         }
     }
 
-    private String createCompleteRecordString(String id, String xmlRecord, boolean includeNamespaces) {
-        StringBuilder out = new StringBuilder("<?xml version=\"1.0\"?>\n");
-        out.append("<record");
-        if (includeNamespaces) {
-            for (Map.Entry<String, String> namespace : namespaces.entrySet()) {
-                if (namespace.getKey().isEmpty()) {
-                    out.append(String.format(" xmlns=\"%s\"", namespace.getValue()));
-                }
-                else {
-                    out.append(String.format(" xmlns:%s=\"%s\"", namespace.getKey(), namespace.getValue()));
-                }
-            }
-        }
-        out.append(String.format(" id=\"%s\"", id));
-        out.append(">\n");
-        out.append(xmlRecord);
-        out.append("\n</record>");
-        return out.toString();
-    }
 }
