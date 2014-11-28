@@ -4,7 +4,6 @@ import eu.delving.sip.base.NetworkClient;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.HomeDirectory;
-import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.files.StorageHelper;
 import eu.delving.sip.model.SipModel;
@@ -107,8 +106,6 @@ class UploadListModel extends AbstractListModel<File> {
                 try {
                     networkClient.uploadNarthex(
                             selectedFile,
-                            sipModel.getPreferences().get(Storage.NARTHEX_URL, ""),
-                            sipModel.getPreferences().get(Storage.NARTHEX_API_KEY, ""),
                             datsetName,
                             new Swing() {
                                 @Override

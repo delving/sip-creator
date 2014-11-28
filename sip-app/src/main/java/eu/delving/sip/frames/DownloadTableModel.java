@@ -25,11 +25,8 @@ import eu.delving.sip.base.NetworkClient;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -46,20 +43,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.prefs.Preferences;
 
 import static eu.delving.sip.base.SwingHelper.ICON_DOWNLOAD;
 import static eu.delving.sip.base.SwingHelper.ICON_OWNED;
-import static eu.delving.sip.files.Storage.NARTHEX_API_KEY;
-import static eu.delving.sip.files.Storage.NARTHEX_URL;
 
 /**
  * @author Gerald de Jong <gerald@delving.eu>
  */
 
 class DownloadTableModel extends AbstractTableModel {
-    private static final DateTimeFormatter DATE_FORMAT = ISODateTimeFormat.dateTime();
+//    private static final DateTimeFormatter DATE_FORMAT = ISODateTimeFormat.dateTime();
     private final SipModel sipModel;
     private final NetworkClient networkClient;
     private DefaultTableColumnModel columnModel = new DefaultTableColumnModel();
@@ -136,9 +129,6 @@ class DownloadTableModel extends AbstractTableModel {
 
     public TableColumnModel getColumnModel() {
         return columnModel;
-    }
-
-    public void setPattern() {
     }
 
     public void setNarthexEntries(NetworkClient.SipZips sipZips) {
@@ -262,7 +252,7 @@ class DownloadTableModel extends AbstractTableModel {
 
     public final RefreshAction REFRESH_ACTION = new RefreshAction();
 
-    private class RefreshAction extends AbstractAction {
+    public class RefreshAction extends AbstractAction {
 
         private RefreshAction() {
             super("Refresh list from Narthex");
@@ -272,43 +262,29 @@ class DownloadTableModel extends AbstractTableModel {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             setEnabled(false);
-            Preferences preferences = sipModel.getPreferences();
-            Map<String, String> fields = new TreeMap<String, String>();
-            fields.put(NARTHEX_URL, preferences.get(NARTHEX_URL, ""));
-            fields.put(NARTHEX_API_KEY, preferences.get(NARTHEX_API_KEY, ""));
-            if (sipModel.getFeedback().getNarthexCredentials(fields)) {
-                preferences.put(NARTHEX_URL, fields.get(NARTHEX_URL));
-                preferences.put(NARTHEX_API_KEY, fields.get(NARTHEX_API_KEY));
-                fetchList(fields.get(NARTHEX_URL), fields.get(NARTHEX_API_KEY));
-            }
+            networkClient.narthexCredentials.ask();
+            fetchList();
         }
 
-        public void fetchList(String narthexUrl, String narthexApiKey) {
-            networkClient.fetchNarthexSipList(
-                    narthexUrl,
-                    narthexApiKey,
-                    new NetworkClient.NarthexListListener() {
-                        @Override
-                        public void listReceived(NetworkClient.SipZips sipZips) {
-                            setNarthexEntries(sipZips);
-                            setEnabled(true);
-                        }
+        public void fetchList() {
+            if (!networkClient.narthexCredentials.areSet()) return;
+            networkClient.fetchNarthexSipList(new NetworkClient.NarthexListListener() {
+                @Override
+                public void listReceived(NetworkClient.SipZips sipZips) {
+                    setNarthexEntries(sipZips);
+                    checkEnabled();
+                    setEnabled(true);
+                }
 
-                        @Override
-                        public void failed(Exception e) {
-                            sipModel.getFeedback().alert("Unable to fetch Narthex sip-zip list", e);
-                            setNarthexEntries(null);
-                            getPatternField().setText(null);
-                            setEnabled(true);
-                        }
-                    }
-            );
+                @Override
+                public void failed(Exception e) {
+                    sipModel.getFeedback().alert("Unable to fetch Narthex sip-zip list", e);
+                    setNarthexEntries(null);
+                    getPatternField().setText(null);
+                    setEnabled(true);
+                }
+            });
         }
-    }
-
-    public void fetchList() {
-        Preferences preferences = sipModel.getPreferences();
-        REFRESH_ACTION.fetchList(preferences.get(NARTHEX_URL, ""), preferences.get(NARTHEX_API_KEY, ""));
     }
 
     public final DownloadAction DOWNLOAD_ACTION = new DownloadAction();
@@ -333,8 +309,6 @@ class DownloadTableModel extends AbstractTableModel {
                 networkClient.downloadNarthexDataset(
                         selectedRow.getFileName(),
                         dataSet,
-                        sipModel.getPreferences().get(Storage.NARTHEX_URL, ""),
-                        sipModel.getPreferences().get(Storage.NARTHEX_API_KEY, ""),
                         new Swing() {
                             @Override
                             public void run() {

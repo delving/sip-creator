@@ -61,9 +61,9 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 public class NetworkClient {
     private static final int BLOCK_SIZE = 1024;
-    private final String serverUrl;
     private final SipModel sipModel;
     private final HttpClient httpClient;
+    public final NarthexCredentials narthexCredentials;
 
     public enum Code {
         OK(SC_OK, "All is well"),
@@ -91,10 +91,17 @@ public class NetworkClient {
         }
     }
 
-    public NetworkClient(SipModel sipModel, HttpClient httpClient, String serverUrl) {
+    public interface NarthexCredentials {
+        boolean areSet();
+        void ask();
+        String narthexUrl();
+        String narthexApiKey();
+    }
+
+    public NetworkClient(SipModel sipModel, HttpClient httpClient, NarthexCredentials narthexCredentials) {
         this.sipModel = sipModel;
         this.httpClient = httpClient;
-        this.serverUrl = serverUrl;
+        this.narthexCredentials = narthexCredentials;
     }
 
     public interface NarthexListListener {
@@ -105,28 +112,25 @@ public class NetworkClient {
     }
 
 
-    public void fetchNarthexSipList(String url, String apiKey, NarthexListListener narthexListListener) {
-        sipModel.exec(new NarthexListFetcher(narthexListListener, url, apiKey));
+    public void fetchNarthexSipList(NarthexListListener narthexListListener) {
+        sipModel.exec(new NarthexListFetcher(narthexListListener));
     }
 
-    public void downloadNarthexDataset(String fileName, DataSet dataSet, String url, String apiKey, Swing finished) {
-        sipModel.exec(new NarthexDatasetDownloader(fileName, dataSet, url, apiKey, finished));
+    public void downloadNarthexDataset(String fileName, DataSet dataSet, Swing finished) {
+        sipModel.exec(new NarthexDatasetDownloader(fileName, dataSet, finished));
     }
 
-    public void uploadNarthex(File sipZipFile, String url, String apiKey, String datasetName, Swing finished) throws StorageException {
-        sipModel.exec(new NarthexUploader(sipZipFile, url, apiKey, datasetName, finished));
+    public void uploadNarthex(File sipZipFile, String datasetName, Swing finished) throws StorageException {
+        sipModel.exec(new NarthexUploader(sipZipFile, datasetName, finished));
     }
 
     // NARTHEX ========================================
 
     private class NarthexListFetcher implements Work {
         private NarthexListListener narthexListListener;
-        private String url, apiKey;
 
-        public NarthexListFetcher(NarthexListListener narthexListListener, String url, String apiKey) {
+        public NarthexListFetcher(NarthexListListener narthexListListener) {
             this.narthexListListener = narthexListListener;
-            this.url = url;
-            this.apiKey = apiKey;
         }
 
         @Override
@@ -176,7 +180,7 @@ public class NetworkClient {
         private HttpGet createNarthexListRequest() {
             String requestUrl = String.format(
                     "%s/sip-creator/%s",
-                    url, apiKey
+                    narthexCredentials.narthexUrl(), narthexCredentials.narthexApiKey()
             );
             feedback().info("GET "+requestUrl);
             return new HttpGet(requestUrl);
@@ -184,18 +188,14 @@ public class NetworkClient {
     }
 
     private class NarthexDatasetDownloader implements Work.DataSetWork, Work.LongTermWork {
-        private final String apiKey;
-        private final String url;
         private final DataSet dataSet;
         private final String fileName;
         private Swing finished;
         private ProgressListener progressListener;
 
-        private NarthexDatasetDownloader(String fileName, DataSet dataSet, String url, String apiKey, Swing finished) {
+        private NarthexDatasetDownloader(String fileName, DataSet dataSet, Swing finished) {
             this.fileName = fileName;
             this.dataSet = dataSet;
-            this.url = url;
-            this.apiKey = apiKey;
             this.finished = finished;
         }
 
@@ -276,7 +276,9 @@ public class NetworkClient {
         private HttpGet createSipZipDownloadRequest() throws OAuthSystemException, OAuthProblemException {
             String requestUrl = String.format(
                     "%s/sip-creator/%s/%s",
-                    url, apiKey, dataSet.getSpec()
+                    narthexCredentials.narthexUrl(),
+                    narthexCredentials.narthexApiKey(),
+                    dataSet.getSpec()
             );
             feedback().info("GET "+requestUrl);
             return new HttpGet(requestUrl);
@@ -285,16 +287,12 @@ public class NetworkClient {
 
     private class NarthexUploader implements Work.LongTermWork {
         private final File sipZipFile;
-        private final String url;
-        private final String apiKey;
         private final String datasetName;
         private ProgressListener progressListener;
         private Swing finished;
 
-        NarthexUploader(File sipZipFile, String url, String apiKey, String datasetName, Swing finished) throws StorageException {
+        NarthexUploader(File sipZipFile, String datasetName, Swing finished) throws StorageException {
             this.sipZipFile = sipZipFile;
-            this.url = url;
-            this.apiKey = apiKey;
             this.datasetName = datasetName;
             this.finished = finished;
         }
@@ -334,7 +332,10 @@ public class NetworkClient {
         private HttpPost createSipZipUploadRequest(File file, ProgressListener progressListener) {
             String requestUrl = String.format(
                     "%s/sip-creator/%s/%s/%s",
-                    url, apiKey, datasetName, file.getName()
+                    narthexCredentials.narthexUrl(),
+                    narthexCredentials.narthexApiKey(),
+                    datasetName,
+                    file.getName()
             );
             feedback().info("POST "+requestUrl);
             HttpPost post = new HttpPost(requestUrl);

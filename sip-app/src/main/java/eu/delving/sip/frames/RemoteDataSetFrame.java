@@ -163,7 +163,7 @@ public class RemoteDataSetFrame extends FrameBase {
         Swing.Exec.later(new Swing() {
             @Override
             public void run() {
-                downloadTableModel.fetchList();
+                downloadTableModel.REFRESH_ACTION.fetchList();
                 uploadListModel.refresh();
             }
         });

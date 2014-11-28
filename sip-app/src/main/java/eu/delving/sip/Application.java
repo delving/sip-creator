@@ -75,7 +75,9 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.prefs.Preferences;
 
 import static eu.delving.sip.base.HttpClientFactory.createHttpClient;
@@ -86,6 +88,8 @@ import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
 import static eu.delving.sip.files.DataSetState.MAPPING;
 import static eu.delving.sip.files.DataSetState.PROCESSED;
 import static eu.delving.sip.files.DataSetState.SOURCED;
+import static eu.delving.sip.files.Storage.NARTHEX_API_KEY;
+import static eu.delving.sip.files.Storage.NARTHEX_URL;
 
 /**
  * The main application, based on the SipModel and bringing everything together in a big frame with a central
@@ -154,7 +158,34 @@ public class Application {
         context.setStorage(storage);
         context.setHttpClient(httpClient);
         sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, preferences);
-        NetworkClient networkClient = new NetworkClient(sipModel, httpClient, serverUrl);
+        NetworkClient networkClient = new NetworkClient(sipModel, httpClient, new NetworkClient.NarthexCredentials() {
+
+            @Override
+            public boolean areSet() {
+                return !(narthexUrl().isEmpty() || narthexApiKey().isEmpty());
+            }
+
+            @Override
+            public void ask() {
+                Map<String, String> fields = new TreeMap<String, String>();
+                fields.put(NARTHEX_URL, narthexUrl());
+                fields.put(NARTHEX_API_KEY, narthexApiKey());
+                if (sipModel.getFeedback().getNarthexCredentials(fields)) {
+                    sipModel.getPreferences().put(NARTHEX_URL, fields.get(NARTHEX_URL));
+                    sipModel.getPreferences().put(NARTHEX_API_KEY, fields.get(NARTHEX_API_KEY));
+                }
+            }
+
+            @Override
+            public String narthexUrl() {
+                return sipModel.getPreferences().get(NARTHEX_URL, "").trim();
+            }
+
+            @Override
+            public String narthexApiKey() {
+                return sipModel.getPreferences().get(NARTHEX_API_KEY, "").trim();
+            }
+        });
         createSipZipAction = new CreateSipZipAction();
         expertMenu = new ExpertMenu(desktop, sipModel, networkClient, allFrames);
         statusPanel = new StatusPanel(sipModel);
