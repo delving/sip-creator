@@ -25,12 +25,14 @@ class UploadListModel extends AbstractListModel<File> {
     public static final String SELECT_FILE = "Select file for uploading";
     private final NetworkClient networkClient;
     private final SipModel sipModel;
+    private final Swing afterRefresh;
     private List<File> uploadFiles = new ArrayList<File>();
     private File selectedFile;
 
-    public UploadListModel(SipModel sipModel, NetworkClient networkClient) {
+    public UploadListModel(SipModel sipModel, NetworkClient networkClient, Swing afterRefresh) {
         this.sipModel = sipModel;
         this.networkClient = networkClient;
+        this.afterRefresh = afterRefresh;
     }
 
     @Override
@@ -56,6 +58,7 @@ class UploadListModel extends AbstractListModel<File> {
             }
         });
         fireIntervalAdded(this, 0, getSize());
+        afterRefresh.run();
     }
 
     public ListCellRenderer<File> CELL_RENDERER = new ListCellRenderer<File>() {
@@ -96,9 +99,7 @@ class UploadListModel extends AbstractListModel<File> {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             if (selectedFile == null) {
-                if (!uploadFiles.isEmpty()) {
-                    selectedFile = uploadFiles.get(0);
-                }
+                afterRefresh.run();
             }
             else {
                 String datsetName = StorageHelper.datasetNameFromSipZip(selectedFile);

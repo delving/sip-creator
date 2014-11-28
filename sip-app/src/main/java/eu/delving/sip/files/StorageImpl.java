@@ -433,6 +433,8 @@ public class StorageImpl implements Storage {
             try {
                 // check if the dataset is based on a harvest
                 Map<String, String> hints = getHints();
+                hints.put("pockets", "true");
+                setHints(hints);
                 String harvestUrl = hints.get(Storage.HARVEST_URL);
                 boolean harvestBased = harvestUrl != null && !harvestUrl.trim().isEmpty();
                 // gather the files together

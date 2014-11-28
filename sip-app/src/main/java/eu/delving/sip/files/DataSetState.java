@@ -32,7 +32,7 @@ public enum DataSetState {
     SOURCED("Analyze Source","Source data is available", "Analyze the source data"),
     ANALYZED_SOURCE("Map", "Source data has been analyzed", "Building the mapping is now possible"),
     MAPPING("Validate", "There is a mapping", "Transform and validate all of the data"),
-    PROCESSED("Generate SIP", "Dataset has been processed", "Create a SIP-Zip file for Narthex");
+    PROCESSED("Generate SIP", "Dataset has been processed", "Create a SIP-Zip file for Narthex upload");
 
     private String[] description;
 

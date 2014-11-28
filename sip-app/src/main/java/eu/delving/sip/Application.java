@@ -28,12 +28,12 @@ import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.schema.SchemaRepository;
-import eu.delving.sip.actions.CreateSipZipAction;
 import eu.delving.sip.actions.UnlockMappingAction;
 import eu.delving.sip.actions.ValidateAction;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.NetworkClient;
 import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.VisualFeedback;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSetState;
@@ -155,7 +155,7 @@ public class Application {
         context.setHttpClient(httpClient);
         sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, preferences);
         NetworkClient networkClient = new NetworkClient(sipModel, httpClient, serverUrl);
-        createSipZipAction = new CreateSipZipAction(sipModel);
+        createSipZipAction = new CreateSipZipAction();
         expertMenu = new ExpertMenu(desktop, sipModel, networkClient, allFrames);
         statusPanel = new StatusPanel(sipModel);
         home = new JFrame(titleString());
@@ -397,6 +397,28 @@ public class Application {
 
     private static LaunchAction LAUNCH = new LaunchAction();
 
+    public class CreateSipZipAction extends AbstractAction {
+
+        public CreateSipZipAction() {
+            super("Create");
+            putValue(Action.SMALL_ICON, SwingHelper.ICON_UPLOAD);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            setEnabled(false);
+            if (sipModel.getDataSetModel().isEmpty()) return;
+            try {
+                sipModel.getDataSetModel().createSipZip();
+                sipModel.getFeedback().alert("A new SIP file has been created and is ready for upload.");
+                allFrames.initiate();
+            }
+            catch (StorageException e) {
+                sipModel.getFeedback().alert("Unable to create sip zip", e);
+            }
+        }
+    }
+
     private static String getPomVersion() {
         URL resource = Application.class.getResource("/META-INF/maven/eu.delving/sip-app/pom.properties");
         if (resource != null) {
@@ -416,4 +438,5 @@ public class Application {
         version = getPomVersion();
         EventQueue.invokeLater(LAUNCH);
     }
+
 }

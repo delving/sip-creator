@@ -74,7 +74,7 @@ class DownloadTableModel extends AbstractTableModel {
         createSpecNameColumn();
         addColumn("Generated", "2014-11-26T14:39:17");
         createDownloadableColumn();
-        addColumn("Dataset State", "state string");
+        addColumn("Local State", "state string");
         addColumn("Download time", "2014-11-26T14:39:17");
     }
 
@@ -223,18 +223,6 @@ class DownloadTableModel extends AbstractTableModel {
             }
         });
 
-    }
-
-    private void createStateColumn() {
-        TableColumn tc = addColumn("Dataset State", "state string");
-//        tc.setCellRenderer(new DefaultTableCellRenderer() {
-//            @Override
-//            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-//                label.setText(value.toString());
-//                return label;
-//            }
-//        });
     }
 
     private TableColumn addColumn(String title, String prototype) {

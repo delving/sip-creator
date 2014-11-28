@@ -55,7 +55,12 @@ public class RemoteDataSetFrame extends FrameBase {
         super(Which.DATA_SET, sipModel, "Data Sets");
         this.downloadTableModel = new DownloadTableModel(sipModel, networkClient);
         this.downloadTable = createDownloadTable();
-        this.uploadListModel = new UploadListModel(sipModel, networkClient);
+        this.uploadListModel = new UploadListModel(sipModel, networkClient, new Swing() {
+            @Override
+            public void run() {
+                if (uploadListModel.getSize() > 0) uploadList.setSelectedIndex(0);
+            }
+        });
         this.uploadList = new JList<File>(uploadListModel);
         this.uploadList.addListSelectionListener(uploadListModel.UPLOAD_SELECTION);
         this.uploadList.setCellRenderer(uploadListModel.CELL_RENDERER);

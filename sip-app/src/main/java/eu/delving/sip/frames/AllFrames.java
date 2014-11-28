@@ -232,16 +232,8 @@ public class AllFrames {
         };
     }
 
-    public Swing prepareForDelimiting() {
-        return new Swing() {
-            @Override
-            public void run() {
-                viewSelector.selectView(QUICK_MAPPING);
-            }
-        };
-    }
-
     public void initiate() {
+        sipModel.getDataSetModel().clearDataSet();
         sipModel.exec(new Swing() {
             @Override
             public void run() {
