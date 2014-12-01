@@ -27,7 +27,6 @@ import eu.delving.metadata.AssertionTest;
 import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.NodeMappingChange;
-import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaVersion;
@@ -36,7 +35,6 @@ import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.frames.AllFrames;
@@ -54,8 +52,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
 
 /**
  * This is the grand model behind the whole SIP-Creator and it holds all of the other models.  Its state
@@ -149,21 +145,8 @@ public class SipModel {
             public void populationChanged(MappingModel mappingModel, RecDefNode node) {
             }
         });
-
-// todo: on changes in create model?..  clearValidation(recordMapping);
-
+        // todo: on changes in create model?..  clearValidation(recordMapping);
         statsModel = new StatsModel(this);
-        statsModel.addListener(new StatsModel.Listener() {
-            @Override
-            public void mappingHints(List<NodeMapping> mappings) {
-            }
-
-            @Override
-            public void recordRootSet(Path recordRootPath) {
-                clearValidations();
-            }
-
-        });
     }
 
     public void shutdown() {
@@ -475,12 +458,6 @@ public class SipModel {
         @Override
         public void run() {
             try {
-                boolean noRecordRoot = !statsModel.hasRecordRoot();
-                DataSetState state = dataSetModel.getDataSetState();
-                if (noRecordRoot || !state.atLeast(ANALYZED_SOURCE)) {
-                    for (ParseListener parseListener : parseListeners) parseListener.updatedRecord(null);
-                    return;
-                }
                 if (parser == null) {
                     parser = new MetadataParser(dataSetModel.getDataSet().openSourceInputStream(), statsModel.getRecordCount());
                 }

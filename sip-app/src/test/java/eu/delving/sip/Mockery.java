@@ -83,8 +83,6 @@ public class Mockery {
         storage.createDataSet(prefix);
         dataSetDir = new File(root, String.format("%s_%s", prefix, ORG));
         hints.clear();
-        hints.put(Storage.RECORD_ROOT_PATH, recordRootPath);
-        hints.put(Storage.UNIQUE_ELEMENT_PATH, uniqueElementPath);
         File factsSourceDir = new File(getClass().getResource(String.format("/test/%s/dataset", prefix)).getFile());
         if (!factsSourceDir.isDirectory()) throw new RuntimeException();
         FileUtils.copyDirectory(factsSourceDir, dataSetDir);
@@ -129,7 +127,7 @@ public class Mockery {
     public MetadataParser parser() throws StorageException, XMLStreamException {
         return new MetadataParser(
                 dataSetModel.getDataSet().openSourceInputStream(),
-                Integer.parseInt(hints.get(Storage.RECORD_COUNT))
+                -1 // todo: this should be available from the stats model or something getRecordCount()
         );
     }
 

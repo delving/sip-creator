@@ -22,7 +22,6 @@
 package eu.delving.sip.files;
 
 import eu.delving.metadata.Hasher;
-import eu.delving.metadata.Path;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
@@ -49,8 +48,10 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import static eu.delving.sip.files.Storage.*;
+import static eu.delving.sip.files.Storage.FileType;
 import static eu.delving.sip.files.Storage.FileType.*;
+import static eu.delving.sip.files.Storage.MAX_UNIQUE_VALUE_LENGTH;
+import static eu.delving.sip.files.Storage.UNIQUE_VALUE_CONVERTER;
 
 /**
  * This class contains helpers for the StorageImpl to lean on.  It does all of the searching for file name
@@ -66,29 +67,6 @@ public class StorageHelper {
 
     static File createDataSetDirectory(File home, String spec) {
         return new File(home, spec);
-    }
-
-    public static Path getRecordRoot(Map<String, String> hints) throws StorageException {
-        String recordRoot = hints.get(RECORD_ROOT_PATH);
-        if (recordRoot == null) throw new StorageException("Must have record root path");
-        return Path.create(recordRoot);
-    }
-
-    public static int getRecordCount(Map<String, String> hints) throws StorageException {
-        String recordCount = hints.get(RECORD_COUNT);
-        int count = 0;
-        try {
-            count = Integer.parseInt(recordCount);
-        }
-        catch (Exception e) { /* nothing */ }
-        if (count == 0) throw new StorageException("Must have nonzero record count");
-        return count;
-    }
-
-    public static Path getUniqueElement(Map<String, String> hints) throws StorageException {
-        String uniqueElement = hints.get(UNIQUE_ELEMENT_PATH);
-        if (uniqueElement == null) throw new StorageException("Must have unique element path");
-        return Path.create(uniqueElement);
     }
 
     public static int getMaxUniqueValueLength(Map<String, String> hints) {
@@ -116,21 +94,6 @@ public class StorageHelper {
             }
         }
         return facts;
-    }
-
-    static boolean allHintsSet(Map<String, String> hints) {
-        String recordRoot = hints.get(RECORD_ROOT_PATH);
-        String recordCount = hints.get(RECORD_COUNT);
-        String uniqueElement = hints.get(UNIQUE_ELEMENT_PATH);
-        if (recordRoot == null || recordCount == null || uniqueElement == null) return false;
-        if (!uniqueElement.startsWith(recordRoot)) return false;
-        try {
-            if (Integer.parseInt(recordCount) <= 0) return false;
-        }
-        catch (NumberFormatException e) {
-            return false;
-        }
-        return true;
     }
 
     static void writeFacts(File file, Map<String, String> facts) throws IOException {

@@ -89,9 +89,6 @@ public interface Storage {
 
     String FACTS_TAG = "facts";
     String CONSTANT_TAG = "constant";
-    String RECORD_ROOT_PATH = "recordRootPath";
-    String RECORD_COUNT = "recordCount";
-    String UNIQUE_ELEMENT_PATH = "uniqueElementPath";
     String MAX_UNIQUE_VALUE_LENGTH = "maxUniqueValueLength";
     String UNIQUE_VALUE_CONVERTER = "uniqueValueConverter";
     String SCHEMA_VERSIONS = "schemaVersions";

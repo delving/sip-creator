@@ -118,10 +118,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         return termination.getRecordNumber();
     }
 
-    public int getRecordCount() {
-        return sipModel.getStatsModel().getRecordCount();
-    }
-
     private RecDef recDef() {
         return recDefTree().getRecDef();
     }

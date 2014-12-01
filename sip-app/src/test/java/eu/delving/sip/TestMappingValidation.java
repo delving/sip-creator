@@ -225,7 +225,7 @@ public class TestMappingValidation {
                     sourceTree = SourceTreeNode.create(stats.fieldValueMap, dataSet().getDataSetFacts());
                     new FilterTreeModel(sourceTree);
                     int recordCount = sourceTree.setRecordContainer(recordContainer);
-                    mock.hints().put(Storage.RECORD_COUNT, String.valueOf(recordCount));
+                    // todo: see Mockery.java because it needs this record count
                 }
                 catch (StorageException e) {
                     throw new RuntimeException("Coudn't save", e);

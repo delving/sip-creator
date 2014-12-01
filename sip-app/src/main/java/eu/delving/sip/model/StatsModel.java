@@ -34,11 +34,9 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static eu.delving.sip.files.Storage.MAX_UNIQUE_VALUE_LENGTH;
 
@@ -53,6 +51,7 @@ public class StatsModel {
     private FactModel hintsModel = new FactModel();
     private SourceTreeNode sourceTree = SourceTreeNode.create("Select a data set from the File menu, or download one");
     private FilterTreeModel sourceTreeModel = new FilterTreeModel(sourceTree);
+    private int recordCount;
 
     public StatsModel(SipModel sipModel) {
         this.sipModel = sipModel;
@@ -91,7 +90,7 @@ public class StatsModel {
     public void setStatistics(Stats stats) {
         if (stats != null) {
             sourceTree = SourceTreeNode.create(stats.fieldValueMap, sipModel.getDataSetFacts().getFacts());
-            setSourceTree(sourceTree, Storage.RECORD_CONTAINER, Storage.UNIQUE_ELEMENT);
+            setSourceTree(sourceTree);
             if (sipModel.getMappingModel().hasRecMapping()) {
                 // merge the mapping into the source tree
                 for (NodeMapping nodeMapping : sipModel.getMappingModel().getRecMapping().getNodeMappings()) {
@@ -100,41 +99,22 @@ public class StatsModel {
             }
         }
         else {
-            setSourceTree(SourceTreeNode.create("Analysis not yet performed"), null, null);
+            setSourceTree(SourceTreeNode.create("Analysis not yet performed"));
         }
     }
 
-    private void setSourceTree(SourceTreeNode sourceTreeRoot, Path recordContainer, Path uniqueElement) {
+    private void setSourceTree(SourceTreeNode sourceTreeRoot) {
         this.sourceTree = sourceTreeRoot;
         sourceTreeModel.setRoot(sourceTreeRoot);
-        setDelimiters(recordContainer, uniqueElement);
+        setDelimiters();
     }
 
     public FactModel getHintsModel() {
         return hintsModel;
     }
 
-    public boolean hasRecordRoot() {
-        return hintsModel.get(Storage.RECORD_ROOT_PATH) != null && !hintsModel.get(Storage.RECORD_ROOT_PATH).isEmpty();
-    }
-
-    public void setRecordContainer(Path recordContainer) {
-        int recordCount = sourceTree.setRecordContainer(recordContainer);
-        hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
-        fireRecordRootSet();
-    }
-
-    public Path getRecordRoot() {
-        return Path.create(hintsModel.get(Storage.RECORD_ROOT_PATH));
-    }
-
     public int getRecordCount() {
-        String recordCount = hintsModel.get(Storage.RECORD_COUNT);
-        return recordCount == null ? 0 : Integer.parseInt(recordCount);
-    }
-
-    public Path getUniqueElement() {
-        return Path.create(hintsModel.get(Storage.UNIQUE_ELEMENT_PATH));
+        return recordCount;
     }
 
     public void setMaxUniqueValueLength(int max) {
@@ -154,32 +134,9 @@ public class StatsModel {
         return sourceTreeModel;
     }
 
-    private void setDelimiters(Path recordContainer, Path uniqueElement) {
-        if (recordContainer != null) {
-            int recordCount = sourceTree.setRecordContainer(recordContainer);
-            hintsModel.set(Storage.RECORD_COUNT, String.valueOf(recordCount));
-        }
-        if (uniqueElement != null) sourceTree.setUniqueElement(uniqueElement);
-    }
-
-    private void fireRecordRootSet() {
-        Path recordRoot = getRecordRoot();
-        for (Listener listener : listeners) {
-            listener.recordRootSet(recordRoot);
-        }
-    }
-
-    private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
-
-    public void addListener(Listener listener) {
-        listeners.add(listener);
-    }
-
-    public interface Listener {
-        void mappingHints(List<NodeMapping> mappings);
-
-        void recordRootSet(Path recordRootPath);
-
+    private void setDelimiters() {
+        sourceTree.setRecordContainer(Storage.RECORD_CONTAINER);
+        sourceTree.setUniqueElement(Storage.UNIQUE_ELEMENT);
     }
 
     private class HintSaveTimer implements FactModel.Listener, ActionListener, Work.DataSetWork {
