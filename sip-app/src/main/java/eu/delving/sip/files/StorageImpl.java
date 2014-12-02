@@ -38,8 +38,6 @@ import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CountingInputStream;
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
 
@@ -123,8 +121,8 @@ public class StorageImpl implements Storage {
     }
 
     @Override
-    public DataSet createDataSet(String spec) throws StorageException {
-        File directory = createDataSetDirectory(home, spec);
+    public DataSet createDataSet(String sipFileName) throws StorageException {
+        File directory = createDataSetDirectory(home, sipFileName);
         if (!directory.exists() && !directory.mkdirs()) {
             throw new StorageException(String.format("Unable to create data set directory %s", directory.getAbsolutePath()));
         }
@@ -141,14 +139,13 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public String getSpec() {
+        public String getSipFileName() {
             return here.getName();
         }
 
         @Override
-        public String getTime() {
-            DateTime dateTime = new DateTime(factsFile(here).lastModified());
-            return ISODateTimeFormat.dateTimeNoMillis().print(dateTime.toLocalDateTime());
+        public String getSpec() {
+            return StorageHelper.datasetNameFromSipZip(here);
         }
 
         @Override

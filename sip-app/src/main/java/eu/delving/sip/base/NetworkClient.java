@@ -456,7 +456,6 @@ public class NetworkClient {
     public static class SipEntry {
         public String dataset;
         public String file;
-        public String date;
     }
 
 

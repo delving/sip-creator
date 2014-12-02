@@ -177,7 +177,10 @@ public class StorageHelper {
     }
 
     public static DateTime dateTimeFromSipZip(File file) {
-        String n = file.getName();
+        return dateTimeFromSipZipName(file.getName());
+    }
+
+    public static DateTime dateTimeFromSipZipName(String n) {
         Matcher matcher = EXTRACT_DATE.matcher(n);
         if (matcher.matches()) {
             int year = Integer.parseInt(matcher.group(1));

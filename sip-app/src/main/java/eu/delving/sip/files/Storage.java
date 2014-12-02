@@ -38,7 +38,7 @@ public interface Storage {
 
     Map<String, DataSet> getDataSets();
 
-    DataSet createDataSet(String spec) throws StorageException;
+    DataSet createDataSet(String sipFileName) throws StorageException;
 
     enum FileType {
         SOURCE("source.xml.gz", null, null, null, 2),

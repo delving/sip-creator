@@ -28,7 +28,9 @@ import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.HomeDirectory;
 import eu.delving.sip.files.StorageException;
+import eu.delving.sip.files.StorageHelper;
 import eu.delving.sip.model.SipModel;
+import org.joda.time.DateTime;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -44,8 +46,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import static eu.delving.sip.base.NetworkClient.SipEntry;
@@ -206,17 +210,21 @@ public class RemoteDataSetFrame extends FrameBase {
     }
 
     class DownloadItem implements Comparable<DownloadItem> {
-        public final SipEntry sipEntry;
-        public DataSet dataSet;
-        public File file;
+        public final String remote;
+        public final boolean local;
 
-        DownloadItem(SipEntry sipEntry) {
-            this.sipEntry = sipEntry;
+        DownloadItem(String remote, boolean local) {
+            this.remote = remote;
+            this.local = local;
         }
 
         @Override
         public int compareTo(DownloadItem other) {
-            return other.sipEntry.date.compareTo(sipEntry.date);
+            return toString().compareTo(other.toString());
+        }
+
+        public String toString() {
+            return remote;
         }
     }
 
@@ -225,19 +233,10 @@ public class RemoteDataSetFrame extends FrameBase {
 
         @Override
         public Component getListCellRendererComponent(JList list, DownloadItem downloadItem, int index, boolean isSelected, boolean cellHasFocus) {
-            String html;
-            if (downloadItem.dataSet != null) {
-                html = String.format(
-                        "<html><b>%s (%s) (%s)</b>",
-                        downloadItem.sipEntry.dataset, downloadItem.sipEntry.date, downloadItem.dataSet.getTime()
-                );
-            }
-            else {
-                html = String.format(
-                        "<html>%s (%s)",
-                        downloadItem.sipEntry.dataset, downloadItem.sipEntry.date
-                );
-            }
+            String html = String.format(
+                    "<html>" + (downloadItem.local ? "<b>%s</b>" : "%s"),
+                    downloadItem.toString()
+            );
             return defaultListCellRenderer.getListCellRendererComponent(list, html, index, isSelected, cellHasFocus);
         }
     };
@@ -261,8 +260,8 @@ public class RemoteDataSetFrame extends FrameBase {
         @Override
         public Component getListCellRendererComponent(JList list, WorkItem workItem, int index, boolean isSelected, boolean cellHasFocus) {
             String html = String.format(
-                    "<html><b>%s</b> (%s)",
-                    workItem.dataset.getSpec(), workItem.dataset.getTime()
+                    "<html><b>%s</b> %s",
+                    workItem.dataset.getSipFileName(), workItem.dataset.getState()
             );
             return defaultListCellRenderer.getListCellRendererComponent(list, html, index, isSelected, cellHasFocus);
         }
@@ -270,10 +269,12 @@ public class RemoteDataSetFrame extends FrameBase {
 
     class UploadItem implements Comparable<UploadItem> {
         public final File file;
+        public final DateTime date;
         public SipEntry sipEntry;
 
         public UploadItem(File file) {
             this.file = file;
+            this.date = StorageHelper.dateTimeFromSipZip(file);
         }
 
         public String getDatasetName() {
@@ -295,7 +296,7 @@ public class RemoteDataSetFrame extends FrameBase {
             if (uploadItem.sipEntry != null) {
                 html = String.format(
                         "<html><b>%s</b> (%s)",
-                        uploadItem.file.getName(), uploadItem.sipEntry.date
+                        uploadItem.file.getName(), uploadItem.date
                 );
             }
             else {
@@ -346,7 +347,7 @@ public class RemoteDataSetFrame extends FrameBase {
             Map<Integer, Integer> map = new HashMap<Integer, Integer>();
             int actual = 0, virtual = 0;
             for (DownloadItem downloadItem : downloadItems) {
-                if (downloadItem.sipEntry.dataset.contains(filter)) {
+                if (downloadItem.toString().contains(filter)) {
                     map.put(virtual, actual);
                     virtual++;
                 }
@@ -356,26 +357,28 @@ public class RemoteDataSetFrame extends FrameBase {
         }
 
         public void refresh(NetworkClient.SipZips sipZips) {
+            // get a set of the local file names
             File[] downloadFiles = HomeDirectory.DOWN_DIR.listFiles();
             if (downloadFiles == null) throw new RuntimeException();
-            Map<String, File> downloadMap = new TreeMap<String, File>();
-            for (File file: downloadFiles) downloadMap.put(file.getName(), file);
-            Map<String, DataSet> datasetMap = sipModel.getStorage().getDataSets();
+            Set<String> localFiles = new HashSet<String>();
+            for (File file : downloadFiles) localFiles.add(file.getName());
+            // get a set of all the remote file names
+            Set<String> remoteFiles = new HashSet<String>();
+            if (sipZips != null && sipZips.available != null)
+                for (SipEntry entry : sipZips.available) remoteFiles.add(entry.file);
+            // clear
             int size = getSize();
             downloadItems.clear();
             fireIntervalRemoved(this, 0, size);
-            if (sipZips != null && sipZips.available != null) {
-                for (SipEntry entry : sipZips.available) {
-                    DownloadItem item = new DownloadItem(entry);
-                    item.dataSet = datasetMap.get(entry.dataset);
-                    item.file = downloadMap.get(entry.file);
-                    System.out.println("Download "+entry.file);
-                    downloadItems.add(item);
-                }
-                Collections.sort(downloadItems);
-                activateFilter();
-                fireIntervalAdded(this, 0, getSize());
+            Map<String, DownloadItem> downloadItemMap = new TreeMap<String, DownloadItem>();
+            for (String remote : remoteFiles) {
+                DownloadItem item = downloadItemMap.get(remote);
+                if (item == null) downloadItemMap.put(remote, new DownloadItem(remote, localFiles.contains(remote)));
             }
+            downloadItems.addAll(downloadItemMap.values());
+            Collections.sort(downloadItems);
+            activateFilter();
+            fireIntervalAdded(this, 0, getSize());
         }
     }
 
@@ -427,8 +430,9 @@ public class RemoteDataSetFrame extends FrameBase {
         }
 
         public void refresh() {
+            int size = getSize();
             workItems.clear();
-            fireIntervalRemoved(this, 0, getSize());
+            fireIntervalRemoved(this, 0, size);
             for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
                 workItems.add(new WorkItem(dataSet));
             }
@@ -498,7 +502,7 @@ public class RemoteDataSetFrame extends FrameBase {
             for (File uploadFile : uploadFiles) {
                 UploadItem item = new UploadItem(uploadFile);
                 item.sipEntry = uploadedMap.get(item.getDatasetName());
-                System.out.println("Upload "+item.file);
+                System.out.println("Upload " + item.file.getName());
                 uploadItems.add(item);
             }
             Collections.sort(uploadItems);
@@ -564,9 +568,9 @@ public class RemoteDataSetFrame extends FrameBase {
             if (selectedDownload == null) return;
             setEnabled(false);
             try {
-                DataSet dataSet = sipModel.getStorage().createDataSet(selectedDownload.sipEntry.dataset);
+                DataSet dataSet = sipModel.getStorage().createDataSet(selectedDownload.toString());
                 networkClient.downloadNarthexDataset(
-                        selectedDownload.sipEntry.file,
+                        selectedDownload.toString(),
                         dataSet,
                         new Swing() {
                             @Override
@@ -578,7 +582,7 @@ public class RemoteDataSetFrame extends FrameBase {
                 );
             }
             catch (StorageException e) {
-                sipModel.getFeedback().alert("Unable to create data set called " + selectedDownload.sipEntry.dataset, e);
+                sipModel.getFeedback().alert("Unable to create data set called " + selectedDownload.toString(), e);
             }
         }
     }
@@ -595,7 +599,7 @@ public class RemoteDataSetFrame extends FrameBase {
             }
             else {
                 selectedDownload = downloadModel.getElementAt(downloadIndex);
-                DOWNLOAD_ACTION.putValue(Action.NAME, "Download " + selectedDownload.sipEntry.file);
+                DOWNLOAD_ACTION.putValue(Action.NAME, "Download " + selectedDownload.remote);
             }
         }
     }
@@ -690,3 +694,4 @@ public class RemoteDataSetFrame extends FrameBase {
     }
 
 }
+

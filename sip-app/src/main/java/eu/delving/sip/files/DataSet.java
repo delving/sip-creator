@@ -43,9 +43,9 @@ import java.util.Map;
 
 public interface DataSet extends Comparable<DataSet> {
 
-    String getSpec();
+    String getSipFileName();
 
-    String getTime();
+    String getSpec();
 
     SchemaVersion getSchemaVersion();
 
