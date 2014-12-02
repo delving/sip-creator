@@ -125,7 +125,7 @@ public class ExpertMenu extends JMenu {
                         mm.setRecMapping(dsm.getRecMapping());
                     }
                     catch (StorageException e) {
-                        sipModel.getFeedback().alert("Cannot refresh the mapping", e);
+                        sipModel.getFeedback().alert("Cannot setNarthexEntries the mapping", e);
                     }
                 }
             });

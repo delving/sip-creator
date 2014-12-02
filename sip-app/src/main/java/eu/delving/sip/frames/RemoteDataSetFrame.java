@@ -25,19 +25,33 @@ import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.NetworkClient;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.HomeDirectory;
+import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-import static eu.delving.sip.base.KeystrokeHelper.SPACE;
-import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
+import static eu.delving.sip.base.NetworkClient.SipEntry;
+import static eu.delving.sip.base.SwingHelper.ICON_DOWNLOAD;
+import static eu.delving.sip.files.StorageHelper.datasetNameFromSipZip;
+import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
 /**
  * Show the datasets both local and on the server, so all info about their status is unambiguous.
@@ -46,24 +60,46 @@ import static eu.delving.sip.base.KeystrokeHelper.addKeyboardAction;
  */
 
 public class RemoteDataSetFrame extends FrameBase {
-    private final DownloadTableModel downloadTableModel;
-    private final JTable downloadTable;
-    private final JList<File> uploadList;
-    private final UploadListModel uploadListModel;
+    private final UploadModel uploadModel;
+    private final WorkItemModel workItemModel;
+    private final DownloadModel downloadModel;
+    private final JList<DownloadItem> downloadList;
+    private final JList<WorkItem> workItemList;
+    private final JList<UploadItem> uploadList;
+    private final NetworkClient networkClient;
+    private final JTextField filterField = new JTextField(16);
+    private DownloadItem selectedDownload;
+    private WorkItem selectedWorkItem;
+    private UploadItem selectedUpload;
 
     public RemoteDataSetFrame(final SipModel sipModel, NetworkClient networkClient) {
         super(Which.DATA_SET, sipModel, "Data Sets");
-        this.downloadTableModel = new DownloadTableModel(sipModel, networkClient);
-        this.downloadTable = createDownloadTable();
-        this.uploadListModel = new UploadListModel(sipModel, networkClient, new Swing() {
+        this.networkClient = networkClient;
+        this.downloadModel = new DownloadModel();
+        this.downloadList = new JList<DownloadItem>(downloadModel);
+        this.downloadList.setSelectionMode(SINGLE_SELECTION);
+        this.downloadList.addListSelectionListener(DOWNLOAD_LISTENER);
+        this.downloadList.setCellRenderer(DOWNLOAD_CELL_RENDERER);
+        this.workItemModel = new WorkItemModel();
+        this.workItemList = new JList<WorkItem>(workItemModel);
+        this.workItemList.setSelectionMode(SINGLE_SELECTION);
+        this.workItemList.setCellRenderer(WORK_CELL_RENDERER);
+        this.workItemList.addListSelectionListener(WORK_ITEM_LISTENER);
+        this.uploadModel = new UploadModel();
+        this.uploadList = new JList<UploadItem>(uploadModel);
+        this.uploadList.setSelectionMode(SINGLE_SELECTION);
+        this.uploadList.addListSelectionListener(UPLOAD_LISTENER);
+        this.uploadList.setCellRenderer(UPLOAD_CELL_RENDERER);
+        filterField.addActionListener(new ActionListener() {
             @Override
-            public void run() {
-                if (uploadListModel.getSize() > 0) uploadList.setSelectedIndex(0);
+            public void actionPerformed(ActionEvent e) {
+                String pattern = filterField.getText().trim();
+                downloadModel.setFilter(pattern);
+                workItemModel.setFilter(pattern);
+                uploadModel.setFilter(pattern);
             }
         });
-        this.uploadList = new JList<File>(uploadListModel);
-        this.uploadList.addListSelectionListener(uploadListModel.UPLOAD_SELECTION);
-        this.uploadList.setCellRenderer(uploadListModel.CELL_RENDERER);
+
     }
 
     @Override
@@ -71,7 +107,7 @@ public class RemoteDataSetFrame extends FrameBase {
         if (opened) Swing.Exec.later(new Swing() {
             @Override
             public void run() {
-                downloadTable.requestFocus();
+                downloadList.requestFocus();
             }
         });
     }
@@ -79,65 +115,68 @@ public class RemoteDataSetFrame extends FrameBase {
     @Override
     protected void buildContent(Container content) {
         content.add(createCenter(), BorderLayout.CENTER);
+        content.add(createSouth(), BorderLayout.SOUTH);
     }
 
     private JPanel createCenter() {
         JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
         p.add(createDownloadPanel());
+        p.add(createWorkPanel());
         p.add(createUploadPanel());
+        return p;
+    }
+
+    private JPanel createSouth() {
+        JPanel r = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel l = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        l.add(createFilterPanel());
+        r.add(new JButton(REFRESH_ACTION));
+        JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
+        p.add(l);
+        p.add(r);
         return p;
     }
 
     private JComponent createDownloadPanel() {
         JPanel p = new JPanel(new BorderLayout());
-        p.add(SwingHelper.scrollV("Narthex/Local Data Sets", downloadTable), BorderLayout.CENTER);
-        p.add(createDownloadSouth(downloadTableModel.getPatternField()), BorderLayout.SOUTH);
+        p.add(SwingHelper.scrollV("Datasets Available from Narthex", downloadList), BorderLayout.CENTER);
+        p.add(createDownloadSouth(), BorderLayout.SOUTH);
+        return p;
+    }
+
+    private JPanel createDownloadSouth() {
+        JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
+        p.setBorder(BorderFactory.createTitledBorder("Actions"));
+        p.add(button(DOWNLOAD_ACTION));
+        return p;
+    }
+
+    private JComponent createWorkPanel() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.add(SwingHelper.scrollV("Local Datasets", workItemList), BorderLayout.CENTER);
+        p.add(createWorkSouth(), BorderLayout.SOUTH);
+        return p;
+    }
+
+    private JPanel createWorkSouth() {
+        JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
+        p.setBorder(BorderFactory.createTitledBorder("Actions"));
+        p.add(button(OPEN_WORK_ITEM_ACTION));
         return p;
     }
 
     private JComponent createUploadPanel() {
         JPanel p = new JPanel(new BorderLayout());
-        p.add(SwingHelper.scrollV("Upload SIP Files", uploadList));
+        p.add(SwingHelper.scrollV("SIP Files for upload", uploadList));
         p.add(createUploadSouth(), BorderLayout.SOUTH);
-        return p;
-    }
-
-    private JTable createDownloadTable() {
-        JTable table = new JTable(downloadTableModel, downloadTableModel.getColumnModel());
-        table.setRowHeight(45);
-        table.setIntercellSpacing(new Dimension(12, 4));
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.getSelectionModel().addListSelectionListener(downloadTableModel.getSelectionListener());
-        table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() > 1 && downloadTableModel.EDIT_ACTION.isEnabled()) {
-                    if (downloadTable.getSelectedRow() != downloadTable.rowAtPoint(e.getPoint())) return;
-                    downloadTableModel.EDIT_ACTION.actionPerformed(null);
-                }
-            }
-        });
-        return table;
-    }
-
-    private JPanel createDownloadSouth(JTextField patternField) {
-        JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
-        p.setBorder(BorderFactory.createTitledBorder("Actions"));
-        p.add(button(downloadTableModel.REFRESH_ACTION));
-        p.add(createFilter(patternField));
-        p.add(button(downloadTableModel.EDIT_ACTION));
-        addKeyboardAction(downloadTableModel.EDIT_ACTION, SPACE, (JComponent) getContentPane());
-//        addKeyboardAction(new UpDownAction(false), UP, (JComponent) getContentPane());
-//        addKeyboardAction(new UpDownAction(true), DOWN, (JComponent) getContentPane());
-        p.add(button(downloadTableModel.DOWNLOAD_ACTION));
         return p;
     }
 
     private JPanel createUploadSouth() {
         JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
         p.setBorder(BorderFactory.createTitledBorder("Actions"));
-        p.add(button(uploadListModel.REFRESH_ACTION));
-        p.add(button(uploadListModel.UPLOAD_ACTION));
+        p.add(button(UPLOAD_ACTION));
+        // todo: delete/cleanup buttons
         return p;
     }
 
@@ -147,14 +186,12 @@ public class RemoteDataSetFrame extends FrameBase {
         return button;
     }
 
-    private JPanel createFilter(JTextField patternField) {
+    private JPanel createFilterPanel() {
         JLabel label = new JLabel("Filter:", JLabel.RIGHT);
-        label.setLabelFor(patternField);
+        label.setLabelFor(filterField);
         JPanel p = new JPanel(new BorderLayout());
         p.add(label, BorderLayout.WEST);
-//        attachAccelerator(new UpDownAction(true), patternField);
-//        attachAccelerator(new UpDownAction(false), patternField);
-        p.add(patternField, BorderLayout.CENTER);
+        p.add(filterField, BorderLayout.CENTER);
         return p;
     }
 
@@ -163,10 +200,493 @@ public class RemoteDataSetFrame extends FrameBase {
         Swing.Exec.later(new Swing() {
             @Override
             public void run() {
-                downloadTableModel.REFRESH_ACTION.fetchList();
-                uploadListModel.refresh();
+                REFRESH_ACTION.fetchList();
             }
         });
+    }
+
+    class DownloadItem implements Comparable<DownloadItem> {
+        public final SipEntry sipEntry;
+        public DataSet dataSet;
+        public File file;
+
+        DownloadItem(SipEntry sipEntry) {
+            this.sipEntry = sipEntry;
+        }
+
+        @Override
+        public int compareTo(DownloadItem other) {
+            return other.sipEntry.date.compareTo(sipEntry.date);
+        }
+    }
+
+    public ListCellRenderer<DownloadItem> DOWNLOAD_CELL_RENDERER = new ListCellRenderer<DownloadItem>() {
+        private DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
+
+        @Override
+        public Component getListCellRendererComponent(JList list, DownloadItem downloadItem, int index, boolean isSelected, boolean cellHasFocus) {
+            String html;
+            if (downloadItem.dataSet != null) {
+                html = String.format(
+                        "<html><b>%s (%s) (%s)</b>",
+                        downloadItem.sipEntry.dataset, downloadItem.sipEntry.date, downloadItem.dataSet.getTime()
+                );
+            }
+            else {
+                html = String.format(
+                        "<html>%s (%s)",
+                        downloadItem.sipEntry.dataset, downloadItem.sipEntry.date
+                );
+            }
+            return defaultListCellRenderer.getListCellRendererComponent(list, html, index, isSelected, cellHasFocus);
+        }
+    };
+
+    class WorkItem implements Comparable<WorkItem> {
+        private final DataSet dataset;
+
+        WorkItem(DataSet dataset) {
+            this.dataset = dataset;
+        }
+
+        @Override
+        public int compareTo(WorkItem other) {
+            return dataset.getSpec().compareTo(other.dataset.getSpec());
+        }
+    }
+
+    public ListCellRenderer<WorkItem> WORK_CELL_RENDERER = new ListCellRenderer<WorkItem>() {
+        private DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
+
+        @Override
+        public Component getListCellRendererComponent(JList list, WorkItem workItem, int index, boolean isSelected, boolean cellHasFocus) {
+            String html = String.format(
+                    "<html><b>%s</b> (%s)",
+                    workItem.dataset.getSpec(), workItem.dataset.getTime()
+            );
+            return defaultListCellRenderer.getListCellRendererComponent(list, html, index, isSelected, cellHasFocus);
+        }
+    };
+
+    class UploadItem implements Comparable<UploadItem> {
+        public final File file;
+        public SipEntry sipEntry;
+
+        public UploadItem(File file) {
+            this.file = file;
+        }
+
+        public String getDatasetName() {
+            return datasetNameFromSipZip(file);
+        }
+
+        @Override
+        public int compareTo(UploadItem other) {
+            return (int) (other.file.lastModified() - file.lastModified());
+        }
+    }
+
+    public ListCellRenderer<UploadItem> UPLOAD_CELL_RENDERER = new ListCellRenderer<UploadItem>() {
+        private DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
+
+        @Override
+        public Component getListCellRendererComponent(JList list, UploadItem uploadItem, int index, boolean isSelected, boolean cellHasFocus) {
+            String html;
+            if (uploadItem.sipEntry != null) {
+                html = String.format(
+                        "<html><b>%s</b> (%s)",
+                        uploadItem.file.getName(), uploadItem.sipEntry.date
+                );
+            }
+            else {
+                html = String.format(
+                        "<html>%s",
+                        uploadItem.file.getName()
+                );
+            }
+            return defaultListCellRenderer.getListCellRendererComponent(list, html, index, isSelected, cellHasFocus);
+        }
+    };
+
+    class DownloadModel extends AbstractListModel<DownloadItem> {
+        private List<DownloadItem> downloadItems = new ArrayList<DownloadItem>();
+        private String filter = "";
+        private Map<Integer, Integer> index;
+
+        @Override
+        public int getSize() {
+            if (index != null) {
+                return index.size();
+            }
+            else {
+                return downloadItems.size();
+            }
+        }
+
+        @Override
+        public DownloadItem getElementAt(int rowIndex) {
+            if (index != null) {
+                return downloadItems.get(index.get(rowIndex));
+            }
+            else {
+                return downloadItems.get(rowIndex);
+            }
+        }
+
+        public void setFilter(String filter) {
+            this.filter = filter;
+            activateFilter();
+        }
+
+        public void activateFilter() {
+            if (filter.isEmpty()) {
+                index = null;
+                return;
+            }
+            Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+            int actual = 0, virtual = 0;
+            for (DownloadItem downloadItem : downloadItems) {
+                if (downloadItem.sipEntry.dataset.contains(filter)) {
+                    map.put(virtual, actual);
+                    virtual++;
+                }
+                actual++;
+            }
+            index = map;
+        }
+
+        public void refresh(NetworkClient.SipZips sipZips) {
+            File[] downloadFiles = HomeDirectory.DOWN_DIR.listFiles();
+            if (downloadFiles == null) throw new RuntimeException();
+            Map<String, File> downloadMap = new TreeMap<String, File>();
+            for (File file: downloadFiles) downloadMap.put(file.getName(), file);
+            Map<String, DataSet> datasetMap = sipModel.getStorage().getDataSets();
+            int size = getSize();
+            downloadItems.clear();
+            fireIntervalRemoved(this, 0, size);
+            if (sipZips != null && sipZips.available != null) {
+                for (SipEntry entry : sipZips.available) {
+                    DownloadItem item = new DownloadItem(entry);
+                    item.dataSet = datasetMap.get(entry.dataset);
+                    item.file = downloadMap.get(entry.file);
+                    System.out.println("Download "+entry.file);
+                    downloadItems.add(item);
+                }
+                Collections.sort(downloadItems);
+                activateFilter();
+                fireIntervalAdded(this, 0, getSize());
+            }
+        }
+    }
+
+    class WorkItemModel extends AbstractListModel<WorkItem> {
+        private List<WorkItem> workItems = new ArrayList<WorkItem>();
+        private String filter = "";
+        private Map<Integer, Integer> index;
+
+        @Override
+        public int getSize() {
+            if (index != null) {
+                return index.size();
+            }
+            else {
+                return workItems.size();
+            }
+        }
+
+        @Override
+        public WorkItem getElementAt(int rowIndex) {
+            if (index != null) {
+                return workItems.get(index.get(rowIndex));
+            }
+            else {
+                return workItems.get(rowIndex);
+            }
+        }
+
+        public void setFilter(String filter) {
+            this.filter = filter;
+            activateFilter();
+        }
+
+        public void activateFilter() {
+            if (filter.isEmpty()) {
+                index = null;
+                return;
+            }
+            Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+            int actual = 0, virtual = 0;
+            for (WorkItem workItem : workItems) {
+                if (workItem.dataset.getSpec().contains(filter)) {
+                    map.put(virtual, actual);
+                    virtual++;
+                }
+                actual++;
+            }
+            index = map;
+        }
+
+        public void refresh() {
+            workItems.clear();
+            fireIntervalRemoved(this, 0, getSize());
+            for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
+                workItems.add(new WorkItem(dataSet));
+            }
+            Collections.sort(workItems);
+            activateFilter();
+            fireIntervalAdded(this, 0, getSize());
+        }
+    }
+
+    class UploadModel extends AbstractListModel<UploadItem> {
+        private List<UploadItem> uploadItems = new ArrayList<UploadItem>();
+        private String filter = "";
+        private Map<Integer, Integer> index;
+
+        @Override
+        public int getSize() {
+            if (index != null) {
+                return index.size();
+            }
+            else {
+                return uploadItems.size();
+            }
+        }
+
+        @Override
+        public UploadItem getElementAt(int rowIndex) {
+            if (index != null) {
+                return uploadItems.get(index.get(rowIndex));
+            }
+            else {
+                return uploadItems.get(rowIndex);
+            }
+        }
+
+        public void setFilter(String filter) {
+            this.filter = filter;
+            activateFilter();
+        }
+
+        public void activateFilter() {
+            if (filter.isEmpty()) {
+                index = null;
+                return;
+            }
+            Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+            int actual = 0, virtual = 0;
+            for (UploadItem uploadItem : uploadItems) {
+                if (uploadItem.getDatasetName().contains(filter)) {
+                    map.put(virtual, actual);
+                    virtual++;
+                }
+                actual++;
+            }
+            index = map;
+        }
+
+        public void refresh(NetworkClient.SipZips sipZips) {
+            Map<String, SipEntry> uploadedMap = new TreeMap<String, SipEntry>();
+            if (sipZips != null && sipZips.uploaded != null) {
+                for (SipEntry entry : sipZips.uploaded) uploadedMap.put(entry.file, entry);
+            }
+            File[] uploadFiles = HomeDirectory.UP_DIR.listFiles();
+            if (uploadFiles == null) throw new RuntimeException();
+            int size = getSize();
+            uploadItems.clear();
+            fireIntervalRemoved(this, 0, size);
+            for (File uploadFile : uploadFiles) {
+                UploadItem item = new UploadItem(uploadFile);
+                item.sipEntry = uploadedMap.get(item.getDatasetName());
+                System.out.println("Upload "+item.file);
+                uploadItems.add(item);
+            }
+            Collections.sort(uploadItems);
+            activateFilter();
+            fireIntervalAdded(this, 0, getSize());
+        }
+    }
+
+    public final RefreshAction REFRESH_ACTION = new RefreshAction();
+
+    public class RefreshAction extends AbstractAction {
+
+        private RefreshAction() {
+            super("Refresh list from Narthex");
+            putValue(Action.SMALL_ICON, SwingHelper.ICON_FETCH_LIST);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            setEnabled(false);
+            networkClient.narthexCredentials.ask();
+            fetchList();
+        }
+
+        public void fetchList() {
+            if (!networkClient.narthexCredentials.areSet()) return;
+            networkClient.fetchNarthexSipList(new NetworkClient.NarthexListListener() {
+                @Override
+                public void listReceived(NetworkClient.SipZips sipZips) {
+                    downloadModel.refresh(sipZips);
+                    workItemModel.refresh();
+                    uploadModel.refresh(sipZips);
+                    setEnabled(true);
+                }
+
+                @Override
+                public void failed(Exception e) {
+                    sipModel.getFeedback().alert("Unable to fetch Narthex sip-zip list", e);
+                    downloadModel.refresh(null);
+                    workItemModel.refresh();
+                    uploadModel.refresh(null);
+                    setEnabled(true);
+                }
+            });
+        }
+    }
+
+    public final DownloadAction DOWNLOAD_ACTION = new DownloadAction();
+
+    public class DownloadAction extends AbstractAction {
+
+        private DownloadAction() {
+            super("Download from Narthex");
+            putValue(Action.SMALL_ICON, ICON_DOWNLOAD);
+        }
+
+        public void checkEnabled() {
+            this.setEnabled(selectedDownload != null);
+        }
+
+        @Override
+        public void actionPerformed(final ActionEvent actionEvent) {
+            if (selectedDownload == null) return;
+            setEnabled(false);
+            try {
+                DataSet dataSet = sipModel.getStorage().createDataSet(selectedDownload.sipEntry.dataset);
+                networkClient.downloadNarthexDataset(
+                        selectedDownload.sipEntry.file,
+                        dataSet,
+                        new Swing() {
+                            @Override
+                            public void run() {
+                                setEnabled(true);
+                                refresh();
+                            }
+                        }
+                );
+            }
+            catch (StorageException e) {
+                sipModel.getFeedback().alert("Unable to create data set called " + selectedDownload.sipEntry.dataset, e);
+            }
+        }
+    }
+
+    public final DownloadListener DOWNLOAD_LISTENER = new DownloadListener();
+
+    private class DownloadListener implements ListSelectionListener {
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            if (e.getValueIsAdjusting()) return;
+            int downloadIndex = downloadList.getSelectedIndex();
+            if (downloadIndex < 0) {
+                DOWNLOAD_ACTION.putValue(Action.NAME, "Download");
+            }
+            else {
+                selectedDownload = downloadModel.getElementAt(downloadIndex);
+                DOWNLOAD_ACTION.putValue(Action.NAME, "Download " + selectedDownload.sipEntry.file);
+            }
+        }
+    }
+
+    public final OpenWorkItemAction OPEN_WORK_ITEM_ACTION = new OpenWorkItemAction();
+
+    public class OpenWorkItemAction extends AbstractAction {
+
+        private OpenWorkItemAction() {
+            super("Open");
+            putValue(Action.SMALL_ICON, SwingHelper.ICON_EDIT);
+        }
+
+        public void checkEnabled() {
+            this.setEnabled(selectedWorkItem != null);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (selectedWorkItem == null) return;
+            sipModel.setDataSet(selectedWorkItem.dataset, new Swing() {
+                @Override
+                public void run() {
+                    setEnabled(true);
+                    sipModel.getViewSelector().selectView(AllFrames.View.QUICK_MAPPING);
+                }
+            });
+        }
+    }
+
+    public final WorkItemListener WORK_ITEM_LISTENER = new WorkItemListener();
+
+    private class WorkItemListener implements ListSelectionListener {
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            if (e.getValueIsAdjusting()) return;
+            int workItemIndex = workItemList.getSelectedIndex();
+            if (workItemIndex < 0) {
+                OPEN_WORK_ITEM_ACTION.putValue(Action.NAME, "Open");
+            }
+            else {
+                selectedWorkItem = workItemModel.getElementAt(workItemIndex);
+                OPEN_WORK_ITEM_ACTION.putValue(Action.NAME, "Open " + selectedWorkItem.dataset.getSpec());
+            }
+        }
+    }
+
+    public final UploadAction UPLOAD_ACTION = new UploadAction();
+
+    private class UploadAction extends AbstractAction {
+
+        private UploadAction() {
+            super("Upload");
+            putValue(Action.SMALL_ICON, SwingHelper.ICON_UPLOAD);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (selectedUpload == null) return;
+            setEnabled(false);
+            try {
+                networkClient.uploadNarthex(selectedUpload.file, selectedUpload.getDatasetName(), new Swing() {
+                    @Override
+                    public void run() {
+                        sipModel.getFeedback().alert("Uploaded " + selectedUpload.file.getName() + " to Narthex");
+                        setEnabled(true);
+                    }
+                });
+            }
+            catch (StorageException e) {
+                sipModel.getFeedback().alert("Unable to upload to Narthex", e);
+            }
+        }
+    }
+
+    public final UploadListener UPLOAD_LISTENER = new UploadListener();
+
+    private class UploadListener implements ListSelectionListener {
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            if (e.getValueIsAdjusting()) return;
+            JList list = (JList) e.getSource();
+            int uploadIndex = list.getSelectedIndex();
+            if (uploadIndex < 0) {
+                UPLOAD_ACTION.putValue(Action.NAME, "Upload");
+            }
+            else {
+                selectedUpload = uploadModel.getElementAt(uploadIndex);
+                UPLOAD_ACTION.putValue(Action.NAME, "Upload " + selectedUpload.file.getName());
+            }
+        }
     }
 
 }

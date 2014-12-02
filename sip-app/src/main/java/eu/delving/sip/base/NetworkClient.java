@@ -217,7 +217,7 @@ public class NetworkClient {
                             InputStream input = entity.getContent();
                             byte[] buffer = new byte[BLOCK_SIZE];
                             int count = 0;
-                            int bytesRead = 0;
+                            int bytesRead;
                             while (-1 != (bytesRead = input.read(buffer))) {
                                 output.write(buffer, 0, bytesRead);
                                 count++;
@@ -270,7 +270,7 @@ public class NetworkClient {
         @Override
         public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
-            progressListener.setProgressMessage("Downloading from the hub.");
+            progressListener.setProgressMessage("Downloading from Narthex");
         }
 
         private HttpGet createSipZipDownloadRequest() throws OAuthSystemException, OAuthProblemException {
@@ -444,35 +444,6 @@ public class NetworkClient {
     private Feedback feedback() {
         return sipModel.getFeedback();
     }
-
-    /*
-    <sip-zips>
-<available>
-<sip-zip>
-<dataset>frans_hals_museum</dataset>
-<file>frans_hals_museum.sip.zip</file>
-<date>2014-11-26T14:39:17</date>
-</sip-zip>
-</available>
-<uploaded>
-<sip-zip>
-<dataset>frans_hals_museum</dataset>
-<file>frans-hals-museum__2014_11_24_16_19__icn.sip.zip</file>
-<date>2014-11-24T16:19:00</date>
-</sip-zip>
-<sip-zip>
-<dataset>prent</dataset>
-<file>brabant-collectie-prent__2014_11_17_15_33.sip.zip</file>
-<date>2014-11-17T15:33:00</date>
-</sip-zip>
-<sip-zip>
-<dataset>uu</dataset>
-<file>uu-collection__2014_11_20_16_52.sip.zip</file>
-<date>2014-11-20T16:52:00</date>
-</sip-zip>
-</uploaded>
-</sip-zips>
-     */
 
     @XStreamAlias("sip-zips")
     public static class SipZips {

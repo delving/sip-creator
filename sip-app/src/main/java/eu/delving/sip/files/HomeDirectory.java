@@ -30,7 +30,7 @@ import java.io.File;
  */
 
 public class HomeDirectory {
-    public static final File WORKSPACE_DIR = new File(System.getProperty("user.home"), "NarthexSIPCreator");
+    public static final File WORKSPACE_DIR = new File(System.getProperty("user.home"), "PocketMapper");
     public static final File WORK_DIR = new File(WORKSPACE_DIR, "work");
     public static final File UP_DIR = new File(WORKSPACE_DIR, "up");
     public static final File DOWN_DIR = new File(WORKSPACE_DIR, "down");
