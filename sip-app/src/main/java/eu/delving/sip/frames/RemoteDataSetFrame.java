@@ -234,7 +234,7 @@ public class RemoteDataSetFrame extends FrameBase {
         @Override
         public Component getListCellRendererComponent(JList list, DownloadItem downloadItem, int index, boolean isSelected, boolean cellHasFocus) {
             String html = String.format(
-                    "<html>" + (downloadItem.local ? "<b>%s</b>" : "%s"),
+                    "<html>" + (downloadItem.local ? "%s" : "<b>%s</b>"),
                     downloadItem.toString()
             );
             return defaultListCellRenderer.getListCellRendererComponent(list, html, index, isSelected, cellHasFocus);
@@ -560,7 +560,7 @@ public class RemoteDataSetFrame extends FrameBase {
         }
 
         public void checkEnabled() {
-            this.setEnabled(selectedDownload != null);
+            this.setEnabled(selectedDownload != null && !selectedDownload.local);
         }
 
         @Override
@@ -600,6 +600,7 @@ public class RemoteDataSetFrame extends FrameBase {
             else {
                 selectedDownload = downloadModel.getElementAt(downloadIndex);
                 DOWNLOAD_ACTION.putValue(Action.NAME, "Download " + selectedDownload.remote);
+                DOWNLOAD_ACTION.checkEnabled();
             }
         }
     }
