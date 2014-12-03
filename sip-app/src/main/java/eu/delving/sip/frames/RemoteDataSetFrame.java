@@ -56,6 +56,7 @@ import static eu.delving.sip.base.NetworkClient.SipEntry;
 import static eu.delving.sip.base.SwingHelper.ICON_DOWNLOAD;
 import static eu.delving.sip.files.StorageHelper.datasetNameFromSipZip;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 
 /**
  * Show the datasets both local and on the server, so all info about their status is unambiguous.
@@ -149,9 +150,10 @@ public class RemoteDataSetFrame extends FrameBase {
     }
 
     private JPanel createDownloadSouth() {
-        JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
+        JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Actions"));
-        p.add(button(DOWNLOAD_ACTION));
+        p.add(button(DOWNLOAD_ACTION), BorderLayout.CENTER);
+        p.add(button(DELETE_DOWNLOAD_ACTION), BorderLayout.EAST);
         return p;
     }
 
@@ -163,9 +165,10 @@ public class RemoteDataSetFrame extends FrameBase {
     }
 
     private JPanel createWorkSouth() {
-        JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
+        JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Actions"));
-        p.add(button(OPEN_WORK_ITEM_ACTION));
+        p.add(button(OPEN_WORK_ITEM_ACTION), BorderLayout.CENTER);
+        p.add(button(DELETE_WORK_ITEM_ACTION), BorderLayout.EAST);
         return p;
     }
 
@@ -177,10 +180,10 @@ public class RemoteDataSetFrame extends FrameBase {
     }
 
     private JPanel createUploadSouth() {
-        JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
+        JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Actions"));
-        p.add(button(UPLOAD_ACTION));
-        // todo: delete/cleanup buttons
+        p.add(button(UPLOAD_ACTION), BorderLayout.CENTER);
+        p.add(button(DELETE_UPLOAD_ACTION), BorderLayout.EAST);
         return p;
     }
 
@@ -587,6 +590,27 @@ public class RemoteDataSetFrame extends FrameBase {
         }
     }
 
+    public final DeleteDownloadAction DELETE_DOWNLOAD_ACTION = new DeleteDownloadAction();
+
+    public class DeleteDownloadAction extends AbstractAction {
+
+        private DeleteDownloadAction() {
+            super("Delete");
+        }
+
+        public void checkEnabled() {
+            this.setEnabled(selectedDownload != null && selectedDownload.local);
+        }
+
+        @Override
+        public void actionPerformed(final ActionEvent actionEvent) {
+            if (selectedDownload == null) return;
+            File file = HomeDirectory.downFile(selectedDownload.remote);
+            deleteQuietly(file);
+            refresh();
+        }
+    }
+
     public final DownloadListener DOWNLOAD_LISTENER = new DownloadListener();
 
     private class DownloadListener implements ListSelectionListener {
@@ -600,8 +624,9 @@ public class RemoteDataSetFrame extends FrameBase {
             else {
                 selectedDownload = downloadModel.getElementAt(downloadIndex);
                 DOWNLOAD_ACTION.putValue(Action.NAME, "Download " + selectedDownload.remote);
-                DOWNLOAD_ACTION.checkEnabled();
             }
+            DOWNLOAD_ACTION.checkEnabled();
+            DELETE_DOWNLOAD_ACTION.checkEnabled();
         }
     }
 
@@ -631,6 +656,31 @@ public class RemoteDataSetFrame extends FrameBase {
         }
     }
 
+    public final DeleteWorkItemAction DELETE_WORK_ITEM_ACTION = new DeleteWorkItemAction();
+
+    public class DeleteWorkItemAction extends AbstractAction {
+
+        private DeleteWorkItemAction() {
+            super("Delete");
+        }
+
+        public void checkEnabled() {
+            this.setEnabled(selectedWorkItem != null);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (selectedWorkItem == null) return;
+            try {
+                selectedWorkItem.dataset.remove();
+                refresh();
+            }
+            catch (StorageException e) {
+                sipModel.getFeedback().alert("Unable to delete", e);
+            }
+        }
+    }
+
     public final WorkItemListener WORK_ITEM_LISTENER = new WorkItemListener();
 
     private class WorkItemListener implements ListSelectionListener {
@@ -639,12 +689,15 @@ public class RemoteDataSetFrame extends FrameBase {
             if (e.getValueIsAdjusting()) return;
             int workItemIndex = workItemList.getSelectedIndex();
             if (workItemIndex < 0) {
+                selectedWorkItem = null;
                 OPEN_WORK_ITEM_ACTION.putValue(Action.NAME, "Open");
             }
             else {
                 selectedWorkItem = workItemModel.getElementAt(workItemIndex);
-                OPEN_WORK_ITEM_ACTION.putValue(Action.NAME, "Open " + selectedWorkItem.dataset.getSpec());
+                OPEN_WORK_ITEM_ACTION.putValue(Action.NAME, "Open " + selectedWorkItem.dataset.getSipFileName());
             }
+            OPEN_WORK_ITEM_ACTION.checkEnabled();
+            DELETE_WORK_ITEM_ACTION.checkEnabled();
         }
     }
 
@@ -673,6 +726,22 @@ public class RemoteDataSetFrame extends FrameBase {
             catch (StorageException e) {
                 sipModel.getFeedback().alert("Unable to upload to Narthex", e);
             }
+        }
+    }
+
+    public final DeleteUploadAction DELETE_UPLOAD_ACTION = new DeleteUploadAction();
+
+    private class DeleteUploadAction extends AbstractAction {
+
+        private DeleteUploadAction() {
+            super("Delete");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (selectedUpload == null) return;
+            deleteQuietly(selectedUpload.file);
+            refresh();
         }
     }
 
