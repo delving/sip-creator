@@ -211,7 +211,8 @@ public class NetworkClient {
                     switch (code) {
                         case OK:
                             dataSet.remove();
-                            File sipZipFile = HomeDirectory.downFile(fileName);
+                            File sipZipFile = new File(HomeDirectory.WORKSPACE_DIR, fileName);
+                            sipZipFile.deleteOnExit();
                             FileOutputStream output = new FileOutputStream(sipZipFile);
                             progressListener.prepareFor((int) (entity.getContentLength() / BLOCK_SIZE));
                             InputStream input = entity.getContent();
@@ -225,6 +226,7 @@ public class NetworkClient {
                             }
                             output.close();
                             dataSet.fromSipZip(sipZipFile, progressListener);
+                            sipZipFile.delete();
                             success = true;
                             break;
                         case UNAUTHORIZED:

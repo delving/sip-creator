@@ -33,20 +33,10 @@ public class HomeDirectory {
     public static final File WORKSPACE_DIR = new File(System.getProperty("user.home"), "PocketMapper");
     public static final File WORK_DIR = new File(WORKSPACE_DIR, "work");
     public static final File UP_DIR = new File(WORKSPACE_DIR, "up");
-    public static final File DOWN_DIR = new File(WORKSPACE_DIR, "down");
 
     static {
         if (!WORKSPACE_DIR.exists()) WORKSPACE_DIR.mkdirs();
         if (!UP_DIR.exists()) UP_DIR.mkdirs();
-        if (!DOWN_DIR.exists()) DOWN_DIR.mkdirs();
         if (!WORK_DIR.exists()) WORK_DIR.mkdirs();
-    }
-
-    public static File downFile(String fileName) {
-        return new File(DOWN_DIR, fileName);
-    }
-
-    public static File upFile(String fileName) {
-        return new File(UP_DIR, fileName);
     }
 }

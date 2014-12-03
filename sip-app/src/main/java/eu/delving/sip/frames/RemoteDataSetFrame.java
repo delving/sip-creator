@@ -153,7 +153,6 @@ public class RemoteDataSetFrame extends FrameBase {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Actions"));
         p.add(button(DOWNLOAD_ACTION), BorderLayout.CENTER);
-        p.add(button(DELETE_DOWNLOAD_ACTION), BorderLayout.EAST);
         return p;
     }
 
@@ -214,16 +213,18 @@ public class RemoteDataSetFrame extends FrameBase {
 
     class DownloadItem implements Comparable<DownloadItem> {
         public final String remote;
+        public final DateTime dateTime;
         public final boolean local;
 
         DownloadItem(String remote, boolean local) {
             this.remote = remote;
+            this.dateTime = StorageHelper.dateTimeFromSipZipName(remote);
             this.local = local;
         }
 
         @Override
         public int compareTo(DownloadItem other) {
-            return toString().compareTo(other.toString());
+            return (int)(other.dateTime.getMillis() - dateTime.getMillis());
         }
 
         public String toString() {
@@ -360,11 +361,8 @@ public class RemoteDataSetFrame extends FrameBase {
         }
 
         public void refresh(NetworkClient.SipZips sipZips) {
-            // get a set of the local file names
-            File[] downloadFiles = HomeDirectory.DOWN_DIR.listFiles();
-            if (downloadFiles == null) throw new RuntimeException();
-            Set<String> localFiles = new HashSet<String>();
-            for (File file : downloadFiles) localFiles.add(file.getName());
+            // get a set of the local work datasets
+            Map<String, DataSet> datasetMap = sipModel.getStorage().getDataSets();
             // get a set of all the remote file names
             Set<String> remoteFiles = new HashSet<String>();
             if (sipZips != null && sipZips.available != null)
@@ -376,7 +374,7 @@ public class RemoteDataSetFrame extends FrameBase {
             Map<String, DownloadItem> downloadItemMap = new TreeMap<String, DownloadItem>();
             for (String remote : remoteFiles) {
                 DownloadItem item = downloadItemMap.get(remote);
-                if (item == null) downloadItemMap.put(remote, new DownloadItem(remote, localFiles.contains(remote)));
+                if (item == null) downloadItemMap.put(remote, new DownloadItem(remote, datasetMap.containsKey(remote)));
             }
             downloadItems.addAll(downloadItemMap.values());
             Collections.sort(downloadItems);
@@ -590,27 +588,6 @@ public class RemoteDataSetFrame extends FrameBase {
         }
     }
 
-    public final DeleteDownloadAction DELETE_DOWNLOAD_ACTION = new DeleteDownloadAction();
-
-    public class DeleteDownloadAction extends AbstractAction {
-
-        private DeleteDownloadAction() {
-            super("Delete");
-        }
-
-        public void checkEnabled() {
-            this.setEnabled(selectedDownload != null && selectedDownload.local);
-        }
-
-        @Override
-        public void actionPerformed(final ActionEvent actionEvent) {
-            if (selectedDownload == null) return;
-            File file = HomeDirectory.downFile(selectedDownload.remote);
-            deleteQuietly(file);
-            refresh();
-        }
-    }
-
     public final DownloadListener DOWNLOAD_LISTENER = new DownloadListener();
 
     private class DownloadListener implements ListSelectionListener {
@@ -626,7 +603,6 @@ public class RemoteDataSetFrame extends FrameBase {
                 DOWNLOAD_ACTION.putValue(Action.NAME, "Download " + selectedDownload.remote);
             }
             DOWNLOAD_ACTION.checkEnabled();
-            DELETE_DOWNLOAD_ACTION.checkEnabled();
         }
     }
 
