@@ -285,10 +285,10 @@ public class Application {
 
     private String titleString() {
         if (version != null) {
-            return String.format("SIP-Creator %s", version);
+            return String.format("SIP-App %s", version);
         }
         else {
-            return "SIP Creator Test";
+            return "SIP-App Test";
         }
     }
 
