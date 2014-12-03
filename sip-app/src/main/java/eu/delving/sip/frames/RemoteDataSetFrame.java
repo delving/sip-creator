@@ -323,8 +323,8 @@ public class RemoteDataSetFrame extends FrameBase {
             String html;
             if (uploadItem.sipEntry != null) {
                 html = String.format(
-                        "<html><b>%s</b> (%s)",
-                        uploadItem.file.getName(), uploadItem.date
+                        "<html><b>%s</b>",
+                        uploadItem.file.getName()
                 );
             }
             else {
@@ -529,7 +529,7 @@ public class RemoteDataSetFrame extends FrameBase {
             fireIntervalRemoved(this, 0, size);
             for (File uploadFile : uploadFiles) {
                 UploadItem item = new UploadItem(uploadFile);
-                item.sipEntry = uploadedMap.get(item.getDatasetName());
+                item.sipEntry = uploadedMap.get(item.file.getName());
                 uploadItems.add(item);
             }
             Collections.sort(uploadItems);
@@ -720,7 +720,7 @@ public class RemoteDataSetFrame extends FrameBase {
         }
 
         public void checkEnabled() {
-            this.setEnabled(selectedUpload != null);
+            this.setEnabled(selectedUpload != null && selectedUpload.sipEntry == null);
         }
 
         @Override
@@ -733,6 +733,7 @@ public class RemoteDataSetFrame extends FrameBase {
                     public void run() {
                         sipModel.getFeedback().alert("Uploaded " + selectedUpload.file.getName() + " to Narthex");
                         setEnabled(true);
+                        uploadModel.refreshUploads();
                     }
                 });
             }
