@@ -33,6 +33,8 @@ import eu.delving.sip.model.SipModel;
 import org.joda.time.DateTime;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.BorderLayout;
@@ -41,7 +43,6 @@ import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,6 +74,7 @@ public class RemoteDataSetFrame extends FrameBase {
     private final JList<UploadItem> uploadList;
     private final NetworkClient networkClient;
     private final JTextField filterField = new JTextField(16);
+    private NetworkClient.SipZips sipZips;
     private DownloadItem selectedDownload;
     private WorkItem selectedWorkItem;
     private UploadItem selectedUpload;
@@ -95,16 +97,38 @@ public class RemoteDataSetFrame extends FrameBase {
         this.uploadList.setSelectionMode(SINGLE_SELECTION);
         this.uploadList.addListSelectionListener(UPLOAD_LISTENER);
         this.uploadList.setCellRenderer(UPLOAD_CELL_RENDERER);
-        filterField.addActionListener(new ActionListener() {
+        filterField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void insertUpdate(DocumentEvent e) {
+                change();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                change();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                change();
+            }
+
+            private void change() {
                 String pattern = filterField.getText().trim();
                 downloadModel.setFilter(pattern);
                 workItemModel.setFilter(pattern);
                 uploadModel.setFilter(pattern);
             }
         });
-
+//        filterField.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                String pattern = filterField.getText().trim();
+//                downloadModel.setFilter(pattern);
+//                workItemModel.setFilter(pattern);
+//                uploadModel.setFilter(pattern);
+//            }
+//        });
     }
 
     @Override
@@ -341,6 +365,7 @@ public class RemoteDataSetFrame extends FrameBase {
         public void setFilter(String filter) {
             this.filter = filter;
             activateFilter();
+            refreshDownloads();
         }
 
         public void activateFilter() {
@@ -360,7 +385,7 @@ public class RemoteDataSetFrame extends FrameBase {
             index = map;
         }
 
-        public void refresh(NetworkClient.SipZips sipZips) {
+        public void refreshDownloads() {
             // get a set of the local work datasets
             Map<String, DataSet> datasetMap = sipModel.getStorage().getDataSets();
             // get a set of all the remote file names
@@ -411,6 +436,7 @@ public class RemoteDataSetFrame extends FrameBase {
         public void setFilter(String filter) {
             this.filter = filter;
             activateFilter();
+            refreshWorkItems();
         }
 
         public void activateFilter() {
@@ -430,7 +456,7 @@ public class RemoteDataSetFrame extends FrameBase {
             index = map;
         }
 
-        public void refresh() {
+        public void refreshWorkItems() {
             int size = getSize();
             workItems.clear();
             fireIntervalRemoved(this, 0, size);
@@ -471,6 +497,7 @@ public class RemoteDataSetFrame extends FrameBase {
         public void setFilter(String filter) {
             this.filter = filter;
             activateFilter();
+            refreshUploads();
         }
 
         public void activateFilter() {
@@ -490,7 +517,7 @@ public class RemoteDataSetFrame extends FrameBase {
             index = map;
         }
 
-        public void refresh(NetworkClient.SipZips sipZips) {
+        public void refreshUploads() {
             Map<String, SipEntry> uploadedMap = new TreeMap<String, SipEntry>();
             if (sipZips != null && sipZips.uploaded != null) {
                 for (SipEntry entry : sipZips.uploaded) uploadedMap.put(entry.file, entry);
@@ -503,7 +530,6 @@ public class RemoteDataSetFrame extends FrameBase {
             for (File uploadFile : uploadFiles) {
                 UploadItem item = new UploadItem(uploadFile);
                 item.sipEntry = uploadedMap.get(item.getDatasetName());
-                System.out.println("Upload " + item.file.getName());
                 uploadItems.add(item);
             }
             Collections.sort(uploadItems);
@@ -533,18 +559,19 @@ public class RemoteDataSetFrame extends FrameBase {
             networkClient.fetchNarthexSipList(new NetworkClient.NarthexListListener() {
                 @Override
                 public void listReceived(NetworkClient.SipZips sipZips) {
-                    downloadModel.refresh(sipZips);
-                    workItemModel.refresh();
-                    uploadModel.refresh(sipZips);
+                    RemoteDataSetFrame.this.sipZips = sipZips;
+                    downloadModel.refreshDownloads();
+                    workItemModel.refreshWorkItems();
+                    uploadModel.refreshUploads();
                     setEnabled(true);
                 }
 
                 @Override
                 public void failed(Exception e) {
                     sipModel.getFeedback().alert("Unable to fetch Narthex sip-zip list", e);
-                    downloadModel.refresh(null);
-                    workItemModel.refresh();
-                    uploadModel.refresh(null);
+                    downloadModel.refreshDownloads();
+                    workItemModel.refreshWorkItems();
+                    uploadModel.refreshUploads();
                     setEnabled(true);
                 }
             });
@@ -558,6 +585,7 @@ public class RemoteDataSetFrame extends FrameBase {
         private DownloadAction() {
             super("Download from Narthex");
             putValue(Action.SMALL_ICON, ICON_DOWNLOAD);
+            setEnabled(false);
         }
 
         public void checkEnabled() {
@@ -577,7 +605,8 @@ public class RemoteDataSetFrame extends FrameBase {
                             @Override
                             public void run() {
                                 setEnabled(true);
-                                refresh();
+                                downloadModel.refreshDownloads();
+                                workItemModel.refreshWorkItems();
                             }
                         }
                 );
@@ -613,6 +642,7 @@ public class RemoteDataSetFrame extends FrameBase {
         private OpenWorkItemAction() {
             super("Open");
             putValue(Action.SMALL_ICON, SwingHelper.ICON_EDIT);
+            setEnabled(false);
         }
 
         public void checkEnabled() {
@@ -638,6 +668,7 @@ public class RemoteDataSetFrame extends FrameBase {
 
         private DeleteWorkItemAction() {
             super("Delete");
+            setEnabled(false);
         }
 
         public void checkEnabled() {
@@ -649,7 +680,8 @@ public class RemoteDataSetFrame extends FrameBase {
             if (selectedWorkItem == null) return;
             try {
                 selectedWorkItem.dataset.remove();
-                refresh();
+                workItemModel.refreshWorkItems();
+                downloadModel.refreshDownloads();
             }
             catch (StorageException e) {
                 sipModel.getFeedback().alert("Unable to delete", e);
@@ -684,6 +716,11 @@ public class RemoteDataSetFrame extends FrameBase {
         private UploadAction() {
             super("Upload");
             putValue(Action.SMALL_ICON, SwingHelper.ICON_UPLOAD);
+            setEnabled(false);
+        }
+
+        public void checkEnabled() {
+            this.setEnabled(selectedUpload != null);
         }
 
         @Override
@@ -711,13 +748,18 @@ public class RemoteDataSetFrame extends FrameBase {
 
         private DeleteUploadAction() {
             super("Delete");
+            setEnabled(false);
+        }
+
+        public void checkEnabled() {
+            this.setEnabled(selectedUpload != null);
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             if (selectedUpload == null) return;
             deleteQuietly(selectedUpload.file);
-            refresh();
+            uploadModel.refreshUploads();
         }
     }
 
@@ -736,6 +778,8 @@ public class RemoteDataSetFrame extends FrameBase {
                 selectedUpload = uploadModel.getElementAt(uploadIndex);
                 UPLOAD_ACTION.putValue(Action.NAME, "Upload " + selectedUpload.file.getName());
             }
+            UPLOAD_ACTION.checkEnabled();
+            DELETE_UPLOAD_ACTION.checkEnabled();
         }
     }
 

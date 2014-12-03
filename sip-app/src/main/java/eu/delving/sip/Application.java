@@ -63,7 +63,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -116,13 +115,7 @@ public class Application {
 
     private Application(final File storageDir) throws StorageException {
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
-        final ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/delving-background.png"));
-        desktop = new JDesktopPane() {
-            public void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                g.drawImage(backgroundIcon.getImage(), 0, 0, desktop);
-            }
-        };
+        desktop = new JDesktopPane();
         desktop.setMinimumSize(new Dimension(MINIMUM_DESKTOP_SIZE));
         resizeTimer = new Timer(DEFAULT_RESIZE_INTERVAL, new ActionListener() {
             @Override
