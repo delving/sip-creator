@@ -35,6 +35,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -338,6 +339,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
                 if (node == null) node = fresh;
             }
         }
+        if (node != null) Collections.sort(node.children);
         return node;
     }
 

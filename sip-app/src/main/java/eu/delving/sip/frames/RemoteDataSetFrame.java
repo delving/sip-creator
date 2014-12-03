@@ -394,7 +394,7 @@ public class RemoteDataSetFrame extends FrameBase {
                 for (SipEntry entry : sipZips.available) remoteFiles.add(entry.file);
             // clear
             int size = getSize();
-            downloadItems.clear();
+            downloadItems.clear(); // todo: maybe this should be after fireInterval after all
             fireIntervalRemoved(this, 0, size);
             Map<String, DownloadItem> downloadItemMap = new TreeMap<String, DownloadItem>();
             for (String remote : remoteFiles) {

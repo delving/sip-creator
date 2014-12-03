@@ -167,16 +167,16 @@ public class Tag implements Comparable<Tag>, Serializable {
 
     @Override
     public int compareTo(Tag tag) {
-        if (prefix == null && tag.prefix != null) {
-            return 1;
-        }
-        if (prefix != null && tag.prefix == null) {
-            return -1;
-        }
         if (!attribute && tag.attribute) {
             return 1;
         }
         if (attribute && !tag.attribute) {
+            return -1;
+        }
+        if (prefix == null && tag.prefix != null) {
+            return 1;
+        }
+        if (prefix != null && tag.prefix == null) {
             return -1;
         }
         if (prefix != null && tag.prefix != null) {
