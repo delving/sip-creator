@@ -99,9 +99,9 @@ import static eu.delving.sip.files.Storage.NARTHEX_USERNAME;
  */
 
 public class Application {
+    public static String version;
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
     private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
-    private static String version;
     private SipModel sipModel;
     private Action validateAction;
     private JFrame home;

@@ -22,8 +22,10 @@
 package eu.delving.sip.base;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import eu.delving.XStreamFactory;
 import eu.delving.metadata.Hasher;
+import eu.delving.sip.Application;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.HomeDirectory;
 import eu.delving.sip.files.StorageException;
@@ -157,7 +159,7 @@ public class NetworkClient {
                         "{ \"username\":\"%s\", \"password\":\"%s\" }",
                         narthexCredentials.narthexUser(), narthexCredentials.narthexPassword()
                 );
-                post.setEntity(new StringEntity(json,ContentType.APPLICATION_JSON));
+                post.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
                 HttpResponse response = httpClient.execute(post);
                 Code code = Code.from(response);
                 HttpEntity entity = response.getEntity();
@@ -220,6 +222,9 @@ public class NetworkClient {
                         case OK:
                             SipZips sipZips = (SipZips) XStreamFactory.getStreamFor(SipZips.class).fromXML(entity.getContent());
                             narthexListListener.listReceived(sipZips);
+                            if (Application.version != null && !sipZips.sipAppVersion.equals(Application.version)) {
+                                feedback().alert("You are running version " + Application.version + " but " + sipZips.sipAppVersion + " is available.");
+                            }
                             break;
                         case UNAUTHORIZED:
                             loggedIn = false;
@@ -523,6 +528,9 @@ public class NetworkClient {
 
     @XStreamAlias("sip-zips")
     public static class SipZips {
+        @XStreamAsAttribute
+        public String sipAppVersion;
+
         public List<SipEntry> available;
 
         public List<SipEntry> uploaded;
