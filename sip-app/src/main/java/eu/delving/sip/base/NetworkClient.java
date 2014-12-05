@@ -38,6 +38,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
 import java.io.File;
@@ -64,6 +66,7 @@ public class NetworkClient {
     private final SipModel sipModel;
     private final HttpClient httpClient;
     public final NarthexCredentials narthexCredentials;
+    private volatile boolean loggedIn;
 
     public enum Code {
         OK(SC_OK, "All is well"),
@@ -93,9 +96,14 @@ public class NetworkClient {
 
     public interface NarthexCredentials {
         boolean areSet();
+
         void ask();
+
         String narthexUrl();
-        String narthexApiKey();
+
+        String narthexUser();
+
+        String narthexPassword();
     }
 
     public NetworkClient(SipModel sipModel, HttpClient httpClient, NarthexCredentials narthexCredentials) {
@@ -111,20 +119,86 @@ public class NetworkClient {
         void failed(Exception e);
     }
 
+    public void afterLogin(Work work) {
+        if (loggedIn) {
+            sipModel.exec(work);
+        }
+        else {
+            sipModel.exec(new NarthexLogin(work));
+        }
+    }
 
     public void fetchNarthexSipList(NarthexListListener narthexListListener) {
-        sipModel.exec(new NarthexListFetcher(narthexListListener));
+        afterLogin(new NarthexListFetcher(narthexListListener));
     }
 
     public void downloadNarthexDataset(String fileName, DataSet dataSet, Swing finished) {
-        sipModel.exec(new NarthexDatasetDownloader(fileName, dataSet, finished));
+        afterLogin(new NarthexDatasetDownloader(fileName, dataSet, finished));
     }
 
     public void uploadNarthex(File sipZipFile, String datasetName, Swing finished) throws StorageException {
-        sipModel.exec(new NarthexUploader(sipZipFile, datasetName, finished));
+        afterLogin(new NarthexUploader(sipZipFile, datasetName, finished));
     }
 
     // NARTHEX ========================================
+
+    private class NarthexLogin implements Work {
+        private final Work afterLogin;
+
+        private NarthexLogin(Work afterLogin) {
+            this.afterLogin = afterLogin;
+        }
+
+        @Override
+        public void run() {
+            try {
+                HttpPost post = createNarthexLoginRequest();
+                String json = String.format(
+                        "{ \"username\":\"%s\", \"password\":\"%s\" }",
+                        narthexCredentials.narthexUser(), narthexCredentials.narthexPassword()
+                );
+                post.setEntity(new StringEntity(json,ContentType.APPLICATION_JSON));
+                HttpResponse response = httpClient.execute(post);
+                Code code = Code.from(response);
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    switch (code) {
+                        case OK:
+                            loggedIn = true;
+                            sipModel.exec(afterLogin);
+                            break;
+                        case UNAUTHORIZED:
+                            loggedIn = false;
+                            break;
+                        default:
+                            reportResponse(code, response.getStatusLine());
+                            break;
+                    }
+                    EntityUtils.consume(entity);
+                }
+                else {
+                    throw new IOException("Response was empty");
+                }
+            }
+            catch (Exception e) {
+                feedback().alert("Error logging in to Narthex", e);
+            }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.LOGIN;
+        }
+
+        private HttpPost createNarthexLoginRequest() {
+            String requestUrl = String.format(
+                    "%s/login",
+                    narthexCredentials.narthexUrl()
+            );
+            feedback().info("POST " + requestUrl);
+            return new HttpPost(requestUrl);
+        }
+    }
 
     private class NarthexListFetcher implements Work {
         private NarthexListListener narthexListListener;
@@ -148,7 +222,8 @@ public class NetworkClient {
                             narthexListListener.listReceived(sipZips);
                             break;
                         case UNAUTHORIZED:
-                            narthexListListener.failed(new Exception("Unable to fetch list"));
+                            loggedIn = false;
+                            narthexListListener.failed(new Exception("Unauthorized"));
                             break;
                         default:
                             reportResponse(code, response.getStatusLine());
@@ -179,10 +254,10 @@ public class NetworkClient {
 
         private HttpGet createNarthexListRequest() {
             String requestUrl = String.format(
-                    "%s/sip-creator/%s",
-                    narthexCredentials.narthexUrl(), narthexCredentials.narthexApiKey()
+                    "%s/sip-app",
+                    narthexCredentials.narthexUrl()
             );
-            feedback().info("GET "+requestUrl);
+            feedback().info("GET " + requestUrl);
             return new HttpGet(requestUrl);
         }
     }
@@ -230,6 +305,7 @@ public class NetworkClient {
                             success = true;
                             break;
                         case UNAUTHORIZED:
+                            loggedIn = false;
                             finished = null;
                             success = false;
                             break;
@@ -277,12 +353,11 @@ public class NetworkClient {
 
         private HttpGet createSipZipDownloadRequest() throws OAuthSystemException, OAuthProblemException {
             String requestUrl = String.format(
-                    "%s/sip-creator/%s/%s",
+                    "%s/sip-app/%s",
                     narthexCredentials.narthexUrl(),
-                    narthexCredentials.narthexApiKey(),
                     dataSet.getSpec()
             );
-            feedback().info("GET "+requestUrl);
+            feedback().info("GET " + requestUrl);
             return new HttpGet(requestUrl);
         }
     }
@@ -333,13 +408,12 @@ public class NetworkClient {
 
         private HttpPost createSipZipUploadRequest(File file, ProgressListener progressListener) {
             String requestUrl = String.format(
-                    "%s/sip-creator/%s/%s/%s",
+                    "%s/sip-app/%s/%s",
                     narthexCredentials.narthexUrl(),
-                    narthexCredentials.narthexApiKey(),
                     datasetName,
                     file.getName()
             );
-            feedback().info("POST "+requestUrl);
+            feedback().info("POST " + requestUrl);
             HttpPost post = new HttpPost(requestUrl);
             FileEntity fileEntity = new FileEntity(file, progressListener);
             post.setEntity(fileEntity);

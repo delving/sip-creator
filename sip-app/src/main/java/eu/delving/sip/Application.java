@@ -87,8 +87,9 @@ import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
 import static eu.delving.sip.files.DataSetState.MAPPING;
 import static eu.delving.sip.files.DataSetState.PROCESSED;
 import static eu.delving.sip.files.DataSetState.SOURCED;
-import static eu.delving.sip.files.Storage.NARTHEX_API_KEY;
+import static eu.delving.sip.files.Storage.NARTHEX_PASSWORD;
 import static eu.delving.sip.files.Storage.NARTHEX_URL;
+import static eu.delving.sip.files.Storage.NARTHEX_USERNAME;
 
 /**
  * The main application, based on the SipModel and bringing everything together in a big frame with a central
@@ -155,17 +156,19 @@ public class Application {
 
             @Override
             public boolean areSet() {
-                return !(narthexUrl().isEmpty() || narthexApiKey().isEmpty());
+                return !(narthexUrl().isEmpty() || narthexUser().isEmpty());
             }
 
             @Override
             public void ask() {
                 Map<String, String> fields = new TreeMap<String, String>();
                 fields.put(NARTHEX_URL, narthexUrl());
-                fields.put(NARTHEX_API_KEY, narthexApiKey());
+                fields.put(NARTHEX_USERNAME, narthexUser());
+                fields.put(NARTHEX_PASSWORD, narthexPassword());
                 if (sipModel.getFeedback().getNarthexCredentials(fields)) {
                     sipModel.getPreferences().put(NARTHEX_URL, fields.get(NARTHEX_URL));
-                    sipModel.getPreferences().put(NARTHEX_API_KEY, fields.get(NARTHEX_API_KEY));
+                    sipModel.getPreferences().put(NARTHEX_USERNAME, fields.get(NARTHEX_USERNAME));
+                    sipModel.getPreferences().put(NARTHEX_PASSWORD, fields.get(NARTHEX_PASSWORD));
                 }
             }
 
@@ -175,8 +178,13 @@ public class Application {
             }
 
             @Override
-            public String narthexApiKey() {
-                return sipModel.getPreferences().get(NARTHEX_API_KEY, "").trim();
+            public String narthexUser() {
+                return sipModel.getPreferences().get(NARTHEX_USERNAME, "").trim();
+            }
+
+            @Override
+            public String narthexPassword() {
+                return sipModel.getPreferences().get(NARTHEX_PASSWORD, "").trim();
             }
         });
         createSipZipAction = new CreateSipZipAction();

@@ -40,10 +40,11 @@ import java.net.URL;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
-import static eu.delving.sip.files.Storage.NARTHEX_API_KEY;
 import static eu.delving.sip.files.Storage.NARTHEX_DATASET_NAME;
+import static eu.delving.sip.files.Storage.NARTHEX_PASSWORD;
 import static eu.delving.sip.files.Storage.NARTHEX_PREFIX;
 import static eu.delving.sip.files.Storage.NARTHEX_URL;
+import static eu.delving.sip.files.Storage.NARTHEX_USERNAME;
 import static javax.swing.JOptionPane.*;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.apache.commons.lang.StringUtils.isWhitespace;
@@ -146,21 +147,24 @@ public class VisualFeedback implements Feedback {
     public boolean getNarthexCredentials(Map<String, String> fields) {
         if (fields.containsKey(NARTHEX_DATASET_NAME)) {
             JTextField urlField = new JTextField(fields.get(NARTHEX_URL), 45);
-            JTextField apiKeyField = new JTextField(fields.get(NARTHEX_API_KEY));
+            JTextField usernameField = new JTextField(fields.get(NARTHEX_USERNAME));
+            JPasswordField passwordField = new JPasswordField(fields.get(NARTHEX_PASSWORD));
             JTextField datasetField = new JTextField(fields.get(NARTHEX_DATASET_NAME));
             JTextField prefixField = new JTextField(fields.get(NARTHEX_PREFIX));
             if (!form(
                     "Narthex details",
                     "Server", urlField,
-                    "API Key", apiKeyField,
+                    "Username", usernameField,
+                    "Password", passwordField,
                     "Dataset", datasetField,
                     "Prefix", prefixField
             )) return false;
-            if (!(isEmpty(urlField.getText()) || isEmpty(apiKeyField.getText()) || isEmpty(datasetField.getText()) || isEmpty(prefixField.getText()))) {
+            if (!(isEmpty(urlField.getText()) || isEmpty(usernameField.getText()) || isEmpty(datasetField.getText()) || isEmpty(prefixField.getText()))) {
                 try {
                     new URL(urlField.getText().trim());
                     fields.put(NARTHEX_URL, urlField.getText().trim());
-                    fields.put(NARTHEX_API_KEY, apiKeyField.getText().trim());
+                    fields.put(NARTHEX_USERNAME, usernameField.getText().trim());
+                    fields.put(NARTHEX_PASSWORD, new String(passwordField.getPassword()));
                     fields.put(NARTHEX_DATASET_NAME, datasetField.getText().trim());
                     fields.put(NARTHEX_PREFIX, prefixField.getText().trim());
                     return true;
@@ -172,17 +176,20 @@ public class VisualFeedback implements Feedback {
         }
         else {
             JTextField urlField = new JTextField(fields.get(NARTHEX_URL), 45);
-            JTextField apiKeyField = new JTextField(fields.get(NARTHEX_API_KEY));
+            JTextField usernameField = new JTextField(fields.get(NARTHEX_USERNAME));
+            JPasswordField passwordField = new JPasswordField(fields.get(NARTHEX_PASSWORD));
             if (!form(
                     "Narthex details",
                     "Server", urlField,
-                    "API Key", apiKeyField
+                    "Username", usernameField,
+                    "Password", passwordField
             )) return false;
-            if (!(isEmpty(urlField.getText()) || isEmpty(apiKeyField.getText()))) {
+            if (!(isEmpty(urlField.getText()) || isEmpty(usernameField.getText()))) {
                 try {
                     new URL(urlField.getText().trim());
                     fields.put(NARTHEX_URL, urlField.getText().trim());
-                    fields.put(NARTHEX_API_KEY, apiKeyField.getText().trim());
+                    fields.put(NARTHEX_USERNAME, usernameField.getText().trim());
+                    fields.put(NARTHEX_PASSWORD, new String(passwordField.getPassword()));
                     return true;
                 }
                 catch (MalformedURLException e) {

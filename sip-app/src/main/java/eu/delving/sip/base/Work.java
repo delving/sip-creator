@@ -76,6 +76,7 @@ public interface Work extends Runnable {
         RELOAD_MAPPING(DATA_SET_PREFIX),
         DELETE_CACHES(DATA_SET_PREFIX),
 
+        LOGIN(NETWORK),
         FETCH_LIST(NETWORK),
         FETCH_FACTS_DEF(NETWORK),
         FETCH_HELP(NETWORK),

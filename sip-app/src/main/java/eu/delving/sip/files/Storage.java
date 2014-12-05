@@ -94,7 +94,8 @@ public interface Storage {
     String SCHEMA_VERSIONS = "schemaVersions";
     String HARVEST_URL = "harvestUrl";
     String NARTHEX_URL = "narthexUrl";
-    String NARTHEX_API_KEY = "narthexApiKey";
+    String NARTHEX_USERNAME = "narthexUsername";
+    String NARTHEX_PASSWORD = "narthexPassword";
     String NARTHEX_DATASET_NAME = "narthexDatasetName";
     String NARTHEX_PREFIX = "narthexPrefix";
     String CACHE_DIR = "__cache__";
