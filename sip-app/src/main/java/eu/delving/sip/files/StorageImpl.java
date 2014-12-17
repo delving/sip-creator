@@ -431,13 +431,11 @@ public class StorageImpl implements Storage {
                 // check if the dataset is based on a harvest
                 Map<String, String> hints = getHints();
                 hints.put("pockets", "true");
+                hints.remove("recordRootPath");
+                hints.remove("uniqueIdPath");
                 setHints(hints);
-                String harvestUrl = hints.get(Storage.HARVEST_URL);
-                boolean harvestBased = harvestUrl != null && !harvestUrl.trim().isEmpty();
                 // gather the files together
                 List<File> files = new ArrayList<File>();
-                // if there's no harvest, we give Narthex source so it can be downloaded by somebody else
-                if (!harvestBased) files.add(sourceFile(here));
                 // narthexFacts take only the chosen SCHEMA_VERSIONS
                 Map<String, String> narthexFacts = new TreeMap<String, String>(dataSetFacts);
                 // for the mapping matching the prefix
