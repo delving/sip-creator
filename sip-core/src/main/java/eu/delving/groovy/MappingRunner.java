@@ -96,7 +96,7 @@ public class MappingRunner {
             throw e;
         }
         catch (MissingPropertyException e) {
-            throw new MappingException(metadataRecord, "Missing Property " + e.getProperty() + "\n" + code, e);
+            throw new MappingException(metadataRecord, "Missing Property " + e.getProperty(), e);
         }
         catch (MultipleCompilationErrorsException e) {
             StringBuilder out = new StringBuilder();
