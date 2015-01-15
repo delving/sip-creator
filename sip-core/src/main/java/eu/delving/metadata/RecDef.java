@@ -502,6 +502,9 @@ public class RecDef {
         public Assertion assertion;
 
         @XStreamImplicit
+        public List<Attr> subattrs = new ArrayList<Attr>();
+
+        @XStreamImplicit
         public List<Elem> subelements = new ArrayList<Elem>();
 
         @XStreamAlias("node-mapping")
@@ -518,6 +521,9 @@ public class RecDef {
 
         @XStreamOmitField
         public List<Elem> elemList = new ArrayList<Elem>();
+
+        @XStreamOmitField
+        public boolean attrsAdded;
 
         @XStreamOmitField
         public boolean subelementsAdded;
@@ -565,6 +571,10 @@ public class RecDef {
                     attrList.addAll(recDef.attrGroup(name, path.toString()).deepCopy().attrs);
                 }
                 attrGroups = null;
+            }
+            if (!attrsAdded) {
+                attrList.addAll(subattrs);
+                attrsAdded = true;
             }
             if (elems != null) {
                 for (String localName : elems.split(DELIM)) {
