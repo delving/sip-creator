@@ -30,7 +30,7 @@
     <artifactId>sip-app</artifactId>
     <packaging>jar</packaging>
     <name>SIP-App</name>
-    <version>P14-04</version>
+    <version>1.0.0</version>
     <inceptionYear>2008</inceptionYear>
 
     <organization>
@@ -65,7 +65,7 @@
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-creator</artifactId>
-        <version>14.12-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <build>
@@ -105,7 +105,7 @@
         <dependency>
             <groupId>eu.delving</groupId>
             <artifactId>sip-core</artifactId>
-            <version>14.12-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.jgoodies</groupId>
