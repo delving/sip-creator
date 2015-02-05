@@ -30,7 +30,7 @@
     <artifactId>schema-repo</artifactId>
     <packaging>jar</packaging>
     <name>Schema-Repo</name>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <description>
         Schema repository
     </description>
@@ -54,7 +54,7 @@
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-creator</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
     </parent>
 
     <build>
