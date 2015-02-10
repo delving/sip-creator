@@ -121,34 +121,53 @@ public class NetworkClient {
         void failed(Exception e);
     }
 
-    public void afterLogin(Work work) {
+    public interface NarthexLoginFailure {
+        void loginFailure(String reason);
+    }
+
+    public void afterLogin(Work work, NarthexLoginFailure loginFailure) {
         if (loggedIn) {
             sipModel.exec(work);
         }
         else {
-            sipModel.exec(new NarthexLogin(work));
+            sipModel.exec(new NarthexLogin(work, loginFailure));
         }
     }
 
-    public void fetchNarthexSipList(NarthexListListener narthexListListener) {
-        afterLogin(new NarthexListFetcher(narthexListListener));
+    public void fetchNarthexSipList(final NarthexListListener narthexListListener) {
+        afterLogin(new NarthexListFetcher(narthexListListener), new NarthexLoginFailure() {
+            @Override
+            public void loginFailure(String reason) {
+                narthexListListener.failed(new Exception(reason));
+            }
+        });
     }
 
     public void downloadNarthexDataset(String fileName, DataSet dataSet, Swing finished) {
-        afterLogin(new NarthexDatasetDownloader(fileName, dataSet, finished));
+        afterLogin(new NarthexDatasetDownloader(fileName, dataSet, finished), new NarthexLoginFailure() {
+            @Override
+            public void loginFailure(String reason) {
+            }
+        });
     }
 
     public void uploadNarthex(File sipZipFile, String datasetName, Swing finished) throws StorageException {
-        afterLogin(new NarthexUploader(sipZipFile, datasetName, finished));
+        afterLogin(new NarthexUploader(sipZipFile, datasetName, finished), new NarthexLoginFailure() {
+            @Override
+            public void loginFailure(String reason) {
+            }
+        });
     }
 
     // NARTHEX ========================================
 
     private class NarthexLogin implements Work {
         private final Work afterLogin;
+        private final NarthexLoginFailure failure;
 
-        private NarthexLogin(Work afterLogin) {
+        private NarthexLogin(Work afterLogin, NarthexLoginFailure failure) {
             this.afterLogin = afterLogin;
+            this.failure = failure;
         }
 
         @Override
@@ -171,9 +190,11 @@ public class NetworkClient {
                             break;
                         case UNAUTHORIZED:
                             loggedIn = false;
+                            failure.loginFailure("Unauthorized");
                             break;
                         default:
                             reportResponse(code, response.getStatusLine());
+                            failure.loginFailure(response.getStatusLine().getReasonPhrase());
                             break;
                     }
                     EntityUtils.consume(entity);
@@ -184,6 +205,7 @@ public class NetworkClient {
             }
             catch (Exception e) {
                 feedback().alert("Error logging in to Narthex", e);
+                failure.loginFailure(e.getMessage());
             }
         }
 

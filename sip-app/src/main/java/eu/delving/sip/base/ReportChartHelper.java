@@ -23,7 +23,6 @@ package eu.delving.sip.base;
 
 import eu.delving.metadata.RecDef;
 import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.LinkFile;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
@@ -36,20 +35,13 @@ import org.jfree.chart.labels.ItemLabelPosition;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.RingPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.PieDataset;
 
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
+import javax.swing.*;
 import java.awt.Color;
-import java.awt.GridLayout;
 import java.awt.Paint;
-import java.util.Locale;
-import java.util.Map;
 
 import static org.jfree.chart.labels.ItemLabelAnchor.INSIDE12;
 import static org.jfree.chart.labels.ItemLabelAnchor.OUTSIDE12;
@@ -132,32 +124,6 @@ public class ReportChartHelper {
             return colors[i % colors.length];
         }
 
-    }
-
-    public static JComponent createLinkChart(DataSet dataSet, String prefix, Map<RecDef.Check, LinkFile.LinkStats> linkStatsMap) {
-        JPanel p = new JPanel(new GridLayout(0, 1));
-        for (Map.Entry<RecDef.Check, LinkFile.LinkStats> entry : linkStatsMap.entrySet()) {
-            JPanel pp = new JPanel(new GridLayout(1, 0));
-            pp.setBorder(BorderFactory.createTitledBorder(entry.getKey().toString()));
-            for (Map.Entry<String, PieDataset> datasetEntry : entry.getValue().createPies().entrySet()) {
-                JFreeChart chart = ChartFactory.createRingChart(
-                        datasetEntry.getKey(),
-                        datasetEntry.getValue(),
-                        true,
-                        false,
-                        Locale.getDefault()
-                );
-                RingPlot plot = (RingPlot)chart.getPlot();
-                plot.setLabelGenerator(null);
-                plot.setNoDataMessage("No data available");
-                plot.setSectionDepth(0.34999999999999998D);
-                plot.setCircular(true);
-                plot.setLabelGap(0.02D);
-                pp.add(new ChartPanel(chart));
-            }
-            p.add(pp);
-        }
-        return p;
     }
 
 

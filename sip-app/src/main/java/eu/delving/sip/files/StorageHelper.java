@@ -156,8 +156,8 @@ public class StorageHelper {
         return new File(dir, REPORT_INDEX.getName(prefix));
     }
 
-    static File linkFile(File dir, String prefix) {
-        return new File(dir, LINKS.getName(prefix));
+    static File reportConclusionFile(File dir, String prefix) {
+        return new File(dir, REPORT_CONCLUSION.getName(prefix));
     }
 
     public static File statsFile(File dir) {

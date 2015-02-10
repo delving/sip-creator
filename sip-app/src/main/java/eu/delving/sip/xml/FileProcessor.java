@@ -212,7 +212,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         public void record(ReportWriter reportWriter, XmlOutput xmlOutput) {
             try {
                 if (exception == null) {
-                    reportWriter.valid(mappingResult.getLocalId(), mappingResult);
                     xmlOutput.write(mappingResult.getLocalId(), mappingResult.rootAugmented());
                 }
                 else if (exception instanceof DiscardRecordException) {
@@ -247,7 +246,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         public void accept(MetadataRecord metadataRecord, MappingResult mappingResult, Exception exception) {
 //            timer("mapping", false);
-            recordCount++;
             outputQueue.add(new MappingOutput(metadataRecord, mappingResult, exception, termination));
         }
 
@@ -358,7 +356,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         return;
                     }
                     try {
-//                        timer("mapping", true);
                         Node node = mappingRunner.runMapping(record);
                         MappingResult result = new MappingResultImpl(serializer, uriGenerator.generateUri(record.getId()), node, mappingRunner.getRecDefTree()).resolve();
                         if (validator == null) {

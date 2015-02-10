@@ -26,12 +26,21 @@ import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlNodePrinter;
 import eu.delving.groovy.XmlSerializer;
-import eu.delving.sip.xml.LinkCheckExtractor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.CountingOutputStream;
 
 import javax.xml.xpath.XPathExpressionException;
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Describes how a report is written during dataset processing
@@ -44,35 +53,25 @@ public class ReportWriter {
     private XmlSerializer serializer = new XmlSerializer();
     private File reportFile;
     private File reportIndexFile;
-    private LinkCheckExtractor linkCheckExtractor;
+    private File reportConclusionFile;
     private CountingOutputStream count;
     private Writer out;
     private DataOutputStream indexOut;
     private int recordNumber;
 
     public enum ReportType {
-        VALID,
         INVALID,
         DISCARDED,
         UNEXPECTED
     }
 
-    public ReportWriter(File reportFile, File reportIndexFile, LinkCheckExtractor linkCheckExtractor) throws FileNotFoundException, XPathExpressionException, UnsupportedEncodingException {
+    public ReportWriter(File reportFile, File reportIndexFile, File reportConclusionFile) throws FileNotFoundException, XPathExpressionException, UnsupportedEncodingException {
         this.reportFile = reportFile;
         this.reportIndexFile = reportIndexFile;
-        this.linkCheckExtractor = linkCheckExtractor;
+        this.reportConclusionFile = reportConclusionFile;
         this.indexOut = new DataOutputStream(new FileOutputStream(reportIndexFile));
         this.count = new CountingOutputStream(new FileOutputStream(reportFile));
         this.out = new OutputStreamWriter(count, "UTF-8");
-    }
-
-    public void valid(String id, MappingResult mappingResult) throws XPathExpressionException, IOException {
-        report(ReportType.VALID, id);
-        for (String line : linkCheckExtractor.getChecks(mappingResult)) {
-            out.write(line);
-            out.write("\n");
-        }
-        terminate();
     }
 
     public void invalid(MappingResult mappingResult, Exception e) throws IOException {
@@ -112,13 +111,12 @@ public class ReportWriter {
     public void finish(int validCount, int invalidCount) {
         try {
             indexOut.close();
-            out.flush();
-            out.write(DIVIDER);
-            out.write("\n");
-            out.write(String.format("total=%d\n", validCount + invalidCount));
-            out.write(String.format("valid=%d\n", validCount));
-            out.write(String.format("invalid=%d\n", invalidCount));
             out.close();
+            List<String> lines = new ArrayList<String>();
+            lines.add(String.format("Total Records: %d", validCount + invalidCount));
+            lines.add(String.format("Valid Records: %d", validCount));
+            lines.add(String.format("Invalid Records: %d", invalidCount));
+            FileUtils.writeLines(reportConclusionFile, lines);
         }
         catch (IOException e) {
             throw new RuntimeException("Unable to finish report", e);

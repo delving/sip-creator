@@ -43,6 +43,8 @@ import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,6 +94,16 @@ public class RemoteDataSetFrame extends FrameBase {
         this.workItemList.setSelectionMode(SINGLE_SELECTION);
         this.workItemList.setCellRenderer(WORK_CELL_RENDERER);
         this.workItemList.addListSelectionListener(WORK_ITEM_LISTENER);
+        this.workItemList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() > 1 && OPEN_WORK_ITEM_ACTION.isEnabled()) {
+                    if (workItemList.getSelectedIndex() != workItemList.locationToIndex(e.getPoint())) return;
+                    OPEN_WORK_ITEM_ACTION.actionPerformed(null);
+                }
+            }
+        });
+
         this.uploadModel = new UploadModel();
         this.uploadList = new JList<UploadItem>(uploadModel);
         this.uploadList.setSelectionMode(SINGLE_SELECTION);
@@ -271,14 +283,16 @@ public class RemoteDataSetFrame extends FrameBase {
 
     class WorkItem implements Comparable<WorkItem> {
         private final DataSet dataset;
+        public final DateTime dateTime;
 
         WorkItem(DataSet dataset) {
             this.dataset = dataset;
+            this.dateTime = StorageHelper.dateTimeFromSipZipName(dataset.getSipFileName());
         }
 
         @Override
         public int compareTo(WorkItem other) {
-            return dataset.getSpec().compareTo(other.dataset.getSpec());
+            return (int)(other.dateTime.getMillis() - dateTime.getMillis());
         }
     }
 

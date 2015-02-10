@@ -26,14 +26,12 @@ import eu.delving.metadata.Hasher;
 import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefModel;
-import eu.delving.metadata.RecDefNamespaceContext;
 import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaResponse;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.xml.LinkCheckExtractor;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -342,9 +340,9 @@ public class StorageImpl implements Storage {
         public ReportWriter openReportWriter(RecDef recDef) throws StorageException {
             File reportFile = new File(here, FileType.REPORT.getName(recDef.prefix));
             File reportIndexFile = new File(here, FileType.REPORT_INDEX.getName(recDef.prefix));
+            File reportConclusionFile = new File(here, FileType.REPORT_CONCLUSION.getName(recDef.prefix));
             try {
-                LinkCheckExtractor linkCheckExtractor = new LinkCheckExtractor(recDef.fieldMarkers, new RecDefNamespaceContext(recDef.namespaces));
-                return new ReportWriter(reportFile, reportIndexFile, linkCheckExtractor);
+                return new ReportWriter(reportFile, reportIndexFile, reportConclusionFile);
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
@@ -360,8 +358,9 @@ public class StorageImpl implements Storage {
                 String prefix = getSchemaVersion().getPrefix();
                 File reportFile = reportFile(here, prefix);
                 File reportIndexFile = reportIndexFile(here, prefix);
+                File reportConclusionFile = reportConclusionFile(here, prefix);
                 if (!(reportFile.exists() && reportIndexFile.exists())) return null;
-                return new ReportFile(reportFile, reportIndexFile, linkFile(here, prefix), this, prefix);
+                return new ReportFile(reportFile, reportIndexFile, reportConclusionFile, this, prefix);
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);

@@ -21,13 +21,10 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.sip.base.HttpClientFactory;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.LinkChecker;
 import eu.delving.sip.files.ReportFile;
 import eu.delving.sip.files.StorageException;
-import org.apache.http.client.HttpClient;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -46,7 +43,6 @@ public class ReportFileModel {
     private SipModel sipModel;
     private Listener listener;
     private ReportFile reportFile;
-    private HttpClient httpClient;
 
     public interface Listener {
         void reportsUpdated(ReportFileModel reportFileModel);
@@ -79,38 +75,33 @@ public class ReportFileModel {
     }
 
     public void refresh() {
-        if (sipModel.getDataSetModel().isEmpty()) return;
+        if (sipModel.getDataSetModel().isEmpty()) {
+            return;
+        }
         if (reportFile != null) {
             reportFile.close();
             reportFile = null;
-            DataSet dataSet = sipModel.getDataSetModel().getDataSet();
-            try {
-                ReportFile reportFile = dataSet.getReport();
-                if (reportFile != null) {
-                    ReportFileModel.this.reportFile = reportFile;
-                    reportFile.setLinkChecker(new LinkChecker(getHttpClient()));
-                }
-            }
-            catch (StorageException e) {
-                sipModel.getFeedback().alert("Cannot read report file", e);
-            }
-            sipModel.exec(new Swing() {
-                @Override
-                public void run() {
-                    listener.reportsUpdated(ReportFileModel.this);
-                }
-            });
         }
+        DataSet dataSet = sipModel.getDataSetModel().getDataSet();
+        try {
+            ReportFile reportFile = dataSet.getReport();
+            if (reportFile != null) {
+                ReportFileModel.this.reportFile = reportFile;
+            }
+        }
+        catch (StorageException e) {
+            sipModel.getFeedback().alert("Cannot read report file", e);
+        }
+        sipModel.exec(new Swing() {
+            @Override
+            public void run() {
+                listener.reportsUpdated(ReportFileModel.this);
+            }
+        });
     }
 
     public void shutdown() {
         reportFile.close();
     }
 
-    private synchronized HttpClient getHttpClient() {
-        if (httpClient == null) {
-            httpClient = HttpClientFactory.createLinkCheckClient();
-        }
-        return httpClient;
-    }
 }
