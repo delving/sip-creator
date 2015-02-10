@@ -180,20 +180,7 @@ public class RecMapping {
             if (recDefNode == null) throw new RuntimeException("Cannot find dyn-opt path " + dynOpt.path);
             recDefNode.addSibling(dynOpt);
         }
-        if (nodeMappings.isEmpty()) {
-            List<RecDef.FieldMarker> fieldMarkers = recDefTree.getRecDef().fieldMarkers;
-            if (fieldMarkers != null) for (RecDef.FieldMarker marker : fieldMarkers) {
-                if (!"fact".equals(marker.type)) continue;
-                Path path = marker.path.withDefaultPrefix(recDefTree.getRecDef().prefix);
-                RecDefNode recDefNode = recDefTree.getRecDefNode(path);
-                if (recDefNode != null) {
-                    NodeMapping nodeMapping = new NodeMapping().setInputPath(Path.create().child(Tag.create("facts")).child(Tag.create(marker.name)));
-                    recDefNode.addNodeMapping(nodeMapping);
-                    nodeMappings.add(nodeMapping);
-                }
-            }
-        }
-        else {
+        if (!nodeMappings.isEmpty()) {
             Iterator<NodeMapping> walk = nodeMappings.iterator();
             while (walk.hasNext()) {
                 NodeMapping nodeMapping = walk.next();

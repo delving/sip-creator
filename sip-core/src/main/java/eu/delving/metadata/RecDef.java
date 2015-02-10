@@ -72,32 +72,8 @@ public class RecDef {
     public static final RecDef.Namespace XML_NAMESPACE = new RecDef.Namespace("xml", "http://www.w3.org/XML/1998/namespace", null);
     public static final RecDef.Namespace XSI_NAMESPACE = new RecDef.Namespace("xsi", "http://www.w3.org/2001/XMLSchema-instance", null);
 
-    public static final String DEFAULT_FIELD_TYPE = "text";
     public static final String DELVING_NAMESPACE_URI = "http://schemas.delving.eu/";
     public static final String DELVING_PREFIX = "delving";
-    public static final String[] REQUIRED_FIELDS = {
-            "delving:title",
-            "delving:owner",
-            "delving:provider",
-            "delving:landingPage",
-            "delving:thumbnail"
-    };
-    public static final String LANDING_PAGE = REQUIRED_FIELDS[3];
-    public static final String THUMBNAIL = REQUIRED_FIELDS[4];
-
-    public static final String[][] BACKWARDS_COMPATIBILITY_REFRERENCE = {
-            {"TITLE", "delving:title"},
-            {"OWNER", "delving:owner"},
-            {"PROVIDER", "delving:provider"},
-            {"LANDING_PAGE", "delving:landingPage"},
-            {"THUMBNAIL", "delving:thumbnail"},
-            {"DESCRIPTION", "delving:description"},
-            {"CREATOR", "delving:creator"},
-            {"GEOHASH", "delving:geohash"},
-            {"ADDRESS", "delving:address"},
-            {"IMAGE_URL", "delving:imageUrl"},
-            {"DEEP_ZOOM_URL", "delving:deepZoomUrl"},
-    };
 
     public static RecDef read(InputStream in) {
         try {
@@ -150,9 +126,6 @@ public class RecDef {
     @XStreamAlias("assertion-list")
     public Assertion.AssertionList assertionList;
 
-    @XStreamAlias("field-markers")
-    public List<FieldMarker> fieldMarkers;
-
     public List<Doc> docs;
 
     @XStreamOmitField
@@ -204,11 +177,6 @@ public class RecDef {
         throw new RuntimeException(String.format("No elem group [%s] at %s", name, where));
     }
 
-    public String getFieldType(Path path) {
-        path = path.withDefaultPrefix(prefix);
-        return root.getFieldType(path);
-    }
-
     public String toString() {
         return String.format("RecDef(%s/%s)", prefix, version);
     }
@@ -237,65 +205,6 @@ public class RecDef {
             throw new RuntimeException("No element found for path " + path);
         }
         return found;
-    }
-
-    public enum Check {
-        LANDING_PAGE(true, false),
-        DIGITAL_OBJECT(true, true),
-        THUMBNAIL(true, true),
-        DEEP_ZOOM(true, false),
-        THESAURUS_REFERENCE(true, false),
-        LOD_REFERENCE(true, false),
-        GEO_COORDINATE(false, false),
-        DATE(false, false);
-
-        public final boolean fetch;
-        public final boolean captureSize;
-
-        private Check(boolean fetch, boolean captureSize) {
-            this.fetch = fetch;
-            this.captureSize = captureSize;
-        }
-    }
-
-    @XStreamAlias("field-marker")
-    public static class FieldMarker {
-
-        @XStreamAsAttribute
-        public String name;
-
-        @XStreamAsAttribute
-        public String type;
-
-        @XStreamAsAttribute
-        public Path path;
-
-        @XStreamAsAttribute
-        public String xpath;
-
-        @XStreamAsAttribute
-        public Check check;
-
-        public void resolve(RecDefTree recDefTree) {
-            if (path != null) {
-                path = path.withDefaultPrefix(recDefTree.getRecDef().prefix);
-            }
-            if (name != null) {
-                for (String[] translation : BACKWARDS_COMPATIBILITY_REFRERENCE) {
-                    if (translation[0].equals(name)) {
-                        name = translation[1];
-                    }
-                }
-            }
-        }
-
-        public String getXPath() {
-            return xpath != null ? xpath : path.toString();
-        }
-
-        public boolean hasPath() {
-            return xpath != null || path != null;
-        }
     }
 
     @XStreamAlias("doc")
@@ -392,6 +301,9 @@ public class RecDef {
         public boolean required;
 
         @XStreamAsAttribute
+        public boolean uriCheck;
+
+        @XStreamAsAttribute
         public boolean hidden;
 
         @XStreamAsAttribute
@@ -400,18 +312,11 @@ public class RecDef {
         @XStreamAlias("node-mapping")
         public NodeMapping nodeMapping;
 
-        @XStreamAsAttribute
-        public String fieldType;
-
         @XStreamOmitField
         public Doc doc;
 
         public String toString() {
             return tag.toString();
-        }
-
-        public String getFieldType() {
-            return fieldType != null ? fieldType : DEFAULT_FIELD_TYPE;
         }
 
         public Attr copy() {
@@ -482,13 +387,13 @@ public class RecDef {
         public boolean singular;
 
         @XStreamAsAttribute
+        public boolean uriCheck;
+
+        @XStreamAsAttribute
         public boolean hidden;
 
         @XStreamAsAttribute
         public boolean unmappable;
-
-        @XStreamAsAttribute
-        public String fieldType;
 
         @XStreamAsAttribute
         public String function;
@@ -593,22 +498,6 @@ public class RecDef {
                 subelementsAdded = true;
             }
             for (Elem elem : elemList) elem.resolve(path, recDef);
-        }
-
-        String getFieldType() {
-            return fieldType != null ? fieldType : DEFAULT_FIELD_TYPE;
-        }
-
-        private String getFieldType(Path path) {
-            if (path.getTag(0).equals(tag)) {
-                if (path.parent() == Path.ROOT) return getFieldType();
-                Path subPath = path.withRootRemoved();
-                for (Elem sub : elemList) {
-                    String fieldType = sub.getFieldType(subPath);
-                    if (fieldType != null) return fieldType;
-                }
-            }
-            return null;
         }
 
         public Elem deepCopy() {

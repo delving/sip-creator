@@ -420,15 +420,14 @@ public class CodeGenerator {
                 codeOut.line(recDefNode.hasFunction() ? String.format("%s(%s.toString())", recDefNode.getFunction(), mapUsage) : mapUsage);
             }
             else {
-                String sanitize = recDefNode.getFieldType().equalsIgnoreCase("link") ? ".sanitizeURI()" : "";
                 if (nodeMapping.isConstant()) {
                     codeOut.line("'%s'", nodeMapping.getConstantValue());
                 }
                 else if (recDefNode.hasFunction()) {
-                    codeOut.line("\"${%s(%s)%s}\"", recDefNode.getFunction(), toLeafGroovyParam(path), sanitize);
+                    codeOut.line("\"${%s(%s)}\"", recDefNode.getFunction(), toLeafGroovyParam(path));
                 }
                 else {
-                    codeOut.line("\"${%s%s}\"", toLeafGroovyParam(path), sanitize);
+                    codeOut.line("\"${%s}\"", toLeafGroovyParam(path));
                 }
             }
         }

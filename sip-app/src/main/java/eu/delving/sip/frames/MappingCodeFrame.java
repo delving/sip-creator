@@ -21,7 +21,7 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.MappingResult;
+import eu.delving.metadata.MappingResult;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecMapping;
@@ -31,10 +31,7 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.MappingCompileModel;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Font;

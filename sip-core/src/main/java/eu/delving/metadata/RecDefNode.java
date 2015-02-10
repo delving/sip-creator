@@ -178,8 +178,13 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return dynOpt;
     }
 
-    public String getFieldType() {
-        return elem != null ? elem.getFieldType() : attr.getFieldType();
+    public boolean hasUriCheck() {
+        if (isAttr()) {
+            return attr.uriCheck;
+        }
+        else {
+            return elem.uriCheck;
+        }
     }
 
     public boolean isAttr() {
