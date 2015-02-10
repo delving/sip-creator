@@ -38,7 +38,6 @@ import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.ReportWriter;
-import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
 import eu.delving.stats.Stats;
 import org.w3c.dom.Node;
@@ -64,16 +63,21 @@ import java.util.concurrent.TransferQueue;
  */
 
 public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork {
-    private SipModel sipModel;
-    private DataSet dataSet;
-    private RecMapping recMapping;
-    private GroovyCodeResource groovyCodeResource;
-    private UriGenerator uriGenerator;
+    private final SipModel sipModel;
+    private final DataSet dataSet;
+    private final RecMapping recMapping;
+    private final GroovyCodeResource groovyCodeResource;
+    private final UriGenerator uriGenerator;
+    private final boolean allowInvalid;
+    private final Listener listener;
     private ProgressListener progressListener;
-    private boolean allowInvalid;
     private TransferQueue<MetadataRecord> recordSource = new LinkedTransferQueue<MetadataRecord>();
     private Stats stats;
-    private Termination termination;
+    private Termination termination = new Termination();
+
+    private void info(String message) {
+        sipModel.getFeedback().info(message);
+    }
 
     public interface Listener {
 
@@ -103,7 +107,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         this.allowInvalid = allowInvalid;
         this.groovyCodeResource = groovyCodeResource;
         this.uriGenerator = uriGenerator;
-        this.termination = new Termination(this, sipModel.getFeedback(), listener);
+        this.listener = listener;
     }
 
     public String getSpec() {
@@ -147,18 +151,14 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         progressListener.setProgressMessage("Map, validate, gather stats");
     }
 
-    private static class QueueFiller implements Runnable {
+    private class QueueFiller implements Runnable {
         final MetadataParser parser;
         final TransferQueue<MetadataRecord> sink;
-        final Termination termination;
-        final GroovyCodeResource groovyCodeResource;
         private Thread thread = new Thread(this);
 
-        private QueueFiller(MetadataParser parser, TransferQueue<MetadataRecord> sink, Termination termination, GroovyCodeResource groovyCodeResource) {
+        private QueueFiller(MetadataParser parser, TransferQueue<MetadataRecord> sink) {
             this.parser = parser;
             this.sink = sink;
-            this.termination = termination;
-            this.groovyCodeResource = groovyCodeResource;
         }
 
         @Override
@@ -169,9 +169,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     while (!sink.tryTransfer(metadataRecord, 1000, TimeUnit.MILLISECONDS)) {
                         System.out.println("retry feeding record");
                     }
-                    if (metadataRecord.isPoison()) {
-                        termination.normalCompletion();
-                    }
                 }
             }
             catch (Exception e) {
@@ -180,33 +177,31 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
 
         public void start() {
+            info("Queue filler started");
             thread.start();
         }
 
     }
 
-    private static class MappingOutput {
+    private class MappingOutput {
         final MetadataRecord metadataRecord;
         final MappingResult mappingResult;
         final Exception exception;
-        final Termination termination;
 
-        private MappingOutput(MetadataRecord metadataRecord, MappingResult mappingResult, Exception exception, Termination termination) {
+        private MappingOutput(MetadataRecord metadataRecord, MappingResult mappingResult, Exception exception) {
             this.metadataRecord = metadataRecord;
             this.mappingResult = mappingResult;
             this.exception = exception;
-            this.termination = termination;
         }
 
         private MappingOutput() {
             this.metadataRecord = null;
             this.mappingResult = null;
             this.exception = null;
-            this.termination = null;
         }
 
         public boolean isPoison() {
-            return termination == null;
+            return metadataRecord == null;
         }
 
         public void record(ReportWriter reportWriter, XmlOutput xmlOutput) {
@@ -231,22 +226,19 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
     }
 
-    private static class Consumer implements Runnable {
+    private class Consumer implements Runnable {
         final BlockingQueue<MappingOutput> outputQueue = new LinkedBlockingDeque<MappingOutput>();
         final ReportWriter reportWriter;
         final XmlOutput xmlOutput;
-        final Termination termination;
         private int recordCount, validCount;
 
-        private Consumer(ReportWriter reportWriter, XmlOutput xmlOutput, Termination termination) {
+        private Consumer(ReportWriter reportWriter, XmlOutput xmlOutput) {
             this.reportWriter = reportWriter;
             this.xmlOutput = xmlOutput;
-            this.termination = termination;
         }
 
         public void accept(MetadataRecord metadataRecord, MappingResult mappingResult, Exception exception) {
-//            timer("mapping", false);
-            outputQueue.add(new MappingOutput(metadataRecord, mappingResult, exception, termination));
+            outputQueue.add(new MappingOutput(metadataRecord, mappingResult, exception));
         }
 
         public void poison() {
@@ -260,6 +252,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     MappingOutput mappingOutput = outputQueue.take();
                     if (mappingOutput.isPoison()) {
                         outputQueue.add(mappingOutput);
+                        info("Consumer stopping");
                         break;
                     }
                     recordCount++;
@@ -274,10 +267,13 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             }
             xmlOutput.finish(termination.isIncomplete());
             if (termination.isIncomplete()) {
+                info("Abort report writer");
                 reportWriter.abort();
             }
             else {
+                info(String.format("Finish report writer records=%d valid=%d", recordCount, validCount));
                 reportWriter.finish(validCount, recordCount - validCount);
+                termination.normalCompletion();
             }
         }
     }
@@ -289,10 +285,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             parser.setProgressListener(progressListener);
             ReportWriter reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
             XmlOutput xmlOutput = new XmlOutput(getDataSet().targetOutput(), recDef().getNamespaceMap());
-            QueueFiller queueFiller = new QueueFiller(parser, recordSource, termination, groovyCodeResource);
+            QueueFiller queueFiller = new QueueFiller(parser, recordSource);
             this.stats = createStats();
-            Consumer consumer = new Consumer(reportWriter, xmlOutput, termination);
+            Consumer consumer = new Consumer(reportWriter, xmlOutput);
             int engineCount = Runtime.getRuntime().availableProcessors();
+            info(String.format("Processing with %d engines", engineCount));
             for (int walk = 0; walk < engineCount; walk++) {
                 // todo: disabled
 //                Validator validator = dataSet.newValidator();
@@ -306,7 +303,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 engine.start();
             }
             queueFiller.start();
-            System.out.println(Thread.currentThread().getName() + " about to consume");
+            info(Thread.currentThread().getName() + " about to consume");
             consumer.run();
         }
         catch (Exception e) {
@@ -411,21 +408,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         ABORT
     }
 
-    private static class Termination {
-        final FileProcessor fileProcessor;
-        final Feedback feedback;
-        final Listener listener;
-
+    private class Termination {
         private MetadataRecord failedRecord;
         private Exception exception;
         private boolean cancelled, completed;
         private NextStep nextStep = NextStep.CONTINUE;
-
-        private Termination(FileProcessor fileProcessor, Feedback feedback, Listener listener) {
-            this.fileProcessor = fileProcessor;
-            this.feedback = feedback;
-            this.listener = listener;
-        }
 
         boolean notYet() {
             return !completed && !isIncomplete();
@@ -441,12 +428,12 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         void normalCompletion() {
             completed = true;
-            listener.succeeded(fileProcessor);
+            listener.succeeded(FileProcessor.this);
         }
 
         void dueToCancellation() {
             cancelled = true;
-            listener.aborted(fileProcessor);
+            listener.aborted(FileProcessor.this);
         }
 
         void dueToException(Exception exception) {
@@ -455,11 +442,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         synchronized void dueToException(MetadataRecord failedRecord, Exception exception) {
             if (this.exception == null) { // only show one of them
-                feedback.alert("Problem processing", exception);
+                sipModel.getFeedback().alert("Problem processing", exception);
             }
             this.failedRecord = failedRecord;
             this.exception = exception;
-            listener.failed(fileProcessor);
+            listener.failed(FileProcessor.this);
         }
 
         synchronized void askHowToProceed(MetadataRecord failedRecord, Exception exception) {
@@ -487,17 +474,17 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         private NextStep blockForNextStep(int recordNumber) {
             JRadioButton continueButton = new JRadioButton(String.format(
                     "<html><b>Continue</b> - Continue the %s mapping of data set %s, discarding invalid record %d",
-                    fileProcessor.getPrefix(), fileProcessor.getSpec(), recordNumber
+                    getPrefix(), getSpec(), recordNumber
             ));
             JRadioButton investigateButton = new JRadioButton(String.format(
                     "<html><b>Investigate</b> - Stop and fix the %s mapping of data set %s, with invalid record %d in view",
-                    fileProcessor.getPrefix(), fileProcessor.getSpec(), recordNumber
+                    getPrefix(), getSpec(), recordNumber
             ));
             ButtonGroup bg = new ButtonGroup();
             bg.add(continueButton);
             continueButton.setSelected(true);
             bg.add(investigateButton);
-            if (feedback.form("Invalid Record! How to proceed?", continueButton, investigateButton)) {
+            if (sipModel.getFeedback().form("Invalid Record! How to proceed?", continueButton, investigateButton)) {
                 if (investigateButton.isSelected()) {
                     return NextStep.INVESTIGATE;
                 }
@@ -510,57 +497,4 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             }
         }
     }
-
-//    static class MapStat {
-//        final String name;
-//        long totalIn, totalOut, count;
-//        long in, out;
-//        long lastAppearance;
-//
-//        MapStat(String name) {
-//            this.name = name;
-//        }
-//
-//        boolean shouldShow() {
-//            if (lastAppearance > System.currentTimeMillis() - 1000) return false;
-//            lastAppearance = System.currentTimeMillis() + (long) (Math.random() * 200);
-//            return true;
-//        }
-//
-//        public String toString() {
-//            Runtime r = Runtime.getRuntime();
-//            return name + "/" + count + ": " + (out - in) + ": in=" + totalIn + ": out=" + totalOut;
-//        }
-//
-//        public void stamp(boolean goIn) {
-//            if (goIn) {
-//                count++;
-//                in = System.currentTimeMillis();
-//                if (out == 0) {
-//                    out = in;
-//                }
-//                else {
-//                    totalOut += in - out;
-//                }
-//            }
-//            else {
-//                out = System.currentTimeMillis();
-//                totalIn += out - in;
-//            }
-//        }
-//    }
-//
-//    static Map<String, MapStat> mapStats = new ConcurrentHashMap<String, MapStat>();
-//
-//    static void timer(String message, boolean goIn) {
-//        String name = Thread.currentThread().getName() + ":" + message;
-//        MapStat mapStat = mapStats.get(name);
-//        if (mapStat == null) {
-//            mapStats.put(name, mapStat = new MapStat(name));
-//        }
-//        mapStat.stamp(goIn);
-//        if (!goIn && mapStat.shouldShow()) {
-//            System.out.println(mapStat);
-//        }
-//    }
 }

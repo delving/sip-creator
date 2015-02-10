@@ -188,7 +188,7 @@ public class Application {
             }
         });
         createSipZipAction = new CreateSipZipAction();
-        expertMenu = new ExpertMenu(desktop, sipModel, networkClient, allFrames);
+        expertMenu = new ExpertMenu(sipModel, allFrames);
         statusPanel = new StatusPanel(sipModel);
         home = new JFrame(titleString());
         home.addComponentListener(new ComponentAdapter() {
@@ -282,7 +282,6 @@ public class Application {
                                 titleString() + " - [%s -> %s]",
                                 dataSetModel.getDataSet().getSpec(), dataSetModel.getPrefix().toUpperCase()
                         ));
-                        sipModel.getReportFileModel().refresh();
                         break;
                 }
             }

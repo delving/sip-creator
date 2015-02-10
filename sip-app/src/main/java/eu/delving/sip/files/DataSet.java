@@ -53,8 +53,6 @@ public interface DataSet extends Comparable<DataSet> {
 
     Validator newValidator() throws StorageException;
 
-    boolean isProcessed() throws StorageException;
-
     DataSetState getState();
 
     Map<String, String> getDataSetFacts();
@@ -63,7 +61,7 @@ public interface DataSet extends Comparable<DataSet> {
 
     void setHints(Map<String, String> hints) throws StorageException;
 
-    boolean deleteTarget() throws StorageException;
+    void deleteResults();
 
     InputStream openSourceInputStream() throws StorageException;
 

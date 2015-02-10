@@ -135,8 +135,9 @@ public class DataSetModel implements RecDefModel {
         mappingModel.setRecMapping(null);
     }
 
-    public boolean deleteValidation() throws StorageException {
-        return !isEmpty() && dataSet.deleteTarget();
+    public void deleteResults() {
+        if (isEmpty()) return;
+        dataSet.deleteResults();
     }
 
     private class StateCheckTimer implements Work, ActionListener, Work.DataSetWork {

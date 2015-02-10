@@ -53,7 +53,7 @@ public class ReportFile {
     private RandomAccessFile reportAccess;
     private RandomAccessFile reportIndexAccess;
     private List<Rec> invalidRecs;
-    private OnlyInvalid onlyInvalid = new OnlyInvalid();
+    private InvalidRecListModel invalidRecListModel = new InvalidRecListModel();
 
     public ReportFile(File reportFile, File reportIndexFile, File reportConclusionFile, DataSet dataSet, String prefix) throws IOException {
         this.reportAccess = new RandomAccessFile(reportFile, "r");
@@ -77,8 +77,8 @@ public class ReportFile {
         return reportConclusion;
     }
 
-    public OnlyInvalid getOnlyInvalid() {
-        return onlyInvalid;
+    public InvalidRecListModel getInvalidRecListModel() {
+        return invalidRecListModel;
     }
 
     public DataSet getDataSet() {
@@ -203,7 +203,7 @@ public class ReportFile {
                 @Override
                 public void run() {
                     lines = freshLines;
-                    onlyInvalid.fireContentsChanged(recordNumber);
+                    invalidRecListModel.fireContentsChanged(recordNumber);
                 }
             });
         }
@@ -265,7 +265,7 @@ public class ReportFile {
         return out.toString();
     }
 
-    public class OnlyInvalid extends AbstractListModel<Rec> {
+    public class InvalidRecListModel extends AbstractListModel<Rec> {
         @Override
         public int getSize() {
             return invalidRecs.size();
@@ -280,7 +280,7 @@ public class ReportFile {
             int index = 0;
             for (Rec invalidRec : invalidRecs) {
                 if (invalidRec.recordNumber == recordNumber) {
-                    fireContentsChanged(OnlyInvalid.this, index, index);
+                    fireContentsChanged(InvalidRecListModel.this, index, index);
                     break;
                 }
                 index++;

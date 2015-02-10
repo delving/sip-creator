@@ -22,9 +22,7 @@
 package eu.delving.sip.actions;
 
 import eu.delving.sip.base.Swing;
-import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.DataSetState;
-import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.xml.FileProcessor;
@@ -70,32 +68,34 @@ public class ValidateAction extends AbstractAction {
         setEnabled(false);
         sipModel.processFile(new FileProcessor.Listener() {
             @Override
-            public void failed(final FileProcessor fileProcessor) {
+            public void failed(final FileProcessor processor) {
                 sipModel.exec(new Swing() {
                     @Override
                     public void run() {
                         sipModel.getMappingModel().setLocked(false);
                         setEnabled(true);
-                        if (isNotCurrent(fileProcessor)) {
-                            sipModel.setDataSet(fileProcessor.getDataSet(), new Swing() {
+                        if (isNotCurrent(processor)) {
+                            sipModel.setDataSet(processor.getDataSet(), new Swing() {
                                 @Override
                                 public void run() {
 //                                    dataSetMenu.refreshAndChoose(fileProcessor.getDataSet(), fileProcessor.getPrefix());
-                                    sipModel.seekRecordNumber(fileProcessor.getFailedRecordNumber());
+                                    sipModel.seekRecordNumber(processor.getFailedRecordNumber());
                                     investigate.run();
                                 }
                             });
                         }
                         else {
-                            sipModel.seekRecordNumber(fileProcessor.getFailedRecordNumber());
+                            sipModel.seekRecordNumber(processor.getFailedRecordNumber());
                             investigate.run();
                         }
                     }
                 });
+                processor.getDataSet().deleteResults();
+                sipModel.getReportFileModel().refresh();
             }
 
             @Override
-            public void aborted(FileProcessor processor) {
+            public void aborted(final FileProcessor processor) {
                 sipModel.exec(new Swing() {
                     @Override
                     public void run() {
@@ -103,13 +103,8 @@ public class ValidateAction extends AbstractAction {
                         setEnabled(true);
                     }
                 });
-                DataSet dataSet = processor.getDataSet();
-                try {
-                    dataSet.deleteTarget();
-                }
-                catch (StorageException e) {
-                    sipModel.getFeedback().alert("Unable to remove validation results", e);
-                }
+                processor.getDataSet().deleteResults();
+                sipModel.getReportFileModel().refresh();
             }
 
             @Override

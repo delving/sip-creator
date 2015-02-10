@@ -68,6 +68,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
     @Override
     public void reportsUpdated(ReportFileModel reportFileModel) {
         ReportFile reportFile = reportFileModel.getReport();
+        mainPanel.removeAll();
         if (reportFile == null) {
             mainPanel.add(EMPTY_LABEL, BorderLayout.CENTER);
         }
@@ -124,7 +125,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
 
         @SuppressWarnings("unchecked")
         private void createList() {
-            list = new JList<ReportFile.Rec>(report.getOnlyInvalid());
+            list = new JList<ReportFile.Rec>(report.getInvalidRecListModel());
             list.setCellRenderer(report.getCellRenderer()); // too bad this is untyped still
             list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {

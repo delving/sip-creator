@@ -123,22 +123,22 @@ public class SipModel {
 
             @Override
             public void functionChanged(MappingModel mappingModel, MappingFunction function) {
-                clearValidation();
+                dataSetModel.deleteResults();
             }
 
             @Override
             public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
-                clearValidation();
+                dataSetModel.deleteResults();
             }
 
             @Override
             public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                clearValidation();
+                dataSetModel.deleteResults();
             }
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-                clearValidation();
+                dataSetModel.deleteResults();
             }
 
             @Override
@@ -166,25 +166,6 @@ public class SipModel {
 
     public void setViewSelector(AllFrames.ViewSelector viewSelector) {
         this.viewSelector = viewSelector;
-    }
-
-    private void clearValidation() {
-        try {
-            dataSetModel.deleteValidation();
-        }
-        catch (StorageException e) {
-            feedback.alert(String.format("Error while deleting validation file %s", e));
-        }
-    }
-
-    private void clearValidations() {
-        try {
-            DataSet dataSet = dataSetModel.getDataSet();
-            dataSet.deleteTarget();
-        }
-        catch (StorageException e) {
-            feedback.alert(String.format("Error while deleting validation files %s", e));
-        }
     }
 
     public void addParseListener(ParseListener parseListener) {
@@ -294,6 +275,7 @@ public class SipModel {
                 dataSetModel.getMappingModel().setSchemaVersion(schemaVersion);
                 recordCompileModel.setValidator(dataSetModel.newValidator());
                 recordCompileModel.setAssertions(AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource));
+                reportFileModel.refresh();
                 exec(new Swing() {
                     @Override
                     public void run() {
@@ -389,6 +371,7 @@ public class SipModel {
     public void processFile(FileProcessor.Listener listener) {
         final DataSet dataSet = getDataSetModel().getDataSet();
         final String narthexUrl = getPreferences().get(Storage.NARTHEX_URL, "");
+        dataSet.deleteResults();
         getMappingModel().setLocked(true);
         exec(new FileProcessor(
                 this,

@@ -22,7 +22,6 @@
 package eu.delving.sip.menus;
 
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.NetworkClient;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
@@ -53,14 +52,13 @@ public class ExpertMenu extends JMenu {
     private SipModel sipModel;
     private AllFrames allFrames;
 
-    public ExpertMenu(JDesktopPane desktop, final SipModel sipModel, NetworkClient networkClient, AllFrames allFrames) {
+    public ExpertMenu(final SipModel sipModel, AllFrames allFrames) {
         super("Expert");
         this.sipModel = sipModel;
         this.allFrames = allFrames;
         add(new SourceIncludedAction());
         add(new MaxUniqueValueLengthAction());
         add(new ReloadMappingAction());
-        add(new DeleteCachesAction());
         add(new ToggleFrameArrangements());
         add(new ShowMemory());
         add(new ShowMemoryConfigAction());
@@ -171,47 +169,6 @@ public class ExpertMenu extends JMenu {
         }
     }
 
-
-    private class DeleteCachesAction extends AbstractAction {
-        private DeleteCachesAction() {
-            super("Delete cached items in this dataset");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            sipModel.exec(new Work.DataSetPrefixWork() {
-
-                final DataSetModel dsm = sipModel.getDataSetModel();
-
-                @Override
-                public String getPrefix() {
-                    return sipModel.getMappingModel().getPrefix();
-                }
-
-                @Override
-                public DataSet getDataSet() {
-                    return sipModel.getDataSetModel().getDataSet();
-                }
-
-                @Override
-                public Job getJob() {
-                    return Job.DELETE_CACHES;
-                }
-
-                @Override
-                public void run() {
-                    try {
-                        DataSet dataSet = dsm.getDataSet();
-                        if (dataSet == null) return;
-                        dataSet.deleteTarget();
-                    }
-                    catch (StorageException e) {
-                        sipModel.getFeedback().alert("Cannot delete caches", e);
-                    }
-                }
-            });
-        }
-    }
 
     private class ShowMemory extends AbstractAction {
         public ShowMemory() {

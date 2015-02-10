@@ -75,6 +75,7 @@ public class ReportFileModel {
     }
 
     public void refresh() {
+        sipModel.getFeedback().info("Report file model refreshing");
         if (sipModel.getDataSetModel().isEmpty()) {
             return;
         }
@@ -86,7 +87,11 @@ public class ReportFileModel {
         try {
             ReportFile reportFile = dataSet.getReport();
             if (reportFile != null) {
+                sipModel.getFeedback().info("There is a report file");
                 ReportFileModel.this.reportFile = reportFile;
+            }
+            else {
+                sipModel.getFeedback().info("There is no report file");
             }
         }
         catch (StorageException e) {

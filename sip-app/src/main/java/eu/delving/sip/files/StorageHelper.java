@@ -126,7 +126,7 @@ public class StorageHelper {
     }
 
     static File targetFile(File dir, Map<String, String> facts, String prefix) {
-        String fileName = String.format("%s__%s.xml.gz", facts.get("spec"), prefix);
+        String fileName = String.format("%s__%s.xml", facts.get("spec"), prefix);
         return new File(dir, fileName);
     }
 

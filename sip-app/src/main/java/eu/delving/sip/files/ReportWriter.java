@@ -26,7 +26,6 @@ import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlNodePrinter;
 import eu.delving.groovy.XmlSerializer;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.CountingOutputStream;
 
 import javax.xml.xpath.XPathExpressionException;
@@ -41,6 +40,9 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.apache.commons.io.FileUtils.deleteQuietly;
+import static org.apache.commons.io.FileUtils.writeLines;
 
 /**
  * Describes how a report is written during dataset processing
@@ -69,6 +71,7 @@ public class ReportWriter {
         this.reportFile = reportFile;
         this.reportIndexFile = reportIndexFile;
         this.reportConclusionFile = reportConclusionFile;
+        deleteQuietly(reportConclusionFile);
         this.indexOut = new DataOutputStream(new FileOutputStream(reportIndexFile));
         this.count = new CountingOutputStream(new FileOutputStream(reportFile));
         this.out = new OutputStreamWriter(count, "UTF-8");
@@ -104,8 +107,9 @@ public class ReportWriter {
         catch (IOException e) {
             throw new RuntimeException("Unable to close", e);
         }
-        FileUtils.deleteQuietly(reportFile);
-        FileUtils.deleteQuietly(reportIndexFile);
+        deleteQuietly(reportFile);
+        deleteQuietly(reportIndexFile);
+        deleteQuietly(reportConclusionFile);
     }
 
     public void finish(int validCount, int invalidCount) {
@@ -116,7 +120,7 @@ public class ReportWriter {
             lines.add(String.format("Total Records: %d", validCount + invalidCount));
             lines.add(String.format("Valid Records: %d", validCount));
             lines.add(String.format("Invalid Records: %d", invalidCount));
-            FileUtils.writeLines(reportConclusionFile, lines);
+            writeLines(reportConclusionFile, lines);
         }
         catch (IOException e) {
             throw new RuntimeException("Unable to finish report", e);

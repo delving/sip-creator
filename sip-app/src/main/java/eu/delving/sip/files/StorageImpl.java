@@ -166,11 +166,6 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public boolean isProcessed() throws StorageException {
-            return targetOutput().exists();
-        }
-
-        @Override
         public DataSetState getState() {
             File source = sourceFile(here);
             if (source.exists()) {
@@ -230,11 +225,12 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public boolean deleteTarget() throws StorageException {
-            File targetFile = targetFile(here, dataSetFacts, getSchemaVersion().getPrefix());
-            boolean deleted = targetFile.exists();
-            delete(targetFile);
-            return deleted;
+        public void deleteResults() {
+            String prefix = getSchemaVersion().getPrefix();
+            delete(targetFile(here, dataSetFacts, prefix));
+            delete(reportFile(here, prefix));
+            delete(reportIndexFile(here, prefix));
+            delete(reportConclusionFile(here, prefix));
         }
 
         @Override
@@ -359,7 +355,7 @@ public class StorageImpl implements Storage {
                 File reportFile = reportFile(here, prefix);
                 File reportIndexFile = reportIndexFile(here, prefix);
                 File reportConclusionFile = reportConclusionFile(here, prefix);
-                if (!(reportFile.exists() && reportIndexFile.exists())) return null;
+                if (!(reportFile.exists() && reportIndexFile.exists() && reportConclusionFile.exists())) return null;
                 return new ReportFile(reportFile, reportIndexFile, reportConclusionFile, this, prefix);
             }
             catch (IOException e) {

@@ -38,13 +38,13 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Create an output file with our standard record wrapping from a file of otherwise wrapped records, given by
@@ -59,25 +59,28 @@ public class XmlOutput {
     private static final String RDF_ID_ATTRIBUTE = "about";
     private static final String RDF_PREFIX = "rdf";
     private static final String RDF_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-    private static final String [][] NAMESPACES = {
-            { RDF_PREFIX, RDF_URI },
-            { "geo", "http://www.w3.org/2003/01/geo/wgs84_pos#" },
-            { "skos", "http://www.w3.org/2004/02/skos/core#" },
-            { "rdfs", "http://www.w3.org/2000/01/rdf-schema#" },
-            { "cc", "http://creativecommons.org/ns#" },
-            { "owl", "http://www.w3.org/2002/07/owl#" },
-            { "foaf", "http://xmlns.com/foaf/0.1/" },
-            { "dbpedia-owl", "http://dbpedia.org/ontology/" },
-            { "dbprop", "http://dbpedia.org/property/" }
+    private static final String[][] NAMESPACES = {
+            {RDF_PREFIX, RDF_URI},
+            {"geo", "http://www.w3.org/2003/01/geo/wgs84_pos#"},
+            {"skos", "http://www.w3.org/2004/02/skos/core#"},
+            {"rdfs", "http://www.w3.org/2000/01/rdf-schema#"},
+            {"cc", "http://creativecommons.org/ns#"},
+            {"owl", "http://www.w3.org/2002/07/owl#"},
+            {"foaf", "http://xmlns.com/foaf/0.1/"},
+            {"dbpedia-owl", "http://dbpedia.org/ontology/"},
+            {"dbprop", "http://dbpedia.org/property/"}
     };
-    private File outputZipFile;
+    private File outputXmlFile;
+    private File tempOutputFile;
     private XMLEventFactory eventFactory = XMLToolFactory.xmlEventFactory();
-    private GZIPOutputStream outputStream;
+    private OutputStream outputStream;
     private XMLEventWriter out;
 
-    public XmlOutput(File outputZipFile, Map<String, RecDef.Namespace> namespaces) throws IOException, XMLStreamException {
-        this.outputZipFile = outputZipFile;
-        outputStream = new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream(outputZipFile)));
+    public XmlOutput(File outputXmlFile, Map<String, RecDef.Namespace> namespaces) throws IOException, XMLStreamException {
+        this.outputXmlFile = outputXmlFile;
+        FileUtils.deleteQuietly(outputXmlFile);
+        this.tempOutputFile = new File(outputXmlFile.getParentFile(), outputXmlFile.getName() + ".temp");
+        outputStream = new BufferedOutputStream(new FileOutputStream(tempOutputFile));
         out = XMLToolFactory.xmlOutputFactory().createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
         out.add(eventFactory.createStartDocument());
         out.add(eventFactory.createCharacters("\n"));
@@ -91,7 +94,7 @@ public class XmlOutput {
                 schemaLocation.append(namespace.uri).append(' ').append(namespace.schema).append(' ');
             }
         }
-        for (String [] pair : NAMESPACES) {
+        for (String[] pair : NAMESPACES) {
             if (prefixes.contains(pair[0])) continue;
             namespaceList.add(eventFactory.createNamespace(pair[0], pair[1]));
         }
@@ -104,7 +107,7 @@ public class XmlOutput {
         List<Attribute> attributes = new ArrayList<Attribute>();
         attributes.add(eventFactory.createAttribute(RDF_PREFIX, RDF_URI, RDF_ID_ATTRIBUTE, identifier));
         out.add(eventFactory.createCharacters("\n"));
-        out.add(eventFactory.createStartElement(RDF_PREFIX,RDF_URI, RDF_RECORD_TAG, attributes.iterator(), null));
+        out.add(eventFactory.createStartElement(RDF_PREFIX, RDF_URI, RDF_RECORD_TAG, attributes.iterator(), null));
         Element element = (Element) node;
         element.removeAttribute("xsi:schemaLocation");
         // skip the root tag, which would have been this: writeElement(element, 1);
@@ -127,7 +130,10 @@ public class XmlOutput {
             out.flush();
             outputStream.close();
             if (aborted) {
-                FileUtils.deleteQuietly(outputZipFile);
+                FileUtils.deleteQuietly(tempOutputFile);
+            }
+            else {
+                FileUtils.moveFile(tempOutputFile, outputXmlFile);
             }
         }
         catch (Exception e) {

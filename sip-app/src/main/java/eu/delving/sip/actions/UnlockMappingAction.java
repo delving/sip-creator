@@ -22,7 +22,6 @@
 package eu.delving.sip.actions;
 
 import eu.delving.sip.base.Work;
-import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.SipModel;
 
 import javax.swing.*;
@@ -56,12 +55,8 @@ public class UnlockMappingAction extends AbstractAction implements Work {
     @Override
     public void run() {
         sipModel.getMappingModel().setLocked(false);
-        try {
-            sipModel.getDataSetModel().deleteValidation();
-        }
-        catch (StorageException e) {
-            sipModel.getFeedback().alert("Unable to delete validation", e);
-        }
+        sipModel.getDataSetModel().deleteResults();
+        sipModel.getReportFileModel().refresh();
     }
 
     @Override
