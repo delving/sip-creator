@@ -46,6 +46,7 @@ import org.xml.sax.SAXException;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -85,7 +86,9 @@ public class TestMappingValidation {
                 "/delving-sip-source/input",
                 "/delving-sip-source/input/@id"
         );
-        mock.validator();
+        String xml = runFullCycle(3);
+        System.out.println(xml);
+//        mock.validator();
     }
 
     @Test
@@ -173,9 +176,15 @@ public class TestMappingValidation {
 
     private String runFullCycle(int expectedRecords) throws Exception {
 
-        int fileCount = 3;
+        int fileCount = 4;
 
-        assertEquals(String.valueOf(Arrays.asList(mock.files())), fileCount++, mock.fileCount());
+        File[] files = mock.files();
+
+        for( File f : files) {
+            System.out.println(f);
+        }
+
+        assertEquals(String.valueOf(Arrays.asList(files)), fileCount++, mock.fileCount());
 
         assertEquals(SOURCED, state());
         performAnalysis();
@@ -200,6 +209,7 @@ public class TestMappingValidation {
         Source source = new DOMSource(node);
         try {
             mock.validator().validate(source);
+            System.out.println("Validated!");
         }
         catch (SAXException e) {
             fail(e.getMessage());

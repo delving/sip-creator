@@ -1,0 +1,13 @@
+#SIPCreator - facts
+baseUrl=http://acc.brabantcloud.delving.org
+country=Netherlands
+dataProvider=Ton Smits Huis
+dataProviderUri=http://id.musip.nl/crm_e39/2872
+language=nl
+name=Ton Smits Huis
+orgId=brabantcloud
+provider=Erfgoed Brabant
+rights=http://www.europeana.eu/rights/rr-r/
+schemaVersions=edm_5.2.3
+spec=ton-smits-huis
+type=IMAGE

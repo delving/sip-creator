@@ -1,547 +1,503 @@
-<?xml version ="1.0" encoding="UTF-8"?>
-<lido:lidoWrap xmlns:lido="http://www.lido-schema.org">
-    <lido:lido>
-        <lido:lidoRecID lido:type="local"
-                        lido:source="Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg">DE-Mb112/lido/obj/00000001</lido:lidoRecID>
-        <lido:category>
-            <lido:conceptID lido:type="URI">http://www.cidoc-crm.org/crm-concepts/E22</lido:conceptID>
-            <lido:term xml:lang="eng">Man-Made Object</lido:term>
-        </lido:category>
-        <lido:descriptiveMetadata xml:lang="deu">
-            <lido:objectClassificationWrap>
-                <lido:objectWorkTypeWrap>
-                    <lido:objectWorkType lido:type="Sachbegriff">
-                        <lido:term>Bild</lido:term>
-                        <lido:term lido:addedSearchTerm="yes">Bildwerk</lido:term>
-                    </lido:objectWorkType>
-                </lido:objectWorkTypeWrap>
-                <lido:classificationWrap>
-                    <lido:classification lido:type="Gattung">
-                        <lido:term>Tafelmalerei</lido:term>
-                        <lido:term lido:addedSearchTerm="yes">Malerei</lido:term>
-                    </lido:classification>
-                </lido:classificationWrap>
-            </lido:objectClassificationWrap>
-            <lido:objectIdentificationWrap>
-                <lido:titleWrap>
-                    <lido:titleSet>
-                        <lido:appellationValue lido:pref="preferred">Via San Giovanni in Laterano mit
-                            Blick auf das Kolosseum
-                        </lido:appellationValue>
-                    </lido:titleSet>
-                </lido:titleWrap>
-                <lido:repositoryWrap>
-                    <lido:repositorySet lido:type="current">
-                        <lido:repositoryName>
-                            <lido:legalBodyName>
-                                <lido:appellationValue>Museen der Stadt Aachen — Suermondt-Ludwig-Museum
-                                    (Aachen)
-                                </lido:appellationValue>
-                            </lido:legalBodyName>
-                        </lido:repositoryName>
-                        <lido:workID lido:type="Inventarnummer">4</lido:workID>
-                        <lido:repositoryLocation>
-                            <lido:placeID lido:type="local" lido:source="TGN">7004799</lido:placeID>
-                            <lido:namePlaceSet>
-                                <lido:appellationValue>Aachen</lido:appellationValue>
-                            </lido:namePlaceSet>
-                            <lido:partOfPlace lido:politicalEntity="Kreis">
-                                <lido:namePlaceSet>
-                                    <lido:appellationValue>kreisfrei</lido:appellationValue>
-                                </lido:namePlaceSet>
-                                <lido:partOfPlace lido:politicalEntity="Regierungsbezirk/Provinz">
-                                    <lido:namePlaceSet>
-                                        <lido:appellationValue>Aachen, Regierungsbezirk
-                                        </lido:appellationValue>
-                                    </lido:namePlaceSet>
-                                    <lido:partOfPlace lido:politicalEntity="Bundesland">
-                                        <lido:namePlaceSet>
-                                            <lido:appellationValue>Nordrhein-Westfalen
-                                            </lido:appellationValue>
-                                        </lido:namePlaceSet>
-                                        <lido:partOfPlace lido:politicalEntity="Staat">
-                                            <lido:namePlaceSet>
-                                                <lido:appellationValue>Deutschland
-                                                </lido:appellationValue>
-                                            </lido:namePlaceSet>
-                                        </lido:partOfPlace>
-                                    </lido:partOfPlace>
-                                </lido:partOfPlace>
-                            </lido:partOfPlace>
-                        </lido:repositoryLocation>
-                    </lido:repositorySet>
-                </lido:repositoryWrap>
-                <lido:objectMeasurementsWrap>
-                    <lido:objectMeasurementsSet>
-                        <lido:displayObjectMeasurements>Höhe x Breite: 130 x 110 cm
-                        </lido:displayObjectMeasurements>
-                        <lido:objectMeasurements>
-                            <lido:measurementsSet>
-                                <lido:measurementType>Höhe x Breite</lido:measurementType>
-                                <lido:measurementUnit>cm</lido:measurementUnit>
-                                <lido:measurementValue>130 x 110</lido:measurementValue>
-                            </lido:measurementsSet>
-                        </lido:objectMeasurements>
-                    </lido:objectMeasurementsSet>
-                </lido:objectMeasurementsWrap>
-            </lido:objectIdentificationWrap>
-            <lido:eventWrap>
-                <lido:eventSet>
-                    <lido:event>
-                        <lido:eventType>
-                            <lido:term>Herstellung</lido:term>
-                            <lido:term lido:addedSearchTerm="yes">Herstellung</lido:term>
-                        </lido:eventType>
-                        <lido:eventActor>
-                            <lido:actorInRole>
-                                <lido:actor lido:type="person">
-                                    <lido:actorID lido:type="local" lido:source="Bildindex-KUE-Datei">
-                                        kue/02530967
-                                    </lido:actorID>
-                                    <lido:nameActorSet>
-                                        <lido:appellationValue lido:pref="preferred">Achenbach, Andreas
-                                        </lido:appellationValue>
-                                    </lido:nameActorSet>
-                                    <lido:nationalityActor>
-                                        <lido:term>Deutschland</lido:term>
-                                    </lido:nationalityActor>
-                                    <lido:vitalDatesActor>
-                                        <lido:earliestDate lido:type="birthDate">1815-09-29
-                                        </lido:earliestDate>
-                                        <lido:latestDate lido:type="deathDate">1910-04-01
-                                        </lido:latestDate>
-                                    </lido:vitalDatesActor>
-                                    <lido:genderActor>männlich</lido:genderActor>
-                                </lido:actor>
-                                <lido:roleActor>
-                                    <lido:term>Maler</lido:term>
-                                </lido:roleActor>
-                            </lido:actorInRole>
-                        </lido:eventActor>
-                        <lido:eventDate>
-                            <lido:displayDate>1875</lido:displayDate>
-                            <lido:date>
-                                <lido:earliestDate>1875</lido:earliestDate>
-                                <lido:latestDate>1875</lido:latestDate>
-                            </lido:date>
-                        </lido:eventDate>
-                        <lido:eventMaterialsTech>
-                            <lido:materialsTech>
-                                <lido:termMaterialsTech lido:type="Material">
-                                    <lido:term>Öl</lido:term>
-                                    <lido:term lido:addedSearchTerm="yes">Farbmaterial</lido:term>
-                                </lido:termMaterialsTech>
-                            </lido:materialsTech>
-                        </lido:eventMaterialsTech>
-                        <lido:eventMaterialsTech>
-                            <lido:materialsTech>
-                                <lido:termMaterialsTech lido:type="Material">
-                                    <lido:term>Leinwand</lido:term>
-                                    <lido:term lido:addedSearchTerm="yes">Textil</lido:term>
-                                </lido:termMaterialsTech>
-                            </lido:materialsTech>
-                        </lido:eventMaterialsTech>
-                    </lido:event>
-                </lido:eventSet>
-            </lido:eventWrap>
-            <lido:objectRelationWrap>
-                <lido:subjectWrap>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/11Q758
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">11 Q 75 8</lido:term>
-                                <lido:term lido:pref="alternative">Prozessionen in der christlichen
-                                    Religion
-                                </lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/11P31521
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">11 P 31 52 1</lido:term>
-                                <lido:term lido:pref="alternative">Mönch(e), Klosterbrüder</lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/25I141:
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">25 I 14 1 :</lido:term>
-                                <lido:term lido:pref="alternative">Straße</lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/61F(VIA SAN GIOVANNI IN LATERANO)
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">61 F (VIA SAN GIOVANNI IN LATERANO)
-                                </lido:term>
-                                <lido:term lido:pref="alternative">Namen historischer Gebäude,
-                                    Örtlichkeiten, Straßen, etc. (mit NAMEN)
-                                </lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/61E(ROMA)
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">61 E (ROMA)</lido:term>
-                                <lido:term lido:pref="alternative">Namen von Städten und Dörfern (mit
-                                    NAMEN)
-                                </lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/43C8:
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">43 C 8 :</lido:term>
-                                <lido:term lido:pref="alternative">Plätze, Anlagen, Einrichtungen für
-                                    Sport, Spiele und körperliche Freizeitbeschäftigungen
-                                </lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/61F(KOLOSSEUM)
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">61 F (KOLOSSEUM)</lido:term>
-                                <lido:term lido:pref="alternative">Namen historischer Gebäude,
-                                    Örtlichkeiten, Straßen, etc. (mit NAMEN)
-                                </lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                </lido:subjectWrap>
-                <lido:relatedWorksWrap>
-                    <lido:relatedWorkSet>
-                        <lido:relatedWork>
-                            <lido:object>
-                                <lido:objectID lido:type="local" lido:source="Bildindex-LIT-Datei">
-                                    lit/05017576
-                                </lido:objectID>
-                                <lido:objectNote lido:type="Kurztitel">Achenbach, Andreas u. Oswald,
-                                    Düsseld.-Hamburg-Linz, 1997-98, S. 132
-                                </lido:objectNote>
-                            </lido:object>
-                        </lido:relatedWork>
-                        <lido:relatedWorkRelType>
-                            <lido:term>dokumentiert in</lido:term>
-                        </lido:relatedWorkRelType>
-                    </lido:relatedWorkSet>
-                </lido:relatedWorksWrap>
-            </lido:objectRelationWrap>
-        </lido:descriptiveMetadata>
-        <lido:administrativeMetadata xml:lang="deu">
-            <lido:recordWrap>
-                <lido:recordID lido:type="local">obj/00000001</lido:recordID>
-                <lido:recordType>
-                    <lido:term>Einzelobjekt</lido:term>
-                </lido:recordType>
-                <lido:recordSource>
-                    <lido:legalBodyName>
-                        <lido:appellationValue>Foto Marburg</lido:appellationValue>
-                    </lido:legalBodyName>
-                </lido:recordSource>
-                <lido:recordRights>
-                    <lido:rightsHolder>
-                        <lido:legalBodyName>
-                            <lido:appellationValue>Foto Marburg</lido:appellationValue>
-                        </lido:legalBodyName>
-                    </lido:rightsHolder>
-                </lido:recordRights>
-                <lido:recordInfoSet>
-                    <lido:recordInfoLink lido:formatResource="html">
-                        http://www.bildindex.de/dokumente/html/obj00000001
-                    </lido:recordInfoLink>
-                </lido:recordInfoSet>
-            </lido:recordWrap>
-            <lido:resourceWrap>
-                <lido:resourceSet>
-                    <lido:resourceID lido:type="local">192.356</lido:resourceID>
-                    <lido:resourceRepresentation lido:type="image_thumb">
-                        <lido:linkResource lido:formatResource="jpg">
-                            http://www.bildindex.de/bilder/mi00012a01b.jpg
-                        </lido:linkResource>
-                    </lido:resourceRepresentation>
-                    <lido:resourceType>
-                        <lido:term>Digitales Bild (retrodigitalisiert)</lido:term>
-                    </lido:resourceType>
-                    <lido:resourceDateTaken>
-                        <lido:displayDate>1945/1946</lido:displayDate>
-                    </lido:resourceDateTaken>
-                    <lido:resourceSource lido:type="Fotoverwalter">
-                        <lido:legalBodyName>
-                            <lido:appellationValue>Foto Marburg</lido:appellationValue>
-                        </lido:legalBodyName>
-                    </lido:resourceSource>
-                    <lido:rightsResource>
-                        <lido:rightsHolder>
-                            <lido:legalBodyName>
-                                <lido:appellationValue>Foto Marburg</lido:appellationValue>
-                            </lido:legalBodyName>
-                        </lido:rightsHolder>
-                    </lido:rightsResource>
-                </lido:resourceSet>
-            </lido:resourceWrap>
-        </lido:administrativeMetadata>
-    </lido:lido>
-    <lido:lido>
-        <lido:lidoRecID lido:type="local"
-                        lido:source="Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg">
-            DE-Mb112/lido/obj/00000002
-        </lido:lidoRecID>
-        <lido:category>
-            <lido:conceptID lido:type="URI">http://www.cidoc-crm.org/crm-concepts/E22</lido:conceptID>
-            <lido:term xml:lang="eng">Man-Made Object</lido:term>
-        </lido:category>
-        <lido:descriptiveMetadata xml:lang="deu">
-            <lido:objectClassificationWrap>
-                <lido:objectWorkTypeWrap>
-                    <lido:objectWorkType lido:type="Sachbegriff">
-                        <lido:term>Bild</lido:term>
-                        <lido:term lido:addedSearchTerm="yes">Bildwerk</lido:term>
-                    </lido:objectWorkType>
-                </lido:objectWorkTypeWrap>
-                <lido:classificationWrap>
-                    <lido:classification lido:type="Gattung">
-                        <lido:term>Tafelmalerei</lido:term>
-                        <lido:term lido:addedSearchTerm="yes">Malerei</lido:term>
-                    </lido:classification>
-                </lido:classificationWrap>
-            </lido:objectClassificationWrap>
-            <lido:objectIdentificationWrap>
-                <lido:titleWrap>
-                    <lido:titleSet>
-                        <lido:appellationValue lido:pref="preferred">Marktszene</lido:appellationValue>
-                    </lido:titleSet>
-                </lido:titleWrap>
-                <lido:repositoryWrap>
-                    <lido:repositorySet lido:type="current">
-                        <lido:repositoryName>
-                            <lido:legalBodyName>
-                                <lido:appellationValue>Museen der Stadt Aachen — Suermondt-Ludwig-Museum
-                                    (Aachen)
-                                </lido:appellationValue>
-                            </lido:legalBodyName>
-                        </lido:repositoryName>
-                        <lido:workID lido:type="Inventarnummer">11</lido:workID>
-                        <lido:repositoryLocation>
-                            <lido:placeID lido:type="local" lido:source="TGN">7004799</lido:placeID>
-                            <lido:namePlaceSet>
-                                <lido:appellationValue>Aachen</lido:appellationValue>
-                            </lido:namePlaceSet>
-                            <lido:partOfPlace lido:politicalEntity="Kreis">
-                                <lido:namePlaceSet>
-                                    <lido:appellationValue>kreisfrei</lido:appellationValue>
-                                </lido:namePlaceSet>
-                                <lido:partOfPlace lido:politicalEntity="Regierungsbezirk/Provinz">
-                                    <lido:namePlaceSet>
-                                        <lido:appellationValue>Aachen, Regierungsbezirk
-                                        </lido:appellationValue>
-                                    </lido:namePlaceSet>
-                                    <lido:partOfPlace lido:politicalEntity="Bundesland">
-                                        <lido:namePlaceSet>
-                                            <lido:appellationValue>Nordrhein-Westfalen
-                                            </lido:appellationValue>
-                                        </lido:namePlaceSet>
-                                        <lido:partOfPlace lido:politicalEntity="Staat">
-                                            <lido:namePlaceSet>
-                                                <lido:appellationValue>Deutschland
-                                                </lido:appellationValue>
-                                            </lido:namePlaceSet>
-                                        </lido:partOfPlace>
-                                    </lido:partOfPlace>
-                                </lido:partOfPlace>
-                            </lido:partOfPlace>
-                        </lido:repositoryLocation>
-                    </lido:repositorySet>
-                </lido:repositoryWrap>
-                <lido:objectMeasurementsWrap>
-                    <lido:objectMeasurementsSet>
-                        <lido:displayObjectMeasurements>Höhe x Breite: 69 x 135 cm
-                        </lido:displayObjectMeasurements>
-                        <lido:objectMeasurements>
-                            <lido:measurementsSet>
-                                <lido:measurementType>Höhe x Breite</lido:measurementType>
-                                <lido:measurementUnit>cm</lido:measurementUnit>
-                                <lido:measurementValue>69 x 135</lido:measurementValue>
-                            </lido:measurementsSet>
-                        </lido:objectMeasurements>
-                    </lido:objectMeasurementsSet>
-                </lido:objectMeasurementsWrap>
-            </lido:objectIdentificationWrap>
-            <lido:eventWrap>
-                <lido:eventSet>
-                    <lido:event>
-                        <lido:eventType>
-                            <lido:term>Herstellung</lido:term>
-                            <lido:term lido:addedSearchTerm="yes">Herstellung</lido:term>
-                        </lido:eventType>
-                        <lido:eventActor>
-                            <lido:actorInRole>
-                                <lido:actor lido:type="person">
-                                    <lido:actorID lido:type="local" lido:source="Bildindex-KUE-Datei">
-                                        kue/02553237
-                                    </lido:actorID>
-                                    <lido:nameActorSet>
-                                        <lido:appellationValue lido:pref="preferred">Aertsen, Pieter
-                                        </lido:appellationValue>
-                                    </lido:nameActorSet>
-                                    <lido:nameActorSet>
-                                        <lido:appellationValue lido:pref="alternative">Aertsz, Pieter
-                                        </lido:appellationValue>
-                                    </lido:nameActorSet>
-                                    <lido:nameActorSet>
-                                        <lido:appellationValue lido:pref="alternative">Aertszone, Pieter
-                                        </lido:appellationValue>
-                                    </lido:nameActorSet>
-                                    <lido:nameActorSet>
-                                        <lido:appellationValue lido:pref="alternative">Lange Pier
-                                        </lido:appellationValue>
-                                    </lido:nameActorSet>
-                                    <lido:nationalityActor>
-                                        <lido:term>Niederlande</lido:term>
-                                    </lido:nationalityActor>
-                                    <lido:vitalDatesActor>
-                                        <lido:earliestDate lido:type="birthDate">1508
-                                        </lido:earliestDate>
-                                        <lido:latestDate lido:type="deathDate">1575-06-02
-                                        </lido:latestDate>
-                                    </lido:vitalDatesActor>
-                                    <lido:genderActor>männlich</lido:genderActor>
-                                </lido:actor>
-                                <lido:roleActor>
-                                    <lido:term>Maler</lido:term>
-                                </lido:roleActor>
-                            </lido:actorInRole>
-                        </lido:eventActor>
-                        <lido:eventDate>
-                            <lido:displayDate>1559?</lido:displayDate>
-                            <lido:date>
-                                <lido:earliestDate>1559</lido:earliestDate>
-                                <lido:latestDate>1559</lido:latestDate>
-                            </lido:date>
-                        </lido:eventDate>
-                        <lido:eventMaterialsTech>
-                            <lido:materialsTech>
-                                <lido:termMaterialsTech lido:type="Material">
-                                    <lido:term>Öl</lido:term>
-                                    <lido:term lido:addedSearchTerm="yes">Farbmaterial</lido:term>
-                                </lido:termMaterialsTech>
-                            </lido:materialsTech>
-                        </lido:eventMaterialsTech>
-                        <lido:eventMaterialsTech>
-                            <lido:materialsTech>
-                                <lido:termMaterialsTech lido:type="Material">
-                                    <lido:term>Eichenholz</lido:term>
-                                    <lido:term lido:addedSearchTerm="yes">Holz</lido:term>
-                                </lido:termMaterialsTech>
-                            </lido:materialsTech>
-                        </lido:eventMaterialsTech>
-                    </lido:event>
-                </lido:eventSet>
-            </lido:eventWrap>
-            <lido:objectRelationWrap>
-                <lido:subjectWrap>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/46B11
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">46 B 11</lido:term>
-                                <lido:term lido:pref="alternative">Markt</lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                    <lido:subjectSet>
-                        <lido:subject lido:type="Ikonographie">
-                            <lido:subjectConcept>
-                                <lido:conceptID lido:type="URI" lido:source="Iconclass">
-                                    http://iconclass.org/41C6
-                                </lido:conceptID>
-                                <lido:term lido:pref="preferred">41 C 6</lido:term>
-                                <lido:term lido:pref="alternative">Lebensmittel; Stilleben mit
-                                    Lebensmitteln
-                                </lido:term>
-                            </lido:subjectConcept>
-                        </lido:subject>
-                    </lido:subjectSet>
-                </lido:subjectWrap>
-            </lido:objectRelationWrap>
-        </lido:descriptiveMetadata>
-        <lido:administrativeMetadata xml:lang="deu">
-            <lido:recordWrap>
-                <lido:recordID lido:type="local">obj/00000002</lido:recordID>
-                <lido:recordType>
-                    <lido:term>Einzelobjekt</lido:term>
-                </lido:recordType>
-                <lido:recordSource>
-                    <lido:legalBodyName>
-                        <lido:appellationValue>Foto Marburg</lido:appellationValue>
-                    </lido:legalBodyName>
-                </lido:recordSource>
-                <lido:recordRights>
-                    <lido:rightsHolder>
-                        <lido:legalBodyName>
-                            <lido:appellationValue>Foto Marburg</lido:appellationValue>
-                        </lido:legalBodyName>
-                    </lido:rightsHolder>
-                </lido:recordRights>
-                <lido:recordInfoSet>
-                    <lido:recordInfoLink lido:formatResource="html">
-                        http://www.bildindex.de/dokumente/html/obj00000002
-                    </lido:recordInfoLink>
-                </lido:recordInfoSet>
-            </lido:recordWrap>
-            <lido:resourceWrap>
-                <lido:resourceSet>
-                    <lido:resourceID lido:type="local">192.357</lido:resourceID>
-                    <lido:resourceRepresentation lido:type="image_thumb">
-                        <lido:linkResource lido:formatResource="jpg">
-                            http://www.bildindex.de/bilder/mi00012a02b.jpg
-                        </lido:linkResource>
-                    </lido:resourceRepresentation>
-                    <lido:resourceType>
-                        <lido:term>Digitales Bild (retrodigitalisiert)</lido:term>
-                    </lido:resourceType>
-                    <lido:resourceSource lido:type="Fotoverwalter">
-                        <lido:legalBodyName>
-                            <lido:appellationValue>Foto Marburg</lido:appellationValue>
-                        </lido:legalBodyName>
-                    </lido:resourceSource>
-                    <lido:rightsResource>
-                        <lido:rightsHolder>
-                            <lido:legalBodyName>
-                                <lido:appellationValue>Foto Marburg</lido:appellationValue>
-                            </lido:legalBodyName>
-                        </lido:rightsHolder>
-                    </lido:rightsResource>
-                </lido:resourceSet>
-            </lido:resourceWrap>
-        </lido:administrativeMetadata>
-    </lido:lido>
-</lido:lidoWrap>
+<?xml version='1.0' encoding='UTF-8'?>
+<delving-sip-source >
+<input id="001">
+<priref>23806</priref>
+<description.name option="Smits-Zoetmulder, Lidwien" value="Smits-Zoetmulder, Lidwien">
+<text language="0">Smits-Zoetmulder, Lidwien</text>
+<text language="1">Smits-Zoetmulder, Lidwien</text>
+</description.name>
+<description.date>2008-11-02</description.date>
+<institution.name>Ton Smits Huis</institution.name>
+<description>Een ballerina die dansend op een figuratief paard staat</description>
+<institution.place>Eindhoven</institution.place>
+<collection>Schilderijen</collection>
+<dimension.type option="hoogte" value="hoogte">
+<text language="0">hoogte</text>
+<text language="1">hoogte</text>
+</dimension.type>
+<dimension.type option="breedte" value="breedte">
+<text language="0">breedte</text>
+<text language="1">breedte</text>
+</dimension.type>
+<dimension.type option="hoogte" value="hoogte">
+<text language="0">hoogte</text>
+<text language="1">hoogte</text>
+</dimension.type>
+<dimension.type option="breedte" value="breedte">
+<text language="0">breedte</text>
+<text language="1">breedte</text>
+</dimension.type>
+<dimension.part>paneel</dimension.part>
+<dimension.part>paneel</dimension.part>
+<dimension.part>lijst</dimension.part>
+<dimension.part>lijst</dimension.part>
+<production.date.start.prec>1969</production.date.start.prec>
+<production.date.end.prec>1969</production.date.end.prec>
+<dimension.unit>cm</dimension.unit>
+<dimension.unit>cm</dimension.unit>
+<dimension.unit>cm</dimension.unit>
+<dimension.unit>cm</dimension.unit>
+<reproduction.reference>T:\TonSmitsHuis\Collectie\Schilderij\001.jpg</reproduction.reference>
+<creator.role>kunstschilder</creator.role>
+<current_owner>Stichting Ton Smits</current_owner>
+<institution.code>0827</institution.code>
+<object_number>001</object_number>
+<frame.notes>Een houten lijst met een ziverenrand</frame.notes>
+<material option="paneel" value="paneel">
+<text language="0">paneel</text>
+<text language="1">paneel</text>
+</material>
+<material option="olieverf" value="olieverf">
+<text language="0">olieverf</text>
+<text language="1">olieverf</text>
+</material>
+<material option="slotvernis" value="slotvernis">
+<text language="0">slotvernis</text>
+<text language="1">slotvernis</text>
+</material>
+<object_name option="schilderij" value="schilderij">
+<text language="0">schilderij</text>
+<text language="1">schilderij</text>
+</object_name>
+<title.type>originele titel</title.type>
+<phys_characteristic.aspect>uitdrukkingswijze</phys_characteristic.aspect>
+<phys_characteristic.keyword>figuratief</phys_characteristic.keyword>
+<acquisition.place>Eindhoven</acquisition.place>
+<number_of_parts>1</number_of_parts>
+<title>Droom van een ballerina</title>
+<technique option="geschilderd" value="geschilderd">
+<text language="0">geschilderd</text>
+<text language="1">geschilderd</text>
+</technique>
+<condition option="goed" value="goed">
+<text language="0">goed</text>
+<text language="1">goed</text>
+</condition>
+<acquisition.date>1981</acquisition.date>
+<acquisition.source>Smits, Ton</acquisition.source>
+<production.place>Eindhoven</production.place>
+<creator>Smits, Ton</creator>
+<dimension.value>40</dimension.value>
+<dimension.value>50</dimension.value>
+<dimension.value>57</dimension.value>
+<dimension.value>47</dimension.value>
+<input.date>2008-11-03</input.date>
+<edit.date>2012-08-15</edit.date>
+<edit.date>2011-11-03</edit.date>
+<edit.date>2011-11-02</edit.date>
+<edit.date>2011-11-02</edit.date>
+<edit.date>2011-10-10</edit.date>
+<edit.date>2011-07-28</edit.date>
+<edit.date>2011-07-21</edit.date>
+<edit.date>2010-12-05</edit.date>
+<edit.date>2010-09-06</edit.date>
+<edit.date>2009-04-23</edit.date>
+<edit.date>2009-04-23</edit.date>
+<edit.date>2008-11-06</edit.date>
+<edit.date>2008-11-06</edit.date>
+<edit.date>2008-11-06</edit.date>
+<edit.date>2008-11-05</edit.date>
+<content.subject>dansers</content.subject>
+<content.subject>paarden</content.subject>
+<content.subject>bloemen</content.subject>
+<content.subject>gelaat</content.subject>
+<content.subject>bergen</content.subject>
+<content.subject>maan</content.subject>
+<content.subject>ballet</content.subject>
+<input.name>ton smits</input.name>
+<edit.name>TonSmitsHuis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<record_type option="OBJECT" value="OBJECT">
+<text language="0">single object</text>
+<text language="1">enkelvoudig object</text>
+<text language="2">objet individuel</text>
+<text language="3">Einzelnes Objekt</text>
+</record_type>
+<edit.time>14:34:42</edit.time>
+<edit.time>09:57:57</edit.time>
+<edit.time>12:04:34</edit.time>
+<edit.time>12:01:32</edit.time>
+<edit.time>14:39:37</edit.time>
+<edit.time>14:18:06</edit.time>
+<edit.time>17:07:38</edit.time>
+<edit.time>10:20:21</edit.time>
+<edit.time>11:05:01</edit.time>
+<edit.time>16:19:01</edit.time>
+<edit.time>16:14:37</edit.time>
+<edit.time>16:08:27</edit.time>
+<edit.time>14:44:39</edit.time>
+<edit.time>14:18:54</edit.time>
+<edit.time>09:29:35</edit.time>
+<input.time>13:18:13</input.time>
+<input.source>collect>intern</input.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+</input>
+<input id="002">
+<priref>8466</priref>
+<description.name option="Smits-Zoetmulder, Lidwien" value="Smits-Zoetmulder, Lidwien">
+<text language="0">Smits-Zoetmulder, Lidwien</text>
+<text language="1">Smits-Zoetmulder, Lidwien</text>
+</description.name>
+<description.date>2004-09-17</description.date>
+<institution.name>Ton Smits Huis</institution.name>
+<description>Figuratieve voorstelling van een kunstenaar in zijn attelier met een model met fantasie elementen, zoals een vogel en verschillende gezichten. In twee hoofdkleuren geschilderd.</description>
+<institution.place>Eindhoven</institution.place>
+<collection>Schilderijen</collection>
+<dimension.type option="hoogte" value="hoogte">
+<text language="0">hoogte</text>
+<text language="1">hoogte</text>
+</dimension.type>
+<dimension.type option="breedte" value="breedte">
+<text language="0">breedte</text>
+<text language="1">breedte</text>
+</dimension.type>
+<dimension.type option="hoogte" value="hoogte">
+<text language="0">hoogte</text>
+<text language="1">hoogte</text>
+</dimension.type>
+<dimension.type option="breedte" value="breedte">
+<text language="0">breedte</text>
+<text language="1">breedte</text>
+</dimension.type>
+<dimension.part>doek</dimension.part>
+<dimension.part>doek</dimension.part>
+<dimension.part>lijst</dimension.part>
+<dimension.part>lijst</dimension.part>
+<dimension.notes>Het is linnen van net na de oorlog dus erg slecht. Aan de achterkant is het linnen al gerepareerd met een ander stukje linnen. Het doek is op een spieraam gespannen</dimension.notes>
+<production.date.start.prec>1955</production.date.start.prec>
+<production.date.end.prec>1955</production.date.end.prec>
+<dimension.unit>cm</dimension.unit>
+<dimension.unit>cm</dimension.unit>
+<dimension.unit>cm</dimension.unit>
+<dimension.unit>cm</dimension.unit>
+<reproduction.reference>T:\TonSmitsHuis\Collectie\Schilderij\002.jpg</reproduction.reference>
+<creator.role>kunstschilder</creator.role>
+<current_owner>Stichting Ton Smits</current_owner>
+<institution.code>0827</institution.code>
+<object_number>002</object_number>
+<frame.notes>Een houten lijst bedekt met bladgoud</frame.notes>
+<material option="doek" value="doek">
+<text language="0">doek</text>
+<text language="1">doek</text>
+</material>
+<material option="olieverf" value="olieverf">
+<text language="0">olieverf</text>
+<text language="1">olieverf</text>
+</material>
+<material option="slotvernis" value="slotvernis">
+<text language="0">slotvernis</text>
+<text language="1">slotvernis</text>
+</material>
+<object_name option="schilderij" value="schilderij">
+<text language="0">schilderij</text>
+<text language="1">schilderij</text>
+</object_name>
+<title.type>originele titel</title.type>
+<phys_characteristic.aspect>uitdrukkingswijze</phys_characteristic.aspect>
+<phys_characteristic.keyword>figuratief</phys_characteristic.keyword>
+<acquisition.place>Eindhoven</acquisition.place>
+<number_of_parts>1</number_of_parts>
+<condition.notes>Het doek is gerepareerd</condition.notes>
+<title>Model in atelier</title>
+<technique option="geschilderd" value="geschilderd">
+<text language="0">geschilderd</text>
+<text language="1">geschilderd</text>
+</technique>
+<condition option="goed" value="goed">
+<text language="0">goed</text>
+<text language="1">goed</text>
+</condition>
+<production.notes>niet gesigneerd</production.notes>
+<acquisition.date>1981</acquisition.date>
+<acquisition.source>Smits, Ton</acquisition.source>
+<production.place>Eindhoven</production.place>
+<creator>Smits, Ton</creator>
+<acquisition.method>schenking</acquisition.method>
+<dimension.value>40</dimension.value>
+<dimension.value>50</dimension.value>
+<dimension.value>56</dimension.value>
+<dimension.value>66</dimension.value>
+<input.date>2004-10-01</input.date>
+<edit.date>2012-08-15</edit.date>
+<edit.date>2011-11-03</edit.date>
+<edit.date>2011-11-02</edit.date>
+<edit.date>2011-10-10</edit.date>
+<edit.date>2011-07-28</edit.date>
+<edit.date>2011-07-21</edit.date>
+<edit.date>2010-12-06</edit.date>
+<edit.date>2010-12-05</edit.date>
+<edit.date>2010-09-06</edit.date>
+<edit.date>2009-04-23</edit.date>
+<edit.date>2009-04-23</edit.date>
+<edit.date>2006-06-22</edit.date>
+<edit.date>2006-06-08</edit.date>
+<edit.date>2006-03-09</edit.date>
+<edit.date>2005-12-12</edit.date>
+<edit.date>2005-10-14</edit.date>
+<edit.date>2005-10-14</edit.date>
+<edit.date>2005-10-14</edit.date>
+<edit.date>2005-09-05</edit.date>
+<content.subject>dansers</content.subject>
+<content.subject>hanen</content.subject>
+<content.subject>bloemen</content.subject>
+<content.subject>gelaat</content.subject>
+<content.subject>zon</content.subject>
+<content.subject>hoeden</content.subject>
+<content.subject>parasols</content.subject>
+<content.subject>stoelen</content.subject>
+<content.subject>mannen</content.subject>
+<content.subject>atelier-ezels</content.subject>
+<content.subject>Schilderijen</content.subject>
+<content.subject>vrouwen</content.subject>
+<content.subject>kunstschilders</content.subject>
+<input.name>unknown</input.name>
+<edit.name>TonSmitsHuis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>unknown</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<record_type option="OBJECT" value="OBJECT">
+<text language="0">single object</text>
+<text language="1">enkelvoudig object</text>
+<text language="2">objet individuel</text>
+<text language="3">Einzelnes Objekt</text>
+</record_type>
+<edit.time>14:34:22</edit.time>
+<edit.time>09:53:08</edit.time>
+<edit.time>12:03:25</edit.time>
+<edit.time>14:23:22</edit.time>
+<edit.time>14:18:09</edit.time>
+<edit.time>17:07:36</edit.time>
+<edit.time>10:20:10</edit.time>
+<edit.time>10:11:31</edit.time>
+<edit.time>11:05:00</edit.time>
+<edit.time>16:18:25</edit.time>
+<edit.time>16:14:35</edit.time>
+<edit.time>14:00:34</edit.time>
+<edit.time>19:23:54</edit.time>
+<edit.time>17:23:42</edit.time>
+<edit.time>10:11:23</edit.time>
+<edit.time>12:23:51</edit.time>
+<edit.time>12:22:48</edit.time>
+<edit.time>12:22:30</edit.time>
+<edit.time>10:38:57</edit.time>
+<input.time>17:18:39</input.time>
+<input.source>collect>intern</input.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+</input>
+<input id="003">
+<priref>23814</priref>
+<description.name option="Smits-Zoetmulder, Lidwien" value="Smits-Zoetmulder, Lidwien">
+<text language="0">Smits-Zoetmulder, Lidwien</text>
+<text language="1">Smits-Zoetmulder, Lidwien</text>
+</description.name>
+<description.date>2008-11-05</description.date>
+<institution.name>Ton Smits Huis</institution.name>
+<description>Figuratieve voorstelling van paard met vrouwenhoofd en een vrouw.</description>
+<institution.place>Eindhoven</institution.place>
+<collection>Schilderijen</collection>
+<dimension.type option="hoogte" value="hoogte">
+<text language="0">hoogte</text>
+<text language="1">hoogte</text>
+</dimension.type>
+<dimension.type option="breedte" value="breedte">
+<text language="0">breedte</text>
+<text language="1">breedte</text>
+</dimension.type>
+<dimension.type option="hoogte" value="hoogte">
+<text language="0">hoogte</text>
+<text language="1">hoogte</text>
+</dimension.type>
+<dimension.type option="breedte" value="breedte">
+<text language="0">breedte</text>
+<text language="1">breedte</text>
+</dimension.type>
+<dimension.part>paneel</dimension.part>
+<dimension.part>paneel</dimension.part>
+<dimension.part>lijst</dimension.part>
+<dimension.part>lijst</dimension.part>
+<production.date.start.prec>1981</production.date.start.prec>
+<production.date.end.prec>1981</production.date.end.prec>
+<dimension.unit>cm</dimension.unit>
+<dimension.unit>cm</dimension.unit>
+<dimension.unit>cm</dimension.unit>
+<dimension.unit>cm</dimension.unit>
+<reproduction.reference>T:\TonSmitsHuis\Collectie\Schilderij\003.jpg</reproduction.reference>
+<creator.role>cartoonist</creator.role>
+<current_owner>Stichting Ton Smits</current_owner>
+<institution.code>0827</institution.code>
+<object_number>003</object_number>
+<frame.notes>Een houten lijstje bedekt met bladgoud</frame.notes>
+<material option="paneel" value="paneel">
+<text language="0">paneel</text>
+<text language="1">paneel</text>
+</material>
+<material option="olieverf" value="olieverf">
+<text language="0">olieverf</text>
+<text language="1">olieverf</text>
+</material>
+<object_name option="schilderij" value="schilderij">
+<text language="0">schilderij</text>
+<text language="1">schilderij</text>
+</object_name>
+<object_name.notes>Dit is een van de laatste 12 schilderijen die Ton net voor zijn dood geschilderd heeft</object_name.notes>
+<title.type>originele titel</title.type>
+<phys_characteristic.aspect>uitdrukkingswijze</phys_characteristic.aspect>
+<phys_characteristic.keyword>figuratief</phys_characteristic.keyword>
+<acquisition.place>Eindhoven</acquisition.place>
+<number_of_parts>1</number_of_parts>
+<title>Vrouwelijk paard, Rode zon</title>
+<technique option="geschilderd" value="geschilderd">
+<text language="0">geschilderd</text>
+<text language="1">geschilderd</text>
+</technique>
+<condition option="goed" value="goed">
+<text language="0">goed</text>
+<text language="1">goed</text>
+</condition>
+<acquisition.date>1981</acquisition.date>
+<acquisition.source>Smits, Ton</acquisition.source>
+<production.place>Eindhoven</production.place>
+<creator>Smits, Ton</creator>
+<dimension.value>60</dimension.value>
+<dimension.value>60</dimension.value>
+<dimension.value>61.5</dimension.value>
+<dimension.value>61.5</dimension.value>
+<input.date>2008-11-05</input.date>
+<edit.date>2012-08-15</edit.date>
+<edit.date>2011-11-03</edit.date>
+<edit.date>2011-11-02</edit.date>
+<edit.date>2011-11-02</edit.date>
+<edit.date>2011-07-28</edit.date>
+<edit.date>2011-07-21</edit.date>
+<edit.date>2010-12-05</edit.date>
+<edit.date>2010-09-06</edit.date>
+<edit.date>2010-01-21</edit.date>
+<edit.date>2009-04-23</edit.date>
+<edit.date>2009-04-23</edit.date>
+<edit.date>2008-11-06</edit.date>
+<edit.date>2008-11-06</edit.date>
+<edit.date>2008-11-06</edit.date>
+<edit.date>2008-11-05</edit.date>
+<edit.date>2008-11-05</edit.date>
+<content.subject>vogels</content.subject>
+<content.subject>haar</content.subject>
+<content.subject>zon</content.subject>
+<content.subject>gelaat</content.subject>
+<content.subject>vrouwen</content.subject>
+<content.subject>bergen</content.subject>
+<input.name>ton smits</input.name>
+<edit.name>TonSmitsHuis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>Ton Smits Huis</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<edit.name>ton smits</edit.name>
+<record_type option="OBJECT" value="OBJECT">
+<text language="0">single object</text>
+<text language="1">enkelvoudig object</text>
+<text language="2">objet individuel</text>
+<text language="3">Einzelnes Objekt</text>
+</record_type>
+<edit.time>14:34:43</edit.time>
+<edit.time>09:58:19</edit.time>
+<edit.time>12:04:49</edit.time>
+<edit.time>12:01:57</edit.time>
+<edit.time>14:18:11</edit.time>
+<edit.time>17:07:39</edit.time>
+<edit.time>10:20:22</edit.time>
+<edit.time>11:05:01</edit.time>
+<edit.time>21:39:48</edit.time>
+<edit.time>16:19:25</edit.time>
+<edit.time>16:14:37</edit.time>
+<edit.time>16:08:47</edit.time>
+<edit.time>14:44:59</edit.time>
+<edit.time>14:30:01</edit.time>
+<edit.time>09:30:05</edit.time>
+<edit.time>09:26:03</edit.time>
+<input.time>09:18:27</input.time>
+<input.source>collect>intern</input.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+<edit.source>collect>intern</edit.source>
+</input>
+</delving-sip-source>
