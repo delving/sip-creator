@@ -1,1 +1,1 @@
-java -jar -Xms1024m -Xmx1024m SIP-Creator-xx-xx.jar
+java -jar -Xms1024m -Xmx1024m sip-app-2015CH1-SNAPSHOT-exejar.jar

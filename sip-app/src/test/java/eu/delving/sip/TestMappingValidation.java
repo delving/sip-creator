@@ -27,7 +27,11 @@ import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.base.Work;
-import eu.delving.sip.files.*;
+import eu.delving.sip.files.DataSet;
+import eu.delving.sip.files.DataSetState;
+import eu.delving.sip.files.FileImporter;
+import eu.delving.sip.files.Storage;
+import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.FilterTreeModel;
 import eu.delving.sip.model.SourceTreeNode;
 import eu.delving.sip.xml.AnalysisParser;
@@ -35,7 +39,11 @@ import eu.delving.sip.xml.MetadataParser;
 import eu.delving.sip.xml.SourceConverter;
 import eu.delving.stats.Stats;
 import org.apache.log4j.Logger;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -44,8 +52,15 @@ import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static eu.delving.sip.files.DataSetState.*;
-import static org.junit.Assert.*;
+import static eu.delving.sip.files.DataSetState.ANALYZED_IMPORT;
+import static eu.delving.sip.files.DataSetState.DELIMITED;
+import static eu.delving.sip.files.DataSetState.IMPORTED;
+import static eu.delving.sip.files.DataSetState.MAPPING;
+import static eu.delving.sip.files.DataSetState.SOURCED;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Make sure the storage is working
@@ -67,16 +82,6 @@ public class TestMappingValidation {
     @After
     public void deleteStorage() {
         mock.delete();
-    }
-
-    @Test
-    public void testEDM() throws Exception {
-        mock.prepareDataset(
-                "edm",
-                "/delving-sip-source/input",
-                "/delving-sip-source/input/@id"
-        );
-        mock.validator();
     }
 
     @Test

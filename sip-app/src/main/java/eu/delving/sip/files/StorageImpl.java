@@ -27,13 +27,11 @@ import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecMapping;
-import eu.delving.metadata.XPathContext;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaResponse;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
-import eu.delving.sip.xml.LinkCheckExtractor;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -60,7 +58,11 @@ import java.util.zip.ZipInputStream;
 
 import static eu.delving.schema.SchemaType.RECORD_DEFINITION;
 import static eu.delving.schema.SchemaType.VALIDATION_SCHEMA;
-import static eu.delving.sip.files.Storage.FileType.*;
+import static eu.delving.sip.files.Storage.FileType.IMPORTED;
+import static eu.delving.sip.files.Storage.FileType.MAPPING;
+import static eu.delving.sip.files.Storage.FileType.RESULT_STATS;
+import static eu.delving.sip.files.Storage.FileType.SOURCE;
+import static eu.delving.sip.files.Storage.FileType.VALIDATION;
 import static eu.delving.sip.files.StorageHelper.*;
 
 /**
@@ -475,9 +477,9 @@ public class StorageImpl implements Storage {
         public ReportWriter openReportWriter(RecDef recDef) throws StorageException {
             File reportFile = new File(here, FileType.REPORT.getName(recDef.prefix));
             File reportIndexFile = new File(here, FileType.REPORT_INDEX.getName(recDef.prefix));
+            File reportConclusionFile = new File(here, FileType.REPORT_CONCLUSION.getName(recDef.prefix));
             try {
-                LinkCheckExtractor linkCheckExtractor = new LinkCheckExtractor(recDef.fieldMarkers, new XPathContext(recDef.namespaces));
-                return new ReportWriter(reportFile, reportIndexFile, linkCheckExtractor);
+                return new ReportWriter(reportFile, reportIndexFile, reportConclusionFile);
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
@@ -492,9 +494,9 @@ public class StorageImpl implements Storage {
             try {
                 File reportFile = reportFile(here, prefix);
                 File reportIndexFile = reportIndexFile(here, prefix);
-                File validationFile = validationFile(here, prefix);
-                if (!(reportFile.exists() && reportIndexFile.exists() && validationFile.exists())) return null;
-                return new ReportFile(reportFile, reportIndexFile, validationFile, linkFile(here, prefix), this, prefix);
+                File reportConclusionFile = reportConclusionFile(here, prefix);
+                if (!(reportFile.exists() && reportIndexFile.exists())) return null;
+                return new ReportFile(reportFile, reportIndexFile, reportConclusionFile, this, prefix);
             }
             catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
@@ -516,7 +518,6 @@ public class StorageImpl implements Storage {
                     addLatestHashed(here, MAPPING, prefix, files);
                     addLatestHashed(here, VALIDATION, prefix, files);
                     addLatestHashed(here, RESULT_STATS, prefix, files);
-                    addLatestHashed(here, LINKS, prefix, files);
                 }
                 files.add(Hasher.ensureFileHashed(sourceFile(here)));
                 return files;

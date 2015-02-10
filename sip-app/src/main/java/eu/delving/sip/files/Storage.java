@@ -56,7 +56,8 @@ public interface Storage {
         RESULT_STATS(null, "stats-result_", ".xml.gz", "stats-result_%s.xml.gz", 1),
         REPORT(null, "report_", null, "report_%s.txt", 1),
         REPORT_INDEX(null, "report_", null, "report_%s.long", 1),
-        LINKS(null, "links_", null, "links_%s.csv.gz", 1);
+        REPORT_CONCLUSION(null, "report-conclusion_", null, "report-conclusion_%s.txt", 1);
+
 
         private String name, prefix, suffix, pattern;
         private int historySize = 1;

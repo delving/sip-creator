@@ -28,8 +28,21 @@ import eu.delving.schema.SchemaVersion;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -191,12 +204,12 @@ public class StorageHelper {
         return new File(dir, REPORT_INDEX.getName(prefix));
     }
 
-    static File validationFile(File dir, String prefix) {
-        return findLatestFile(dir, VALIDATION, prefix);
+    static File reportConclusionFile(File dir, String prefix) {
+        return new File(dir, REPORT_CONCLUSION.getName(prefix));
     }
 
-    static File linkFile(File dir, String prefix) {
-        return new File(dir, LINKS.getName(prefix));
+    static File validationFile(File dir, String prefix) {
+        return findLatestFile(dir, VALIDATION, prefix);
     }
 
     public static File statsFile(File dir, boolean sourceFormat, String prefix) {

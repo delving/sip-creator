@@ -54,7 +54,6 @@ public class ReportStrings {
 
     public static ReportStrings START = new ReportStrings("<<", ",", ">>");
     public static ReportStrings END = new ReportStrings("<<>>");
-    public static ReportStrings LINK = new ReportStrings("<<<",">>>");
 
     public static void main(String[] args) {
         Match match = START.matcher("<<5,VALID>>NF.1908-0211Æ1");

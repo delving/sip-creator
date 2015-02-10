@@ -22,15 +22,12 @@
 package eu.delving.sip.model;
 
 import eu.delving.schema.SchemaVersion;
-import eu.delving.sip.base.HttpClientFactory;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.LinkChecker;
 import eu.delving.sip.files.ReportFile;
 import eu.delving.sip.files.StorageException;
-import org.apache.http.client.HttpClient;
 
-import javax.swing.Timer;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -48,7 +45,6 @@ public class ReportFileModel {
     private SipModel sipModel;
     private Listener listener;
     private List<ReportFile> reportFiles = new CopyOnWriteArrayList<ReportFile>();
-    private HttpClient httpClient;
 
     public interface Listener {
         void reportsUpdated(ReportFileModel reportFileModel);
@@ -90,7 +86,6 @@ public class ReportFileModel {
                 ReportFile reportFile = dataSet.getReport(schemaVersion.getPrefix());
                 if (reportFile == null) continue;
                 reportFiles.add(reportFile);
-                reportFile.setLinkChecker(new LinkChecker(getHttpClient()));
             }
             catch (StorageException e) {
                 sipModel.getFeedback().alert("Cannot read report file for " + schemaVersion.getPrefix(), e);
@@ -108,10 +103,4 @@ public class ReportFileModel {
         for (ReportFile reportFile : reportFiles) reportFile.close();
     }
 
-    private synchronized HttpClient getHttpClient() {
-        if (httpClient == null) {
-            httpClient = HttpClientFactory.createLinkCheckClient();
-        }
-        return httpClient;
-    }
 }

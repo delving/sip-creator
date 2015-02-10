@@ -22,8 +22,21 @@
 package eu.delving.sip.xml;
 
 import eu.delving.MappingResult;
-import eu.delving.groovy.*;
-import eu.delving.metadata.*;
+import eu.delving.groovy.DiscardRecordException;
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.MappingException;
+import eu.delving.groovy.MappingRunner;
+import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.XmlSerializer;
+import eu.delving.metadata.AssertionException;
+import eu.delving.metadata.AssertionTest;
+import eu.delving.metadata.MappingResultImpl;
+import eu.delving.metadata.MetadataException;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RecDef;
+import eu.delving.metadata.RecDefTree;
+import eu.delving.metadata.RecMapping;
+import eu.delving.metadata.Tag;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
@@ -37,11 +50,15 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.swing.*;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
@@ -55,13 +72,13 @@ import java.util.Map;
  */
 
 public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork {
+    public static final int MAX_INVALID = 200000;
     public static final String OUTPUT_FILE_PREF = "outputFile";
     private XmlSerializer serializer = new XmlSerializer();
     private Feedback feedback;
     private DataSet dataSet;
     private RecMapping recMapping;
     private BitSet valid;
-    private ReportWriter reportWriter;
     private GroovyCodeResource groovyCodeResource;
     private ProgressListener progressListener;
     private Listener listener;
@@ -72,7 +89,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private File outputDirectory;
     private PrintWriter expertOutput;
     private int maxUniqueValueLength;
-//    private SipModel sipModel;
 
     public interface Listener {
 
@@ -153,7 +169,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         MappingRunner mappingRunner;
         MetadataParser parser;
         Validator validator;
-        List<AssertionTest> assertionTests = null;
+        List<AssertionTest> assertionTests;
+        ReportWriter reportWriter;
         try {
             validator = createValidator();
             mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null, false);
@@ -196,7 +213,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                             }
                             expertOutput.println("==");
                         }
-                        reportWriter.valid(record.getId(), result);
                     }
                     catch (Exception e) {
                         invalidCount++;
@@ -217,6 +233,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                                     break;
                             }
                         }
+                        else if (invalidCount >= MAX_INVALID) {
+                            feedback.alert("Maximum number of invalid records reached: " + MAX_INVALID);
+                            aborted = true;
+                        }
+
                     }
                 }
                 catch (DiscardRecordException e) {
@@ -248,16 +269,21 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             else {
                 listener.succeeded(this);
                 reportWriter.finish(validCount, invalidCount);
+                String message = String.format(
+                        "Total records %d, with %d valid and %d invalid.",
+                        recordCount, validCount, invalidCount
+                );
+                feedback.alert(message);
             }
         }
     }
 
-    private XmlOutput createXmlOutput() throws FileNotFoundException, UnsupportedEncodingException, XMLStreamException {
-        String fileName = String.format("%s-%s.xml", getDataSet().getSpec(), recMapping.getPrefix());
-        File outputFile = new File(outputDirectory, fileName);
-        OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
-        return new XmlOutput(outputStream, recDef().getNamespaceMap());
-    }
+//    private XmlOutput createXmlOutput() throws FileNotFoundException, UnsupportedEncodingException, XMLStreamException {
+//        String fileName = String.format("%s-%s.xml", getDataSet().getSpec(), recMapping.getPrefix());
+//        File outputFile = new File(outputDirectory, fileName);
+//        OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
+//        return new XmlOutput(outputStream, recDef().getNamespaceMap());
+//    }
 
     private PrintWriter createExpertOutput() throws FileNotFoundException, UnsupportedEncodingException {
         String fileName = String.format("%s-%s.txt", getDataSet().getSpec(), recMapping.getPrefix());

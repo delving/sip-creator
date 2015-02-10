@@ -21,25 +21,15 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.MappingResult;
-import eu.delving.metadata.XPathContext;
-import eu.delving.sip.base.*;
-import eu.delving.sip.files.DataSet;
-import eu.delving.sip.files.LinkChecker;
-import eu.delving.sip.model.MappingCompileModel;
+import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.KeystrokeHelper;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.SipModel;
-import eu.delving.sip.panels.HtmlPanel;
-import eu.delving.sip.xml.LinkCheckExtractor;
-import eu.delving.sip.xml.ResultLinkChecks;
-import org.apache.http.client.HttpClient;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
-import javax.xml.xpath.XPathExpressionException;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Font;
@@ -62,62 +52,14 @@ import static eu.delving.sip.base.SwingHelper.setError;
 
 public class OutputFrame extends FrameBase {
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
-    private JTabbedPane tabs = new JTabbedPane();
-    private HttpClient httpClient = HttpClientFactory.createLinkCheckClient();
     private JTextField searchField = new JTextField(25);
     private JTextArea outputArea;
-    private HtmlPanel htmlPanel;
     private List<Integer> found = new ArrayList<Integer>();
     private int foundSelected;
 
     public OutputFrame(final SipModel sipModel) {
         super(Which.OUTPUT, sipModel, "Output");
-        htmlPanel = new HtmlPanel("Link Checks").addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
-                    SwingHelper.launchURL(e.getURL().toString());
-            }
-        });
         sipModel.getRecordCompileModel().setEnabled(false);
-        sipModel.getRecordCompileModel().addListener(new MappingCompileModel.Listener() {
-            @Override
-            public void stateChanged(CompileState state) {
-            }
-
-            @Override
-            public void codeCompiled(MappingCompileModel.Type type, String code) {
-            }
-
-            @Override
-            public void mappingComplete(MappingResult mappingResult) {
-                try {
-                    LinkCheckExtractor extractor = new LinkCheckExtractor(
-                            mappingResult.getRecDefTree().getRecDef().fieldMarkers,
-                            new XPathContext(mappingResult.getRecDefTree().getRecDef().namespaces)
-                    );
-                    final List<String> checkLines = extractor.getChecks(mappingResult);
-                    DataSet dataSet = sipModel.getDataSetModel().getDataSet();
-                    String prefix = sipModel.getMappingModel().getPrefix();
-                    final LinkChecker linkChecker = new LinkChecker(httpClient);
-                    ResultLinkChecks checks = new ResultLinkChecks(dataSet, prefix, linkChecker);
-                    Work.DataSetPrefixWork work = checks.checkLinks(mappingResult.getLocalId(), checkLines, sipModel.getFeedback(), new Swing() {
-                        @Override
-                        public void run() {
-                            StringBuilder out = new StringBuilder();
-                            ResultLinkChecks.validLinesToHTML(checkLines, linkChecker, out);
-                            htmlPanel.setHtml(out.toString());
-                        }
-                    });
-                    if (work != null) {
-                        sipModel.exec(work);
-                    }
-                }
-                catch (XPathExpressionException e) {
-                    sipModel.getFeedback().alert("XPath problem", e);
-                }
-            }
-        });
     }
 
     @Override
@@ -127,9 +69,7 @@ public class OutputFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        tabs.addTab("XML Output", createOutputPanel());
-        tabs.addTab("Link Check", htmlPanel);
-        content.add(tabs, BorderLayout.CENTER);
+        content.add(createOutputPanel(), BorderLayout.CENTER);
     }
 
     private JPanel createOutputPanel() {
