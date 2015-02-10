@@ -426,7 +426,7 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public File toSipZip() throws StorageException {
+        public File toSipZip(boolean sourceIncluded) throws StorageException {
             try {
                 // check if the dataset is based on a harvest
                 Map<String, String> hints = getHints();
@@ -449,6 +449,7 @@ public class StorageImpl implements Storage {
                 files.add(hintsFile(here));
                 writeFacts(narthexFactsFile(here), narthexFacts);
                 files.add(narthexFactsFile(here));
+                if (sourceIncluded) files.add(sourceFile(here));
                 File sipZip = sipZip(HomeDirectory.UP_DIR, getSpec(), getSchemaVersion().getPrefix());
                 FileOutputStream fos = new FileOutputStream(sipZip);
                 ZipOutputStream zos = new ZipOutputStream(fos);

@@ -296,8 +296,10 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             Consumer consumer = new Consumer(reportWriter, xmlOutput, termination);
             int engineCount = Runtime.getRuntime().availableProcessors();
             for (int walk = 0; walk < engineCount; walk++) {
-                Validator validator = dataSet.newValidator();
-                validator.setErrorHandler(null);
+                // todo: disabled
+//                Validator validator = dataSet.newValidator();
+//                validator.setErrorHandler(null);
+                Validator validator = null;
                 MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null, false);
                 List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
                 MappingEngine engine = new MappingEngine(
@@ -359,20 +361,25 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 //                        timer("mapping", true);
                         Node node = mappingRunner.runMapping(record);
                         MappingResult result = new MappingResultImpl(serializer, uriGenerator.generateUri(record.getId()), node, mappingRunner.getRecDefTree()).resolve();
-                        try {
-                            Source source = new DOMSource(node);
-                            validator.validate(source);
-                            result.checkMissingFields();
-                            for (AssertionTest assertionTest : assertionTests) {
-                                String violation = assertionTest.getViolation(result.root());
-                                if (violation != null) throw new AssertionException(violation);
-                            }
+                        if (validator == null) {
                             consumer.accept(record, result, null);
                         }
-                        catch (Exception e) {
-                            consumer.accept(record, result, e);
-                            if (!allowInvalid) {
-                                termination.askHowToProceed(record, e);
+                        else {
+                            try {
+                                Source source = new DOMSource(node);
+                                validator.validate(source);
+                                result.checkMissingFields();
+                                for (AssertionTest assertionTest : assertionTests) {
+                                    String violation = assertionTest.getViolation(result.root());
+                                    if (violation != null) throw new AssertionException(violation);
+                                }
+                                consumer.accept(record, result, null);
+                            }
+                            catch (Exception e) {
+                                consumer.accept(record, result, e);
+                                if (!allowInvalid) {
+                                    termination.askHowToProceed(record, e);
+                                }
                             }
                         }
                     }

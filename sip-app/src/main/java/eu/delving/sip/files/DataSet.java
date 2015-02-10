@@ -89,7 +89,7 @@ public interface DataSet extends Comparable<DataSet> {
 
     void fromSipZip(File sipZipFile, ProgressListener progressListener) throws IOException, StorageException;
 
-    File toSipZip() throws StorageException;
+    File toSipZip(boolean sourceIncluded) throws StorageException;
 
     void remove() throws StorageException;
 

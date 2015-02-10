@@ -57,6 +57,7 @@ public class ExpertMenu extends JMenu {
         super("Expert");
         this.sipModel = sipModel;
         this.allFrames = allFrames;
+        add(new SourceIncludedAction());
         add(new MaxUniqueValueLengthAction());
         add(new ReloadMappingAction());
         add(new DeleteCachesAction());
@@ -85,6 +86,33 @@ public class ExpertMenu extends JMenu {
                 }
                 catch (NumberFormatException e) {
                     sipModel.getFeedback().alert("Not a number: " + answer);
+                }
+            }
+        }
+    }
+
+    private class SourceIncludedAction extends AbstractAction {
+
+        private SourceIncludedAction() {
+            super("Include source in upload");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            String sourceIncludedString = sipModel.getStatsModel().getHintsModel().get("sourceIncluded");
+            if (sourceIncludedString == null) sourceIncludedString = "false";
+            String answer = sipModel.getFeedback().ask(
+                    "Type 'true' if you want to have source included in the upload",
+                    sourceIncludedString
+            );
+            if (answer != null) {
+                answer = answer.trim();
+                try {
+                    boolean sourceIncluded = Boolean.parseBoolean(answer);
+                    sipModel.getStatsModel().getHintsModel().set("sourceIncluded", String.valueOf(sourceIncluded));
+                }
+                catch (NumberFormatException e) {
+                    sipModel.getFeedback().alert("Must be 'true' or 'false': " + answer);
                 }
             }
         }

@@ -95,8 +95,8 @@ public class DataSetModel implements RecDefModel {
         return mappingModel.getPrefix();
     }
 
-    public File createSipZip() throws StorageException {
-        return dataSet.toSipZip();
+    public File createSipZip(boolean sourceIncluded) throws StorageException {
+        return dataSet.toSipZip(sourceIncluded);
     }
 
     public Validator newValidator() throws MetadataException {
