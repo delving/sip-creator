@@ -98,7 +98,7 @@ public class TestCodeGeneration {
         Map<String, String> ns = new TreeMap<String, String>();
         ns.put("test", "http://testicles.org");
         // todo: this has wrapping
-        return new MetadataRecordFactory(ns).metadataRecordFrom(input, true);
+        return new MetadataRecordFactory(ns).metadataRecordFrom(input, "id");
     }
 
     private static RecDefModel recDefModel() {
