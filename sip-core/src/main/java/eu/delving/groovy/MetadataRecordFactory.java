@@ -62,7 +62,7 @@ public class MetadataRecordFactory {
         return MetadataRecord.create(rootNode, recordNumber, recordCount);
     }
 
-    public MetadataRecord metadataRecordFrom(String recordContents, boolean wrapInInput) throws XMLStreamException {
+    public MetadataRecord metadataRecordFrom(String recordContents, String id) throws XMLStreamException {
         try {
             Reader reader = new StringReader(recordContents);
             XMLStreamReader2 input = (XMLStreamReader2) inputFactory.createXMLStreamReader(reader);
@@ -73,13 +73,11 @@ public class MetadataRecordFactory {
                     case XMLEvent.START_DOCUMENT:
                         break;
                     case XMLEvent.START_ELEMENT:
-                        if (wrapInInput && rootNode == null) {
+                        if (rootNode == null) {
                             rootNode = node = new GroovyNode(null, "input");
+                            node.attributes().put("id", id);
                         }
                         node = new GroovyNode(node, input.getNamespaceURI(), input.getLocalName(), input.getPrefix());
-                        if (!wrapInInput && rootNode == null) {
-                            rootNode = node;
-                        }
                         if (input.getAttributeCount() > 0) {
                             for (int walk = 0; walk < input.getAttributeCount(); walk++) {
                                 QName attributeName = input.getAttributeName(walk);
