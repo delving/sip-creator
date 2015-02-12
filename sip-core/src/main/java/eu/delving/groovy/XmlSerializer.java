@@ -169,7 +169,11 @@ public class XmlSerializer {
             }
         }
         if (nodeHasSubelement && indentString != null) out.add(eventFactory.createCharacters(indentString));
-        out.add(eventFactory.createEndElement(node.getPrefix(), node.getNamespaceURI(), node.getLocalName()));
+        out.add(eventFactory.createEndElement(
+                node.getPrefix() == null ? "" : node.getPrefix(),
+                node.getNamespaceURI() == null ? "" : node.getNamespaceURI(),
+                node.getLocalName()
+        ));
         if (fromMapping) out.add(eventFactory.createCharacters("\n"));
     }
 
