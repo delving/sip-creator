@@ -91,7 +91,7 @@ public class MetadataParser {
                         if (idIndex < 0) {
                             throw new IOException("Expected record root to have @id");
                         }
-                        node.attributes().put(Storage.POCKET_ID, StringUtil.sanitizeId(input.getAttributeValue(0)));
+                        node.attributes().put(Storage.POCKET_ID, StringUtil.sanitizeId(input.getAttributeValue(idIndex)));
                     }
                     else if (node != null) {
                         node = new GroovyNode(node, input.getNamespaceURI(), input.getLocalName(), input.getPrefix());
