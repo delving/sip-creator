@@ -39,6 +39,10 @@ import java.util.regex.Pattern;
 
 public class StringUtil {
 
+    public static String sanitizeId(String id) {
+        return id.replaceAll("[/_ ]", "-");
+    }
+
     public static final Pattern IF_ABSENT_PATTERN = Pattern.compile("^ *if *\\( *_absent_ *\\) *\\{ *$");
 
     public static String csvEscapeXML(String value) {

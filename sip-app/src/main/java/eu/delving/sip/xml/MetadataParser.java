@@ -26,6 +26,7 @@ import eu.delving.groovy.GroovyNode;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.MetadataRecordFactory;
 import eu.delving.metadata.Path;
+import eu.delving.metadata.StringUtil;
 import eu.delving.metadata.Tag;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
@@ -90,7 +91,7 @@ public class MetadataParser {
                         if (idIndex < 0) {
                             throw new IOException("Expected record root to have @id");
                         }
-                        node.attributes().put(Storage.POCKET_ID, input.getAttributeValue(0));
+                        node.attributes().put(Storage.POCKET_ID, StringUtil.sanitizeId(input.getAttributeValue(0)));
                     }
                     else if (node != null) {
                         node = new GroovyNode(node, input.getNamespaceURI(), input.getLocalName(), input.getPrefix());
