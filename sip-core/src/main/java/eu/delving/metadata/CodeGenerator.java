@@ -43,6 +43,7 @@ public class CodeGenerator {
     private RecMapping recMapping;
     private EditPath editPath;
     private CodeOut codeOut = new CodeOut();
+    private String prefixFirstBuilder = "outputNode = WORLD.output.";
     private boolean trace;
 
     public CodeGenerator(RecMapping recMapping) {
@@ -109,9 +110,8 @@ public class CodeGenerator {
         codeOut.line_("use (MappingCategory) {");
         codeOut.line_("WORLD.input * { _input ->");
         codeOut.line("_uniqueIdentifier = _input['@id'][0].toString()");
-        codeOut.line("outputNode = WORLD.output.");
         if (recDefTree.getRoot().isPopulated()) {
-            toElementCode(recDefTree.getRoot(), true, new Stack<String>());
+            toElementCode(recDefTree.getRoot(), new Stack<String>());
         }
         else {
             codeOut.line("no 'mapping'");
@@ -123,7 +123,7 @@ public class CodeGenerator {
     }
 
 
-    private void toElementCode(RecDefNode recDefNode, boolean isRoot, Stack<String> groovyParams) {
+    private void toElementCode(RecDefNode recDefNode, Stack<String> groovyParams) {
         if (recDefNode.isAttr() || !recDefNode.isPopulated()) return;
         if (editPath != null && !recDefNode.getPath().isFamilyOf(editPath.getNodeMapping().outputPath)) return;
         if (recDefNode.getNodeMappings().isEmpty()) {
@@ -154,7 +154,7 @@ public class CodeGenerator {
         }
         else if (editPath != null && editPath.getNodeMapping().recDefNode == recDefNode) {
             NodeMapping nodeMapping = editPath.getNodeMapping();
-            if (!isRoot) codeOut.line("_absent_ = true");
+            codeOut.line("_absent_ = true");
             codeOut.start(nodeMapping);
             toNodeMappingLoop(recDefNode, nodeMapping, getLocalPath(nodeMapping), groovyParams);
             codeOut.end(nodeMapping);
@@ -162,7 +162,7 @@ public class CodeGenerator {
         }
         else {
             for (NodeMapping nodeMapping : recDefNode.getNodeMappings().values()) {
-                if (!isRoot) codeOut.line("_absent_ = true");
+                codeOut.line("_absent_ = true");
                 codeOut.start(nodeMapping);
                 toNodeMappingLoop(recDefNode, nodeMapping, getLocalPath(nodeMapping), groovyParams);
                 codeOut.end(nodeMapping);
@@ -302,7 +302,7 @@ public class CodeGenerator {
                     codeOut.line("%s %s", sub.getTag().toBuilderCall(), sub.getOptBox().getInnerOptReference());
                 }
                 else {
-                    toElementCode(sub, false, groovyParams);
+                    toElementCode(sub, groovyParams);
                 }
             }
             codeOut.end(nodeMapping);
@@ -314,7 +314,7 @@ public class CodeGenerator {
         startBuilderCall(recDefNode, false, groovyParams);
         for (RecDefNode sub : recDefNode.getChildren()) {
             if (sub.isAttr()) continue;
-            toElementCode(sub, false, groovyParams);
+            toElementCode(sub, groovyParams);
         }
         codeOut._line("}");
     }
@@ -333,11 +333,16 @@ public class CodeGenerator {
     private void startBuilderCall(RecDefNode recDefNode, boolean absentFalse, Stack<String> groovyParams) {
         trace();
         if (!recDefNode.hasActiveAttributes()) {
-            codeOut.line_("%s { %s", recDefNode.getTag().toBuilderCall(), absentFalse ? ABSENT_IS_FALSE : "");
+            codeOut.line_("%s%s { %s",
+                    prefixFirstBuilder, recDefNode.getTag().toBuilderCall(), absentFalse ? ABSENT_IS_FALSE : ""
+            );
         }
         else {
             Tag tag = recDefNode.getTag();
-            codeOut.line_("%s (", tag.toBuilderCall());
+            codeOut.line_(
+                    "%s%s (",
+                    prefixFirstBuilder, tag.toBuilderCall()
+            );
             boolean comma = false;
             for (RecDefNode sub : recDefNode.getChildren()) {
                 if (!sub.isAttr()) continue;
@@ -363,6 +368,7 @@ public class CodeGenerator {
             }
             codeOut._line(") { %s", absentFalse ? ABSENT_IS_FALSE : "").in();
         }
+        prefixFirstBuilder = ""; // no longer first
     }
 
     private void toUserCode(NodeMapping nodeMapping, Stack<String> groovyParams) {

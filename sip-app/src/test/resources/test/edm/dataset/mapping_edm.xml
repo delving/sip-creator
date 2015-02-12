@@ -1,28 +1,29 @@
-<rec-mapping prefix="edm" schemaVersion="5.2.3" locked="true">
+<?xml version='1.0' encoding='UTF-8'?>
+<rec-mapping prefix="edm" schemaVersion="5.2.3" locked="false">
   <facts>
     <entry>
-      <string>spec</string>
-      <string>ton-smits-huis</string>
+      <string>baseUrl</string>
+      <string>http://acc.brabantcloud.delving.org/</string>
     </entry>
     <entry>
       <string>orgId</string>
       <string>brabantcloud</string>
     </entry>
     <entry>
-      <string>baseUrl</string>
-      <string>http://acc.brabantcloud.delving.org</string>
+      <string>spec</string>
+      <string>ton-smits-huis</string>
     </entry>
     <entry>
       <string>dataProvider</string>
       <string>Ton Smits Huis</string>
     </entry>
     <entry>
-      <string>dataProviderUri</string>
-      <string>http://id.musip.nl/crm_e39/2872</string>
-    </entry>
-    <entry>
       <string>schemaVersions</string>
       <string>tib_1.0.3, edm_5.2.3</string>
+    </entry>
+    <entry>
+      <string>dataProviderUri</string>
+      <string>http://id.musip.nl/crm_e39/2872</string>
     </entry>
     <entry>
       <string>name</string>
@@ -52,141 +53,102 @@
   <functions>
     <mapping-function name="deepZoomUrltwee">
       <groovy-code>
-        <string>image = it.toString().replaceAll(&apos;^.*[\\/|\\\\]&apos;,&apos;&apos;).replaceAll(&apos;(?i)\\.jpg|\\.jpeg|\\.tif|\\.tiff|\\.png|\\.gif&apos;,&apos;.tif.dzi&apos;)</string>
-        <string>&quot;http://media.delving.org/iip/deepzoom/mnt/tib/tiles/brabantcloud/${spec}/${image}&quot;</string>
+        <string>image = it.toString().replaceAll('^.*[\\/|\\\\]','').replaceAll('(?i)\\.jpg|\\.jpeg|\\.tif|\\.tiff|\\.png|\\.gif','.tif.dzi')</string>
+        <string>"http://media.delving.org/iip/deepzoom/mnt/tib/tiles/brabantcloud/${spec}/${image}"</string>
       </groovy-code>
     </mapping-function>
   </functions>
   <dyn-opts/>
   <node-mappings>
-    <node-mapping inputPath="/input/@id" outputPath="/edm:RDF/ore:Aggregation/@rdf:about">
+
+      <!--adding an initial mapping from root to root-->
+      <node-mapping inputPath="/input/whateverroot" outputPath="/edm:RDF"/>
+
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:citName">
       <groovy-code>
-        <string>_input[&apos;@id&apos;] * { _id -&gt;</string>
-        <string>&quot;${baseUrl}/resource/aggregation/${spec}/${_id}&quot;</string>
-        <string>}</string>
+        <string>'ccBrabant_TSH'</string>
       </groovy-code>
     </node-mapping>
-    <node-mapping inputPath="/input/@id" outputPath="/edm:RDF/ore:Aggregation/edm:aggregatedCHO/@rdf:resource">
+    <node-mapping inputPath="/input/whateverroot/object_number" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:citOldId">
       <groovy-code>
-        <string>_input[&apos;@id&apos;] * { _id -&gt;</string>
-        <string>&quot;${baseUrl}/resource/document/${spec}/${_id}&quot;</string>
-        <string>}</string>
+        <string>"ccBrabant_TSH_${_objectnumber}"</string>
       </groovy-code>
     </node-mapping>
-    <node-mapping inputPath="/facts/dataProvider" outputPath="/edm:RDF/ore:Aggregation/edm:dataProvider"/>
-    <node-mapping inputPath="/input/reproduction.reference" outputPath="/edm:RDF/ore:Aggregation/edm:isShownAt/@rdf:resource">
-      <groovy-code>
-        <string>_input.reproductionreference * { _reproductionreference -&gt;</string>
-        <string>&quot;${isShownAt(cleanAdlibImageReference(_reproductionreference)).replaceAll(&apos;.jpg&apos;, &apos;&apos;).sanitizeURI()}&quot;</string>
-        <string>}</string>
-      </groovy-code>
-    </node-mapping>
-    <node-mapping inputPath="/input/reproduction.reference" outputPath="/edm:RDF/ore:Aggregation/edm:isShownBy/@rdf:resource">
-      <groovy-code>
-        <string>_input.reproductionreference * { _reproductionreference -&gt;</string>
-        <string>&quot;${largeThumbnail(_reproductionreference).sanitizeURI()}&quot;</string>
-        <string>}</string>
-      </groovy-code>
-    </node-mapping>
-    <node-mapping inputPath="/input/reproduction.reference" outputPath="/edm:RDF/ore:Aggregation/edm:object/@rdf:resource">
-      <groovy-code>
-        <string>_input.reproductionreference * { _reproductionreference -&gt;</string>
-        <string>&quot;${smallThumbnail(_reproductionreference).sanitizeURI()}&quot;</string>
-        <string>}</string>
-      </groovy-code>
-    </node-mapping>
-    <node-mapping inputPath="/facts/provider" outputPath="/edm:RDF/ore:Aggregation/edm:provider"/>
-    <node-mapping inputPath="/facts/rights" outputPath="/edm:RDF/ore:Aggregation/edm:rights"/>
-    <node-mapping inputPath="/input/@id" outputPath="/edm:RDF/edm:ProvidedCHO/@rdf:about">
-      <groovy-code>
-        <string>_input[&apos;@id&apos;] * { _id -&gt;</string>
-        <string>&quot;${baseUrl}/document/${spec}/${_id}&quot;</string>
-        <string>}</string>
-      </groovy-code>
-    </node-mapping>
-    <node-mapping inputPath="/input/creator" outputPath="/edm:RDF/edm:ProvidedCHO/dc:creator"/>
-    <node-mapping inputPath="/input/description" outputPath="/edm:RDF/edm:ProvidedCHO/dc:description"/>
-    <node-mapping inputPath="/input/object_number" outputPath="/edm:RDF/edm:ProvidedCHO/dc:identifier"/>
-    <node-mapping inputPath="/constant" outputPath="/edm:RDF/edm:ProvidedCHO/dc:rights">
-      <groovy-code>
-        <string>&apos;© L. Smits-Zoetmulder. De werken van Ton Smits zijn auteursrechtelijk beschermd. Indien u zijn werken openbaar wil maken dient u vooraf toestemming te verkrijgen. Neemt u hiervoor contact op met mevr. L. Smits–Zoetmulder, Jacob Reviuslaan 25, 5644 TP Eindhoven.&apos;</string>
-      </groovy-code>
-    </node-mapping>
-    <node-mapping inputPath="/input/content.subject" outputPath="/edm:RDF/edm:ProvidedCHO/dc:subject" operator="ALL"/>
-    <node-mapping inputPath="/input/title" outputPath="/edm:RDF/edm:ProvidedCHO/dc:title">
-      <groovy-code>
-        <string>if (_absent_) {</string>
-        <string>&quot;geen titel&quot;</string>
-        <string>}</string>
-        <string>else {</string>
-        <string>&quot;${_title}&quot;</string>
-        <string>}</string>
-      </groovy-code>
-    </node-mapping>
-    <node-mapping inputPath="/facts/type" outputPath="/edm:RDF/edm:ProvidedCHO/edm:type"/>
-    <node-mapping inputPath="/input/@id" outputPath="/edm:RDF/edm:BrabantCloud/@rdf:about">
-      <groovy-code>
-        <string>_input[&apos;@id&apos;] * { _id -&gt;</string>
-        <string>&quot;${baseUrl}/resource/brabantcloud/${spec}/${_id}&quot;</string>
-        <string>}</string>
-      </groovy-code>
-    </node-mapping>
-    <node-mapping inputPath="/input/@id" outputPath="/edm:RDF/edm:BrabantCloud/ore:isAggregatedBy/@rdf:resource">
-      <groovy-code>
-        <string>_input[&apos;@id&apos;] * { _id -&gt;</string>
-        <string>&quot;${baseUrl}/resource/aggregation/${spec}/${_id}&quot;</string>
-        <string>}</string>
-      </groovy-code>
-    </node-mapping>
-    <node-mapping inputPath="/constant" outputPath="/edm:RDF/edm:BrabantCloud/brac:citName">
-      <groovy-code>
-        <string>&apos;ccBrabant_TSH&apos;</string>
-      </groovy-code>
-    </node-mapping>
-    <node-mapping inputPath="/input/object_number" outputPath="/edm:RDF/edm:BrabantCloud/brac:citOldId">
-      <groovy-code>
-        <string>&quot;ccBrabant_TSH_${_objectnumber}&quot;</string>
-      </groovy-code>
-    </node-mapping>
-    <node-mapping inputPath="/input/reproduction.reference" outputPath="/edm:RDF/edm:BrabantCloud/brac:thumbLarge"/>
-    <node-mapping inputPath="/input/reproduction.reference" outputPath="/edm:RDF/edm:BrabantCloud/brac:thumbSmall"/>
-    <node-mapping inputPath="/facts/name" outputPath="/edm:RDF/edm:BrabantCloud/brac:collection"/>
-    <node-mapping inputPath="/input/creator.role" outputPath="/edm:RDF/edm:BrabantCloud/brac:creatorRole"/>
-    <node-mapping inputPath="/input/production.date.start" outputPath="/edm:RDF/edm:BrabantCloud/brac:productionPeriod"/>
-    <node-mapping inputPath="/input/production.date.start" outputPath="/edm:RDF/edm:BrabantCloud/brac:productionStart"/>
-    <node-mapping inputPath="/input/production.date.end" outputPath="/edm:RDF/edm:BrabantCloud/brac:productionEnd"/>
-    <node-mapping inputPath="/input/dimension.part" outputPath="/edm:RDF/edm:BrabantCloud/brac:dimension">
+    <node-mapping inputPath="/input/whateverroot/reproduction.reference" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:thumbLarge"/>
+    <node-mapping inputPath="/input/whateverroot/reproduction.reference" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:thumbSmall"/>
+    <node-mapping inputPath="/facts/name" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:collection"/>
+    <node-mapping inputPath="/input/whateverroot/creator.role" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:creatorRole"/>
+    <node-mapping inputPath="/input/whateverroot/production.date.start" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:productionPeriod"/>
+    <node-mapping inputPath="/input/whateverroot/production.date.start" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:productionStart"/>
+    <node-mapping inputPath="/input/whateverroot/production.date.end" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:productionEnd"/>
+    <node-mapping inputPath="/input/whateverroot/dimension.part" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:dimension">
       <siblings>
-        <path>/input/dimension.type</path>
-        <path>/input/dimension.unit</path>
-        <path>/input/dimension.value</path>
+        <path>/input/whateverroot/dimension.type</path>
+        <path>/input/whateverroot/dimension.unit</path>
+        <path>/input/whateverroot/dimension.value</path>
       </siblings>
       <groovy-code>
-        <string>&quot;${_M2[&apos;dimensiontype&apos;].text[0]} ${_M2[&apos;dimensionpart&apos;]}: ${_M2[&apos;dimensionvalue&apos;]} ${_M2[&apos;dimensionunit&apos;]} &quot;</string>
+        <string>"${_M3['dimensiontype'].text[0]} ${_M3['dimensionpart']}: ${_M3['dimensionvalue']} ${_M3['dimensionunit']} "</string>
       </groovy-code>
     </node-mapping>
-    <node-mapping inputPath="/input/object_number" outputPath="/edm:RDF/edm:BrabantCloud/brac:objectNumber"/>
-    <node-mapping inputPath="/input/object_name/@value" outputPath="/edm:RDF/edm:BrabantCloud/brac:objectSoort"/>
-    <node-mapping inputPath="/input/material/@value" outputPath="/edm:RDF/edm:BrabantCloud/brac:material"/>
-    <node-mapping inputPath="/input/production.place" outputPath="/edm:RDF/edm:BrabantCloud/brac:place"/>
-    <node-mapping inputPath="/input/technique/@value" outputPath="/edm:RDF/edm:BrabantCloud/brac:technique"/>
-    <node-mapping inputPath="/input/@id" outputPath="/edm:RDF/edm:Delving/@rdf:about">
+    <node-mapping inputPath="/input/whateverroot/object_number" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:objectNumber"/>
+    <node-mapping inputPath="/input/whateverroot/object_name/@value" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:objectSoort"/>
+    <node-mapping inputPath="/input/whateverroot/material/@value" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:material"/>
+    <node-mapping inputPath="/input/whateverroot/production.place" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:place"/>
+    <node-mapping inputPath="/input/whateverroot/technique/@value" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:technique"/>
+    <node-mapping inputPath="/input/whateverroot/title" outputPath="/edm:RDF/edm:ProvidedCHO/dc:title">
       <groovy-code>
-        <string>_input[&apos;@id&apos;] * { _id -&gt;</string>
-        <string>&quot;${baseUrl}/resource/delving/${spec}/${_id}&quot;</string>
+        <string>if (_absent_) {</string>
+        <string>"geen titel"</string>
+        <string>}</string>
+        <string>else {</string>
+        <string>"${_title}"</string>
         <string>}</string>
       </groovy-code>
     </node-mapping>
-    <node-mapping inputPath="/input/@id" outputPath="/edm:RDF/edm:Delving/ore:isAggregatedBy/@rdf:resource">
+    <node-mapping inputPath="/input/whateverroot/creator" outputPath="/edm:RDF/edm:ProvidedCHO/dc:creator"/>
+    <node-mapping inputPath="/input/whateverroot/content.subject" outputPath="/edm:RDF/edm:ProvidedCHO/dc:subject" operator="ALL"/>
+    <node-mapping inputPath="/input/whateverroot/description" outputPath="/edm:RDF/edm:ProvidedCHO/dc:description"/>
+    <node-mapping inputPath="/input/whateverroot/object_number" outputPath="/edm:RDF/edm:ProvidedCHO/dc:identifier"/>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/edm:ProvidedCHO/dc:rights">
       <groovy-code>
-        <string>_input[&apos;@id&apos;] * { _id -&gt;</string>
-        <string>&quot;${baseUrl}/resource/aggregation/${spec}/${_id}&quot;</string>
-        <string>}</string>
+        <string>'© L. Smits-Zoetmulder. De werken van Ton Smits zijn auteursrechtelijk beschermd. Indien u zijn werken openbaar wil maken dient u vooraf toestemming te verkrijgen. Neemt u hiervoor contact op met mevr. L. Smits–Zoetmulder, Jacob Reviuslaan 25, 5644 TP Eindhoven.'</string>
       </groovy-code>
     </node-mapping>
-    <node-mapping inputPath="/input/reproduction.reference" outputPath="/edm:RDF/edm:Delving/delving:deepZoomUrl">
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/edm:ProvidedCHO/dcterms:rightsHolder">
       <groovy-code>
-        <string>&quot;${deepZoomUrltwee(_reproductionreference).sanitizeURI()}&quot;</string>
+        <string>'L. Smits-Zoetmulder. De werken van Ton Smits zijn auteursrechtelijk beschermd. Indien u zijn werken openbaar wil maken dient u vooraf toestemming te verkrijgen. Neemt u hiervoor contact op met mevr. L. Smits–Zoetmulder, Jacob Reviuslaan 25, 5644 TP Eindhoven.'</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/whateverroot/reproduction.reference" outputPath="/edm:RDF/ore:Aggregation/edm:isShownBy/@rdf:resource"/>
+
+    <node-mapping inputPath="/facts/rights" outputPath="/edm:RDF/ore:Aggregation/edm:rights"/>
+
+    <!--<node-mapping inputPath="/input/whateverroot/reproduction.reference" outputPath="/edm:RDF/ore:Aggregation/edm:isShownAt/@rdf:resource">-->
+      <!--<groovy-code>-->
+          <!--<string>_input.whateverroot * { _whateverroot -&gt;</string>-->
+
+          <!--<string>_whateverroot.reproductionreference * { _reproductionreference -&gt;</string>-->
+          <!--<string>"${largeThumbnail(_reproductionreference).sanitizeURI()}"</string>-->
+          <!--<string>}</string>-->
+
+          <!--<string>}</string>-->
+          <!--since this is mapping to an attribute, we have to loop inside-->
+          <!--<string>"${largeThumbnail(_input.siprecord[0].reproductionreference_).sanitizeURI()}"</string>-->
+      <!--</groovy-code>-->
+    <!--</node-mapping>-->
+    <node-mapping inputPath="/input/whateverroot/reproduction.reference" outputPath="/edm:RDF/ore:Aggregation/edm:object/@rdf:resource"/>
+    <node-mapping inputPath="/facts/provider" outputPath="/edm:RDF/ore:Aggregation/edm:provider"/>
+    <node-mapping inputPath="/facts/dataProvider" outputPath="/edm:RDF/ore:Aggregation/edm:dataProvider"/>
+    <node-mapping inputPath="/facts/type" outputPath="/edm:RDF/edm:ProvidedCHO/edm:type"/>
+    <node-mapping inputPath="/input/whateverroot/priref" outputPath="/edm:RDF/ore:Aggregation/edm:uri"/>
+    <node-mapping inputPath="/facts/language" outputPath="/edm:RDF/ore:Aggregation/edm:language"/>
+    <node-mapping inputPath="/facts/country" outputPath="/edm:RDF/ore:Aggregation/edm:country"/>
+    <node-mapping inputPath="/facts/spec" outputPath="/edm:RDF/ore:Aggregation/edm:collectionName"/>
+    <node-mapping inputPath="/facts/name" outputPath="/edm:RDF/ore:Aggregation/edm:collectionTitle"/>
+    <node-mapping inputPath="/input/whateverroot/reproduction.reference" outputPath="/edm:RDF/nave:DelvingResource/nave:deepZoomUrl">
+      <groovy-code>
+        <string>"${deepZoomUrltwee(_reproductionreference).sanitizeURI()}"</string>
       </groovy-code>
     </node-mapping>
   </node-mappings>
