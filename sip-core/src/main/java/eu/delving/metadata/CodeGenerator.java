@@ -21,7 +21,14 @@
 
 package eu.delving.metadata;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
+import java.util.TreeSet;
 
 import static eu.delving.metadata.OptRole.CHILD;
 import static eu.delving.metadata.OptRole.ROOT;
@@ -97,14 +104,14 @@ public class CodeGenerator {
         codeOut.line("// Dictionaries:");
         for (NodeMapping nodeMapping : recDefTree.getNodeMappings()) toLookupCode(nodeMapping);
         codeOut.line("// DSL Category wraps Builder call:");
-        codeOut.line("boolean _absent_");
+        codeOut.line("boolean _absent_ = true");
         codeOut.line("org.w3c.dom.Node outputNode");
         codeOut.line_("use (MappingCategory) {");
         codeOut.line_("WORLD.input * { _input ->");
         codeOut.line("_uniqueIdentifier = _input['@id'][0].toString()");
         codeOut.line("outputNode = WORLD.output.");
         if (recDefTree.getRoot().isPopulated()) {
-            toElementCode(recDefTree.getRoot(), new Stack<String>());
+            toElementCode(recDefTree.getRoot(), true, new Stack<String>());
         }
         else {
             codeOut.line("no 'mapping'");
@@ -116,7 +123,7 @@ public class CodeGenerator {
     }
 
 
-    private void toElementCode(RecDefNode recDefNode, Stack<String> groovyParams) {
+    private void toElementCode(RecDefNode recDefNode, boolean isRoot, Stack<String> groovyParams) {
         if (recDefNode.isAttr() || !recDefNode.isPopulated()) return;
         if (editPath != null && !recDefNode.getPath().isFamilyOf(editPath.getNodeMapping().outputPath)) return;
         if (recDefNode.getNodeMappings().isEmpty()) {
@@ -147,7 +154,7 @@ public class CodeGenerator {
         }
         else if (editPath != null && editPath.getNodeMapping().recDefNode == recDefNode) {
             NodeMapping nodeMapping = editPath.getNodeMapping();
-            codeOut.line("_absent_ = true");
+            if (!isRoot) codeOut.line("_absent_ = true");
             codeOut.start(nodeMapping);
             toNodeMappingLoop(recDefNode, nodeMapping, getLocalPath(nodeMapping), groovyParams);
             codeOut.end(nodeMapping);
@@ -155,7 +162,7 @@ public class CodeGenerator {
         }
         else {
             for (NodeMapping nodeMapping : recDefNode.getNodeMappings().values()) {
-                codeOut.line("_absent_ = true");
+                if (!isRoot) codeOut.line("_absent_ = true");
                 codeOut.start(nodeMapping);
                 toNodeMappingLoop(recDefNode, nodeMapping, getLocalPath(nodeMapping), groovyParams);
                 codeOut.end(nodeMapping);
@@ -295,7 +302,7 @@ public class CodeGenerator {
                     codeOut.line("%s %s", sub.getTag().toBuilderCall(), sub.getOptBox().getInnerOptReference());
                 }
                 else {
-                    toElementCode(sub, groovyParams);
+                    toElementCode(sub, false, groovyParams);
                 }
             }
             codeOut.end(nodeMapping);
@@ -307,7 +314,7 @@ public class CodeGenerator {
         startBuilderCall(recDefNode, false, groovyParams);
         for (RecDefNode sub : recDefNode.getChildren()) {
             if (sub.isAttr()) continue;
-            toElementCode(sub, groovyParams);
+            toElementCode(sub, false, groovyParams);
         }
         codeOut._line("}");
     }
