@@ -172,7 +172,7 @@ public class TestMappingValidation {
 
     private String runFullCycle(int expectedRecords) throws Exception {
 
-        int fileCount = 4;
+        int fileCount = 3;
 
         File[] files = mock.files();
 

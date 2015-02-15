@@ -21,8 +21,8 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.MappingResult;
 import eu.delving.metadata.MappingFunction;
+import eu.delving.metadata.MappingResult;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.Operator;

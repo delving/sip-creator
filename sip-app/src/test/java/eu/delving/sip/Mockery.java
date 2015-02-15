@@ -90,7 +90,6 @@ public class Mockery {
         if (dataSet == null) throw new RuntimeException("No dataset called: "+dataSetDir);
         dataSetModel.setDataSet(dataSet, prefix);
         recMapping = dataSetModel.getMappingModel().getRecMapping();
-//        FileUtils.writeStringToFile(new File("/tmp/EAD-paths.txt"), recMapping.getRecDefTree().getPathsList());
     }
 
     public Storage storage() {

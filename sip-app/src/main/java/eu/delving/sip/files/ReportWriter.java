@@ -21,11 +21,10 @@
 
 package eu.delving.sip.files;
 
-import eu.delving.MappingResult;
 import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlNodePrinter;
-import eu.delving.groovy.XmlSerializer;
+import eu.delving.metadata.MappingResult;
 import org.apache.commons.io.output.CountingOutputStream;
 
 import javax.xml.xpath.XPathExpressionException;
@@ -51,8 +50,6 @@ import static org.apache.commons.io.FileUtils.writeLines;
  */
 
 public class ReportWriter {
-    public static final String DIVIDER = "::::";
-    private XmlSerializer serializer = new XmlSerializer();
     private File reportFile;
     private File reportIndexFile;
     private File reportConclusionFile;
@@ -79,7 +76,7 @@ public class ReportWriter {
 
     public void invalid(MappingResult mappingResult, Exception e) throws IOException {
         report(ReportType.INVALID, e.getMessage());
-        out.write(serializer.toXml(mappingResult.root(), true));
+        out.write(mappingResult.toXml());
         terminate();
     }
 

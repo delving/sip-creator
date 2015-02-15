@@ -21,7 +21,6 @@
 
 package eu.delving.sip.xml;
 
-import eu.delving.MappingResult;
 import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingException;
@@ -30,7 +29,7 @@ import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.AssertionException;
 import eu.delving.metadata.AssertionTest;
-import eu.delving.metadata.MappingResultImpl;
+import eu.delving.metadata.MappingResult;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefTree;
 import eu.delving.metadata.RecMapping;
@@ -207,7 +206,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         public void record(ReportWriter reportWriter, XmlOutput xmlOutput) {
             try {
                 if (exception == null) {
-                    xmlOutput.write(mappingResult.getLocalId(), mappingResult.rootAugmented());
+                    xmlOutput.write(mappingResult.getLocalId(), mappingResult.root());
                 }
                 else if (exception instanceof DiscardRecordException) {
                     reportWriter.discarded(metadataRecord, exception.getMessage());
@@ -354,7 +353,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     }
                     try {
                         Node node = mappingRunner.runMapping(record);
-                        MappingResult result = new MappingResultImpl(serializer, uriGenerator.generateUri(record.getId()), node, mappingRunner.getRecDefTree()).resolve();
+                        MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, mappingRunner.getRecDefTree());
                         if (validator == null) {
                             consumer.accept(record, result, null);
                         }
@@ -362,7 +361,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                             try {
                                 Source source = new DOMSource(node);
                                 validator.validate(source);
-                                result.checkMissingFields();
                                 for (AssertionTest assertionTest : assertionTests) {
                                     String violation = assertionTest.getViolation(result.root());
                                     if (violation != null) throw new AssertionException(violation);

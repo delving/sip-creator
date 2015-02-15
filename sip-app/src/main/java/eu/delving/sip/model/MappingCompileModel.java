@@ -21,8 +21,11 @@
 
 package eu.delving.sip.model;
 
-import eu.delving.MappingResult;
-import eu.delving.groovy.*;
+import eu.delving.groovy.DiscardRecordException;
+import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.MappingRunner;
+import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Swing;
@@ -33,7 +36,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -309,8 +312,10 @@ public class MappingCompileModel {
                         try {
                             validator.validate(new DOMSource(node));
                             handler.checkErrors();
-                            MappingResult result = new MappingResultImpl(serializer, metadataRecord.getId(), node, recMapping.getRecDefTree()).resolve();
-                            result.checkMissingFields(); // todo: replace this kind of validation
+                            MappingResult result = new MappingResult(serializer, metadataRecord.getId(), node, recMapping.getRecDefTree());
+                            List<String> uriErrors = result.getUriErrors();
+                            if (!uriErrors.isEmpty()) {
+                            }
                             StringBuilder out = new StringBuilder();
                             for (AssertionTest test : assertions) {
                                 String violation = test.getViolation(node);
@@ -327,16 +332,28 @@ public class MappingCompileModel {
                         catch (SAXException e) {
                             structureViolation(node, handler.getError());
                         }
-                        catch (MappingResult.MissingFieldsException e) {
-                            compilationComplete(Completion.MISSING_FIELD, node, e.getMessage());
-                        }
                         finally {
                             handler.reset();
                         }
                     }
                     else {
-                        compilationComplete(Completion.UNVALIDATED, node, null);
+                        MappingResult result = new MappingResult(serializer, metadataRecord.getId(), node, recMapping.getRecDefTree());
+                        List<String> uriErrors = result.getUriErrors();
+                        if (!uriErrors.isEmpty()) {
+                            StringBuilder out = new StringBuilder();
+                            for (String uriError : result.getUriErrors()) {
+                                out.append(uriError).append("\n");
+                            }
+                            compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
+                        }
+                        else {
+                            notifyMappingComplete(result);
+                            compilationComplete(Completion.JUST_FINE, node, null);
+                        }
                     }
+//                    else {
+//                        compilationComplete(Completion.UNVALIDATED, node, null);
+//                    }
                     setMappingCode();
                 }
                 catch (DiscardRecordException e) {

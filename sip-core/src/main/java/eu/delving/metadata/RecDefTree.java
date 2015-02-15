@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static eu.delving.metadata.RecDef.REQUIRED_FIELDS;
-
 /**
  * This class takes a RecDef instance and wraps itself around, ensuring
  * event propagation by brokering the Listener that is passed to every
@@ -56,7 +54,7 @@ public class RecDefTree implements RecDefNodeListener {
     private RecDef recDef;
     private RecDefNode root;
     private RecDefNodeListener listener;
-    private Map<String, XPathExpression> expressionMap = new TreeMap<String, XPathExpression>();
+    private Map<String, XPathExpression> uriCheckPaths = new TreeMap<String, XPathExpression>();
 
     public static RecDefTree create(RecDef recDef) {
         RecDefTree tree = new RecDefTree(recDef);
@@ -87,21 +85,17 @@ public class RecDefTree implements RecDefNodeListener {
         return root;
     }
 
+    public Map<String, XPathExpression> getUriCheckPaths() {
+        return uriCheckPaths;
+    }
+
     public RecDefNode getRecDefNode(Path path) {
         return root.getNode(path);
     }
 
-    public String getPathsList() {
-        StringBuilder out = new StringBuilder();
-        for (Path path : collectPaths()) {
-            out.append(path.toString()).append('\n');
-        }
-        return out.toString();
-    }
-
-    public List<Path> collectPaths() {
+    public List<Path> collectUriCheckPaths() {
         List<Path> paths = new ArrayList<Path>();
-        collectPaths(root, Path.create(), paths);
+        collectUriCheckPaths(root, Path.create(), paths);
         return paths;
     }
 
@@ -143,38 +137,18 @@ public class RecDefTree implements RecDefNodeListener {
         if (listener != null) listener.populationChanged(recDefNode);
     }
 
-    private void collectPaths(RecDefNode node, Path path, List<Path> paths) {
+    private void collectUriCheckPaths(RecDefNode node, Path path, List<Path> paths) {
         path = path.child(node.getTag());
-        paths.add(path);
-        for (RecDefNode child : node.getChildren()) collectPaths(child, path, paths);
+        if (node.hasUriCheck()) paths.add(path);
+        for (RecDefNode child : node.getChildren()) collectUriCheckPaths(child, path, paths);
     }
 
     private void resolve() throws XPathExpressionException {
-        if (recDef.fieldMarkers == null) throw new IllegalStateException("Record definition must have field markers");
-        for (RecDef.FieldMarker fieldMarker : recDef.fieldMarkers) {
-            if (!fieldMarker.hasPath()) continue;
-            expressionMap.put(fieldMarker.getXPath(), createPath().compile(fieldMarker.getXPath()));
-        }
-        boolean[] present = new boolean[REQUIRED_FIELDS.length];
-        for (RecDef.FieldMarker marker : recDef.fieldMarkers) {
-            marker.resolve(this);
-            if (marker.name != null && marker.type == null) {
-                for (int index = 0; index < REQUIRED_FIELDS.length; index++) {
-                    if (marker.name.equals(REQUIRED_FIELDS[index])) present[index] = true;
-                }
-            }
-        }
-        for (int index = 0; index < present.length; index++) {
-            if (!present[index]) System.out.println(String.format(
-                    "%s field markers missing required field %s",
-                    recDef.getSchemaVersion(), REQUIRED_FIELDS[index]
-            ));
+        for (Path uriCheckPath :collectUriCheckPaths()) {
+            String path = uriCheckPath.toString();
+            uriCheckPaths.put(path, createPath().compile(path));
         }
         root.checkPopulated();
-    }
-
-    public Map<String, XPathExpression> getExpressionMap() {
-        return expressionMap;
     }
 
     private XPath createPath() {
