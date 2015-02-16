@@ -367,7 +367,7 @@ public class SipModel {
         }
     }
 
-    public void processFile(FileProcessor.Listener listener) {
+    public void processFile(boolean allowInvalid, FileProcessor.Listener listener) {
         final DataSet dataSet = getDataSetModel().getDataSet();
         final String narthexUrl = getPreferences().get(Storage.NARTHEX_URL, "");
         dataSet.deleteResults();
@@ -376,7 +376,7 @@ public class SipModel {
                 this,
                 dataSet,
                 getMappingModel().getRecMapping(),
-                false,
+                allowInvalid,
                 groovyCodeResource,
                 new Generator(narthexUrl, dataSet.getSpec(), getMappingModel().getPrefix()),
                 listener

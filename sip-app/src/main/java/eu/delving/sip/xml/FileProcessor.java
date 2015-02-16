@@ -27,7 +27,6 @@ import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlSerializer;
-import eu.delving.metadata.AssertionException;
 import eu.delving.metadata.AssertionTest;
 import eu.delving.metadata.MappingResult;
 import eu.delving.metadata.RecDef;
@@ -42,8 +41,6 @@ import eu.delving.stats.Stats;
 import org.w3c.dom.Node;
 
 import javax.swing.*;
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
 import java.util.List;
 import java.util.Map;
@@ -354,26 +351,45 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     try {
                         Node node = mappingRunner.runMapping(record);
                         MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, mappingRunner.getRecDefTree());
-                        if (validator == null) {
+                        List<String> uriErrors = result.getUriErrors();
+                        try {
+                            if (!uriErrors.isEmpty()) {
+                                StringBuilder uriErrorsString = new StringBuilder();
+                                for (String uriError: uriErrors) {
+                                    uriErrorsString.append(uriError).append("\n");
+                                }
+                                throw new Exception("URI Errors\n"+ uriErrorsString);
+                            }
                             consumer.accept(record, result, null);
                         }
-                        else {
-                            try {
-                                Source source = new DOMSource(node);
-                                validator.validate(source);
-                                for (AssertionTest assertionTest : assertionTests) {
-                                    String violation = assertionTest.getViolation(result.root());
-                                    if (violation != null) throw new AssertionException(violation);
-                                }
-                                consumer.accept(record, result, null);
-                            }
-                            catch (Exception e) {
-                                consumer.accept(record, result, e);
-                                if (!allowInvalid) {
-                                    termination.askHowToProceed(record, e);
-                                }
+                        catch (Exception e) {
+                            consumer.accept(record, result, e);
+                            if (!allowInvalid) {
+                                termination.askHowToProceed(record, e);
                             }
                         }
+
+//
+//                        if (validator == null) {
+//                            consumer.accept(record, result, null);
+//                        }
+//                        else {
+//                            try {
+//                                Source source = new DOMSource(node);
+//                                validator.validate(source);
+//                                for (AssertionTest assertionTest : assertionTests) {
+//                                    String violation = assertionTest.getViolation(result.root());
+//                                    if (violation != null) throw new AssertionException(violation);
+//                                }
+//                                consumer.accept(record, result, null);
+//                            }
+//                            catch (Exception e) {
+//                                consumer.accept(record, result, e);
+//                                if (!allowInvalid) {
+//                                    termination.askHowToProceed(record, e);
+//                                }
+//                            }
+//                        }
                     }
                     catch (DiscardRecordException e) {
                         consumer.accept(record, null, e);
