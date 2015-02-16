@@ -126,6 +126,9 @@ public class RecDef {
     @XStreamAlias("assertion-list")
     public Assertion.AssertionList assertionList;
 
+    @XStreamAlias("field-markers")
+    public List<FieldMarker> fieldMarkers;
+
     public List<Doc> docs;
 
     @XStreamOmitField
