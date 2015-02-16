@@ -207,6 +207,58 @@ public class RecDef {
         return found;
     }
 
+    public enum Check {
+        LANDING_PAGE(true, false),
+        DIGITAL_OBJECT(true, true),
+        THUMBNAIL(true, true),
+        DEEP_ZOOM(true, false),
+        THESAURUS_REFERENCE(true, false),
+        LOD_REFERENCE(true, false),
+        GEO_COORDINATE(false, false),
+        DATE(false, false);
+
+        public final boolean fetch;
+        public final boolean captureSize;
+
+        private Check(boolean fetch, boolean captureSize) {
+            this.fetch = fetch;
+            this.captureSize = captureSize;
+        }
+    }
+
+    @XStreamAlias("field-marker")
+    public static class FieldMarker {
+
+        @XStreamAsAttribute
+        public String name;
+
+        @XStreamAsAttribute
+        public String type;
+
+        @XStreamAsAttribute
+        public Path path;
+
+        @XStreamAsAttribute
+        public String xpath;
+
+        @XStreamAsAttribute
+        public Check check;
+
+        public void resolve(RecDefTree recDefTree) {
+            if (path != null) {
+                path = path.withDefaultPrefix(recDefTree.getRecDef().prefix);
+            }
+        }
+
+        public String getXPath() {
+            return xpath != null ? xpath : path.toString();
+        }
+
+        public boolean hasPath() {
+            return xpath != null || path != null;
+        }
+    }
+
     @XStreamAlias("doc")
     public static class Doc {
 
