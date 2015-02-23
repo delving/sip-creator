@@ -186,7 +186,7 @@ public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeN
         nodePath(nodes);
         if (nodes.size() > 1 && nodes.get(0).getTag().getLocalName().equals(POCKETS)) {
             nodes.remove(0);
-            if (nodes.size() > 1 && nodes.get(0).getTag().getLocalName().equals(POCKET)) {
+            if (nodes.size() > 0 && nodes.get(0).getTag().getLocalName().equals(POCKET)) {
                 nodes.remove(0);
                 path = path.child(Tag.element("input"));
             }

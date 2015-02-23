@@ -22,13 +22,14 @@
 package eu.delving.metadata;
 
 import eu.delving.groovy.XmlSerializer;
-import org.apache.commons.validator.routines.UrlValidator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -61,15 +62,24 @@ public class MappingResult {
         return recDefTree;
     }
 
+    private boolean uriCheck(String maybeUri) {
+        try {
+            URI uri = new URI(maybeUri);
+            return uri.isAbsolute();
+        }
+        catch (URISyntaxException e) {
+            return false;
+        }
+    }
+
     public List<String> getUriErrors() throws XPathExpressionException {
-        UrlValidator urlValidator = new UrlValidator();
         List<String> errors = new ArrayList<String>();
         for (Map.Entry<String, XPathExpression> entry : recDefTree.getUriCheckPaths().entrySet()) {
             NodeList nodeList = (NodeList) entry.getValue().evaluate(root, XPathConstants.NODESET);
             for (int walk = 0; walk < nodeList.getLength(); walk++) {
                 Node node = nodeList.item(walk);
                 String content = node.getTextContent();
-                if (!urlValidator.isValid(content)) {
+                if (!uriCheck(content)) {
                     errors.add(String.format(
                             "At %s: not a URI: [%s]",
                             entry.getKey(), content

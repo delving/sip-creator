@@ -60,7 +60,7 @@ public class StatsModel {
 
     private TreePath findNodeForInputPath(Path path, SourceTreeNode node) {
         Path nodePath = node.getUnwrappedPath();
-//        System.out.println(nodePath + " =?= "+path);
+//        System.out.println(node.getPath() + ": " + nodePath + " =?= " + path);
         if (nodePath.equals(path)) return node.getTreePath();
         for (SourceTreeNode sub : node.getChildren()) {
             TreePath subPath = findNodeForInputPath(path, sub);

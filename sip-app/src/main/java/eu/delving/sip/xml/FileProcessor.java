@@ -147,14 +147,50 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         progressListener.setProgressMessage("Map, validate, gather stats");
     }
 
+    @Override
+    public void run() {
+        try {
+            MetadataParser parser = new MetadataParser(getDataSet().openSourceInputStream(), sipModel.getStatsModel().getRecordCount());
+            parser.setProgressListener(progressListener);
+            ReportWriter reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
+            XmlOutput xmlOutput = new XmlOutput(getDataSet().targetOutput(), recDef().getNamespaceMap());
+            this.stats = createStats();
+            Consumer consumer = new Consumer(reportWriter, xmlOutput);
+            QueueFiller queueFiller = new QueueFiller(parser, recordSource, consumer);
+            int engineCount = Runtime.getRuntime().availableProcessors();
+            info(String.format("Processing with %d engines", engineCount));
+            for (int walk = 0; walk < engineCount; walk++) {
+                // todo: disabled
+//                Validator validator = dataSet.newValidator();
+//                validator.setErrorHandler(null);
+                Validator validator = null;
+                MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null, false);
+                List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
+                MappingEngine engine = new MappingEngine(
+                        walk, recordSource, mappingRunner, validator, assertionTests, consumer, allowInvalid, termination
+                );
+                engine.start();
+            }
+            queueFiller.start();
+            info(Thread.currentThread().getName() + " about to consume");
+            consumer.run();
+        }
+        catch (Exception e) {
+            termination.dueToException(e);
+            sipModel.getFeedback().alert("File processing setup problem", e);
+        }
+    }
+
     private class QueueFiller implements Runnable {
         final MetadataParser parser;
         final TransferQueue<MetadataRecord> sink;
+        private final Consumer consumer;
         private Thread thread = new Thread(this);
 
-        private QueueFiller(MetadataParser parser, TransferQueue<MetadataRecord> sink) {
+        private QueueFiller(MetadataParser parser, TransferQueue<MetadataRecord> sink, Consumer consumer) {
             this.parser = parser;
             this.sink = sink;
+            this.consumer = consumer;
         }
 
         @Override
@@ -164,8 +200,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     MetadataRecord metadataRecord = parser.nextRecord();
                     while (!sink.tryTransfer(metadataRecord, 1000, TimeUnit.MILLISECONDS)) {
                         System.out.println("retry feeding record");
+                        if (!termination.notYet()) break;
                     }
                 }
+                System.out.println("Queue filler done");
+                consumer.poison();
             }
             catch (Exception e) {
                 termination.dueToException(e);
@@ -271,40 +310,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 reportWriter.finish(validCount, recordCount - validCount);
                 termination.normalCompletion();
             }
-        }
-    }
-
-    @Override
-    public void run() {
-        try {
-            MetadataParser parser = new MetadataParser(getDataSet().openSourceInputStream(), sipModel.getStatsModel().getRecordCount());
-            parser.setProgressListener(progressListener);
-            ReportWriter reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
-            XmlOutput xmlOutput = new XmlOutput(getDataSet().targetOutput(), recDef().getNamespaceMap());
-            QueueFiller queueFiller = new QueueFiller(parser, recordSource);
-            this.stats = createStats();
-            Consumer consumer = new Consumer(reportWriter, xmlOutput);
-            int engineCount = Runtime.getRuntime().availableProcessors();
-            info(String.format("Processing with %d engines", engineCount));
-            for (int walk = 0; walk < engineCount; walk++) {
-                // todo: disabled
-//                Validator validator = dataSet.newValidator();
-//                validator.setErrorHandler(null);
-                Validator validator = null;
-                MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null, false);
-                List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
-                MappingEngine engine = new MappingEngine(
-                        walk, recordSource, mappingRunner, validator, assertionTests, consumer, allowInvalid, termination
-                );
-                engine.start();
-            }
-            queueFiller.start();
-            info(Thread.currentThread().getName() + " about to consume");
-            consumer.run();
-        }
-        catch (Exception e) {
-            termination.dueToException(e);
-            sipModel.getFeedback().alert("File processing setup problem", e);
         }
     }
 
