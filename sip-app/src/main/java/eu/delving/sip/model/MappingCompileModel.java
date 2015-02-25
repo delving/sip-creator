@@ -315,6 +315,11 @@ public class MappingCompileModel {
                             MappingResult result = new MappingResult(serializer, metadataRecord.getId(), node, recMapping.getRecDefTree());
                             List<String> uriErrors = result.getUriErrors();
                             if (!uriErrors.isEmpty()) {
+                                StringBuilder out = new StringBuilder();
+                                for (String uriError : uriErrors) {
+                                    out.append(uriError).append("\n");
+                                }
+                                compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
                             }
                             StringBuilder out = new StringBuilder();
                             for (AssertionTest test : assertions) {

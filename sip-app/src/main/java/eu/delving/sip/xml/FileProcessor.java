@@ -41,6 +41,8 @@ import eu.delving.stats.Stats;
 import org.w3c.dom.Node;
 
 import javax.swing.*;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
 import java.util.List;
 import java.util.Map;
@@ -160,10 +162,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             int engineCount = Runtime.getRuntime().availableProcessors();
             info(String.format("Processing with %d engines", engineCount));
             for (int walk = 0; walk < engineCount; walk++) {
-                // todo: disabled
-//                Validator validator = dataSet.newValidator();
-//                validator.setErrorHandler(null);
-                Validator validator = null;
+                Validator validator = dataSet.newValidator();
+                validator.setErrorHandler(null);
                 MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null, false);
                 List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
                 MappingEngine engine = new MappingEngine(
@@ -358,6 +358,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, mappingRunner.getRecDefTree());
                         List<String> uriErrors = result.getUriErrors();
                         try {
+                            Source source = new DOMSource(node);
+                            validator.validate(source);
                             if (!uriErrors.isEmpty()) {
                                 StringBuilder uriErrorsString = new StringBuilder();
                                 for (String uriError: uriErrors) {

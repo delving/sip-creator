@@ -23,6 +23,7 @@ package eu.delving.sip.model;
 
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MetadataRecord;
+import eu.delving.metadata.AssertionTest;
 import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.NodeMappingChange;
@@ -272,8 +273,8 @@ public class SipModel {
                 mappingHintsModel.initialize(prefix, dataSetModel);
                 dataSetModel.getMappingModel().setFacts(facts);
                 dataSetModel.getMappingModel().setSchemaVersion(schemaVersion);
-//                recordCompileModel.setValidator(dataSetModel.newValidator());
-//                recordCompileModel.setAssertions(AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource));
+                recordCompileModel.setValidator(dataSetModel.newValidator());
+                recordCompileModel.setAssertions(AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource));
                 reportFileModel.refresh();
                 exec(new Swing() {
                     @Override
