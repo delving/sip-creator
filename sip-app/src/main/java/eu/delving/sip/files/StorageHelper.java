@@ -22,7 +22,6 @@
 package eu.delving.sip.files;
 
 import eu.delving.metadata.Hasher;
-import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 
@@ -50,8 +49,6 @@ import java.util.zip.GZIPOutputStream;
 
 import static eu.delving.sip.files.Storage.FileType;
 import static eu.delving.sip.files.Storage.FileType.*;
-import static eu.delving.sip.files.Storage.MAX_UNIQUE_VALUE_LENGTH;
-import static eu.delving.sip.files.Storage.UNIQUE_VALUE_CONVERTER;
 
 /**
  * This class contains helpers for the StorageImpl to lean on.  It does all of the searching for file name
@@ -67,15 +64,6 @@ public class StorageHelper {
 
     static File createDataSetDirectory(File home, String spec) {
         return new File(home, spec);
-    }
-
-    public static int getMaxUniqueValueLength(Map<String, String> hints) {
-        String max = hints.get(MAX_UNIQUE_VALUE_LENGTH);
-        return max == null ? Stats.DEFAULT_MAX_UNIQUE_VALUE_LENGTH : Integer.parseInt(max);
-    }
-
-    public static String getUniqueValueConverter(Map<String, String> hints) {
-        return hints.get(UNIQUE_VALUE_CONVERTER);
     }
 
     static Map<String, String> readFacts(File file) throws IOException {
@@ -119,10 +107,6 @@ public class StorageHelper {
 
     static File sourceFile(File dir) {
         return findOrCreate(dir, SOURCE);
-    }
-
-    static File latestMappingFileOrNull(File dir) {
-        return findOrNull(dir, 0, new PrefixFileFilter(MAPPING), MAPPING);
     }
 
     static File targetFile(File dir, Map<String, String> facts, String prefix) {
@@ -204,18 +188,18 @@ public class StorageHelper {
         return file;
     }
 
-    static File findOrCreate(File directory, Storage.FileType fileType, String prefix) {
-        if (fileType.getName(prefix) == null) throw new RuntimeException("Expected name");
-        File file = findOrNull(directory, 0, new NameFileFilter(fileType.getName(prefix)), fileType);
-        if (file == null) file = new File(directory, fileType.getName(prefix));
-        return file;
-    }
-
-    static File findOrCreate(File directory, String name, FileFilter fileFilter, Storage.FileType fileType) {
-        File file = findOrNull(directory, 0, fileFilter, fileType);
-        if (file == null) file = new File(directory, name);
-        return file;
-    }
+//    static File findOrCreate(File directory, Storage.FileType fileType, String prefix) {
+//        if (fileType.getName(prefix) == null) throw new RuntimeException("Expected name");
+//        File file = findOrNull(directory, 0, new NameFileFilter(fileType.getName(prefix)), fileType);
+//        if (file == null) file = new File(directory, fileType.getName(prefix));
+//        return file;
+//    }
+//
+//    static File findOrCreate(File directory, String name, FileFilter fileFilter, Storage.FileType fileType) {
+//        File file = findOrNull(directory, 0, fileFilter, fileType);
+//        if (file == null) file = new File(directory, name);
+//        return file;
+//    }
 
     static File findOrNull(File directory, int which, FileFilter fileFilter, Storage.FileType fileType) {
         File[] files = directory.listFiles(fileFilter);
@@ -384,19 +368,5 @@ public class StorageHelper {
             }
         }
     }
-
-    static final FileFilter FILE_FILTER = new FileFilter() {
-        @Override
-        public boolean accept(File file) {
-            return file.isFile();
-        }
-    };
-
-    static final FileFilter ATTIC_FILTER = new FileFilter() {
-        @Override
-        public boolean accept(File file) {
-            return file.isDirectory() && file.getName().matches("\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}");
-        }
-    };
 
 }
