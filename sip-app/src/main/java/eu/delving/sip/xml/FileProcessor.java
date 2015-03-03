@@ -27,6 +27,7 @@ import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlSerializer;
+import eu.delving.metadata.AssertionException;
 import eu.delving.metadata.AssertionTest;
 import eu.delving.metadata.MappingResult;
 import eu.delving.metadata.RecDef;
@@ -69,7 +70,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private final boolean allowInvalid;
     private final Listener listener;
     private ProgressListener progressListener;
-    private TransferQueue<MetadataRecord> recordSource = new LinkedTransferQueue<MetadataRecord>();
     private Stats stats;
     private Termination termination = new Termination();
 
@@ -158,7 +158,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             XmlOutput xmlOutput = new XmlOutput(getDataSet().targetOutput(), recDef().getNamespaceMap());
             this.stats = createStats();
             Consumer consumer = new Consumer(reportWriter, xmlOutput);
-            QueueFiller queueFiller = new QueueFiller(parser, recordSource, consumer);
+            Producer producer = new Producer(parser, consumer);
             int engineCount = Runtime.getRuntime().availableProcessors();
             info(String.format("Processing with %d engines", engineCount));
             for (int walk = 0; walk < engineCount; walk++) {
@@ -166,31 +166,34 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 validator.setErrorHandler(null);
                 MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null, false);
                 List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
-                MappingEngine engine = new MappingEngine(
-                        walk, recordSource, mappingRunner, validator, assertionTests, consumer, allowInvalid, termination
+                Mapper mapper = new Mapper(
+                        walk, producer.getProducerQueue(), mappingRunner, validator, assertionTests, consumer, allowInvalid, termination
                 );
-                engine.start();
+                mapper.start();
             }
-            queueFiller.start();
+            producer.start();
             info(Thread.currentThread().getName() + " about to consume");
             consumer.run();
         }
         catch (Exception e) {
             termination.dueToException(e);
-            sipModel.getFeedback().alert("File processing setup problem", e);
+            sipModel.getFeedback().alert("File processing problem", e);
         }
     }
 
-    private class QueueFiller implements Runnable {
-        final MetadataParser parser;
-        final TransferQueue<MetadataRecord> sink;
+    private class Producer implements Runnable {
+        private final MetadataParser parser;
         private final Consumer consumer;
+        private TransferQueue<MetadataRecord> producerQueue = new LinkedTransferQueue<MetadataRecord>();
         private Thread thread = new Thread(this);
 
-        private QueueFiller(MetadataParser parser, TransferQueue<MetadataRecord> sink, Consumer consumer) {
+        private Producer(MetadataParser parser, Consumer consumer) {
             this.parser = parser;
-            this.sink = sink;
             this.consumer = consumer;
+        }
+
+        public TransferQueue<MetadataRecord> getProducerQueue() {
+            return producerQueue;
         }
 
         @Override
@@ -198,12 +201,12 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             try {
                 while (termination.notYet()) {
                     MetadataRecord metadataRecord = parser.nextRecord();
-                    while (!sink.tryTransfer(metadataRecord, 1000, TimeUnit.MILLISECONDS)) {
+                    while (!producerQueue.tryTransfer(metadataRecord, 1000, TimeUnit.MILLISECONDS)) {
                         System.out.println("retry feeding record");
                         if (!termination.notYet()) break;
                     }
                 }
-                System.out.println("Queue filler done");
+                System.out.println("Producer done");
                 consumer.poison();
             }
             catch (Exception e) {
@@ -212,59 +215,16 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
 
         public void start() {
-            info("Queue filler started");
+            info("Producer started");
             thread.start();
         }
 
     }
 
-    private class MappingOutput {
-        final MetadataRecord metadataRecord;
-        final MappingResult mappingResult;
-        final Exception exception;
-
-        private MappingOutput(MetadataRecord metadataRecord, MappingResult mappingResult, Exception exception) {
-            this.metadataRecord = metadataRecord;
-            this.mappingResult = mappingResult;
-            this.exception = exception;
-        }
-
-        private MappingOutput() {
-            this.metadataRecord = null;
-            this.mappingResult = null;
-            this.exception = null;
-        }
-
-        public boolean isPoison() {
-            return metadataRecord == null;
-        }
-
-        public void record(ReportWriter reportWriter, XmlOutput xmlOutput) {
-            try {
-                if (exception == null) {
-                    xmlOutput.write(mappingResult.getLocalId(), mappingResult.root());
-                }
-                else if (exception instanceof DiscardRecordException) {
-                    reportWriter.discarded(metadataRecord, exception.getMessage());
-                }
-                else if (exception instanceof MappingException) {
-                    reportWriter.unexpected(metadataRecord, (MappingException) exception);
-                    termination.dueToException(exception);
-                }
-                else {
-                    reportWriter.invalid(mappingResult, exception);
-                }
-            }
-            catch (Exception e) {
-                termination.dueToException(e);
-            }
-        }
-    }
-
     private class Consumer implements Runnable {
-        final BlockingQueue<MappingOutput> outputQueue = new LinkedBlockingDeque<MappingOutput>();
-        final ReportWriter reportWriter;
-        final XmlOutput xmlOutput;
+        private final BlockingQueue<MappingOutput> outputQueue = new LinkedBlockingDeque<MappingOutput>();
+        private final ReportWriter reportWriter;
+        private final XmlOutput xmlOutput;
         private int recordCount, validCount;
 
         private Consumer(ReportWriter reportWriter, XmlOutput xmlOutput) {
@@ -286,7 +246,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 while (true) {
                     MappingOutput mappingOutput = outputQueue.take();
                     if (mappingOutput.isPoison()) {
-                        outputQueue.add(mappingOutput);
                         info("Consumer stopping");
                         break;
                     }
@@ -313,8 +272,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
     }
 
-    private class MappingEngine implements Runnable {
-        private final BlockingQueue<MetadataRecord> recordSource;
+    private class Mapper implements Runnable {
+        private final BlockingQueue<MetadataRecord> producerQueue;
         private final MappingRunner mappingRunner;
         private final Validator validator;
         private final List<AssertionTest> assertionTests;
@@ -324,11 +283,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         private Thread thread;
         private XmlSerializer serializer = new XmlSerializer();
 
-        private MappingEngine(int index, BlockingQueue<MetadataRecord> recordSource, MappingRunner mappingRunner,
-                              Validator validator, List<AssertionTest> assertionTests, Consumer consumer,
-                              boolean allowInvalid, Termination termination
+        private Mapper(int index, BlockingQueue<MetadataRecord> producerQueue, MappingRunner mappingRunner,
+                       Validator validator, List<AssertionTest> assertionTests, Consumer consumer,
+                       boolean allowInvalid, Termination termination
         ) {
-            this.recordSource = recordSource;
+            this.producerQueue = producerQueue;
             this.mappingRunner = mappingRunner;
             this.validator = validator;
             this.assertionTests = assertionTests;
@@ -347,11 +306,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         public void run() {
             try {
                 while (true) {
-                    MetadataRecord record = recordSource.take();
+                    MetadataRecord record = producerQueue.take();
                     if (record.isPoison()) {
-                        recordSource.add(record);
+                        producerQueue.add(record); // poison anybody else taking from the queue
                         consumer.poison();
-                        return;
+                        return; // it's over
                     }
                     try {
                         Node node = mappingRunner.runMapping(record);
@@ -360,6 +319,10 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         try {
                             Source source = new DOMSource(node);
                             validator.validate(source);
+                            for (AssertionTest assertionTest : assertionTests) {
+                                String violation = assertionTest.getViolation(result.root());
+                                if (violation != null) throw new AssertionException(violation);
+                            }
                             if (!uriErrors.isEmpty()) {
                                 StringBuilder uriErrorsString = new StringBuilder();
                                 for (String uriError: uriErrors) {
@@ -375,28 +338,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                                 termination.askHowToProceed(record, e);
                             }
                         }
-
-//
-//                        if (validator == null) {
-//                            consumer.accept(record, result, null);
-//                        }
-//                        else {
-//                            try {
-//                                Source source = new DOMSource(node);
-//                                validator.validate(source);
-//                                for (AssertionTest assertionTest : assertionTests) {
-//                                    String violation = assertionTest.getViolation(result.root());
-//                                    if (violation != null) throw new AssertionException(violation);
-//                                }
-//                                consumer.accept(record, result, null);
-//                            }
-//                            catch (Exception e) {
-//                                consumer.accept(record, result, e);
-//                                if (!allowInvalid) {
-//                                    termination.askHowToProceed(record, e);
-//                                }
-//                            }
-//                        }
                     }
                     catch (DiscardRecordException e) {
                         consumer.accept(record, null, e);
@@ -465,9 +406,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             if (this.exception == null) { // only show one of them
                 sipModel.getFeedback().alert("Problem processing", exception);
             }
-            this.failedRecord = failedRecord;
-            this.exception = exception;
-            listener.failed(FileProcessor.this);
+            if (this.failedRecord == null) { // only if this is the first call
+                this.failedRecord = failedRecord;
+                this.exception = exception;
+                listener.failed(FileProcessor.this);
+            }
         }
 
         synchronized void askHowToProceed(MetadataRecord failedRecord, Exception exception) {
@@ -518,4 +461,49 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             }
         }
     }
+
+    private class MappingOutput {
+        private final MetadataRecord metadataRecord;
+        private final MappingResult mappingResult;
+        private final Exception exception;
+
+        private MappingOutput(MetadataRecord metadataRecord, MappingResult mappingResult, Exception exception) {
+            this.metadataRecord = metadataRecord;
+            this.mappingResult = mappingResult;
+            this.exception = exception;
+        }
+
+        private MappingOutput() {
+            this.metadataRecord = null;
+            this.mappingResult = null;
+            this.exception = null;
+        }
+
+        public boolean isPoison() {
+            return metadataRecord == null;
+        }
+
+        public void record(ReportWriter reportWriter, XmlOutput xmlOutput) {
+            try {
+                if (exception == null) {
+                    xmlOutput.write(mappingResult.getLocalId(), mappingResult.root());
+                }
+                else if (exception instanceof DiscardRecordException) {
+                    reportWriter.discarded(metadataRecord, exception.getMessage());
+                }
+                else if (exception instanceof MappingException) {
+                    reportWriter.unexpected(metadataRecord, (MappingException) exception);
+                    termination.dueToException(exception);
+                }
+                else {
+                    reportWriter.invalid(mappingResult, exception);
+                }
+            }
+            catch (Exception e) {
+                termination.dueToException(e);
+            }
+        }
+    }
+
+
 }
