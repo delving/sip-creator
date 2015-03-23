@@ -43,7 +43,7 @@ import java.util.Map;
 
 public interface DataSet extends Comparable<DataSet> {
 
-    String getSipFileName();
+    File getSipFile();
 
     String getSpec();
 

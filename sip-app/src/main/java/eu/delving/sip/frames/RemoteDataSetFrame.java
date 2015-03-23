@@ -254,7 +254,7 @@ public class RemoteDataSetFrame extends FrameBase {
 
         DownloadItem(String remote, boolean local) {
             this.remote = remote;
-            this.dateTime = StorageHelper.dateTimeFromSipZipName(remote);
+            this.dateTime = StorageHelper.dateTimeFromSipZip(remote);
             this.local = local;
         }
 
@@ -287,7 +287,7 @@ public class RemoteDataSetFrame extends FrameBase {
 
         WorkItem(DataSet dataset) {
             this.dataset = dataset;
-            this.dateTime = StorageHelper.dateTimeFromSipZipName(dataset.getSipFileName());
+            this.dateTime = StorageHelper.dateTimeFromSipZip(dataset.getSipFile());
         }
 
         @Override
@@ -303,7 +303,7 @@ public class RemoteDataSetFrame extends FrameBase {
         public Component getListCellRendererComponent(JList list, WorkItem workItem, int index, boolean isSelected, boolean cellHasFocus) {
             String html = String.format(
                     "<html><b>%s</b> %s",
-                    workItem.dataset.getSipFileName(), workItem.dataset.getState()
+                    workItem.dataset.getSipFile().getName(), workItem.dataset.getState()
             );
             return defaultListCellRenderer.getListCellRendererComponent(list, html, index, isSelected, cellHasFocus);
         }
@@ -716,7 +716,7 @@ public class RemoteDataSetFrame extends FrameBase {
             }
             else {
                 selectedWorkItem = workItemModel.getElementAt(workItemIndex);
-                OPEN_WORK_ITEM_ACTION.putValue(Action.NAME, "Open " + selectedWorkItem.dataset.getSipFileName());
+                OPEN_WORK_ITEM_ACTION.putValue(Action.NAME, "Open " + selectedWorkItem.dataset.getSipFile().getName());
             }
             OPEN_WORK_ITEM_ACTION.checkEnabled();
             DELETE_WORK_ITEM_ACTION.checkEnabled();

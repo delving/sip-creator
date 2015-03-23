@@ -177,10 +177,12 @@ public class StorageHelper {
     }
 
     public static DateTime dateTimeFromSipZip(File file) {
-        return dateTimeFromSipZipName(file.getName());
+        DateTime dateTime = dateTimeFromSipZip(file.getName());
+        if (dateTime == null) dateTime = new DateTime(file.lastModified());
+        return dateTime;
     }
 
-    public static DateTime dateTimeFromSipZipName(String n) {
+    public static DateTime dateTimeFromSipZip(String n) {
         Matcher matcher = EXTRACT_DATE.matcher(n);
         if (matcher.matches()) {
             int year = Integer.parseInt(matcher.group(1));
@@ -191,7 +193,7 @@ public class StorageHelper {
             return new DateTime(year, month, day, hour, minute);
         }
         else {
-            return new DateTime();
+            return null;
         }
     }
 

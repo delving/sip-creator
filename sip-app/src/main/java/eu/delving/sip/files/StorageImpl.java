@@ -137,8 +137,8 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public String getSipFileName() {
-            return here.getName();
+        public File getSipFile() {
+            return here;
         }
 
         @Override
