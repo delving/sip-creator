@@ -1,7 +1,6 @@
 package eu.delving;
 
 import com.ctc.wstx.stax.WstxInputFactory;
-import org.apache.xerces.impl.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
@@ -67,14 +66,15 @@ public class XMLToolFactory {
 
     public static SchemaFactory schemaFactory(String prefix) {
         SchemaFactory schemaFactory;
-        System.setProperty("javax.xml.validation.SchemaFactory:http://www.w3.org/XML/XMLSchema/v1.1", "org.apache.xerces.jaxp.validation.XMLSchema11Factory");
-        schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1");
-        try {
-            schemaFactory.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.CTA_FULL_XPATH_CHECKING_FEATURE, true);
-        }
-        catch (Exception e) {
-            throw new RuntimeException("Configuring schema factory", e);
-        }
+//        System.setProperty("javax.xml.validation.SchemaFactory:http://www.w3.org/XML/XMLSchema/v1.1", "org.apache.xerces.jaxp.validation.XMLSchema11Factory");
+        System.setProperty("javax.xml.validation.SchemaFactory:http://www.w3.org/XML/XMLSchema/v1.0", "org.apache.xerces.jaxp.validation.XMLSchemaFactory");
+        schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.0");
+//        try {
+//            schemaFactory.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.CTA_FULL_XPATH_CHECKING_FEATURE, true);
+//        }
+//        catch (Exception e) {
+//            throw new RuntimeException("Configuring schema factory", e);
+//        }
         return schemaFactory;
     }
 
