@@ -67,18 +67,13 @@ public class XMLToolFactory {
 
     public static SchemaFactory schemaFactory(String prefix) {
         SchemaFactory schemaFactory;
-        if ("edm".equals(prefix)) {
-            schemaFactory = SchemaFactory.newInstance(Constants.W3C_XML_SCHEMA10_NS_URI);
+        System.setProperty("javax.xml.validation.SchemaFactory:http://www.w3.org/XML/XMLSchema/v1.1", "org.apache.xerces.jaxp.validation.XMLSchema11Factory");
+        schemaFactory = SchemaFactory.newInstance(Constants.W3C_XML_SCHEMA11_NS_URI);
+        try {
+            schemaFactory.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.CTA_FULL_XPATH_CHECKING_FEATURE, true);
         }
-        else {
-            System.setProperty("javax.xml.validation.SchemaFactory:http://www.w3.org/XML/XMLSchema/v1.1", "org.apache.xerces.jaxp.validation.XMLSchema11Factory");
-            schemaFactory = SchemaFactory.newInstance(Constants.W3C_XML_SCHEMA11_NS_URI);
-            try {
-                schemaFactory.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.CTA_FULL_XPATH_CHECKING_FEATURE, true);
-            }
-            catch (Exception e) {
-                throw new RuntimeException("Configuring schema factory", e);
-            }
+        catch (Exception e) {
+            throw new RuntimeException("Configuring schema factory", e);
         }
         return schemaFactory;
     }

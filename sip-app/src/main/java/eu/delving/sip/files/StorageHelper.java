@@ -88,7 +88,7 @@ public class StorageHelper {
                 if (equals < 0) {
                     continue;
                 }
-                String name = line.substring(0, equals).trim();
+                String name = line.substring(0, equals).trim().replace("\uFEFF", "");
                 String value = line.substring(equals + 1).trim();
                 facts.put(name, value);
             }

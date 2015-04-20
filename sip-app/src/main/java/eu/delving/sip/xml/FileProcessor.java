@@ -27,6 +27,7 @@ import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlSerializer;
+import eu.delving.metadata.AssertionException;
 import eu.delving.metadata.AssertionTest;
 import eu.delving.metadata.MappingResult;
 import eu.delving.metadata.RecDef;
@@ -41,6 +42,8 @@ import eu.delving.stats.Stats;
 import org.w3c.dom.Node;
 
 import javax.swing.*;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +52,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TransferQueue;
+
+import static eu.delving.sip.files.Storage.XSD_VALIDATION;
 
 /**
  * Process an input file, mapping it to output records which are validated and used to gather statistics.
@@ -160,10 +165,12 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             int engineCount = Runtime.getRuntime().availableProcessors();
             info(String.format("Processing with %d engines", engineCount));
             for (int walk = 0; walk < engineCount; walk++) {
-                // todo: disabled
-//                Validator validator = dataSet.newValidator();
-//                validator.setErrorHandler(null);
+                boolean enableXSDValidation = sipModel.getPreferences().getBoolean(XSD_VALIDATION, false);
                 Validator validator = null;
+                if (enableXSDValidation) {
+                    validator = dataSet.newValidator();
+                    validator.setErrorHandler(null);
+                }
                 MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null, false);
                 List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
                 MappingEngine engine = new MappingEngine(
@@ -365,7 +372,26 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                                 }
                                 throw new Exception("URI Errors\n"+ uriErrorsString);
                             }
-                            consumer.accept(record, result, null);
+                            if (validator == null) {
+                                consumer.accept(record, result, null);
+                            }
+                            else {
+                                try {
+                                    Source source = new DOMSource(node);
+                                    validator.validate(source);
+                                    for (AssertionTest assertionTest : assertionTests) {
+                                        String violation = assertionTest.getViolation(result.root());
+                                        if (violation != null) throw new AssertionException(violation);
+                                    }
+                                    consumer.accept(record, result, null);
+                                }
+                                catch (Exception e) {
+                                    consumer.accept(record, result, e);
+                                    if (!allowInvalid) {
+                                        termination.askHowToProceed(record, e);
+                                    }
+                                }
+                            }
                         }
                         catch (Exception e) {
                             consumer.accept(record, result, e);
@@ -374,27 +400,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                             }
                         }
 
-//
-//                        if (validator == null) {
-//                            consumer.accept(record, result, null);
-//                        }
-//                        else {
-//                            try {
-//                                Source source = new DOMSource(node);
-//                                validator.validate(source);
-//                                for (AssertionTest assertionTest : assertionTests) {
-//                                    String violation = assertionTest.getViolation(result.root());
-//                                    if (violation != null) throw new AssertionException(violation);
-//                                }
-//                                consumer.accept(record, result, null);
-//                            }
-//                            catch (Exception e) {
-//                                consumer.accept(record, result, e);
-//                                if (!allowInvalid) {
-//                                    termination.askHowToProceed(record, e);
-//                                }
-//                            }
-//                        }
+
                     }
                     catch (DiscardRecordException e) {
                         consumer.accept(record, null, e);

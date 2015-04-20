@@ -92,14 +92,13 @@ public interface Storage {
     String MAX_UNIQUE_VALUE_LENGTH = "maxUniqueValueLength";
     String UNIQUE_VALUE_CONVERTER = "uniqueValueConverter";
     String SCHEMA_VERSIONS = "schemaVersions";
-    String HARVEST_URL = "harvestUrl";
+    String XSD_VALIDATION = "xsdValidation";
     String NARTHEX_URL = "narthexUrl";
     String NARTHEX_USERNAME = "narthexUsername";
     String NARTHEX_PASSWORD = "narthexPassword";
     String NARTHEX_DATASET_NAME = "narthexDatasetName";
     String NARTHEX_PREFIX = "narthexPrefix";
     String CACHE_DIR = "__cache__";
-    String SIP_ZIPS_DIR = "SipZips";
     String FRAME_ARRANGEMENTS_FILE = "frame-arrangements.xml";
 
     String POCKETS = "pockets";

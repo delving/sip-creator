@@ -53,6 +53,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static eu.delving.metadata.StringUtil.documentToString;
 import static eu.delving.metadata.StringUtil.isSimilarCode;
+import static eu.delving.sip.files.Storage.XSD_VALIDATION;
 import static eu.delving.sip.model.MappingCompileModel.Type.RECORD;
 
 /**
@@ -306,7 +307,8 @@ public class MappingCompileModel {
                 try {
                     Node node = mappingRunner.runMapping(metadataRecord);
                     if (node == null) return;
-                    if (validator != null) {
+                    boolean enableXSDValidation = sipModel.getPreferences().getBoolean(XSD_VALIDATION, false);
+                    if (validator != null && enableXSDValidation) {
                         ForgivingErrorHandler handler = new ForgivingErrorHandler();
                         validator.setErrorHandler(handler);
                         try {

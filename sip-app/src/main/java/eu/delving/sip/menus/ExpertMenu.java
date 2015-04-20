@@ -40,6 +40,10 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
+import static eu.delving.sip.files.Storage.XSD_VALIDATION;
 
 /**
  * Special functions for experts, not to be spoken of in mixed company, or among people with potential heart
@@ -56,6 +60,7 @@ public class ExpertMenu extends JMenu {
         super("Expert");
         this.sipModel = sipModel;
         this.allFrames = allFrames;
+        add(new ToggleXSDValidation());
         add(new SourceIncludedAction());
         add(new MaxUniqueValueLengthAction());
         add(new ReloadMappingAction());
@@ -166,6 +171,23 @@ public class ExpertMenu extends JMenu {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             for (FrameBase frame : allFrames.getFrames()) frame.toggleEditMenu();
+        }
+    }
+
+
+    private class ToggleXSDValidation extends JCheckBoxMenuItem implements ItemListener {
+        public ToggleXSDValidation() {
+            super("Toggle XSD Validation");
+            boolean state = sipModel.getPreferences().getBoolean(XSD_VALIDATION, false);
+            setState(state);
+            addItemListener(this);
+        }
+
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            int state = e.getStateChange();
+            boolean selected = state == ItemEvent.SELECTED;
+            sipModel.getPreferences().putBoolean(XSD_VALIDATION, selected);
         }
     }
 
