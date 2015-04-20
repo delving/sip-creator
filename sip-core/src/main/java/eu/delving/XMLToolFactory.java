@@ -68,7 +68,7 @@ public class XMLToolFactory {
     public static SchemaFactory schemaFactory(String prefix) {
         SchemaFactory schemaFactory;
         System.setProperty("javax.xml.validation.SchemaFactory:http://www.w3.org/XML/XMLSchema/v1.1", "org.apache.xerces.jaxp.validation.XMLSchema11Factory");
-        schemaFactory = SchemaFactory.newInstance(Constants.W3C_XML_SCHEMA11_NS_URI);
+        schemaFactory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1");
         try {
             schemaFactory.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.CTA_FULL_XPATH_CHECKING_FEATURE, true);
         }
