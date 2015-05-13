@@ -269,9 +269,11 @@ public class SipModel {
                 String prefix = schemaVersion.getPrefix();
                 dataSetModel.setDataSet(dataSet, prefix);
                 final RecMapping recMapping = dataSetModel.getRecMapping();
+                dataSetFacts.getFacts().clear();
+                dataSetFacts.getFacts().putAll(facts);
                 dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
                 mappingHintsModel.initialize(prefix, dataSetModel);
-                dataSetModel.getMappingModel().setFacts(facts);
+                dataSetModel.getMappingModel().setFacts(dataSetFacts.getFacts());
                 dataSetModel.getMappingModel().setSchemaVersion(schemaVersion);
                 recordCompileModel.setValidator(dataSetModel.newValidator());
                 recordCompileModel.setAssertions(AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource));
