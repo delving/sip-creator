@@ -24,7 +24,7 @@ package eu.delving.sip.base;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
 
-import javax.swing.JTextArea;
+import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import java.net.MalformedURLException;
@@ -59,7 +59,8 @@ public class URLLauncher implements CaretListener {
             int max = Math.min(text.length() - 1, Math.max(dot, mark));
             String urlString = text.substring(min, max);
             if (urlString.contains("\n")) return;
-            if (min > 1 && text.charAt(min - 1) == '>' && max < text.length() && text.charAt(max) == '<') {
+            if (min > 1 && (text.charAt(min - 1) == '>' || text.charAt(min - 1) == '"') &&
+                    max < text.length() && (text.charAt(max) == '<' || text.charAt(max) == '"')) {
                 if (validUrl(urlString)) {
                     SwingHelper.launchURLFromXML(urlString);
                 }
@@ -68,10 +69,10 @@ public class URLLauncher implements CaretListener {
                 }
             }
             else {
-                while (min > 1 && text.charAt(min - 1) != '>') {
+                while (min > 1 && text.charAt(min - 1) != '>' && text.charAt(min - 1) != '"') {
                     min--;
                 }
-                while (max < text.length() - 1 && text.charAt(max) != '<') {
+                while (max < text.length() - 1 && text.charAt(max) != '<' && text.charAt(max) != '"') {
                     max++;
                 }
                 final String url = text.substring(min, max);

@@ -317,18 +317,25 @@ public class MappingCompileModel {
                             MappingResult result = new MappingResult(serializer, metadataRecord.getId(), node, recMapping.getRecDefTree());
                             List<String> uriErrors = result.getUriErrors();
                             if (!uriErrors.isEmpty()) {
-                            }
-                            StringBuilder out = new StringBuilder();
-                            for (AssertionTest test : assertions) {
-                                String violation = test.getViolation(node);
-                                if (violation != null) out.append(test).append(" : ").append(violation).append('\n');
-                            }
-                            if (out.length() > 0) {
+                                StringBuilder out = new StringBuilder();
+                                for (String uriError : result.getUriErrors()) {
+                                    out.append(uriError).append("\n");
+                                }
                                 compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
                             }
                             else {
-                                notifyMappingComplete(result);
-                                compilationComplete(Completion.JUST_FINE, node, null);
+                                StringBuilder out = new StringBuilder();
+                                for (AssertionTest test : assertions) {
+                                    String violation = test.getViolation(node);
+                                    if (violation != null) out.append(test).append(" : ").append(violation).append('\n');
+                                }
+                                if (out.length() > 0) {
+                                    compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
+                                }
+                                else {
+                                    notifyMappingComplete(result);
+                                    compilationComplete(Completion.JUST_FINE, node, null);
+                                }
                             }
                         }
                         catch (SAXException e) {

@@ -51,9 +51,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.StringReader;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -370,6 +368,8 @@ public class StorageImpl implements Storage {
 
         @Override
         public void fromSipZip(File sipZipFile, ProgressListener progressListener) throws StorageException {
+            delete(here);
+            here.mkdir();
             long streamLength = sipZipFile.length();
             try {
                 InputStream inputStream = new FileInputStream(sipZipFile);
@@ -467,16 +467,7 @@ public class StorageImpl implements Storage {
 
         @Override
         public void remove() throws StorageException {
-            if (here.listFiles(FILE_FILTER).length == 0) return;
-            for (File file : here.listFiles(ATTIC_FILTER)) delete(file);
-            String now = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
-            File saveDirectory = new File(here, now);
-            try {
-                for (File file : here.listFiles(FILE_FILTER)) FileUtils.moveFileToDirectory(file, saveDirectory, true);
-            }
-            catch (IOException e) {
-                throw new StorageException(String.format("Unable to save files in %s to directory %s", here.getName(), now), e);
-            }
+            delete(here);
         }
 
         public File getHere() {
