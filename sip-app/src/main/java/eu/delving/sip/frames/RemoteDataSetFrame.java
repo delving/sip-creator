@@ -260,7 +260,7 @@ public class RemoteDataSetFrame extends FrameBase {
 
         @Override
         public int compareTo(DownloadItem other) {
-            return (int)(other.dateTime.getMillis() - dateTime.getMillis());
+            return other.dateTime.compareTo(dateTime);
         }
 
         public String toString() {
@@ -292,7 +292,7 @@ public class RemoteDataSetFrame extends FrameBase {
 
         @Override
         public int compareTo(WorkItem other) {
-            return (int)(other.dateTime.getMillis() - dateTime.getMillis());
+            return other.dateTime.compareTo(dateTime);
         }
     }
 
@@ -325,7 +325,7 @@ public class RemoteDataSetFrame extends FrameBase {
 
         @Override
         public int compareTo(UploadItem other) {
-            return (int) (other.file.lastModified() - file.lastModified());
+            return other.date.compareTo(date);
         }
     }
 
@@ -340,8 +340,7 @@ public class RemoteDataSetFrame extends FrameBase {
                         "<html><b>%s</b>",
                         uploadItem.file.getName()
                 );
-            }
-            else {
+            } else {
                 html = String.format(
                         "<html>%s",
                         uploadItem.file.getName()
@@ -360,8 +359,7 @@ public class RemoteDataSetFrame extends FrameBase {
         public int getSize() {
             if (index != null) {
                 return index.size();
-            }
-            else {
+            } else {
                 return downloadItems.size();
             }
         }
@@ -370,8 +368,7 @@ public class RemoteDataSetFrame extends FrameBase {
         public DownloadItem getElementAt(int rowIndex) {
             if (index != null) {
                 return downloadItems.get(index.get(rowIndex));
-            }
-            else {
+            } else {
                 return downloadItems.get(rowIndex);
             }
         }
@@ -416,7 +413,6 @@ public class RemoteDataSetFrame extends FrameBase {
                 if (item == null) downloadItemMap.put(remote, new DownloadItem(remote, datasetMap.containsKey(remote)));
             }
             downloadItems.addAll(downloadItemMap.values());
-            Collections.sort(downloadItems);
             activateFilter();
             fireIntervalAdded(this, 0, getSize());
         }
@@ -431,8 +427,7 @@ public class RemoteDataSetFrame extends FrameBase {
         public int getSize() {
             if (index != null) {
                 return index.size();
-            }
-            else {
+            } else {
                 return workItems.size();
             }
         }
@@ -441,8 +436,7 @@ public class RemoteDataSetFrame extends FrameBase {
         public WorkItem getElementAt(int rowIndex) {
             if (index != null) {
                 return workItems.get(index.get(rowIndex));
-            }
-            else {
+            } else {
                 return workItems.get(rowIndex);
             }
         }
@@ -474,8 +468,11 @@ public class RemoteDataSetFrame extends FrameBase {
             int size = getSize();
             workItems.clear();
             fireIntervalRemoved(this, 0, size);
-            for (DataSet dataSet : sipModel.getStorage().getDataSets().values()) {
-                workItems.add(new WorkItem(dataSet));
+            for (Map.Entry<String, DataSet> entry: sipModel.getStorage().getDataSets().entrySet()) {
+                DataSet dataSet = entry.getValue();
+                if (entry.getKey().endsWith(".sip.zip")) {
+                    workItems.add(new WorkItem(dataSet));
+                }
             }
             Collections.sort(workItems);
             activateFilter();
@@ -492,8 +489,7 @@ public class RemoteDataSetFrame extends FrameBase {
         public int getSize() {
             if (index != null) {
                 return index.size();
-            }
-            else {
+            } else {
                 return uploadItems.size();
             }
         }
@@ -502,8 +498,7 @@ public class RemoteDataSetFrame extends FrameBase {
         public UploadItem getElementAt(int rowIndex) {
             if (index != null) {
                 return uploadItems.get(index.get(rowIndex));
-            }
-            else {
+            } else {
                 return uploadItems.get(rowIndex);
             }
         }
@@ -542,9 +537,11 @@ public class RemoteDataSetFrame extends FrameBase {
             uploadItems.clear();
             fireIntervalRemoved(this, 0, size);
             for (File uploadFile : uploadFiles) {
-                UploadItem item = new UploadItem(uploadFile);
-                item.sipEntry = uploadedMap.get(item.file.getName());
-                uploadItems.add(item);
+                if (uploadFile.getPath().endsWith(".sip.zip")) {
+                    UploadItem item = new UploadItem(uploadFile);
+                    item.sipEntry = uploadedMap.get(item.file.getName());
+                    uploadItems.add(item);
+                }
             }
             Collections.sort(uploadItems);
             activateFilter();
@@ -624,8 +621,7 @@ public class RemoteDataSetFrame extends FrameBase {
                             }
                         }
                 );
-            }
-            catch (StorageException e) {
+            } catch (StorageException e) {
                 sipModel.getFeedback().alert("Unable to create data set called " + selectedDownload.toString(), e);
             }
         }
@@ -640,8 +636,7 @@ public class RemoteDataSetFrame extends FrameBase {
             int downloadIndex = downloadList.getSelectedIndex();
             if (downloadIndex < 0) {
                 DOWNLOAD_ACTION.putValue(Action.NAME, "Download");
-            }
-            else {
+            } else {
                 selectedDownload = downloadModel.getElementAt(downloadIndex);
                 DOWNLOAD_ACTION.putValue(Action.NAME, "Download " + selectedDownload.remote);
             }
@@ -696,8 +691,7 @@ public class RemoteDataSetFrame extends FrameBase {
                 selectedWorkItem.dataset.remove();
                 workItemModel.refreshWorkItems();
                 downloadModel.refreshDownloads();
-            }
-            catch (StorageException e) {
+            } catch (StorageException e) {
                 sipModel.getFeedback().alert("Unable to delete", e);
             }
         }
@@ -713,8 +707,7 @@ public class RemoteDataSetFrame extends FrameBase {
             if (workItemIndex < 0) {
                 selectedWorkItem = null;
                 OPEN_WORK_ITEM_ACTION.putValue(Action.NAME, "Open");
-            }
-            else {
+            } else {
                 selectedWorkItem = workItemModel.getElementAt(workItemIndex);
                 OPEN_WORK_ITEM_ACTION.putValue(Action.NAME, "Open " + selectedWorkItem.dataset.getSipFile().getName());
             }
@@ -750,8 +743,7 @@ public class RemoteDataSetFrame extends FrameBase {
                         uploadModel.refreshUploads();
                     }
                 });
-            }
-            catch (StorageException e) {
+            } catch (StorageException e) {
                 sipModel.getFeedback().alert("Unable to upload to Narthex", e);
             }
         }
@@ -788,8 +780,7 @@ public class RemoteDataSetFrame extends FrameBase {
             int uploadIndex = list.getSelectedIndex();
             if (uploadIndex < 0) {
                 UPLOAD_ACTION.putValue(Action.NAME, "Upload");
-            }
-            else {
+            } else {
                 selectedUpload = uploadModel.getElementAt(uploadIndex);
                 UPLOAD_ACTION.putValue(Action.NAME, "Upload " + selectedUpload.file.getName());
             }
