@@ -59,7 +59,7 @@ import static eu.delving.sip.base.SwingHelper.*;
 
 public class FunctionFrame extends FrameBase {
     private static final Pattern FUNCTION_NAME = Pattern.compile("[a-z]+[a-zA-z]*");
-    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 14);
+    private static final Font MONOSPACED = new Font(Font.MONOSPACED, Font.BOLD, 14);
     private final Action UNDO_ACTION = new UndoAction();
     private final Action REDO_ACTION = new RedoAction();
     private FunctionListModel libraryListModel = new FunctionListModel();

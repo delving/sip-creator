@@ -44,13 +44,13 @@ import static eu.delving.sip.base.SwingHelper.NORMAL_JOB_COLOR;
  */
 
 public class WorkPanel extends JPanel {
-    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
+    private static final Font MONOSPACED = new Font(Font.MONOSPACED, Font.BOLD, 12);
     private JList<WorkModel.JobContext> list;
 
     public WorkPanel(final SipModel sipModel) {
         super(new BorderLayout());
         this.list = new JList<WorkModel.JobContext>(sipModel.getWorkModel().getListModel());
-        this.list.setFont(MONOSPACED);
+//        this.list.setFont(MONOSPACED);
         this.list.setCellRenderer(new WorkCellRenderer());
         this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.list.addListSelectionListener(new ListSelectionListener() {

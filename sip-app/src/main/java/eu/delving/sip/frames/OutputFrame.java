@@ -51,7 +51,7 @@ import static eu.delving.sip.base.SwingHelper.setError;
  */
 
 public class OutputFrame extends FrameBase {
-    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
+    private static final Font MONOSPACED = new Font(Font.MONOSPACED, Font.BOLD, 12);
     private JTextField searchField = new JTextField(25);
     private JTextArea outputArea;
     private List<Integer> found = new ArrayList<Integer>();
@@ -77,7 +77,7 @@ public class OutputFrame extends FrameBase {
         p.setBorder(BorderFactory.createTitledBorder("Output record"));
         outputArea = new JTextArea(sipModel.getRecordCompileModel().getOutputDocument());
         outputArea.setLineWrap(true);
-        outputArea.setFont(MONOSPACED);
+//        outputArea.setFont(MONOSPACED);
         outputArea.setWrapStyleWord(true);
         outputArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override

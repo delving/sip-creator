@@ -71,7 +71,7 @@ import static eu.delving.sip.base.SwingHelper.scrollV;
  */
 
 public class DataSetStandaloneFrame extends FrameBase {
-    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 26);
+    private static final Font MONOSPACED = new Font(Font.MONOSPACED, Font.BOLD, 26);
     private static final Pattern SPEC_PATTERN = Pattern.compile("[A-Za-z0-9-]{3,40}");
     private static final String UNSELECTED = "<select>";
     private static final FactDefinition SCHEMA_VERSIONS_FACT = new FactDefinition("schemaVersions", "Schema Versions");

@@ -51,7 +51,7 @@ import static eu.delving.sip.base.SwingHelper.scrollVH;
  */
 
 public class MappingCodeFrame extends FrameBase {
-    public static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 10);
+    public static final Font MONOSPACED = new Font(Font.MONOSPACED, Font.BOLD, 10);
     private JTextArea listArea = new JTextArea();
     private JTextArea recordArea = new JTextArea();
     private JTextArea fieldArea = new JTextArea();
