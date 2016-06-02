@@ -238,6 +238,7 @@ public class Application {
         });
         validateAction = new ValidateAction(sipModel, allFrames.prepareForInvestigation(desktop));
         unlockMappingAction = new UnlockMappingAction(sipModel);
+        UnlockMappingAction unlockMappingAction = this.unlockMappingAction;
         attachAccelerator(unlockMappingAction, home);
         content.add(createStatePanel(), BorderLayout.SOUTH);
         content.add(allFrames.getSidePanel(), BorderLayout.WEST);

@@ -77,7 +77,7 @@ public class OutputFrame extends FrameBase {
         p.setBorder(BorderFactory.createTitledBorder("Output record"));
         outputArea = new JTextArea(sipModel.getRecordCompileModel().getOutputDocument());
         outputArea.setLineWrap(true);
-        outputArea.setFont(MONOSPACED);
+//        outputArea.setFont(MONOSPACED);
         outputArea.setWrapStyleWord(true);
         outputArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
