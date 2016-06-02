@@ -433,8 +433,8 @@ public class Application {
             out.append(":: SIP-Creator Startup Batch file for Windows (more memory than ").append(totalMemory).append("Mb)\n");
             out.append("java -jar -Xms1024m -Xmx1024m ").append(JAR_NAME);
         }
-        else if (os.startsWith("Mac")) {
-            out.append("# SIP-Creator Startup Script for Mac OSX (more memory than ").append(totalMemory).append("Mb)\n");
+        else if (os.startsWith("Mac") || os.startsWith("Linux")) {
+            out.append("# SIP-Creator Startup Script for Unix/Linux based systems  (more memory than ").append(totalMemory).append("Mb)\n");
             out.append("java -jar -Xms1024m -Xmx1024m ").append(JAR_NAME);
         }
         else {
