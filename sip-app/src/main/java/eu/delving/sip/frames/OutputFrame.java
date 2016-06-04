@@ -25,6 +25,10 @@ import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.KeystrokeHelper;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.SipModel;
+import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rtextarea.RTextScrollPane;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -75,10 +79,18 @@ public class OutputFrame extends FrameBase {
     private JPanel createOutputPanel() {
         final JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Output record"));
-        outputArea = new JTextArea(sipModel.getRecordCompileModel().getOutputDocument());
-        outputArea.setLineWrap(true);
-//        outputArea.setFont(MONOSPACED);
-        outputArea.setWrapStyleWord(true);
+
+        RSyntaxDocument doc = new RSyntaxDocument(sipModel.getRecordCompileModel().getOutputDocument().toString());
+        final RSyntaxTextArea outputArea = new RSyntaxTextArea(doc);
+        outputArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_XML);
+        outputArea.setCodeFoldingEnabled(true);
+        RTextScrollPane tsp = new RTextScrollPane(outputArea);
+        p.add(tsp);
+
+//        outputArea = new JTextArea(sipModel.getRecordCompileModel().getOutputDocument());
+//        outputArea.setLineWrap(true);
+////        outputArea.setFont(MONOSPACED);
+//        outputArea.setWrapStyleWord(true);
         outputArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
