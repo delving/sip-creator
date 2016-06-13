@@ -174,7 +174,7 @@ public class Application {
 
             @Override
             public String narthexUrl() {
-                return sipModel.getPreferences().get(NARTHEX_URL, "").trim();
+                return sipModel.getPreferences().get(NARTHEX_URL, "").replaceAll("[/#]+$", "").trim();
             }
 
             @Override
