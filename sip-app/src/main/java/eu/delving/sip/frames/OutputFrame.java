@@ -23,19 +23,16 @@ package eu.delving.sip.frames;
 
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.KeystrokeHelper;
-import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.SipModel;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rtextarea.RTextScrollPane;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Font;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,9 +72,11 @@ public class OutputFrame extends FrameBase {
     private JPanel createOutputPanel() {
         final JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Output record"));
-        outputArea = new JTextArea(sipModel.getRecordCompileModel().getOutputDocument());
-        outputArea.setLineWrap(true);
-        outputArea.setWrapStyleWord(true);
+
+        final RSyntaxTextArea outputArea = new RSyntaxTextArea(sipModel.getRecordCompileModel().getOutputDocument());
+        outputArea.setCodeFoldingEnabled(true);
+        RTextScrollPane tsp = new RTextScrollPane(outputArea);
+        p.add(tsp);
         outputArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
@@ -88,8 +87,7 @@ public class OutputFrame extends FrameBase {
                     sipModel.exec(() -> {
                         outputArea.setCaretPosition(0);
                     });
-                }
-                catch (BadLocationException e) {
+                } catch (BadLocationException e) {
                     // who cares
                 }
             }
@@ -154,8 +152,7 @@ public class OutputFrame extends FrameBase {
     private void selectFound() {
         if (found.isEmpty()) {
             outputArea.select(0, 0);
-        }
-        else {
+        } else {
             foundSelected = (foundSelected + found.size()) % found.size();
             final Integer pos = found.get(foundSelected);
             final int findLength = searchField.getText().length();
@@ -167,8 +164,7 @@ public class OutputFrame extends FrameBase {
                     outputArea.scrollRectToVisible(viewRect);
                     outputArea.setCaretPosition(pos);
                     outputArea.moveCaretPosition(pos + findLength);
-                }
-                catch (BadLocationException e) {
+                } catch (BadLocationException e) {
                     throw new RuntimeException("Location bad", e);
                 }
             });

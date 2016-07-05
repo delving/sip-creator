@@ -31,6 +31,8 @@ import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
+import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -73,7 +75,7 @@ public class MappingCompileModel {
     private MetadataRecord metadataRecord;
     private Document codeDocument = new PlainDocument();
     private Document docDocument = new PlainDocument();
-    private Document outputDocument = new PlainDocument();
+    private RSyntaxDocument outputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_XML);
     private TriggerTimer triggerTimer = new TriggerTimer();
     private Type type;
     private Validator validator;
@@ -191,7 +193,7 @@ public class MappingCompileModel {
         return docDocument;
     }
 
-    public Document getOutputDocument() {
+    public RSyntaxDocument getOutputDocument() {
         return outputDocument;
     }
 
