@@ -54,7 +54,7 @@ public class OutputFrame extends FrameBase {
     private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
     private JTextField searchField = new JTextField(25);
     private JTextArea outputArea;
-    private List<Integer> found = new ArrayList<Integer>();
+    private List<Integer> found = new ArrayList<>();
     private int foundSelected;
 
     public OutputFrame(final SipModel sipModel) {
@@ -77,7 +77,6 @@ public class OutputFrame extends FrameBase {
         p.setBorder(BorderFactory.createTitledBorder("Output record"));
         outputArea = new JTextArea(sipModel.getRecordCompileModel().getOutputDocument());
         outputArea.setLineWrap(true);
-//        outputArea.setFont(MONOSPACED);
         outputArea.setWrapStyleWord(true);
         outputArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -86,11 +85,8 @@ public class OutputFrame extends FrameBase {
                     String first = documentEvent.getDocument().getText(0, 1);
                     final boolean error = first.startsWith("#");
                     setError(outputArea, error);
-                    sipModel.exec(new Swing() {
-                        @Override
-                        public void run() {
-                            outputArea.setCaretPosition(0);
-                        }
+                    sipModel.exec(() -> {
+                        outputArea.setCaretPosition(0);
                     });
                 }
                 catch (BadLocationException e) {
@@ -112,24 +108,21 @@ public class OutputFrame extends FrameBase {
         outputArea.getInputMap().put(KeystrokeHelper.LEFT, "prev");
         outputArea.getActionMap().put("next", new NextAction());
         outputArea.getActionMap().put("prev", new PrevAction());
-        searchField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                found.clear();
-                foundSelected = 0;
-                String xml = outputArea.getText().toLowerCase();
-                String sought = searchField.getText().toLowerCase();
-                if (!sought.isEmpty()) {
-                    int start = 0;
-                    while (found.size() < 30) {
-                        int pos = xml.indexOf(sought, start);
-                        if (pos < 0) break;
-                        found.add(pos);
-                        start = pos + sought.length();
-                    }
+        searchField.addActionListener(e -> {
+            found.clear();
+            foundSelected = 0;
+            String xml = outputArea.getText().toLowerCase();
+            String sought = searchField.getText().toLowerCase();
+            if (!sought.isEmpty()) {
+                int start = 0;
+                while (found.size() < 30) {
+                    int pos = xml.indexOf(sought, start);
+                    if (pos < 0) break;
+                    found.add(pos);
+                    start = pos + sought.length();
                 }
-                selectFound();
             }
+            selectFound();
         });
         JPanel sp = new JPanel();
         JLabel label = new JLabel("Search:", JLabel.RIGHT);
@@ -168,18 +161,15 @@ public class OutputFrame extends FrameBase {
             final int findLength = searchField.getText().length();
             if (findLength == 0) return;
             outputArea.requestFocus();
-            sipModel.exec(new Swing() {
-                @Override
-                public void run() {
-                    try {
-                        Rectangle viewRect = outputArea.modelToView(pos);
-                        outputArea.scrollRectToVisible(viewRect);
-                        outputArea.setCaretPosition(pos);
-                        outputArea.moveCaretPosition(pos + findLength);
-                    }
-                    catch (BadLocationException e) {
-                        throw new RuntimeException("Location bad", e);
-                    }
+            sipModel.exec(() -> {
+                try {
+                    Rectangle viewRect = outputArea.modelToView(pos);
+                    outputArea.scrollRectToVisible(viewRect);
+                    outputArea.setCaretPosition(pos);
+                    outputArea.moveCaretPosition(pos + findLength);
+                }
+                catch (BadLocationException e) {
+                    throw new RuntimeException("Location bad", e);
                 }
             });
         }
