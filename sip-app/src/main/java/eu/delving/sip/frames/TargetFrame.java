@@ -215,14 +215,15 @@ public class TargetFrame extends FrameBase {
     }
 
     private void createRecDefTree(SipModel sipModel) {
-        recDefTree = new JTree(new RecDefTreeModel(EMPTY_NODE)) {
-            @Override
-            public String getToolTipText(MouseEvent evt) {
-                TreePath treePath = recDefTree.getPathForLocation(evt.getX(), evt.getY());
-                return treePath != null ? ((RecDefTreeNode) treePath.getLastPathComponent()).toHtml() : "";
-            }
-        };
-        recDefTree.setToolTipText("?");
+        recDefTree = new JTree(new RecDefTreeModel(EMPTY_NODE));
+//        {
+//            @Override
+//            public String getToolTipText(MouseEvent evt) {
+//                TreePath treePath = recDefTree.getPathForLocation(evt.getX(), evt.getY());
+//                return treePath != null ? ((RecDefTreeNode) treePath.getLastPathComponent()).toHtml() : "";
+//            }
+//        };
+//        recDefTree.setToolTipText("?");
         recDefTree.setCellRenderer(new RecDefTreeNode.Renderer());
         recDefTree.setDragEnabled(false);
         recDefTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
