@@ -26,11 +26,22 @@ import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlSerializer;
-import eu.delving.metadata.*;
+import eu.delving.metadata.AssertionTest;
+import eu.delving.metadata.CodeGenerator;
+import eu.delving.metadata.EditPath;
+import eu.delving.metadata.MappingFunction;
+import eu.delving.metadata.MappingResult;
+import eu.delving.metadata.NodeMapping;
+import eu.delving.metadata.NodeMappingChange;
+import eu.delving.metadata.RecDefNode;
+import eu.delving.metadata.RecMapping;
+import eu.delving.metadata.StructureTest;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
+import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -41,7 +52,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.swing.text.PlainDocument;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
 import javax.xml.xpath.XPathExpressionException;
@@ -71,9 +81,9 @@ public class MappingCompileModel {
     private RecMapping recMapping;
     private NodeMapping nodeMapping;
     private MetadataRecord metadataRecord;
-    private Document codeDocument = new PlainDocument();
-    private Document docDocument = new PlainDocument();
-    private Document outputDocument = new PlainDocument();
+    private RSyntaxDocument codeDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_GROOVY);
+    private RSyntaxDocument docDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_XML);
+    private RSyntaxDocument outputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_XML);
     private TriggerTimer triggerTimer = new TriggerTimer();
     private Type type;
     private Validator validator;
@@ -148,8 +158,8 @@ public class MappingCompileModel {
                             break;
                         case FIELD:
                             EditPath editPath = new EditPath(
-                                    nodeMapping,
-                                    nodeMapping.getGroovyCode()
+                                nodeMapping,
+                                nodeMapping.getGroovyCode()
                             );
                             code = new CodeGenerator(recMapping).withTrace(trace).withEditPath(editPath).toNodeMappingCode();
                             break;
@@ -183,15 +193,15 @@ public class MappingCompileModel {
         this.assertions = assertions;
     }
 
-    public Document getCodeDocument() {
+    public RSyntaxDocument getCodeDocument() {
         return codeDocument;
     }
 
-    public Document getDocDocument() {
+    public RSyntaxDocument getDocDocument() {
         return docDocument;
     }
 
-    public Document getOutputDocument() {
+    public RSyntaxDocument getOutputDocument() {
         return outputDocument;
     }
 
@@ -219,8 +229,7 @@ public class MappingCompileModel {
             metadataRecord = updated;
             if (metadataRecord != null) {
                 triggerRun();
-            }
-            else {
+            } else {
                 sipModel.exec(new DocumentSetter(outputDocument, "", false));
             }
         }
@@ -265,8 +274,7 @@ public class MappingCompileModel {
         public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
             if (type == RECORD) {
                 triggerCompile();
-            }
-            else if (MappingCompileModel.this.nodeMapping != null && MappingCompileModel.this.nodeMapping == nodeMapping) {
+            } else if (MappingCompileModel.this.nodeMapping != null && MappingCompileModel.this.nodeMapping == nodeMapping) {
                 setNodeMapping(null);
             }
         }
@@ -322,30 +330,26 @@ public class MappingCompileModel {
                                     out.append(uriError).append("\n");
                                 }
                                 compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
-                            }
-                            else {
+                            } else {
                                 StringBuilder out = new StringBuilder();
                                 for (AssertionTest test : assertions) {
                                     String violation = test.getViolation(node);
-                                    if (violation != null) out.append(test).append(" : ").append(violation).append('\n');
+                                    if (violation != null)
+                                        out.append(test).append(" : ").append(violation).append('\n');
                                 }
                                 if (out.length() > 0) {
                                     compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
-                                }
-                                else {
+                                } else {
                                     notifyMappingComplete(result);
                                     compilationComplete(Completion.JUST_FINE, node, null);
                                 }
                             }
-                        }
-                        catch (SAXException e) {
+                        } catch (SAXException e) {
                             structureViolation(node, handler.getError());
-                        }
-                        finally {
+                        } finally {
                             handler.reset();
                         }
-                    }
-                    else {
+                    } else {
                         MappingResult result = new MappingResult(serializer, metadataRecord.getId(), node, recMapping.getRecDefTree());
                         List<String> uriErrors = result.getUriErrors();
                         if (!uriErrors.isEmpty()) {
@@ -354,8 +358,7 @@ public class MappingCompileModel {
                                 out.append(uriError).append("\n");
                             }
                             compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
-                        }
-                        else {
+                        } else {
                             notifyMappingComplete(result);
                             compilationComplete(Completion.JUST_FINE, node, null);
                         }
@@ -364,17 +367,14 @@ public class MappingCompileModel {
 //                        compilationComplete(Completion.UNVALIDATED, node, null);
 //                    }
                     setMappingCode();
-                }
-                catch (DiscardRecordException e) {
+                } catch (DiscardRecordException e) {
                     compilationComplete(Completion.DISCARDED_RECORD, null, e.getMessage());
                     setMappingCode();
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 compilationComplete(Completion.UNEXPECTED, null, e.getMessage());
                 notifyStateChange(CompileState.ERROR);
-            }
-            finally {
+            } finally {
                 compiling = false;
             }
         }
@@ -387,8 +387,7 @@ public class MappingCompileModel {
                 if (isSimilarCode(editedCode, generatedCode) && !nodeMapping.isConstant()) {
                     nodeMapping.setGroovyCode(null);
                     notifyStateChange(CompileState.ORIGINAL);
-                }
-                else {
+                } else {
                     nodeMapping.setGroovyCode(editedCode);
                     notifyStateChange(CompileState.SAVED);
                 }
@@ -410,15 +409,14 @@ public class MappingCompileModel {
             }
             if (out.length() > 0) {
                 compilationComplete(Completion.STRUCTURE_VIOLATION, node, String.format(
-                        "Record definition structure violations:\n%s\n" +
-                                "Message from XSD validation:\n%s\n",
-                        out, handlerError
-                ));
-            }
-            else {
-                compilationComplete(Completion.SCHEMA_VIOLATION, node, String.format(
+                    "Record definition structure violations:\n%s\n" +
                         "Message from XSD validation:\n%s\n",
-                        handlerError
+                    out, handlerError
+                ));
+            } else {
+                compilationComplete(Completion.SCHEMA_VIOLATION, node, String.format(
+                    "Message from XSD validation:\n%s\n",
+                    handlerError
                 ));
             }
         }
@@ -469,8 +467,7 @@ public class MappingCompileModel {
                 document.remove(0, docLength);
                 document.insertString(0, content, null);
                 ignoreDocChanges = false;
-            }
-            catch (BadLocationException e) {
+            } catch (BadLocationException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -490,8 +487,7 @@ public class MappingCompileModel {
                 try {
                     outputDocument.remove(0, outputDocument.getLength() - 1);
                     return;
-                }
-                catch (BadLocationException e) {
+                } catch (BadLocationException e) {
                     throw new RuntimeException(e);
                 }
             }

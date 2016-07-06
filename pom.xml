@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.delving</groupId>
     <artifactId>sip-creator</artifactId>
-    <version>1.0.8-SNAPSHOT</version>
+    <version>1.0.9-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>SIP-Creator</name>
     <description>
@@ -84,10 +84,10 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.5.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
@@ -154,6 +154,11 @@
                 <groupId>net.sf.saxon</groupId>
                 <artifactId>Saxon-HE</artifactId>
                 <version>9.6.0-5</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fifesoft</groupId>
+                <artifactId>rsyntaxtextarea</artifactId>
+                <version>2.5.8</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>
