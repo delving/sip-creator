@@ -69,7 +69,6 @@ public class TestCoordinateConversion {
         for (String line : inputLines) {
             if (line.trim().isEmpty()) continue;
             String latLongString = functionCall(line, false);
-            System.out.println(latLongString);
             checkLatLong(line, latLongString);
             String utmString = functionCall(line, true);
             Matcher matcher = utmPattern.matcher(utmString);
@@ -79,10 +78,6 @@ public class TestCoordinateConversion {
             String north = matcher.group(3);
             UTMRef ref = new UTMRef(Double.parseDouble(east), Double.parseDouble(north), 'V', Integer.parseInt(srid) % 100);
             String latLongConverted = String.format("%f, %f", ref.toLatLng().getLat(), ref.toLatLng().getLng());
-            System.out.println(String.format(
-                    "SRID=%s;POINT(%s,%s) ==> %s  (https://maps.google.com/maps?f=q&hl=en&geocode=&q=%s&ie=UTF8&z=10)",
-                    srid, east, north, latLongConverted, latLongConverted
-            ));
             checkLatLong(line, latLongConverted);
         }
     }
@@ -92,12 +87,12 @@ public class TestCoordinateConversion {
         double latitude = Double.parseDouble(latLong[0]);
         double longitude = Double.parseDouble(latLong[1]);
         Assert.assertTrue(
-                String.format("Latitude is outside Norway [%s]=>[%s]", line, latLongString),
-                latitude > 58.0 && latitude < 72.0
+            String.format("Latitude is outside Norway [%s]=>[%s]", line, latLongString),
+            latitude > 58.0 && latitude < 72.0
         );
         Assert.assertTrue(
-                String.format("Longitude is outside Norway [%s]=>[%s]", line, latLongString),
-                longitude > 4.0 && longitude < 30.0
+            String.format("Longitude is outside Norway [%s]=>[%s]", line, latLongString),
+            longitude > 4.0 && longitude < 30.0
         );
     }
 
