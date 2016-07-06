@@ -30,7 +30,6 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.URLLauncher;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.model.CreateModel;
@@ -39,22 +38,16 @@ import eu.delving.sip.model.MappingCompileModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.SourceTreeNode;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -80,7 +73,7 @@ import static eu.delving.sip.base.SwingHelper.setEditable;
  */
 
 public class FieldMappingFrame extends FrameBase {
-//    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 16);
+    //    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 16);
     private final Action REVERT_ACTION = new RevertAction();
     private final Action UNDO_ACTION = new UndoAction();
     private final Action REDO_ACTION = new RedoAction();
@@ -88,7 +81,7 @@ public class FieldMappingFrame extends FrameBase {
     private JTextArea docArea;
     private JTextArea outputArea;
     private boolean operatorBoxSetting = false;
-    private JComboBox<Operator> operatorBox = new JComboBox<Operator>(Operator.values());
+    private JComboBox<Operator> operatorBox = new JComboBox<>(Operator.values());
     private FunctionListModel functionModel = new FunctionListModel();
     private JList functionList = new MappingFunctionJList(functionModel);
     private ContextVarListModel contextVarModel = new ContextVarListModel();
@@ -100,15 +93,13 @@ public class FieldMappingFrame extends FrameBase {
     public FieldMappingFrame(SipModel sipModel) {
         super(Which.FIELD_MAPPING, sipModel, "Field Mapping");
         dictionaryPanel = new DictionaryPanel(sipModel);
-        docArea = new JTextArea(sipModel.getFieldCompileModel().getDocDocument());
-//        docArea.setFont(MONOSPACED);
+        docArea = new RSyntaxTextArea(sipModel.getFieldCompileModel().getDocDocument());
         docArea.setTabSize(3);
         docArea.setLineWrap(true);
         docArea.setWrapStyleWord(true);
-        codeArea = new JTextArea(sipModel.getFieldCompileModel().getCodeDocument());
-//        codeArea.setFont(MONOSPACED);
+        codeArea = new RSyntaxTextArea(sipModel.getFieldCompileModel().getCodeDocument());
         codeArea.setTabSize(3);
-        outputArea = new JTextArea(sipModel.getFieldCompileModel().getOutputDocument());
+        outputArea = new RSyntaxTextArea(sipModel.getFieldCompileModel().getOutputDocument());
         outputArea.setWrapStyleWord(true);
         mainTab.addTab("Code", createCodeOutputPanel());
         mainTab.addTab("Dictionary", dictionaryPanel);
@@ -197,25 +188,22 @@ public class FieldMappingFrame extends FrameBase {
                 handleEnablement();
             }
         });
-        operatorBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                if (operatorBoxSetting) return;
-                final NodeMapping nodeMapping = sipModel.getCreateModel().getNodeMapping();
-                if (nodeMapping != null) {
-                    exec(new Work() {
-                        @Override
-                        public void run() {
-                            nodeMapping.operator = (Operator) operatorBox.getSelectedItem();
-                            nodeMapping.notifyChanged(OPERATOR);
-                        }
+        operatorBox.addItemListener(itemEvent -> {
+            if (operatorBoxSetting) return;
+            final NodeMapping nodeMapping = sipModel.getCreateModel().getNodeMapping();
+            if (nodeMapping != null) {
+                exec(new Work() {
+                    @Override
+                    public void run() {
+                        nodeMapping.operator = (Operator) operatorBox.getSelectedItem();
+                        nodeMapping.notifyChanged(OPERATOR);
+                    }
 
-                        @Override
-                        public Job getJob() {
-                            return Job.SET_OPERATOR;
-                        }
-                    });
-                }
+                    @Override
+                    public Job getJob() {
+                        return Job.SET_OPERATOR;
+                    }
+                });
             }
         });
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
@@ -226,28 +214,21 @@ public class FieldMappingFrame extends FrameBase {
                     final NodeMapping nodeMapping = createModel.getNodeMapping();
                     contextVarModel.setList(nodeMapping);
                     sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
-                    exec(new Swing() {
-                        @Override
-                        public void run() {
-                            setEditable(codeArea, nodeMapping.isUserCodeEditable());
-                            operatorBoxSetting = true;
-                            operatorBox.setSelectedIndex(nodeMapping.getOperator().ordinal());
-                            operatorBoxSetting = false;
-                            mainTab.setSelectedIndex(nodeMapping.hasDictionary() ? 1 : 0);
-                        }
+                    exec(() -> {
+                        setEditable(codeArea, nodeMapping.isUserCodeEditable());
+                        operatorBoxSetting = true;
+                        operatorBox.setSelectedIndex(nodeMapping.getOperator().ordinal());
+                        operatorBoxSetting = false;
+                        mainTab.setSelectedIndex(nodeMapping.hasDictionary() ? 1 : 0);
                     });
-                }
-                else {
+                } else {
                     contextVarModel.setList(null);
                     sipModel.getFieldCompileModel().setNodeMapping(null);
-                    exec(new Swing() {
-                        @Override
-                        public void run() {
-                            setEditable(codeArea, false);
-                            operatorBoxSetting = true;
-                            operatorBox.setSelectedIndex(0);
-                            operatorBoxSetting = false;
-                        }
+                    exec(() -> {
+                        setEditable(codeArea, false);
+                        operatorBoxSetting = true;
+                        operatorBox.setSelectedIndex(0);
+                        operatorBoxSetting = false;
                     });
                 }
             }
@@ -255,15 +236,12 @@ public class FieldMappingFrame extends FrameBase {
         sipModel.getFieldCompileModel().addListener(new MappingCompileModel.Listener() {
             @Override
             public void stateChanged(final CompileState state) {
-                exec(new Swing() {
-                    @Override
-                    public void run() {
-                        if (state == CompileState.ORIGINAL) {
-                            undoManager.discardAllEdits();
-                            handleEnablement();
-                        }
-                        state.setBackgroundOf(codeArea);
+                exec(() -> {
+                    if (state == CompileState.ORIGINAL) {
+                        undoManager.discardAllEdits();
+                        handleEnablement();
                     }
+                    state.setBackgroundOf(codeArea);
                 });
             }
 
@@ -384,7 +362,7 @@ public class FieldMappingFrame extends FrameBase {
         }
 
         public List<String> getContextVariables(NodeMapping nodeMapping) {
-            List<String> variables = new ArrayList<String>();
+            List<String> variables = new ArrayList<>();
             Path back = nodeMapping.inputPath;
             while (!back.isEmpty()) {
                 variables.add(0, toGroovyIdentifier(back.peek()));
@@ -395,9 +373,9 @@ public class FieldMappingFrame extends FrameBase {
                 for (SourceTreeNode treeNode : sourceTreeNode.getChildren()) {
                     if (treeNode.getTag().isAttribute()) continue;
                     variables.add(String.format(
-                            "%s.%s",
-                            toGroovyIdentifier(nodeMapping.inputPath.peek()),
-                            toGroovyFirstIdentifier(treeNode.getTag()))
+                        "%s.%s",
+                        toGroovyIdentifier(nodeMapping.inputPath.peek()),
+                        toGroovyFirstIdentifier(treeNode.getTag()))
                     );
                 }
             }
@@ -457,80 +435,66 @@ public class FieldMappingFrame extends FrameBase {
 
     private class ContextVarJList extends JList {
 
-        private Timer timer = new Timer(500, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                String contextVar = (String) getSelectedValue();
-                if (contextVar != null) {
-                    int start = codeArea.getCaretPosition();
-                    try {
-                        Document doc = codeArea.getDocument();
-                        doc.insertString(start, contextVar, null);
-                    }
-                    catch (BadLocationException e) {
-                        throw new RuntimeException("What?", e);
-                    }
+        private Timer timer = new Timer(500, actionEvent -> {
+            String contextVar = (String) getSelectedValue();
+            if (contextVar != null) {
+                int start = codeArea.getCaretPosition();
+                try {
+                    Document doc = codeArea.getDocument();
+                    doc.insertString(start, contextVar, null);
+                } catch (BadLocationException e) {
+                    throw new RuntimeException("What?", e);
                 }
-                clearSelection();
             }
+            clearSelection();
         });
 
         private ContextVarJList(ContextVarListModel listModel) {
             super(listModel);
             timer.setRepeats(false);
             setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-                @Override
-                public void valueChanged(ListSelectionEvent listSelectionEvent) {
-                    if (listSelectionEvent.getValueIsAdjusting() || getSelectedValue() == null) return;
-                    timer.restart();
-                }
+            getSelectionModel().addListSelectionListener(listSelectionEvent -> {
+                if (listSelectionEvent.getValueIsAdjusting() || getSelectedValue() == null) return;
+                timer.restart();
             });
             setPrototypeCellValue("alongvariablenamehere");
             setToolTipText("Clicking here will insert a variable name into the code\n" +
-                    "at the current cursor position");
+                "at the current cursor position");
         }
     }
 
     private class MappingFunctionJList extends JList {
 
-        private Timer timer = new Timer(500, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                String selectedText = codeArea.getSelectedText();
-                MappingFunction mappingFunction = (MappingFunction) getSelectedValue();
-                if (selectedText != null && mappingFunction != null) {
-                    int start = codeArea.getSelectionStart();
-                    try {
-                        if (selectedText.endsWith("\n")) {
-                            selectedText = selectedText.substring(0, selectedText.length() - 1);
-                        }
-                        Document doc = codeArea.getDocument();
-                        doc.remove(start, selectedText.length());
-                        doc.insertString(start, String.format("%s(%s)", mappingFunction.name, selectedText), null);
+        private Timer timer = new Timer(500, actionEvent -> {
+            String selectedText = codeArea.getSelectedText();
+            MappingFunction mappingFunction = (MappingFunction) getSelectedValue();
+            if (selectedText != null && mappingFunction != null) {
+                int start = codeArea.getSelectionStart();
+                try {
+                    if (selectedText.endsWith("\n")) {
+                        selectedText = selectedText.substring(0, selectedText.length() - 1);
                     }
-                    catch (BadLocationException e) {
-                        throw new RuntimeException("What?", e);
-                    }
+                    Document doc = codeArea.getDocument();
+                    doc.remove(start, selectedText.length());
+                    doc.insertString(start, String.format("%s(%s)", mappingFunction.name, selectedText), null);
+                } catch (BadLocationException e) {
+                    throw new RuntimeException("What?", e);
                 }
-                clearSelection();
             }
+            clearSelection();
         });
 
         private MappingFunctionJList(FunctionListModel functionListModel) {
             super(functionListModel);
             timer.setRepeats(false);
             setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-                @Override
-                public void valueChanged(ListSelectionEvent listSelectionEvent) {
-                    if (listSelectionEvent.getValueIsAdjusting() || getSelectedValue() == null) return;
-                    timer.restart();
-                }
+            getSelectionModel().addListSelectionListener(listSelectionEvent -> {
+                if (listSelectionEvent.getValueIsAdjusting() || getSelectedValue() == null) return;
+                timer.restart();
             });
             setPrototypeCellValue("thisIsAVeryLongFunctionNameIndeed()");
             setToolTipText("Selecting code and clicking here will insert\n" +
-                    "a function call around the selected code");
+                "a function call around the selected code");
         }
     }
 
