@@ -25,13 +25,11 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import eu.delving.XMLToolFactory;
 import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.groovy.XmlSerializer;
-import eu.delving.metadata.*;
-import eu.delving.schema.SchemaRepository;
-import eu.delving.schema.SchemaResponse;
-import eu.delving.schema.SchemaType;
-import eu.delving.schema.SchemaVersion;
-import eu.delving.schema.util.FileSystemFetcher;
+import eu.delving.metadata.Assertion;
+import eu.delving.metadata.AssertionTest;
+import eu.delving.metadata.Path;
+import eu.delving.metadata.RecDef;
+import eu.delving.metadata.StructureTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,22 +45,26 @@ import javax.xml.xpath.XPathFactoryConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Try out the assertion mechanism
  *
  * @author Gerald de Jong <gerald@delving.eu>
  */
-
 public class TestAssertions {
 
-    private final XmlSerializer SERIAL = new XmlSerializer();
     private GroovyCodeResource groovyCodeResource;
     private Document modsDoc, icnDoc;
     private DocContext modsContext;
-    private SchemaRepository schemaRepository;
 
     @Before
     public void prep() throws ParserConfigurationException, IOException, SAXException, XPathFactoryConfigurationException {
@@ -70,13 +72,16 @@ public class TestAssertions {
         modsDoc = parseDoc("mods.xml");
         icnDoc = parseDoc("icn.xml");
         modsContext = new DocContext(modsDoc);
-        schemaRepository = new SchemaRepository(new FileSystemFetcher(true));
+
     }
 
     @Test
-    public void testGeneratedStructureTestsICN() throws XPathExpressionException, IOException, XPathFactoryConfigurationException {
-        SchemaResponse response = schemaRepository.getSchema(new SchemaVersion("icn", "1.0.3"), SchemaType.RECORD_DEFINITION);
-        RecDef icnRecDef = RecDef.read(new ByteArrayInputStream(response.getSchemaText().getBytes()));
+    public void testGeneratedStructureTestsICN() throws Exception {
+        URI uri = TestAssertions.class.getClassLoader().getSystemResource("test/icn/icn_1.0.3_record.xml").toURI();
+        java.nio.file.Path path = Paths.get(uri);
+        byte[] bytes = Files.readAllBytes(path);
+        String schemaText = new String(bytes, "UTF-8");
+        RecDef icnRecDef = RecDef.read(new ByteArrayInputStream(schemaText.getBytes()));
         List<StructureTest> structureTests = StructureTest.listFrom(icnRecDef);
         for (StructureTest structureTest : structureTests) {
             switch (structureTest.getViolation(icnDoc.getDocumentElement())) {
@@ -91,9 +96,12 @@ public class TestAssertions {
     }
 
     @Test
-    public void testGeneratedStructureTests() throws XPathExpressionException, IOException, XPathFactoryConfigurationException {
-        SchemaResponse response = schemaRepository.getSchema(new SchemaVersion("mods", "3.4.0"), SchemaType.RECORD_DEFINITION);
-        RecDef modsRecDef = RecDef.read(new ByteArrayInputStream(response.getSchemaText().getBytes()));
+    public void testGeneratedStructureTests() throws Exception {
+        URI uri = TestAssertions.class.getClassLoader().getSystemResource("test/mods/record_def_3.4.0.xml").toURI();
+        java.nio.file.Path path = Paths.get(uri);
+        byte[] bytes = Files.readAllBytes(path);
+        String schemaText = new String(bytes, "UTF-8");
+        RecDef modsRecDef = RecDef.read(new ByteArrayInputStream(schemaText.getBytes()));
         List<StructureTest> structureTests = StructureTest.listFrom(modsRecDef);
         for (StructureTest structureTest : structureTests) {
             switch (structureTest.getViolation(modsDoc)) {
@@ -191,29 +199,5 @@ public class TestAssertions {
         return XMLToolFactory.documentBuilderFactory().newDocumentBuilder().parse(file);
     }
 
-//    private void dump(Document document) {
-//        dump(document.getDocumentElement(), 0);
-//        DOMImplementationLS ls = null;
-//        try {
-//            ls = (DOMImplementationLS) XMLToolFactory.documentBuilderFactory().newDocumentBuilder().getDOMImplementation();
-//        }
-//        catch (ParserConfigurationException e) {
-//            throw new RuntimeException(e);
-//        }
-//        LSSerializer lss = ls.createLSSerializer();
-//        LSOutput lso = ls.createLSOutput();
-//        lso.setByteStream(System.out);
-//        lss.write(document, lso);
-//    }
-//
-//    private void dump(Node node, int level) {
-//        for (int walk = 0; walk < level; walk++) {
-//            System.out.print("\t");
-//        }
-//        System.out.println(String.format("%d: %s:%s {%s}", node.getNodeType(), node.getPrefix(), node.getLocalName(), node.getNamespaceURI()));
-//        NodeList kids = node.getChildNodes();
-//        for (int walk = 0; walk < kids.getLength(); walk++) {
-//            dump(kids.item(walk), level + 1);
-//        }
-//    }
+
 }

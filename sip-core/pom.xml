@@ -30,7 +30,7 @@
     <artifactId>sip-core</artifactId>
     <packaging>jar</packaging>
     <name>SIP-Core</name>
-    <version>1.0.8-SNAPSHOT</version>
+    <version>1.0.9</version>
     <description>
         A Minimal set of classes shared between client and server, avoiding dependency on core module.
     </description>
@@ -68,14 +68,14 @@
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-creator</artifactId>
-        <version>1.0.8-SNAPSHOT</version>
+        <version>1.0.9</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>eu.delving</groupId>
             <artifactId>schema-repo</artifactId>
-            <version>1.0.8-SNAPSHOT</version>
+            <version>1.0.9</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
@@ -113,21 +113,6 @@
             <groupId>org.osgeo</groupId>
             <artifactId>proj4j</artifactId>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>xml-apis</groupId>-->
-            <!--<artifactId>xml-apis</artifactId>-->
-            <!--<version>2.0.2</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.apache</groupId>-->
-            <!--<artifactId>xml-apis</artifactId>-->
-            <!--<version>2.11.0-xsd1.1</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>com.rackspace.apache</groupId>-->
-            <!--<artifactId>xerces2-xsd11</artifactId>-->
-            <!--<version>2.11.2</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
@@ -155,10 +140,6 @@
             <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.igniterealtime.smack</groupId>-->
-            <!--<artifactId>smack</artifactId>-->
-        <!--</dependency>-->
     </dependencies>
 
 </project>

@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.delving</groupId>
     <artifactId>sip-creator</artifactId>
-    <version>1.0.8-SNAPSHOT</version>
+    <version>1.0.9</version>
     <packaging>pom</packaging>
     <name>SIP-Creator</name>
     <description>
@@ -84,11 +84,19 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.5.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <generateBackupPoms>false</generateBackupPoms>
                 </configuration>
             </plugin>
         </plugins>
@@ -107,7 +115,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.7</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -154,6 +162,11 @@
                 <groupId>net.sf.saxon</groupId>
                 <artifactId>Saxon-HE</artifactId>
                 <version>9.6.0-5</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fifesoft</groupId>
+                <artifactId>rsyntaxtextarea</artifactId>
+                <version>2.5.8</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>
