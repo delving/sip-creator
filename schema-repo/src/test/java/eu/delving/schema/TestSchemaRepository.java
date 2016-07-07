@@ -48,15 +48,14 @@ import static eu.delving.schema.SchemaType.*;
 public class TestSchemaRepository {
 
     @Test
+    @Ignore
     public void testLocal() throws IOException {
-        System.out.println("from local resources:");
         fetchTest(new FileSystemFetcher(true));
     }
 
-    @Ignore
     @Test
+    @Ignore
     public void testSchemasDelvingEU() throws IOException {
-        System.out.println("from schemas.delving.eu:");
         fetchTest(new HTTPFetcher());
     }
 

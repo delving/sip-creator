@@ -1,0 +1,466 @@
+<?xml version="1.0"?>
+<record-definition prefix="mods" version="3.4.0" elementFormDefaultQualified="true"
+                   attributeFormDefaultQualified="false">
+    <namespaces>
+        <namespace prefix="mods" uri="http://www.loc.gov/mods/v3"
+                   schema="http://www.loc.gov/standards/mods/v3/mods-3-4.xsd"/>
+        <namespace prefix="xlink" uri="http://www.w3.org/1999/xlink"
+                   schema="http://www.loc.gov/standards/xlink/xlink.xsd"/>
+    </namespaces>
+
+    <attrs>
+        <attr tag="ID"/>
+        <attr tag="xlink:simpleLink"/>
+        <attr tag="source"/>
+        <attr tag="lang"/>
+        <attr tag="xml:lang"/>
+        <attr tag="script"/>
+        <attr tag="transliteration"/>
+        <attr tag="type"/>
+        <attr tag="authority"/>
+        <!--(enumerated: abbreviated, translated, alternative, uniform) -->
+        <attr tag="authorityURI"/>
+        <attr tag="valueURI"/>
+        <attr tag="displayLabel"/>
+        <attr tag="dataLastAccessed"/>
+        <attr tag="access"/>
+        <attr tag="note"/>
+        <attr tag="supplied"/>
+        <!--yes-->
+        <attr tag="usage"/>
+        <!--primary-->
+        <attr tag="altRepGroup"/>
+        <attr tag="nameTitleGroup"/>
+        <attr tag="collection"/>
+        <!--yes-->
+        <attr tag="manuscript"/>
+        <!--yes-->
+        <attr tag="shareable"/>
+        <!--no-->
+        <attr tag="order"/>
+        <attr tag="objectPart"/>
+
+        <!--added by gdj-->
+        <attr tag="edition"/>
+        <attr tag="invalid"/>
+        <attr tag="encoding"/>
+        <attr tag="point"/>
+        <attr tag="keyDate"/>
+        <attr tag="qualifier"/>
+        <attr tag="xlink"/>
+        <attr tag="unitType"/>
+        <attr tag="level"/>
+        <attr tag="unit"/>
+    </attrs>
+
+    <attr-groups>
+        <attr-group name="base-four">
+            <string>lang</string>
+            <string>xml:lang</string>
+            <string>script</string>
+            <string>transliteration</string>
+        </attr-group>
+        <attr-group name="authority">
+            <string>authority</string>
+            <string>authorityURI</string>
+            <string>valueURI</string>
+        </attr-group>
+        <attr-group name="top-level-a">
+            <string>displayLabel</string>
+            <string>usage</string>
+            <string>altRepGroup</string>
+        </attr-group>
+        <attr-group name="top-level-b">
+            <string>ID</string>
+            <string>xlink:simpleLink</string>
+            <string>nameTitleGroup</string>
+        </attr-group>
+        <attr-group name="qualify">
+            <string>encoding</string>
+            <string>point</string>
+            <string>keyDate</string>
+            <string>qualifier</string>
+        </attr-group>
+    </attr-groups>
+
+    <elems>
+        <!-- 1. titleInfo -->
+        <elem tag="titleInfo" attr-groups="base-four, authority, top-level-a, top-level-b" attrs="type, supplied">
+            <!--type attr has values: abbreviated, translated, alternative, uniform-->
+            <elem tag="title" attr-groups="base-four" required="true"/>
+            <elem tag="subTitle" attr-groups="base-four"/>
+            <elem tag="partNumber" attr-groups="base-four"/>
+            <elem tag="partName" attr-groups="base-four"/>
+            <elem tag="nonSort" attr-groups="base-four"/>
+        </elem>
+
+        <!-- 2. name -->
+        <elem tag="name" attr-groups="base-four, authority, top-level-a, top-level-b" attrs="type">
+            <!--type attr has values: personal, corporate, conference, family-->
+            <elem tag="namePart" attr-groups="base-four" attrs="type"/>
+            <elem tag="displayForm" attr-groups="base-four"/>
+            <elem tag="affiliation" attr-groups="base-four"/>
+            <elem tag="role">
+                <elem tag="roleTerm" attr-groups="base-four" attrs="type"/>
+                <!--type attr has values: code, text-->
+                <!--(see:http://www.loc.gov/standards/sourcelist/relator-role.html)-->
+            </elem>
+            <elem tag="description" attr-groups="base-four"/>
+        </elem>
+
+        <!-- 3. typeOfResource -->
+        <elem tag="typeOfResource" attrs="collection, manuscript, displayLabel, usage, altRepGroup"/>
+        <!--typeOfResource has values from opt-list below-->
+
+        <!-- 4. genre -->
+        <elem tag="genre" attr-groups="base-four, top-level-a, authority" attrs="type"/>
+        <!--authority (see: http://www.loc.gov/standards/sourcelist/genre-form.html);-->
+
+    </elems>
+
+    <root tag="mods" elems="titleInfo, name, typeOfResource, genre">
+
+        <!-- 5. originInfo -->
+        <elem tag="originInfo" attr-groups="base-four" attrs="displayLabel, altRepGroup">
+            <elem tag="place" attrs="supplied">
+                <elem tag="placeTerm" attr-groups="base-four, authority" attrs="type"/>
+            </elem>
+            <elem tag="publisher" attr-groups="base-four" attrs="supplied"/>
+            <elem tag="dateIssued" attr-groups="base-four, qualify"/>
+            <elem tag="dateCreated" attr-groups="base-four, qualify"/>
+            <elem tag="dateCaptured" attr-groups="base-four, qualify"/>
+            <elem tag="dateValid" attr-groups="base-four, qualify"/>>
+            <elem tag="dateModified" attr-groups="base-four, qualify"/>
+            <elem tag="copyrightDate" attr-groups="base-four, qualify"/>
+            <elem tag="dateOther" attr-groups="base-four, qualify"/>
+            <elem tag="edition" attr-groups="base-four"/>
+            <elem tag="issuance"/>
+            <!--issuance values: continuing, monographic, single unit, multipart monograph, serial, integrating resource-->
+            <elem tag="frequency" attr-groups="base-four, authority"/>
+            <!--http://www.loc.gov/standards/sourcelist/frequency.html-->
+        </elem>
+
+        <!-- 6. language -->
+        <elem tag="language" attr-groups="base-four" attrs="objectPart, displayLabel, usage, altRepGroup">
+            <elem tag="languageTerm" attr-groups="base-four, authority" attrs="type"/>
+            <elem tag="scriptTerm" attr-groups="base-four, authority" attrs="type"/>
+        </elem>
+
+        <!-- 7. physicalDescription -->
+        <elem tag="physicalDescription" attr-groups="base-four" attrs="displayLabel, altRepGroup">
+            <elem tag="form" attr-groups="base-four, authority"/>
+            <!--http://www.loc.gov/marc/sourcecode/form/formsource.html-->
+            <elem tag="reformattingQuality"/>
+            <!--reformattingQuality values: accesss, preservation, replacement-->
+            <elem tag="internetMediaType" attr-groups="base-four"/>
+            <elem tag="extent" attr-groups="base-four" attrs="supplied"/>
+            <elem tag="digitalOrigin"/>
+            <!--digitalOrigin values: born digital, reformatted digital, digitized microfilm, digitized other analog-->
+            <elem tag="note" attr-groups="base-four" attrs="xlink, displayLabel, type, ID"/>
+        </elem>
+
+        <!-- 8. abstract -->
+        <elem tag="abstract" attr-groups="base-four" attrs="xlink, displayLabel, type, shareable, altRepGroup"/>
+
+        <!-- 9. tableOfContents -->
+        <elem tag="tableOfContents" attr-groups="base-four" attrs="xlink, displayLabel, type, shareable, altRepGroup"/>
+
+        <!-- 10. targetAudience -->
+        <elem tag="targetAudience" attr-groups="base-four, authority" attrs="edition, displayLabel, type, altRepGroup"/>
+        <!--@authority (see: http://www.loc.gov/standards/sourcelist/target-audience.html);-->
+
+        <!--11. note -->
+        <elem tag="note" attr-groups="base-four" attrs="ID, xlink, displayLabel, type, altRepGroup"/>
+        <!--@type (For a list of implemented note types, see: www.loc.gov/standards/mods/mods-notes.html)-->
+
+        <!--12. subject -->
+        <elem tag="subject" attr-groups="base-four, authority"
+              attrs="ID, xlink:simpleLink, type, displayLabel, usage, altRepGroup"
+              elems="titleInfo, name, genre">
+            <elem tag="topic" attr-groups="base-four, authority"/>
+            <elem tag="geographic" attr-groups="base-four, authority"/>
+            <elem tag="temporal" attr-groups="base-four, authority, qualify"/>
+            <elem tag="geographicCode" attr-groups="base-four, authority"/>
+            <elem tag="hierarchicalGeographic" attr-groups="base-four">
+                <elem tag="continent" attr-groups="base-four"/>
+                <elem tag="country" attr-groups="base-four"/>
+                <elem tag="province" attr-groups="base-four"/>
+                <elem tag="region" attr-groups="base-four"/>
+                <elem tag="state" attr-groups="base-four"/>
+                <elem tag="territory" attr-groups="base-four"/>
+                <elem tag="county" attr-groups="base-four"/>
+                <elem tag="city" attr-groups="base-four"/>
+                <elem tag="island" attr-groups="base-four"/>
+                <elem tag="area" attr-groups="base-four"/>
+                <elem tag="extraterrestrialArea" attr-groups="base-four"/>
+                <elem tag="citySection" attr-groups="base-four"/>
+            </elem>
+            <elem tag="cartographics" ordered="true">
+                <elem tag="scale" attr-groups="base-four"/>
+                <elem tag="projection" attr-groups="base-four"/>
+                <elem tag="coordinates" attr-groups="base-four"/>
+            </elem>
+            <elem tag="occupation" attr-groups="base-four, authority"/>
+        </elem>
+
+        <!--13. classification -->
+        <elem tag="classification" attr-groups="base-four, authority"
+              attrs="edition, displayLabel, usage, altRepGroup"/>
+        <!--@authority (see: http://www.loc.gov/standards/sourcelist/classification.html);-->
+
+        <!-- 14. relatedItem -->
+        <elem tag="relatedItem" attrs="ID, xlink:simpleLink, displayLabel, type"/>
+        <!--NOTE: big elements can be put in here!-->
+        <!--@type (enumerated: preceding, succeeding, original, host, constituent, series, otherVersion, otherFormat, isReferencedBy, references, reviewOf)-->
+
+        <!-- 15. identifier -->
+        <elem tag="identifier" attr-groups="base-four" attrs="type, displayLabel, invalid, altRepGroup"/>
+        <!--type = hdl, doi, isbn, isrc, ismn, issn, issue number, istc, lccn, local,-->
+        <!--matrix number, music publisher, music plate, sici, uri, upc, videorecording identifier,-->
+        <!--stock number-->
+
+        <!-- 16. location [ordered] -->
+        <elem tag="location" attr-groups="base-four" attrs="displayLabel, altRepGroup" ordered="true" required="true">
+            <elem tag="physicalLocation" attr-groups="authority" attrs="type, displayLabel, xlink"/>
+            <!--http://www.loc.gov/marc/sourcecode/organization/organizationsource.html-->
+            <elem tag="url" attrs="displayLabel, dataLastAccessed, note, access, usage"/>
+            <elem tag="holdingSimple" singular="true">
+                <elem tag="copyInformation" ordered="true">
+                    <elem tag="form" singular="true" attr-groups="base-four, authority"/>
+                    <elem tag="subLocation" attr-groups="base-four"/>
+                    <elem tag="shelfLocator" attr-groups="base-four"/>
+                    <elem tag="electronicLocator"/>
+                    <elem tag="note" attr-groups="base-four" attrs="ID, xlink, type, displayLabel"/>
+                    <elem tag="enumerationAndChronology" attr-groups="base-four" attrs="unitType"/>
+                </elem>
+            </elem>
+            <elem tag="holdingExternal" singular="true"/>
+        </elem>
+
+        <!-- 17. accessCondition-->
+        <elem tag="accessCondition" attr-groups="base-four" attrs="xlink:simpleLink, displayLabel, type, altRepGroup"/>
+        <!--type: values = restriction on access; use and reproduction-->
+
+        <!-- 18. part-->
+        <elem tag="part" attr-groups="base-four" attrs="ID, type, order, displayLabel, altRepGroup">
+            <elem tag="detail">
+                <elem tag="number" attr-groups="base-four"/>
+                <elem tag="caption" attr-groups="base-four"/>
+                <elem tag="title" attr-groups="base-four" attrs="type, level"/>
+            </elem>
+            <elem tag="extent" ordered="true" attrs="unit">
+                <elem tag="start" attr-groups="base-four"/>
+                <elem tag="end" attr-groups="base-four"/>
+                <elem tag="total" attr-groups="base-four"/>
+                <elem tag="list" attr-groups="base-four"/>
+            </elem>
+            <elem tag="date" attr-groups="base-four, qualify"/>
+            <elem tag="text" attr-groups="base-four" attrs="type, displayLabel"/>
+        </elem>
+
+        <!-- 19. extension -->
+        <elem tag="extension" attrs="displayLabel"/>
+
+        <!--20. recordInfo-->
+        <elem tag="recordInfo" attr-groups="base-four" attrs="displayLabel, altRepGroup">
+            <elem tag="recordContentSource" attr-groups="base-four, authority"/>
+            <elem tag="recordCreationDate" attr-groups="base-four, qualify"/>
+            <elem tag="recordChangeDate" attr-groups="base-four, qualify"/>
+            <elem tag="recordIdentifier" attr-groups="base-four" attrs="source"/>
+            <elem tag="recordOrigin" attr-groups="base-four"/>
+            <elem tag="languageOfCataloging" attrs="objectPart, altRepGroup, usage, displayLabel">
+                <elem tag="languageTerm" attr-groups="base-four, authority" attrs="ID"/>
+                <elem tag="scriptTerm" attr-groups="base-four, authority"/>
+            </elem>
+            <elem tag="descriptionStandard" attr-groups="base-four, authority"/>
+            <!--(see:http://www.loc.gov/standards/sourcelist/descriptive-conventions.html)-->
+        </elem>
+
+    </root>
+
+
+    <field-markers>
+        <!-- todo: these should have paths, currently they are checked for presence but not resolved-->
+        <field-marker name="CREATOR"/>
+        <field-marker name="TITLE"/>
+        <field-marker name="DESCRIPTION"/>
+        <field-marker name="OWNER"/>
+        <field-marker name="PROVIDER"/>
+        <field-marker name="LANDING_PAGE"/>
+        <field-marker name="THUMBNAIL"/>
+        <field-marker name="THUMBNAIL"/>
+        <field-marker name="SPEC"/>
+        <field-marker name="DEEP_ZOOM_URL"/>
+    </field-markers>
+
+
+    <opts>
+        <opt-list dictionary="TT" path="/mods/titleInfo" value="@type" displayName="Title Type">
+            <opt value="abbreviated"/>
+            <opt value="translated"/>
+            <opt value="alternative"/>
+            <opt value="uniform"/>
+        </opt-list>
+
+        <opt-list dictionary="NT" path="/mods/name" value="@type" displayName="Name Type">
+            <opt value="personal"/>
+            <opt value="corporate"/>
+            <opt value="conference"/>
+            <opt value="family"/>
+        </opt-list>
+
+        <opt-list dictionary="AT" path="/mods/location/url" value="@access" displayName="AccessType">
+            <opt value="preview"/>
+            <opt value="raw object"/>
+            <opt value="object in context"/>
+        </opt-list>
+
+        <opt-list dictionary="RT" path="/mods/name/role/roleTerm" displayName="Role Term">
+            <opt value="creator"/>
+            <opt value="contributor"/>
+        </opt-list>
+
+        <opt-list dictionary="TR" path="/mods/typeOfResource" displayName="Type Of Resource">
+            <opt value="text"/>
+            <opt value="cartographic" hidden="true"/>
+            <opt value="notated music" hidden="true"/>
+            <opt value="sound recording-musical" hidden="true"/>
+            <opt value="sound recording-nonmusical" hidden="true"/>
+            <opt value="sound recording" hidden="true"/>
+            <opt value="still image"/>
+            <opt value="moving image" hidden="true"/>
+            <opt value="three dimensional object" hidden="true"/>
+            <opt value="software, multimedia" hidden="true"/>
+            <opt value="mixed material" hidden="true"/>
+        </opt-list>
+
+
+
+        <!--<opt-list path="/mods/typeOfResource" key="@type" displayName="Type of Resource">  &lt;!&ndash;using type attribute&ndash;&gt;-->
+        <!--<opt key="text"/>-->
+        <!--<opt key="cartographic"/>-->
+        <!--<opt key="notated music"/>-->
+        <!--<opt key="sound recording-musical"/>-->
+        <!--<opt key="sound recording-nonmusical"/>-->
+        <!--<opt key="sound recording"/>-->
+        <!--<opt key="still image"/>-->
+        <!--<opt key="moving image"/>-->
+        <!--<opt key="three dimensional object"/>-->
+        <!--<opt key="software, multimedia"/>-->
+        <!--<opt key="mixed material"/>-->
+        <!--</opt-list>-->
+
+    </opts>
+
+
+    <docs>
+        <!--<doc tag="actor">-->
+        <!--<string name="Definition">Describes and identifies an actor, i.e. a person, corporation, family or group, containing structured sub-elements for indexing and identification references. </string>-->
+        <!--</doc>-->
+        <!--<doc tag="lang">-->
+        <!--<string name="Definition"></string>-->
+        <!--<string name="Application"></string>-->
+        <!--<string name="schemaDefinition"></string>-->
+        <!--<string name="Examples">-->
+        <!--<![CDATA[ ]]>-->
+        <!--</string>-->
+        <!--</doc>-->
+
+        <!--Attributes used throughout the schema, see also http://www.loc.gov/standards/mods/v3/mods-userguide-generalapp.html#list -->
+        <doc tag="@lang">
+            <paras>
+                <para name="Definition">
+                    <![CDATA[This attribute is used to specify the language used within individual elements, using the codes from ISO 639-2/b. This is equivalent to authority="iso639-2b" used with the <language> element (which gives a language of the resource described in the record), but is applied to the language used as content of the metadata elements. There is no MARC 21 equivalent for this attribute since language cannot be currently indicated at the element level.]]></para>
+                <para name="Examples">
+                    <![CDATA[
+               <name type="personal">
+                   <namePart type="given">Jack</namePart>
+                   <namePart type="family">May</namePart>
+                   <namePart type="termsOfAddress">I</namePart>
+                   <description lang="eng">District Commissioner</description>
+                   <description lang="fre">Préfet de région</description>
+               </name>
+               ]]>
+                </para>
+            </paras>
+        </doc>
+        <!--<doc tag="@xml:lang">-->
+        <!--<string name="Definition"></string>-->
+        <!--<string name="Application"></string>-->
+        <!--</doc>-->
+        <!--<doc tag="@script">-->
+        <!--<string name="Definition"></string>-->
+        <!--<string name="Application"></string>-->
+        <!--</doc>-->
+        <!--<doc tag="@transliteration">-->
+        <!--<string name="Definition"></string>-->
+        <!--<string name="Application"></string>-->
+        <!--</doc>-->
+
+        <doc path="/mods/name/@authority">
+            <paras>
+                <para name="abne" >Autoridades de la Biblioteca Nacional de España (Madrid: Biblioteca Nacional de España)</para>
+                <para name="banqa" >Fichier d'autorité local de Bibliothèque et Archives nationales du Québec (Bibliothèque et Archives nationales du Québec)</para>
+                <para name="bibalex" >Bibliotheca Alexandrina name and subject authority file (Alexandria, Egypt: Bibliotheca Alexandrina)</para>
+                <para name="conorsi" >CONOR.SI (name authority file) (Maribor, Slovenia: Institut informacijskih znanosti (IZUM))</para>
+                <para name="gkd" >Gemeinsame Körperschaftsdatei (Leipzig, Frankfurt: Deutsche Nationalbibliothek)</para>
+                <para name="gnd" >Gemeinsame Normdatei (Leipzig, Frankfurt: Deutsche Nationalbibliothek)</para>
+                <para name="hapi" >HAPI thesaurus and name authority, 1970-2000 (Los Angeles, CA: UCLC Latin America Center Pubs.)</para>
+                <para name="hkcan" >Hong Kong Chinese Authority File (Name) - HKCAN (Honk Kong: JULAC)</para>
+                <para name="lacnaf" >Library Archives Canada name authority file (Ottawa: ON: Library Archives Canada) [equivalent to second indicator value 5 in name and title headings]</para>
+                <para name="naf" >NACO authority file</para>
+                <para name="nalnaf" >National Agricultural Library name authority file (Beltsville, Maryland; National Agricultural Library) [equivalent to second indicator value 3 in name and title headings]</para>
+                <para name="nlmnaf" >National Library of Medicine name authority file (Bethesda, Maryland: National Library of Medicine) [equivalent to second indicator value 2 in name and title headings]</para>
+                <para name="nznb" >New Zealand national bibliographic (Wellington: National Library of New Zealand)</para>
+                <para name="sanb" >South African national bibliography authority file</para>
+                <para name="ulan" >Union list of artist names (Los Angeles: Getty Research Institute)</para>
+                <para name="unbisn" >UNBIS name authority list (New York, NY: Dag Hammarskjöld Library, United Nations; [London]: Chadwyck-Healey)</para>
+            </paras>
+        </doc>
+
+        <doc path="/mods/genre/@authority">
+            <paras>
+                <para name="amg">Audiovisual material glossary (Dublin, OH: Online Computer Library Center, Inc.)</para>
+                <para name="barngf">Svenska ämnesord för barn - Genre/Form (Stockholm: Kungliga Biblioteket)</para>
+                <para name="bgtchm">Basic genre terms for cultural heritage materials</para>
+                <para name="dct">Dublin Core list of resource types</para>
+                <para name="estc">Eighteenth century short title catalogue, the cataloguing rules. New ed. (London: The British Library)</para>
+                <para name="fbg">Films by genre (Jefferson, NC: McFarland)</para>
+                <para name="fgtpcm">Form/genre terms for printed cartoon material (Bowling Green, OH: Consortium of Popular Culture Collections in the Midwest)</para>
+                <para name="ftamc">Form terms for archival and manuscripts control (Stanford: The Research Libraries Group, Inc.)[Note: used prior to August 1991; term list subsumed by Art and Architecture Thesaurus at that time]</para>
+                <para name="gatbeg">Gattungsbegriffe (Leipzig &amp; Frankfort: Deutsche Nationalbibliothek)</para>
+                <para name="gmd">Anglo-American Cataloguing Rules general material designation (Rule 1.1C)</para>
+                <para name="gmgpc">Thesaurus for graphic materials: TGM II, Genre and physical characteristic terms (Washington, DC: Library of Congress, Cataloging Distribution Service)</para>
+                <para name="gsafd">Guidelines on subject access to individual works of fiction, drama, etc (Chicago: American Library Association)</para>
+                <para name="gtlm">Genre terms for law materials: a thesaurus (Littleton, CO: Rothman Pubs.)</para>
+                <para name="lcgft">Library of Congress genre/form terms for library and archival materials (Washington, DC: Library of Congress, Cataloging Distribution Service)</para>
+                <para name="marccategory">MARC form category term list</para>
+                <para name="marcform">MARC form of item term list</para>
+                <para name="marcgt">MARC genre terms (Washington, DC: Library of Congress)</para>
+                <para name="marcsmd">MARC specific material form term list</para>
+                <para name="migfg">Moving image genre-form guide (Washington, DC: Library of Congress. MBRS)</para>
+                <para name="mim">Moving image materials: genre terms (Washington: Motion Picture Broadcasting and Recorded Sound Division, Library of Congress)</para>
+                <para name="muzeukv">MuzeVideo UK DVD and UMD film genre classification (London: Muze Europe Ltd)</para>
+                <para name="ngl">Newspaper genre list [online only] (Seattle, WA: University of Washington, Library Microform and Newspaper Collections)</para>
+                <para name="nimafc">NIMA form codes (Bethesda, MD: National Imagery and Mapping Agency)</para>
+                <para name="nmc">Revised nomenclature for museum cataloging: a revised and expanded version of Robert C. Chenhall's system for classifying man-made objects (Walnut Creek, Calif.: AltaMira Press)</para>
+                <para name="radfg">Radio form / genre terms guide (Washington, DC: Library of Congress, MBRS, Recorded Sound Section)</para>
+                <para name="rbbin">Binding terms: a thesaurus for use in rare book and special collections cataloguing (Chicago: Association of College and Research Libraries, ALA)</para>
+                <para name="rbgenr">Genre terms: a thesaurus for use in rare book and special collections cataloguing (Chicago: Association of College and Research Libraries)</para>
+                <para name="rbpap">Paper terms: a thesaurus for use in rare book and special collections cataloging (Chicago: Association of College and Research Libraries, ALA) [used for printing terms.]</para>
+                <para name="rbpri">Printing &amp; publishing evidence: a thesaurus for use in rare book and special collections cataloging (Chicago: Association of College and Research Libraries, ALA) [used for printing terms.]</para>
+                <para name="rbprov">Provenance evidence: a thesaurus for use in rare book and special collections cataloging (Chicago: Association of College and Research Libraries, ALA)</para>
+                <para name="rbpub">Printing and publishing evidence: a thesaurus for use in rare book and special collections cataloging (Chicago: Association of College and Research Libraries, ALA) [used for publishing terms.]</para>
+                <para name="rbtyp">Type evidence: a thesaurus for use in rare book and special collections cataloging (Chicago: Association of College and Research Libraries, ALA) [used for printing terms.]</para>
+                <para name="rdacarrier">Term and code list for RDA carrier types</para>
+                <para name="rdacontent">Term and code list for RDA content types</para>
+                <para name="rdamedia">Term and code list for RDA media types</para>
+                <para name="reveal">REVEAL: fiction indexing and genre headings (Bath: UKOLN)</para>
+                <para name="saogf">Svenska ämnesord - Genre/Form (Stockholm: Kungliga Biblioteket)</para>
+                <para name="sgp">Svenska genrebeteckningar för periodika (Stockholm: Kunglige Biblioteket)</para>
+            </paras>
+        </doc>
+
+    </docs>
+
+</record-definition>
