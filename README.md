@@ -1,5 +1,6 @@
 # Delving SIP-Creator
 [![Build Status](https://travis-ci.org/delving/sip-creator.svg)](https://travis-ci.org/delving/sip-creator)
+[![codecov.io](https://codecov.io/github/delving/sip-creator/coverage.svg)](https://codecov.io/github/delving/sip-creator)
 
 The Delving SIP-Creator is a Java application with an elaborate graphical user interface for transforming any given input source of XML records into any of a number of defined output record formats.  It is launched in a browser using the Java Web Start technology, and it is currently bundled with the Delving CultureHub server platform.
 
