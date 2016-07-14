@@ -80,7 +80,7 @@ public class SipModel {
     private ReportFileModel reportFileModel;
     private NodeTransferHandler nodeTransferHandler;
     private MappingSaveTimer mappingSaveTimer;
-    private List<ParseListener> parseListeners = new CopyOnWriteArrayList<ParseListener>();
+    private List<ParseListener> parseListeners = new CopyOnWriteArrayList<>();
 
     public interface ParseListener {
         void updatedRecord(MetadataRecord metadataRecord);
@@ -278,28 +278,25 @@ public class SipModel {
                 recordCompileModel.setValidator(dataSetModel.newValidator());
                 recordCompileModel.setAssertions(AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource));
                 reportFileModel.refresh();
-                exec(new Swing() {
-                    @Override
-                    public void run() {
-                        dataSetFacts.set(facts);
-                        statsModel.getHintsModel().set(hints);
-                        statsModel.setStatistics(stats);
-                        exec(new Work() {
-                            @Override
-                            public void run() {
-                                mappingHintsModel.setSourceTree(statsModel.getSourceTree());
-                                for (NodeMapping nodeMapping : recMapping.getRecDefTree().getNodeMappings()) {
-                                    statsModel.findNodesForInputPaths(nodeMapping);
-                                }
+                exec(() -> {
+                    dataSetFacts.set(facts);
+                    statsModel.getHintsModel().set(hints);
+                    statsModel.setStatistics(stats);
+                    exec(new Work() {
+                        @Override
+                        public void run() {
+                            mappingHintsModel.setSourceTree(statsModel.getSourceTree());
+                            for (NodeMapping nodeMapping : recMapping.getRecDefTree().getNodeMappings()) {
+                                statsModel.findNodesForInputPaths(nodeMapping);
                             }
+                        }
 
-                            @Override
-                            public Job getJob() {
-                                return Job.SET_MAPPING_HINTS_FIND_NODES;
-                            }
-                        });
-                        seekFirstRecord();
-                    }
+                        @Override
+                        public Job getJob() {
+                            return Job.SET_MAPPING_HINTS_FIND_NODES;
+                        }
+                    });
+                    seekFirstRecord();
                 });
                 if (success != null) Swing.Exec.later(success);
             }
@@ -317,12 +314,9 @@ public class SipModel {
             public void success(final Stats stats) {
                 try {
                     dataSetModel.getDataSet().setStats(stats);
-                    exec(new Swing() {
-                        @Override
-                        public void run() {
-                            statsModel.setStatistics(stats);
-                            seekFirstRecord();
-                        }
+                    exec(() -> {
+                        statsModel.setStatistics(stats);
+                        seekFirstRecord();
                     });
                 }
                 catch (StorageException e) {
@@ -415,12 +409,7 @@ public class SipModel {
 
     public void seekRecordNumber(final int recordNumber) {
         seekReset();
-        ScanPredicate numberScan = new ScanPredicate() {
-            @Override
-            public boolean accept(MetadataRecord record) {
-                return record.getRecordNumber() == recordNumber;
-            }
-        };
+        ScanPredicate numberScan = record -> record.getRecordNumber() == recordNumber;
         seekRecord(numberScan, null);
     }
 
@@ -480,10 +469,6 @@ public class SipModel {
             this.progressListener = progressListener;
             progressListener.setProgressMessage("Scanning input records");
         }
-    }
-
-    private MappingModel mappingModel() {
-        return dataSetModel.getMappingModel();
     }
 
     public void exec(Swing swing) {

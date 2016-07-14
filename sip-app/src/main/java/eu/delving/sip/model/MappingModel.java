@@ -170,6 +170,20 @@ public class MappingModel implements RecDefNodeListener {
 
     }
 
+    public static class ChangeListenerAdapter implements ChangeListener {
+        public void lockChanged(MappingModel mappingModel, boolean locked) {}
+
+        public void functionChanged(MappingModel mappingModel, MappingFunction function) {}
+
+        public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {}
+
+        public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {}
+
+        public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {}
+
+        public void populationChanged(MappingModel mappingModel, RecDefNode node) {}
+    }
+
     private TreePath getTreePath(Path path, RecDefTreeNode node) {
         Path nodePath = node.getRecDefPath().getTagPath();
         if (nodePath.equals(path)) return node.getRecDefPath();

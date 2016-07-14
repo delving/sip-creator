@@ -143,12 +143,5 @@
             <artifactId>rsyntaxtextarea</artifactId>
             <version>2.5.8</version>
         </dependency>
-        <!--todo: maybe time to move on:-->
-        <!--<dependency>-->
-        <!--<groupId>com.google.oauth-client</groupId>-->
-        <!--<artifactId>google-oauth-client</artifactId>-->
-        <!--<version>1.19.0</version>-->
-        <!--</dependency>-->
-
     </dependencies>
 </project>

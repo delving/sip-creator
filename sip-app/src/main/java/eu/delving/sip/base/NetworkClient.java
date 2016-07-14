@@ -135,27 +135,16 @@ public class NetworkClient {
     }
 
     public void fetchNarthexSipList(final NarthexListListener narthexListListener) {
-        afterLogin(new NarthexListFetcher(narthexListListener), new NarthexLoginFailure() {
-            @Override
-            public void loginFailure(String reason) {
-                narthexListListener.failed(new Exception(reason));
-            }
-        });
+        afterLogin(new NarthexListFetcher(narthexListListener), reason -> narthexListListener.failed(new Exception(reason)));
     }
 
     public void downloadNarthexDataset(String fileName, DataSet dataSet, Swing finished) {
-        afterLogin(new NarthexDatasetDownloader(fileName, dataSet, finished), new NarthexLoginFailure() {
-            @Override
-            public void loginFailure(String reason) {
-            }
+        afterLogin(new NarthexDatasetDownloader(fileName, dataSet, finished), reason -> {
         });
     }
 
     public void uploadNarthex(File sipZipFile, String datasetName, Swing finished) throws StorageException {
-        afterLogin(new NarthexUploader(sipZipFile, datasetName, finished), new NarthexLoginFailure() {
-            @Override
-            public void loginFailure(String reason) {
-            }
+        afterLogin(new NarthexUploader(sipZipFile, datasetName, finished), reason -> {
         });
     }
 
