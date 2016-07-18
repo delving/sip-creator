@@ -132,12 +132,6 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.amber</groupId>
-            <artifactId>oauth2-client</artifactId>
-            <version>0.2-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>com.fifesoft</groupId>
             <artifactId>rsyntaxtextarea</artifactId>

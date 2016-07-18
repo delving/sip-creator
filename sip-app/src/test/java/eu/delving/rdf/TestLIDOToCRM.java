@@ -21,8 +21,8 @@
 
 package eu.delving.rdf;
 
-import junit.framework.Assert;
 import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -51,14 +51,6 @@ public class TestLIDOToCRM {
             Assert.assertEquals("Line " + index, originalLine, freshLine);
             index++;
         }
-
-//        URL lidoFile = getClass().getResource("/rdf/LIDOExample.xml");
-//        Document lidoDoc = XMLToolFactory.documentBuilderFactory().newDocumentBuilder().parse(lidoFile.openStream());
-//        String lidoXML = new XmlSerializer().toXml(lidoDoc.getDocumentElement(), false);
-//        System.out.println(lidoXML);
-//        Graph graph = new Graph();
-//        forthMapping.apply(graph, lidoDoc.getDocumentElement());
-//        System.out.println(graph);
     }
 
 }

@@ -31,8 +31,6 @@ import eu.delving.sip.files.HomeDirectory;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
-import org.apache.amber.oauth2.common.exception.OAuthProblemException;
-import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -367,7 +365,7 @@ public class NetworkClient {
             progressListener.setProgressMessage("Downloading from Narthex");
         }
 
-        private HttpGet createSipZipDownloadRequest() throws OAuthSystemException, OAuthProblemException {
+        private HttpGet createSipZipDownloadRequest() {
             String requestUrl = String.format(
                     "%s/sip-app/%s",
                     narthexCredentials.narthexUrl(),

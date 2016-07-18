@@ -273,7 +273,7 @@ public class VisualFeedback implements Feedback {
         }
     }
 
-    private class PasswordFetcher implements OAuthClient.PasswordRequest, ActionListener {
+    private class PasswordFetcher implements ActionListener {
         private static final String PASSWORD = "Password";
         private JDialog dialog;
         private JPasswordField passwordField = new JPasswordField(15);
@@ -327,7 +327,6 @@ public class VisualFeedback implements Feedback {
             dialog.pack();
         }
 
-        @Override
         public String getPassword() {
             dialog.setLocation(
                     (Toolkit.getDefaultToolkit().getScreenSize().width - dialog.getSize().width) / 2,
