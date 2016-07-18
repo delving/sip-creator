@@ -206,7 +206,8 @@ public class Application {
         content.add(createStatePanel(), BorderLayout.SOUTH);
         content.add(allFrames.getSidePanel(), BorderLayout.WEST);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        screen.height -= 30;
+        screen.height = (int) (screen.height / 1.5f);
+        screen.width = (int) (screen.width / 1.5f);
         home.setSize(screen);
         home.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         ImageIcon logo = new ImageIcon(getClass().getResource("/sip-creator-logo.png"));
