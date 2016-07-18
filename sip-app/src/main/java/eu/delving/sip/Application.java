@@ -79,7 +79,7 @@ import static eu.delving.sip.files.DataSetState.SOURCED;
 import static eu.delving.sip.files.Storage.NARTHEX_PASSWORD;
 import static eu.delving.sip.files.Storage.NARTHEX_URL;
 import static eu.delving.sip.files.Storage.NARTHEX_USERNAME;
-import static eu.delving.sip.model.MappingModel.*;
+import static eu.delving.sip.model.MappingModel.ChangeListenerAdapter;
 
 /**
  * The main application, based on the SipModel and bringing everything together in a big frame with a central
@@ -91,7 +91,6 @@ import static eu.delving.sip.model.MappingModel.*;
 public class Application {
     public static String version;
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
-    private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
     private SipModel sipModel;
     private Action validateAction;
     private JFrame home;
@@ -107,7 +106,7 @@ public class Application {
     private Application(final File storageDir) throws StorageException {
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         desktop = new JDesktopPane();
-        desktop.setMinimumSize(new Dimension(MINIMUM_DESKTOP_SIZE));
+        desktop.setMinimumSize(new Dimension(800, 600));
         resizeTimer = new Timer(DEFAULT_RESIZE_INTERVAL, actionEvent -> {
             resizeTimer.stop();
             for (JInternalFrame frame : desktop.getAllFrames()) {
@@ -177,7 +176,7 @@ public class Application {
         createSipZipAction = new CreateSipZipAction();
         expertMenu = new ExpertMenu(sipModel, allFrames);
         statusPanel = new StatusPanel(sipModel);
-        home = new JFrame(titleString());
+        home = new JFrame();
         home.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent componentEvent) {
@@ -430,8 +429,15 @@ public class Application {
         return null;
     }
 
-    public static void main(final String[] args) throws StorageException {
+    public static void main(final String[] args) throws Exception {
         version = getPomVersion();
+        String lcOSName = System.getProperty("os.name").toLowerCase();
+        final boolean isMac = lcOSName.startsWith("mac os x");
+        if (isMac) {
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+            System.setProperty("apple.awt.application.name", "SIP Creator");
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }
         EventQueue.invokeLater(LAUNCH);
     }
 
