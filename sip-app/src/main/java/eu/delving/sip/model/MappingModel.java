@@ -21,6 +21,7 @@
 
 package eu.delving.sip.model;
 
+import com.google.common.annotations.VisibleForTesting;
 import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.NodeMappingChange;
@@ -47,7 +48,8 @@ public class MappingModel implements RecDefNodeListener {
     private RecDefTreeNode recDefTreeRoot;
     private NodeMappingListModel nodeMappingListModel = new NodeMappingListModel();
 
-    MappingModel() { // test only
+    @VisibleForTesting
+    MappingModel() {
     }
 
     public MappingModel(SipModel sipModel) {
@@ -194,8 +196,8 @@ public class MappingModel implements RecDefNodeListener {
         return null;
     }
 
-    private List<SetListener> setListeners = new CopyOnWriteArrayList<SetListener>();
-    private List<ChangeListener> changeListeners = new CopyOnWriteArrayList<ChangeListener>();
+    private List<SetListener> setListeners = new CopyOnWriteArrayList<>();
+    private List<ChangeListener> changeListeners = new CopyOnWriteArrayList<>();
 
     public void addSetListener(SetListener listener) {
         setListeners.add(listener);
