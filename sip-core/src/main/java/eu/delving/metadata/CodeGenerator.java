@@ -103,7 +103,9 @@ public class CodeGenerator {
             }
         }
         codeOut.line("// Dictionaries:");
-        for (NodeMapping nodeMapping : recDefTree.getNodeMappings()) toLookupCode(nodeMapping);
+        for (NodeMapping nodeMapping : recDefTree.getNodeMappings()) {
+            toLookupCode(nodeMapping);
+        }
         codeOut.line("// DSL Category wraps Builder call:");
         codeOut.line("boolean _absent_ = true");
         codeOut.line("org.w3c.dom.Node outputNode");
@@ -124,8 +126,12 @@ public class CodeGenerator {
 
 
     private void toElementCode(RecDefNode recDefNode, Stack<String> groovyParams) {
-        if (recDefNode.isAttr() || !recDefNode.isPopulated()) return;
-        if (editPath != null && !recDefNode.getPath().isFamilyOf(editPath.getNodeMapping().outputPath)) return;
+        if (recDefNode.isAttr() || !recDefNode.isPopulated()) {
+            return;
+        }
+        if (editPath != null && !recDefNode.getPath().isFamilyOf(editPath.getNodeMapping().outputPath)) {
+            return;
+        }
         if (recDefNode.getNodeMappings().isEmpty()) {
             if (recDefNode.isRootOptNoOptList()) {
                 Set<Path> siblingPaths = getSiblingInputPathsOfChildren(recDefNode);
@@ -339,10 +345,7 @@ public class CodeGenerator {
         }
         else {
             Tag tag = recDefNode.getTag();
-            codeOut.line_(
-                    "%s%s (",
-                    prefixFirstBuilder, tag.toBuilderCall()
-            );
+
             boolean comma = false;
             for (RecDefNode sub : recDefNode.getChildren()) {
                 if (!sub.isAttr()) continue;
@@ -357,11 +360,14 @@ public class CodeGenerator {
                     for (NodeMapping nodeMapping : sub.getNodeMappings().values()) {
                         if (comma) codeOut.line(",");
                         trace();
+
+                        codeOut.line_("%s (", tag.toBuilderCall());
                         codeOut.line_("%s : {", sub.getTag().toBuilderCall());
                         codeOut.start(nodeMapping);
                         toAttributeCode(nodeMapping, groovyParams);
                         codeOut.end(nodeMapping);
                         codeOut._line("}");
+
                         comma = true;
                     }
                 }
