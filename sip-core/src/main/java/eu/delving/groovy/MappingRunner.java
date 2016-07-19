@@ -66,7 +66,7 @@ public class MappingRunner {
 
     public MappingRunner(GroovyCodeResource groovyCodeResource, RecMapping recMapping, EditPath editPath, boolean trace) {
         this.recMapping = recMapping;
-        this.code = new CodeGenerator(recMapping).withEditPath(editPath).withTrace(true).toRecordMappingCode();
+        this.code = new CodeGenerator(recMapping).withEditPath(editPath).withTrace(trace).toRecordMappingCode();
         this.script = groovyCodeResource.createMappingScript(code);
         this.script.getBinding().setVariable("WORLD", binding);
         GroovyNode factsNode = new GroovyNode(null, "facts");
