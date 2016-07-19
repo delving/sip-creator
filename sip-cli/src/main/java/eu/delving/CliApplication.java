@@ -35,9 +35,7 @@ public class CliApplication {
         options.addOption(DATA_SET_DIR_OPTION);
 
         CommandLineParser parser = new DefaultParser();
-
         CommandLine cmd = parser.parse(options, args);
-
         Optional<Mode> mode = fileOrDirMode(cmd);
 
         if (!mode.isPresent()) {
