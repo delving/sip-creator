@@ -1,4 +1,4 @@
-package eu.delving;
+package eu.delving.sip;
 
 import org.apache.commons.cli.*;
 
