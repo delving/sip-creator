@@ -21,28 +21,11 @@ public class CliApplication {
 
     private final Configuration configuration;
 
-    private static final String HELP_HEADER = "SIP-cli will process a dataset for you, just like the GUI does. Either specify a dataset-dir, or specify the mapping, " +
-        "recdef, facts and hints-files individually. The option d/dataset-dir takes precedence if specified and will cause the other options to be ignored." +
-        "\n\nOutput will be on standard-out\n\n" +
+    private static final String HELP_HEADER = "SIP-cli will process a dataset for you, just like the GUI does." +
+        "\n\nOutput will be on stdout\n\n" +
         "Arguments: \n";
 
-    private enum Mode {
-        // will we get out mapping info from a dataset directory or a number of individual files?
-        Directory, Files
-    }
-
-    private static final Option MAPPING_FILE_OPTION = Option.builder("m").longOpt("mapping").
-        desc("Path to mapping file").hasArg().build();
-    private static final Option REC_DEF_FILE_OPTION = Option.builder("r").longOpt("rec-def")
-        .desc("Path to record-definition file").hasArg().build();
-    private static final Option FACTS_FILE_OPTION = Option.builder("f").longOpt("facts")
-        .desc("Path to facts file").hasArg().build();
-    private static final Option HINTS_FILE_OPTION = Option.builder().longOpt("hints")
-        .desc("Path to hints definition file").hasArg().build();
-    private static final Option SOURCE_DATA_FILE_OPTION = Option.builder("s").longOpt("source")
-        .desc("Path to .xml.gz source file").hasArg().build();
-
-    private static final Option DATA_SET_DIR_OPTION = Option.builder("d").longOpt("data-set-dir")
+    private static final Option DATA_SET_DIR_OPTION = Option.builder("d").longOpt("data-set-dir").required()
         .desc("Path to data-set directory").hasArg().build();
     private static final Option REPORT_DEST_FILE = Option.builder().longOpt("report-file")
         .desc("Report file").hasArg().build();
@@ -50,53 +33,41 @@ public class CliApplication {
     public static void main(String[] args) throws ParseException {
 
         final Options options = new Options();
-        options.addOption(MAPPING_FILE_OPTION);
-        options.addOption(REC_DEF_FILE_OPTION);
-        options.addOption(FACTS_FILE_OPTION);
-        options.addOption(HINTS_FILE_OPTION);
-        options.addOption(SOURCE_DATA_FILE_OPTION);
+
         options.addOption(DATA_SET_DIR_OPTION);
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
-        Optional<Mode> mode = fileOrDirMode(cmd);
 
-        if (!mode.isPresent()) {
-            System.err.println("You must specify either a dataset dir or the set of input-files, not both");
+
+        Optional<Configuration> config = parseConfiguration(cmd);
+        if (!config.isPresent()) {
+            System.err.println("Unable to open dataSet directory or reportPath (if specified) is not writable.\nGiving up.");
             printHelp(options);
-            System.exit(1);
         }
-
-        Configuration configuration = parseConfiguration(mode.get(), cmd);
-        CliApplication cliApplication = new CliApplication(configuration);
+        CliApplication cliApplication = new CliApplication(config.get());
         cliApplication.process();
     }
 
-    private static Configuration parseConfiguration(final Mode mode, final CommandLine cmd) {
-        if (mode.equals(Mode.Directory)) {
-            System.err.println("Directory mode not yet supported, exiting...");
-            System.exit(1);
+    private static Optional<Configuration> parseConfiguration(final CommandLine cmd) {
+        String path = cmd.getOptionValue(DATA_SET_DIR_OPTION.getOpt());
+
+
+        String rpArg = cmd.getOptionValue(REPORT_DEST_FILE.getOpt());
+        Optional<String> reportPath = Optional.ofNullable(rpArg);
+
+        Optional<CharSink> reportOut = reportPath.
+            map(p -> new File(p)).
+            filter(file -> file.canWrite()).
+            map(file -> Files.asCharSink(file, Charset.forName("UTF-8")));
+
+
+        File dataSetDir = new File(path);
+        if (!dataSetDir.canRead()) {
+            return Optional.empty();
         }
-        final CharSource recDef = openFile(cmd.getOptionValue(REC_DEF_FILE_OPTION.getOpt()));
-        final CharSource mapping = openFile(cmd.getOptionValue(MAPPING_FILE_OPTION.getOpt()));
-        final CharSource facts = openFile(cmd.getOptionValue(FACTS_FILE_OPTION.getOpt()));
-        final CharSource hints = openFile(cmd.getOptionValue(HINTS_FILE_OPTION.getOpt()));
-        final CharSource source = openFile(cmd.getOptionValue(SOURCE_DATA_FILE_OPTION.getOpt()));
 
-        String reportDest = cmd.getOptionValue(REPORT_DEST_FILE.getOpt());
-        final Optional<CharSink> reportOut = reportDest == null ?
-            Optional.empty() : Optional.of(Files.asCharSink(new File(reportDest), Charset.forName("UTF-8")));
-
-        final Configuration.Builder builder = new Configuration.Builder();
-        return builder.
-            setRecDef(recDef).
-            setMappingFile(mapping).
-            setSource(source).
-            setFacts(facts).
-            setHints(hints).
-            setOut(System.out).
-            setReportOut(reportOut).
-            createConfiguration();
+        return Optional.of(new Configuration(dataSetDir, System.out, reportOut));
     }
 
     private static CharSource openFile(final String path) {
@@ -112,19 +83,6 @@ public class CliApplication {
         this.configuration = configuration;
     }
 
-    private static Optional<Mode> fileOrDirMode(final CommandLine commandLine) {
-        if (commandLine.hasOption(DATA_SET_DIR_OPTION.getOpt())) {
-            return Optional.of(Mode.Directory);
-        } else if (commandLine.hasOption(MAPPING_FILE_OPTION.getOpt()) &&
-            commandLine.hasOption(REC_DEF_FILE_OPTION.getOpt()) &&
-            commandLine.hasOption(FACTS_FILE_OPTION.getOpt()) &&
-            commandLine.hasOption(HINTS_FILE_OPTION.getOpt())
-            ) {
-            return Optional.of(Mode.Files);
-        }
-        return Optional.empty();
-    }
-
 
     private static void printHelp(final Options options) {
         HelpFormatter help = new HelpFormatter();
@@ -132,72 +90,14 @@ public class CliApplication {
     }
 
     static private class Configuration {
-        public final CharSource recDef;
-        public final CharSource mappingFile;
-        public final CharSource source;
-        public final CharSource facts;
-        public final CharSource hints;
-
+        public final File dataSetDir;
         public final OutputStream out;
         public final Optional<CharSink> reportOut;
 
-        public Configuration(CharSource recDef, CharSource mappingFile, CharSource source, CharSource facts, CharSource hints, OutputStream out, Optional<CharSink> reportOut) {
-            this.recDef = recDef;
-            this.mappingFile = mappingFile;
-            this.source = source;
-            this.facts = facts;
-            this.hints = hints;
+        public Configuration(File dataSetDir, OutputStream out, Optional<CharSink> reportOut) {
+            this.dataSetDir = dataSetDir;
             this.out = out;
             this.reportOut = reportOut;
-        }
-
-        static class Builder {
-            private CharSource recDef;
-            private CharSource mappingFile;
-            private CharSource source;
-            private CharSource facts;
-            private CharSource hints;
-            private OutputStream out;
-            private Optional<CharSink> reportOut;
-
-            public Builder setRecDef(CharSource recDef) {
-                this.recDef = recDef;
-                return this;
-            }
-
-            public Builder setMappingFile(CharSource mappingFile) {
-                this.mappingFile = mappingFile;
-                return this;
-            }
-
-            public Builder setSource(CharSource source) {
-                this.source = source;
-                return this;
-            }
-
-            public Builder setFacts(CharSource facts) {
-                this.facts = facts;
-                return this;
-            }
-
-            public Builder setHints(CharSource hints) {
-                this.hints = hints;
-                return this;
-            }
-
-            public Builder setOut(OutputStream out) {
-                this.out = out;
-                return this;
-            }
-
-            public Builder setReportOut(Optional<CharSink> reportOut) {
-                this.reportOut = reportOut;
-                return this;
-            }
-
-            public CliApplication.Configuration createConfiguration() {
-                return new CliApplication.Configuration(recDef, mappingFile, source, facts, hints, out, reportOut);
-            }
         }
     }
 }
