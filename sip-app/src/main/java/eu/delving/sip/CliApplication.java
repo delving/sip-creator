@@ -1,7 +1,6 @@
 package eu.delving.sip;
 
 import com.google.common.io.CharSink;
-import com.google.common.io.CharSource;
 import com.google.common.io.Files;
 import eu.delving.sip.files.ReportWriter;
 import org.apache.commons.cli.CommandLine;
@@ -27,8 +26,12 @@ public class CliApplication {
 
     private static final Option DATA_SET_DIR_OPTION = Option.builder("d").longOpt("data-set-dir").required()
         .desc("Path to data-set directory").hasArg().build();
-    private static final Option REPORT_DEST_FILE = Option.builder().longOpt("report-file")
+    private static final Option REPORT_DEST_FILE = Option.builder("r").longOpt("report-file")
         .desc("Report file").hasArg().build();
+
+    public CliApplication(final Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     public static void main(String[] args) throws ParseException {
 
@@ -44,6 +47,7 @@ public class CliApplication {
         if (!config.isPresent()) {
             System.err.println("Unable to open dataSet directory or reportPath (if specified) is not writable.\nGiving up.");
             printHelp(options);
+            System.exit(1);
         }
         CliApplication cliApplication = new CliApplication(config.get());
         cliApplication.process();
@@ -51,8 +55,6 @@ public class CliApplication {
 
     private static Optional<Configuration> parseConfiguration(final CommandLine cmd) {
         String path = cmd.getOptionValue(DATA_SET_DIR_OPTION.getOpt());
-
-
         String rpArg = cmd.getOptionValue(REPORT_DEST_FILE.getOpt());
         Optional<String> reportPath = Optional.ofNullable(rpArg);
 
@@ -70,17 +72,8 @@ public class CliApplication {
         return Optional.of(new Configuration(dataSetDir, System.out, reportOut));
     }
 
-    private static CharSource openFile(final String path) {
-        return Files.asCharSource(new File(path), Charset.forName("UTF-8"));
-    }
-
     private ReportWriter process() {
         return null;
-    }
-
-
-    public CliApplication(final Configuration configuration) {
-        this.configuration = configuration;
     }
 
 
