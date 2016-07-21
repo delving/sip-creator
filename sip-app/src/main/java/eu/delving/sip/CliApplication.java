@@ -36,8 +36,8 @@ public class CliApplication {
     public static void main(String[] args) throws ParseException {
 
         final Options options = new Options();
-
         options.addOption(DATA_SET_DIR_OPTION);
+        options.addOption(REPORT_DEST_FILE);
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
@@ -45,7 +45,7 @@ public class CliApplication {
 
         Optional<Configuration> config = parseConfiguration(cmd);
         if (!config.isPresent()) {
-            System.err.println("Unable to open dataSet directory or reportPath (if specified) is not writable.\nGiving up.");
+            System.err.println("Giving up.");
             printHelp(options);
             System.exit(1);
         }
@@ -63,9 +63,13 @@ public class CliApplication {
             filter(file -> file.canWrite()).
             map(file -> Files.asCharSink(file, Charset.forName("UTF-8")));
 
-
+        if (rpArg != null && !reportOut.isPresent()) {
+            System.err.println("Unable to write to report path.");
+            return Optional.empty();
+        }
         File dataSetDir = new File(path);
         if (!dataSetDir.canRead()) {
+            System.err.println("Unable to open dataSet directory.");
             return Optional.empty();
         }
 
