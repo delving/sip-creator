@@ -89,6 +89,7 @@ import static eu.delving.sip.model.MappingModel.ChangeListenerAdapter;
  */
 
 public class Application {
+    public static final String DEFAULT_NARTHEX_URL = "http://localhost:9000/narthex";
     public static String version;
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
     private SipModel sipModel;
@@ -124,7 +125,7 @@ public class Application {
         Preferences preferences = Preferences.userNodeForPackage(SipModel.class);
         feedback = new VisualFeedback(home, desktop, preferences);
         // todo: be sure to set this
-        String serverUrl = preferences.get("serverUrl", "http://localhost:9000/narthex");
+        String serverUrl = preferences.get("serverUrl", DEFAULT_NARTHEX_URL);
         HttpClient httpClient = createHttpClient(serverUrl);
         SchemaRepository schemaRepository;
         try {
