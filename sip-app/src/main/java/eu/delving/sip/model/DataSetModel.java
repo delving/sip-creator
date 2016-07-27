@@ -157,11 +157,8 @@ public class DataSetModel implements RecDefModel {
             final DataSetState freshState = getDataSetState();
             if (freshState != currentState) {
                 currentState = freshState;
-                sipModel.exec(new Swing() {
-                    @Override
-                    public void run() {
-                        for (SwingListener listener : listeners) listener.stateChanged(DataSetModel.this, freshState);
-                    }
+                sipModel.exec(() -> {
+                    for (SwingListener listener : listeners) listener.stateChanged(DataSetModel.this, freshState);
                 });
             }
             timer.restart();
@@ -188,7 +185,7 @@ public class DataSetModel implements RecDefModel {
         }
     }
 
-    private List<SwingListener> listeners = new CopyOnWriteArrayList<SwingListener>();
+    private List<SwingListener> listeners = new CopyOnWriteArrayList<>();
 
     public void addListener(SwingListener listener) {
         listeners.add(listener);
