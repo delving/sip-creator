@@ -76,9 +76,7 @@ public class RecMappingFrame extends FrameBase {
                 if (index <= listModel.getSize()) {
                     NodeMappingEntry entry = (NodeMappingEntry) listModel.getElementAt(index);
                     if (entry.isHighlighted()) {
-                        sipModel.exec(() -> {
-                            nodeMappingList.ensureIndexIsVisible(e.getIndex0());
-                        });
+                        sipModel.exec(() -> nodeMappingList.ensureIndexIsVisible(e.getIndex0()));
                     }
                 }
             }
@@ -88,9 +86,7 @@ public class RecMappingFrame extends FrameBase {
             switch (transition) {
                 case COMPLETE_TO_ARMED_SOURCE:
                 case COMPLETE_TO_ARMED_TARGET:
-                    exec(() -> {
-                        nodeMappingList.clearSelection();
-                    });
+                    exec(() -> nodeMappingList.clearSelection());
                     break;
             }
         });
@@ -140,7 +136,9 @@ public class RecMappingFrame extends FrameBase {
 
         @Override
         public void valueChanged(ListSelectionEvent event) {
-            if (event.getValueIsAdjusting()) return;
+            if (event.getValueIsAdjusting()) {
+                return;
+            }
             final NodeMappingEntry selected = (NodeMappingEntry) nodeMappingList.getSelectedValue();
             if (selected != null) {
                 exec(new Work() {
