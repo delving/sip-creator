@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static eu.delving.metadata.StringUtil.csvLineParse;
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Make sure the String Util

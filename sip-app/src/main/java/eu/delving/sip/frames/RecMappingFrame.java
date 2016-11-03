@@ -21,16 +21,17 @@
 
 package eu.delving.sip.frames;
 
-import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.NodeMappingChange;
-import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.menus.RevertMappingMenu;
-import eu.delving.sip.model.*;
+import eu.delving.sip.model.MappingModel;
+import eu.delving.sip.model.NodeMappingEntry;
+import eu.delving.sip.model.NodeMappingListModel;
+import eu.delving.sip.model.RecDefTreeNode;
+import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.SourceTreeNode;
 
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
@@ -38,11 +39,9 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
-import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 /**
  * Render the record mapping as a list of NodeMapping instances, so that an individual NodeMapping can be
@@ -77,58 +76,25 @@ public class RecMappingFrame extends FrameBase {
                 if (index <= listModel.getSize()) {
                     NodeMappingEntry entry = (NodeMappingEntry) listModel.getElementAt(index);
                     if (entry.isHighlighted()) {
-                        sipModel.exec(new Swing() {
-                            @Override
-                            public void run() {
-                                nodeMappingList.ensureIndexIsVisible(e.getIndex0());
-                            }
-                        });
+                        sipModel.exec(() -> nodeMappingList.ensureIndexIsVisible(e.getIndex0()));
                     }
                 }
             }
         });
         nodeMappingList.addListSelectionListener(new NodeMappingSelection());
-        sipModel.getCreateModel().addListener(new CreateModel.Listener() {
-            @Override
-            public void transition(CreateModel createModel, CreateTransition transition) {
-                switch (transition) {
-                    case COMPLETE_TO_ARMED_SOURCE:
-                    case COMPLETE_TO_ARMED_TARGET:
-                        exec(new Swing() {
-                            @Override
-                            public void run() {
-                                nodeMappingList.clearSelection();
-                            }
-                        });
-                        break;
-                }
+        sipModel.getCreateModel().addListener((createModel, transition) -> {
+            switch (transition) {
+                case COMPLETE_TO_ARMED_SOURCE:
+                case COMPLETE_TO_ARMED_TARGET:
+                    exec(() -> nodeMappingList.clearSelection());
+                    break;
             }
         });
-        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListenerAdapter() {
             @Override
             public void lockChanged(MappingModel mappingModel, boolean locked) {
                 removeAction.setEnabled(!locked);
                 revertMappingMenu.setEnabled(!locked);
-            }
-
-            @Override
-            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
-            }
-
-            @Override
-            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
-            }
-
-            @Override
-            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            }
-
-            @Override
-            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            }
-
-            @Override
-            public void populationChanged(MappingModel mappingModel, RecDefNode node) {
             }
         });
     }
@@ -150,15 +116,12 @@ public class RecMappingFrame extends FrameBase {
         JMenu menu = new JMenu("Sorting");
         menu.add(sourceTargetSorting);
         menu.add(targetSourceSorting);
-        sourceTargetSorting.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                NodeMappingListModel nodeMappingListModel = (NodeMappingListModel) nodeMappingList.getModel();
-                boolean sourceTargetSorting = e.getStateChange() == ItemEvent.SELECTED;
-                nodeMappingListModel.setSorting(sourceTargetSorting);
-                NodeMappingEntry.CellRenderer cellRenderer = (NodeMappingEntry.CellRenderer) nodeMappingList.getCellRenderer();
-                cellRenderer.setSourceTargetOrdering(sourceTargetSorting);
-            }
+        sourceTargetSorting.addItemListener(e -> {
+            NodeMappingListModel nodeMappingListModel = (NodeMappingListModel) nodeMappingList.getModel();
+            boolean sourceTargetSorting1 = e.getStateChange() == ItemEvent.SELECTED;
+            nodeMappingListModel.setSorting(sourceTargetSorting1);
+            NodeMappingEntry.CellRenderer cellRenderer = (NodeMappingEntry.CellRenderer) nodeMappingList.getCellRenderer();
+            cellRenderer.setSourceTargetOrdering(sourceTargetSorting1);
         });
         return menu;
     }
@@ -173,7 +136,9 @@ public class RecMappingFrame extends FrameBase {
 
         @Override
         public void valueChanged(ListSelectionEvent event) {
-            if (event.getValueIsAdjusting()) return;
+            if (event.getValueIsAdjusting()) {
+                return;
+            }
             final NodeMappingEntry selected = (NodeMappingEntry) nodeMappingList.getSelectedValue();
             if (selected != null) {
                 exec(new Work() {

@@ -23,10 +23,6 @@ package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.CachedResourceResolver;
-import eu.delving.metadata.MappingFunction;
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.NodeMappingChange;
-import eu.delving.metadata.RecDefNode;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.sip.actions.UnlockMappingAction;
 import eu.delving.sip.actions.ValidateAction;
@@ -36,7 +32,6 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.VisualFeedback;
 import eu.delving.sip.base.Work;
-import eu.delving.sip.files.DataSetState;
 import eu.delving.sip.files.HomeDirectory;
 import eu.delving.sip.files.SchemaFetcher;
 import eu.delving.sip.files.Storage;
@@ -59,14 +54,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 
 import javax.swing.*;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
@@ -90,6 +79,7 @@ import static eu.delving.sip.files.DataSetState.SOURCED;
 import static eu.delving.sip.files.Storage.NARTHEX_PASSWORD;
 import static eu.delving.sip.files.Storage.NARTHEX_URL;
 import static eu.delving.sip.files.Storage.NARTHEX_USERNAME;
+import static eu.delving.sip.model.MappingModel.ChangeListenerAdapter;
 
 /**
  * The main application, based on the SipModel and bringing everything together in a big frame with a central
@@ -101,7 +91,6 @@ import static eu.delving.sip.files.Storage.NARTHEX_USERNAME;
 public class Application {
     public static String version;
     private static final int DEFAULT_RESIZE_INTERVAL = 1000;
-    private static final Dimension MINIMUM_DESKTOP_SIZE = new Dimension(800, 600);
     private SipModel sipModel;
     private Action validateAction;
     private JFrame home;
@@ -117,15 +106,12 @@ public class Application {
     private Application(final File storageDir) throws StorageException {
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         desktop = new JDesktopPane();
-        desktop.setMinimumSize(new Dimension(MINIMUM_DESKTOP_SIZE));
-        resizeTimer = new Timer(DEFAULT_RESIZE_INTERVAL, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                resizeTimer.stop();
-                for (JInternalFrame frame : desktop.getAllFrames()) {
-                    if (frame instanceof FrameBase) {
-                        ((FrameBase) frame).ensureOnScreen();
-                    }
+        desktop.setMinimumSize(new Dimension(800, 600));
+        resizeTimer = new Timer(DEFAULT_RESIZE_INTERVAL, actionEvent -> {
+            resizeTimer.stop();
+            for (JInternalFrame frame : desktop.getAllFrames()) {
+                if (frame instanceof FrameBase) {
+                    ((FrameBase) frame).ensureOnScreen();
                 }
             }
         });
@@ -161,7 +147,7 @@ public class Application {
 
             @Override
             public void ask() {
-                Map<String, String> fields = new TreeMap<String, String>();
+                Map<String, String> fields = new TreeMap<>();
                 fields.put(NARTHEX_URL, narthexUrl());
                 fields.put(NARTHEX_USERNAME, narthexUser());
                 fields.put(NARTHEX_PASSWORD, narthexPassword());
@@ -190,7 +176,7 @@ public class Application {
         createSipZipAction = new CreateSipZipAction();
         expertMenu = new ExpertMenu(sipModel, allFrames);
         statusPanel = new StatusPanel(sipModel);
-        home = new JFrame(titleString());
+        home = new JFrame();
         home.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent componentEvent) {
@@ -205,35 +191,12 @@ public class Application {
         allFrames = new AllFrames(sipModel, content, dataSetFrame, logFrame);
         desktop.setBackground(new Color(190, 190, 200));
         content.add(desktop, BorderLayout.CENTER);
-        sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListener() {
+        sipModel.getMappingModel().addChangeListener(new ChangeListenerAdapter() {
             @Override
             public void lockChanged(MappingModel mappingModel, final boolean locked) {
-                sipModel.exec(new Swing() {
-                    @Override
-                    public void run() {
-                        unlockMappingAction.setEnabled(locked);
-                    }
+                sipModel.exec(() -> {
+                    unlockMappingAction.setEnabled(locked);
                 });
-            }
-
-            @Override
-            public void functionChanged(MappingModel mappingModel, MappingFunction function) {
-            }
-
-            @Override
-            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
-            }
-
-            @Override
-            public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            }
-
-            @Override
-            public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-            }
-
-            @Override
-            public void populationChanged(MappingModel mappingModel, RecDefNode node) {
             }
         });
         validateAction = new ValidateAction(sipModel, allFrames.prepareForInvestigation(desktop));
@@ -243,7 +206,8 @@ public class Application {
         content.add(createStatePanel(), BorderLayout.SOUTH);
         content.add(allFrames.getSidePanel(), BorderLayout.WEST);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        screen.height -= 30;
+        screen.height = (int) (screen.height / 1.5f);
+        screen.width = (int) (screen.width / 1.5f);
         home.setSize(screen);
         home.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         ImageIcon logo = new ImageIcon(getClass().getResource("/sip-creator-logo.png"));
@@ -256,35 +220,32 @@ public class Application {
             }
         });
         home.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
-            @Override
-            public void stateChanged(DataSetModel model, DataSetState state) {
-                statusPanel.setState(state);
-                switch (state) {
-                    case ABSENT:
-                        sipModel.exec(new Work() {
-                            @Override
-                            public void run() {
-                                sipModel.getDataSetFacts().set(null);
-                                sipModel.getStatsModel().setStatistics(null);
-                            }
+        sipModel.getDataSetModel().addListener((model, state) -> {
+            statusPanel.setState(state);
+            switch (state) {
+                case ABSENT:
+                    sipModel.exec(new Work() {
+                        @Override
+                        public void run() {
+                            sipModel.getDataSetFacts().set(null);
+                            sipModel.getStatsModel().setStatistics(null);
+                        }
 
-                            @Override
-                            public Job getJob() {
-                                return Job.CLEAR_FACTS_STATS;
-                            }
-                        });
-                        home.setTitle(titleString());
-                        sipModel.seekReset();
-                        break;
-                    default:
-                        DataSetModel dataSetModel = sipModel.getDataSetModel();
-                        home.setTitle(String.format(
-                                titleString() + " - [%s -> %s]",
-                                dataSetModel.getDataSet().getSpec(), dataSetModel.getPrefix().toUpperCase()
-                        ));
-                        break;
-                }
+                        @Override
+                        public Job getJob() {
+                            return Job.CLEAR_FACTS_STATS;
+                        }
+                    });
+                    home.setTitle(titleString());
+                    sipModel.seekReset();
+                    break;
+                default:
+                    DataSetModel dataSetModel = sipModel.getDataSetModel();
+                    home.setTitle(String.format(
+                            titleString() + " - [%s -> %s]",
+                            dataSetModel.getDataSet().getSpec(), dataSetModel.getPrefix().toUpperCase()
+                    ));
+                    break;
             }
         });
         attachAccelerator(new QuitAction(), home);
@@ -469,8 +430,15 @@ public class Application {
         return null;
     }
 
-    public static void main(final String[] args) throws StorageException {
+    public static void main(final String[] args) throws Exception {
         version = getPomVersion();
+        String lcOSName = System.getProperty("os.name").toLowerCase();
+        final boolean isMac = lcOSName.startsWith("mac os x");
+        if (isMac) {
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+            System.setProperty("apple.awt.application.name", "SIP Creator");
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }
         EventQueue.invokeLater(LAUNCH);
     }
 

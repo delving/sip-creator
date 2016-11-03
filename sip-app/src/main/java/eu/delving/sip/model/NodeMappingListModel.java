@@ -40,11 +40,11 @@ import java.util.List;
  */
 
 public class NodeMappingListModel extends AbstractListModel<NodeMappingEntry> {
-    private List<NodeMappingEntry> entries = new ArrayList<NodeMappingEntry>();
+    private List<NodeMappingEntry> entries = new ArrayList<>();
     private EntrySorting entrySorting = new EntrySorting(true);
 
     public JList<NodeMappingEntry> createJList() {
-        JList<NodeMappingEntry> list = new JList<NodeMappingEntry>(this);
+        JList<NodeMappingEntry> list = new JList<>(this);
         list.setCellRenderer(new NodeMappingEntry.CellRenderer());
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         return list;
@@ -84,12 +84,7 @@ public class NodeMappingListModel extends AbstractListModel<NodeMappingEntry> {
 
             @Override
             public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, final NodeMapping nodeMapping, NodeMappingChange change) {
-                sipModel.exec(new Swing() {
-                    @Override
-                    public void run() {
-                        fireContentsChanged(indexOf(nodeMapping));
-                    }
-                });
+                sipModel.exec(() -> fireContentsChanged(indexOf(nodeMapping)));
             }
 
             @Override
@@ -123,17 +118,8 @@ public class NodeMappingListModel extends AbstractListModel<NodeMappingEntry> {
     }
 
     public MappingModel.SetListener createSetEar(final SipModel sipModel) {
-        return new MappingModel.SetListener() {
-            @Override
-            public void recMappingSet(final MappingModel mappingModel) {
-                sipModel.exec(new Swing() {
-                    @Override
-                    public void run() {
-                        setList(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getNodeMappings() : null);
-                    }
-                });
-            }
-        };
+        return mappingModel -> sipModel.exec(
+            () -> setList(mappingModel.hasRecMapping() ? mappingModel.getRecMapping().getNodeMappings() : null));
     }
 
     public void setSorting(boolean sourceTargetSorting) {
@@ -146,10 +132,14 @@ public class NodeMappingListModel extends AbstractListModel<NodeMappingEntry> {
         if (!entries.isEmpty()) {
             final int size = getSize();
             entries.clear();
-            if (size > 0) fireIntervalRemoved(this, 0, size - 1);
+            if (size > 0) {
+                fireIntervalRemoved(this, 0, size - 1);
+            }
         }
         if (freshList != null) {
-            for (NodeMapping nodeMapping : freshList) entries.add(new NodeMappingEntry(this, nodeMapping));
+            for (NodeMapping nodeMapping : freshList) {
+                entries.add(new NodeMappingEntry(this, nodeMapping));
+            }
             sortEntries();
         }
         final int size = getSize();

@@ -31,8 +31,6 @@ import eu.delving.sip.files.HomeDirectory;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
-import org.apache.amber.oauth2.common.exception.OAuthProblemException;
-import org.apache.amber.oauth2.common.exception.OAuthSystemException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -135,27 +133,16 @@ public class NetworkClient {
     }
 
     public void fetchNarthexSipList(final NarthexListListener narthexListListener) {
-        afterLogin(new NarthexListFetcher(narthexListListener), new NarthexLoginFailure() {
-            @Override
-            public void loginFailure(String reason) {
-                narthexListListener.failed(new Exception(reason));
-            }
-        });
+        afterLogin(new NarthexListFetcher(narthexListListener), reason -> narthexListListener.failed(new Exception(reason)));
     }
 
     public void downloadNarthexDataset(String fileName, DataSet dataSet, Swing finished) {
-        afterLogin(new NarthexDatasetDownloader(fileName, dataSet, finished), new NarthexLoginFailure() {
-            @Override
-            public void loginFailure(String reason) {
-            }
+        afterLogin(new NarthexDatasetDownloader(fileName, dataSet, finished), reason -> {
         });
     }
 
     public void uploadNarthex(File sipZipFile, String datasetName, Swing finished) throws StorageException {
-        afterLogin(new NarthexUploader(sipZipFile, datasetName, finished), new NarthexLoginFailure() {
-            @Override
-            public void loginFailure(String reason) {
-            }
+        afterLogin(new NarthexUploader(sipZipFile, datasetName, finished), reason -> {
         });
     }
 
@@ -244,9 +231,6 @@ public class NetworkClient {
                         case OK:
                             SipZips sipZips = (SipZips) XStreamFactory.getStreamFor(SipZips.class).fromXML(entity.getContent());
                             narthexListListener.listReceived(sipZips);
-                            if (Application.version != null && !sipZips.sipAppVersion.equals(Application.version)) {
-                                feedback().alert("You are running version " + Application.version + " but " + sipZips.sipAppVersion + " is available.");
-                            }
                             break;
                         case UNAUTHORIZED:
                             loggedIn = false;
@@ -378,7 +362,7 @@ public class NetworkClient {
             progressListener.setProgressMessage("Downloading from Narthex");
         }
 
-        private HttpGet createSipZipDownloadRequest() throws OAuthSystemException, OAuthProblemException {
+        private HttpGet createSipZipDownloadRequest() {
             String requestUrl = String.format(
                     "%s/sip-app/%s",
                     narthexCredentials.narthexUrl(),
@@ -408,7 +392,6 @@ public class NetworkClient {
                 HttpPost sipZipPost = createSipZipUploadRequest(sipZipFile, progressListener);
                 FileEntity fileEntity = (FileEntity) sipZipPost.getEntity();
                 HttpResponse sipZipResponse = httpClient.execute(sipZipPost);
-                System.out.println(EntityUtils.toString(sipZipResponse.getEntity())); // otherwise consume!
                 Code code = Code.from(sipZipResponse);
                 if (code != Code.OK && !fileEntity.abort) {
                     reportResponse(Code.from(sipZipResponse), sipZipResponse.getStatusLine());

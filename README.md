@@ -1,9 +1,10 @@
 # Delving SIP-Creator
 [![Build Status](https://travis-ci.org/delving/sip-creator.svg)](https://travis-ci.org/delving/sip-creator)
+[![codecov.io](https://codecov.io/github/delving/sip-creator/coverage.svg)](https://codecov.io/github/delving/sip-creator)
 
 The Delving SIP-Creator is a Java application with an elaborate graphical user interface for transforming any given input source of XML records into any of a number of defined output record formats.  It is launched in a browser using the Java Web Start technology, and it is currently bundled with the Delving CultureHub server platform.
 
-SIP stands for "Submission Information Package", a term from OAIS which refers to the packages as they initially arrive online. The SIP-Creator application automatically synchronizes its locally stored data with the online server.
+SIP is short for for "Submission Information Package", a term from [OAIS](https://en.wikipedia.org/wiki/Open_Archival_Information_System) which refers to the packages as they initially arrive online. The SIP-Creator application automatically synchronizes its locally stored data with the online server.
 
 ## Transformation
 
