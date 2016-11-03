@@ -231,9 +231,6 @@ public class NetworkClient {
                         case OK:
                             SipZips sipZips = (SipZips) XStreamFactory.getStreamFor(SipZips.class).fromXML(entity.getContent());
                             narthexListListener.listReceived(sipZips);
-                            if (Application.version != null && !sipZips.sipAppVersion.equals(Application.version)) {
-                                feedback().alert("You are running version " + Application.version + " but " + sipZips.sipAppVersion + " is available.");
-                            }
                             break;
                         case UNAUTHORIZED:
                             loggedIn = false;
@@ -395,7 +392,6 @@ public class NetworkClient {
                 HttpPost sipZipPost = createSipZipUploadRequest(sipZipFile, progressListener);
                 FileEntity fileEntity = (FileEntity) sipZipPost.getEntity();
                 HttpResponse sipZipResponse = httpClient.execute(sipZipPost);
-                System.out.println(EntityUtils.toString(sipZipResponse.getEntity())); // otherwise consume!
                 Code code = Code.from(sipZipResponse);
                 if (code != Code.OK && !fileEntity.abort) {
                     reportResponse(Code.from(sipZipResponse), sipZipResponse.getStatusLine());
