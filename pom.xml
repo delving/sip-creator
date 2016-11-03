@@ -108,7 +108,6 @@
         <module>schema-repo</module>
         <module>sip-core</module>
         <module>sip-app</module>
-        <module>sip-cli</module>
     </modules>
 
     <dependencies>
