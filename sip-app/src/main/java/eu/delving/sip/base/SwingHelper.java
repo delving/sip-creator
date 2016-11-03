@@ -49,12 +49,11 @@ public class SwingHelper {
     public static Color NOT_EDITABLE_BG = new Color(255, 255, 200);
     public static Color DELIMITER_BG = new Color(255, 255, 200);
     public static Color MAPPED_COLOR = new Color(220, 255, 220);
-    public static Color HIGHLIGHTED_COLOR = new Color(255, 205, 205);
     public static Color FACT_COLOR = new Color(212, 195, 255);
     public static Color CONSTANT_COLOR = new Color(186, 245, 255);
+    public static Color HIGHLIGHTED_COLOR = new Color(112, 187, 212);
     public static Color LONG_TERM_JOB_COLOR = new Color(255, 180, 180);
     public static Color NORMAL_JOB_COLOR = new Color(200, 255, 200);
-    public static Color REPORT_OK = new Color(0, 50, 0);
     public static Color REPORT_ERROR = new Color(50, 0, 0);
 
     public static final Icon ICON_VALUE = icon("value");
@@ -65,15 +64,8 @@ public class SwingHelper {
     public static final Icon ICON_PLAY = icon("play");
     public static final Icon ICON_VALIDATE = icon("validate");
     public static final Icon ICON_UNLOCK = icon("unlock");
-    public static final Icon ICON_SELECT_ANOTHER = icon("choose-another");
     public static final Icon ICON_DOWNLOAD = icon("download");
     public static final Icon ICON_UPLOAD = icon("upload");
-    public static final Icon ICON_IMPORT = icon("import");
-    public static final Icon ICON_EMPTY = icon("empty");
-    public static final Icon ICON_OWNED = icon("owned");
-    public static final Icon ICON_UNAVAILABLE = icon("unavailable");
-    public static final Icon ICON_BUSY = icon("busy");
-    public static final Icon ICON_HUH = icon("huh");
     public static final Icon ICON_FETCH_LIST = icon("fetch-list");
     public static final Icon ICON_EDIT = icon("edit");
 
