@@ -313,7 +313,7 @@ public class SourceConverter implements Work.DataSetWork, Work.LongTermWork {
     }
 
     private String getUniqueValue() throws StorageException {
-        String trimmed = unique.trim().replaceAll(":", "-");
+        String trimmed = unique.trim().replaceAll(":", "-").toLowerCase();
         String modified = converterPattern != null ? converterPattern.matcher(trimmed).replaceFirst(converterReplacement) : trimmed;
         if (modified.length() > maxUniqueValueLength) {
             throw new StorageException("Unique value too large: " + unique);
