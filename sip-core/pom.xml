@@ -31,15 +31,7 @@
     <packaging>jar</packaging>
     <name>SIP-Core</name>
     <version>1.0.11-SNAPSHOT</version>
-    <description>
-        A Minimal set of classes shared between client and server, avoiding dependency on core module.
-    </description>
-    <inceptionYear>2010</inceptionYear>
 
-    <organization>
-        <name>Delving B.V.</name>
-        <url>http://www.delving.eu</url>
-    </organization>
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-creator</artifactId>
