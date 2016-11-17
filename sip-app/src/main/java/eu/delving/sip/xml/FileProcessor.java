@@ -72,7 +72,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private final boolean allowInvalid;
     private final Listener listener;
     private ProgressListener progressListener;
-    private TransferQueue<MetadataRecord> recordSource = new LinkedTransferQueue<MetadataRecord>();
+    private TransferQueue<MetadataRecord> recordSource = new LinkedTransferQueue<>();
     private Stats stats;
     private Termination termination = new Termination();
 
