@@ -27,7 +27,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 /**
  * Within a version you have a number of files
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 @XStreamAlias("file")

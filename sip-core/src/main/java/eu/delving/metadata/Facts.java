@@ -29,7 +29,7 @@ import java.util.TreeMap;
  * This is a simple map and how it is stored in a file for reading.  Get returns
  * an empty string if nothing is found.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class Facts {

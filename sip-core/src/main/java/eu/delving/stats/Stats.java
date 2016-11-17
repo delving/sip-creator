@@ -54,7 +54,7 @@ import static eu.delving.XStreamFactory.getStreamFor;
  * Gather all the statistics together, identifying whether they are from imported or source.  Also convert one
  * to the other.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 @XStreamAlias("delving-statistics")

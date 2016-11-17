@@ -50,7 +50,7 @@ import static eu.delving.XStreamFactory.getStreamFor;
  * mappings.  It is used to generate the Groovy builder code based on its hierarchical structure, which
  * is "decorated" with the various NodeMapping instances from this mapping.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 @XStreamAlias("rec-mapping")

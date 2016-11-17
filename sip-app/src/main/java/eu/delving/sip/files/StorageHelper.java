@@ -58,7 +58,7 @@ import static eu.delving.sip.files.Storage.UNIQUE_VALUE_CONVERTER;
  * patterns that the storage system needs, as well as maintaining the previous versions of various
  * types of files.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class StorageHelper {

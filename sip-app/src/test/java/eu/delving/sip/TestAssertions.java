@@ -58,7 +58,7 @@ import java.util.TreeMap;
 /**
  * Try out the assertion mechanism
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 public class TestAssertions {
 

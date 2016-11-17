@@ -5,7 +5,7 @@ import java.util.UUID;
 /**
  * Adopted from FORTH code
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class URIPolicies {

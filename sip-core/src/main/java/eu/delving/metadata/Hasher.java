@@ -40,7 +40,7 @@ import java.util.zip.GZIPInputStream;
  * This class manages all aspects of using an MD5 hash as prefix in the naming of files in the data set,
  * so that files are not uploaded repeatedly.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class Hasher {

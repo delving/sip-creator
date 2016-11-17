@@ -39,7 +39,7 @@ import java.util.Map;
  * For DSL aspects, the MappingCategory is automatically wrapped around the builder code
  * which does the mapping transformation.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class GroovyCodeResource {

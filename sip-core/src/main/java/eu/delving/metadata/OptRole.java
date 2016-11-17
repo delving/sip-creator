@@ -26,7 +26,7 @@ import org.apache.commons.lang.WordUtils;
 /**
  * What roles can an opt play in the tree of RecDefNodes
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public enum OptRole {

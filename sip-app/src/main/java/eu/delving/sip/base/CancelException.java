@@ -24,7 +24,7 @@ package eu.delving.sip.base;
 /**
  * ProgressListener cancellation
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class CancelException extends Exception {

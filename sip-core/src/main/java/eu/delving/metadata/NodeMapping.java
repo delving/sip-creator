@@ -52,7 +52,7 @@ import static eu.delving.metadata.StringUtil.stringToLines;
  * Instances are also stored in a list in the RecMapping, and upon reading a mapping they
  * are distributed into the local prototype instance of the record definition data structure.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 @XStreamAlias("node-mapping")

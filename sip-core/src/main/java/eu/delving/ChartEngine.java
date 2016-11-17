@@ -35,7 +35,7 @@ import java.io.OutputStream;
 /**
  * Make charts in the form of images from Stats, so that these charts can also appear on the server-side.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ *
  */
 
 public class ChartEngine {

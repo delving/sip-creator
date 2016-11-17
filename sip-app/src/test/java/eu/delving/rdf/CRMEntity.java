@@ -3,7 +3,7 @@ package eu.delving.rdf;
 /**
  * An enumeration of all the CRM Entities
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public enum CRMEntity {

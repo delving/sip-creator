@@ -49,7 +49,7 @@ import static eu.delving.sip.base.SwingHelper.scrollVH;
  * menus attached to this frame which can be used to open parts of the record definition (related to opt-lists)
  * which are normally hidden so that something can be mapped there.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class TargetFrame extends FrameBase {

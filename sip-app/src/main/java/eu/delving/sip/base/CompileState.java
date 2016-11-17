@@ -28,7 +28,7 @@ import java.awt.*;
  * The different phases in the live-compiling of code, reflected in the colors of
  * the code editing area.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public enum CompileState {

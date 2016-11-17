@@ -50,7 +50,7 @@ import java.util.TreeSet;
  * Create an output file with our standard record wrapping from a file of otherwise wrapped records, given by
  * the recordRootPath
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class XmlOutput {

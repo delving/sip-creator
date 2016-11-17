@@ -55,7 +55,7 @@ import java.util.regex.Pattern;
  * showing results while the user is adjusting the code of a single snippet, and only
  * gives that part of the record output.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class MappingRunner {

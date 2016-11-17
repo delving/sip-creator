@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * RDF Graph
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class Graph {

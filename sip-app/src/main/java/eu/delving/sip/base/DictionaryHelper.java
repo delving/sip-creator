@@ -37,7 +37,7 @@ import static eu.delving.metadata.NodeMappingChange.DICTIONARY;
 /**
  * Help with handling the dictionary contained in a NodeMapping
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class DictionaryHelper {

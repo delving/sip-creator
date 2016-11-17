@@ -3,7 +3,7 @@ package eu.delving.sip.files;
 /**
  * Replace regex due to unicode problems
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 public class ReportStrings {
     private String[] parts;

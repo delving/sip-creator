@@ -61,7 +61,7 @@ import static eu.delving.sip.model.SourceTreeNode.NodeType.UNIQUE_ELEMENT;
  * A node of the analysis tree, where the statistics are stored, and also the node mappings associated
  * with this source tree node so this info can be shown in the interface.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ *
  */
 
 public class SourceTreeNode extends FilterNode implements Comparable<SourceTreeNode> {

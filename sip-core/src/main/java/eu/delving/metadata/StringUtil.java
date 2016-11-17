@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
  * <p/>
  * Remove the frightening things from tag strings so that they can become proper Groovy variable names.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class StringUtil {

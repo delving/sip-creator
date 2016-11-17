@@ -24,7 +24,7 @@ package eu.delving.groovy;
 /**
  * This exception is thrown when the decision is made to discard a record
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class DiscardRecordException extends RuntimeException {

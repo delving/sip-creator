@@ -10,7 +10,7 @@ import static eu.delving.sip.base.Work.Kind.SILENT;
 /**
  * A runnable that will be executed in the worker thread
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public interface Work extends Runnable {

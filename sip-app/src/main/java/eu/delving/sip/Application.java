@@ -85,7 +85,7 @@ import static eu.delving.sip.model.MappingModel.ChangeListenerAdapter;
  * The main application, based on the SipModel and bringing everything together in a big frame with a central
  * desktop pane, with a side panel and panels along the bottom, as well as menus above.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class Application {

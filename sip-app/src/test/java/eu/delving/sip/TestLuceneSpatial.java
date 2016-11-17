@@ -33,7 +33,7 @@ import java.net.URL;
 import java.util.List;
 
 /**
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class TestLuceneSpatial {

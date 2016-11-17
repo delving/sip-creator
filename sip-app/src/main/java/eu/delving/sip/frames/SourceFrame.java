@@ -65,7 +65,7 @@ import static eu.delving.sip.base.SwingHelper.scrollVH;
  * allows for the initial choices of record root and unique element so that conversion to standard form
  * can be done.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class SourceFrame extends FrameBase {

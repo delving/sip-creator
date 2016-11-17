@@ -55,7 +55,7 @@ import java.util.regex.Pattern;
 /**
  * Manage the compiling and running of functions.  Resembles the MappingCompileModel, with input/code/output/docs.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class FunctionCompileModel {

@@ -44,7 +44,7 @@ import java.util.TreeMap;
 /**
  * Here we handle turning a DOM node into an XML Document
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class XmlSerializer {

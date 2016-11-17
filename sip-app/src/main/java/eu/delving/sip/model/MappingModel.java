@@ -40,7 +40,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * This class makes a RecMapping instance observable, and provides the model for a tree component and a refreshable
  * list of all of the node mappings contained in it.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class MappingModel implements RecDefNodeListener {

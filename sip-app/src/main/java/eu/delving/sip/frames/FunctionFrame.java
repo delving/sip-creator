@@ -54,7 +54,7 @@ import static eu.delving.sip.base.SwingHelper.*;
  * input is turned into output using the function.  A list of library functions is gathered here as well, so that
  * frequently used functions can be copied in and modified.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class FunctionFrame extends FrameBase {

@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
  * This is an extremely frequently used class which holds the prefix and localPart
  * of an XML tag, either for an attribute or an element.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class Tag implements Comparable<Tag>, Serializable {

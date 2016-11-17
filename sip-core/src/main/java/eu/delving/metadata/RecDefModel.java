@@ -29,7 +29,7 @@ import eu.delving.schema.SchemaVersion;
  * the create method is called, since the tree is used as a prototype to put
  * rec mappings into.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public interface RecDefModel {

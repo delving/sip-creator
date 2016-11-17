@@ -39,7 +39,7 @@ import java.util.*;
  * <p/>
  * The MetadataParser produces records containing structures of these nodes.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 @SuppressWarnings("unchecked")

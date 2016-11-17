@@ -69,7 +69,7 @@ import static eu.delving.sip.files.StorageHelper.*;
  * This is an implementation of the Storage interface, with most of the functionality built into the inner class
  * which implements the DataSet interface.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class StorageImpl implements Storage {

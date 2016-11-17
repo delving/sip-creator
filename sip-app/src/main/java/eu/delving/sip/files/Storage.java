@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * This interface describes how files are maintained by the SIP-Creator
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public interface Storage {

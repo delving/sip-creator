@@ -31,7 +31,7 @@ import java.util.zip.ZipInputStream;
 /**
  * Somewhat naively concatenate xml files from a zip file in to one sequence of lines
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class ZipEntryXmlReader {

@@ -35,7 +35,7 @@ import java.util.*;
  * which node mappings may be relevant is based on the source paths, so only node mappings with recognized
  * source paths will appear.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class MappingHintsModel {

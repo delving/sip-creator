@@ -24,7 +24,7 @@ package eu.delving.metadata;
 /**
  * An assertion violated
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class AssertionException extends Exception {

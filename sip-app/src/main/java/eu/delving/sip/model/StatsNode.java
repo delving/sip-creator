@@ -39,7 +39,7 @@ import java.util.*;
  * A node of a stats tree, allowing for selection of a field for viewing its statistics.  Also the associated
  * cell renderer is here.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ *
  */
 
 public class StatsNode implements TreeNode, Comparable<StatsNode> {

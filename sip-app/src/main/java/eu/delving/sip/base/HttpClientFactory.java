@@ -39,7 +39,7 @@ import java.util.List;
 /**
  * Create the HttpClient correctly
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class HttpClientFactory {

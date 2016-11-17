@@ -44,7 +44,7 @@ import static eu.delving.metadata.OptRole.ROOT;
  * all changes propagate out and the user interface code can deal
  * with node references.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class RecDefNode implements Comparable<RecDefNode> {

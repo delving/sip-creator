@@ -40,7 +40,7 @@ import java.util.Map;
  * using the MetadataParser, they can be produced one by one using the metadataRecordFrom method, which
  * first cleverly wraps the record and then parses it.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class MetadataRecordFactory {

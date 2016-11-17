@@ -27,7 +27,7 @@ import static eu.delving.metadata.OptRole.*;
  * This little container holds an Opt value and tells you which role it is playing
  * in the tree of RecDefNodes.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 class OptBox {

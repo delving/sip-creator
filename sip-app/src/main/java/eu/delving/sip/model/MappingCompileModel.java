@@ -71,7 +71,7 @@ import static eu.delving.sip.model.MappingCompileModel.Type.RECORD;
  * entire mapping, or one stripped to show only one NodeMapping at a time.  Compilation is triggered automatically
  * when editing action in the input document stops for a time.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class MappingCompileModel {

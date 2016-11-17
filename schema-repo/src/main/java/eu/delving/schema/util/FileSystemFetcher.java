@@ -33,7 +33,7 @@ import java.io.IOException;
 /**
  * This class plays the role of fetcher and searches locally for the right directory
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 public class FileSystemFetcher implements Fetcher {
     private File schemas;

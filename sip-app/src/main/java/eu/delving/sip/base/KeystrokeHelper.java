@@ -31,7 +31,7 @@ import static javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
 /**
  * Keystroke configurations
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class KeystrokeHelper {

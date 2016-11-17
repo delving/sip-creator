@@ -28,7 +28,7 @@ import java.util.Set;
 
 /**
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class Uniqueness {

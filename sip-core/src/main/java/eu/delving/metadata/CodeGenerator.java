@@ -35,7 +35,7 @@ import static eu.delving.metadata.OptRole.ROOT;
 import static eu.delving.metadata.StringUtil.*;
 
 /**
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class CodeGenerator {

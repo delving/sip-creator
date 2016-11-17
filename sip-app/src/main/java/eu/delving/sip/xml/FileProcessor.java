@@ -60,7 +60,7 @@ import static eu.delving.sip.files.Storage.XSD_VALIDATION;
  * A validation report is produced. Output can be recorded for experts as well.  The processing is paused
  * for user input when invalid records are encountered.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork {

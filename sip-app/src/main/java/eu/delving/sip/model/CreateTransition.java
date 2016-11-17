@@ -24,7 +24,7 @@ package eu.delving.sip.model;
 /**
  * Describe the transitions that can take place in the create model
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public enum CreateTransition {

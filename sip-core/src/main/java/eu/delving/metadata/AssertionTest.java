@@ -36,7 +36,7 @@ import java.util.List;
 /**
  * Test assertions
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class AssertionTest {

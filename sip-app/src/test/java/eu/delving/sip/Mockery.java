@@ -57,7 +57,7 @@ import java.util.TreeMap;
 /**
  * Create a data set for testing
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class Mockery {

@@ -45,7 +45,7 @@ import java.util.List;
 /**
  * The base of all windows within the SIP-Creator.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public abstract class FrameBase extends JInternalFrame {

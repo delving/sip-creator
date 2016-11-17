@@ -26,7 +26,7 @@ import eu.delving.sip.model.Feedback;
 /**
  * Allows for progress reporting from a long term process to the work model
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ *
  */
 
 public interface ProgressListener {

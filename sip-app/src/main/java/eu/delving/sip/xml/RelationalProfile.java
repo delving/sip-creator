@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * This XStream class describes the database and how to dump it.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 @XStreamAlias("delving-rdbms-profile")

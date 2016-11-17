@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
  * There is a static converter class at the bottom so that these things can be
  * used easily in XStream.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 @XStreamAlias("path")

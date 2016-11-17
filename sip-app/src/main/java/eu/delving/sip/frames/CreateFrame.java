@@ -54,7 +54,7 @@ import java.util.SortedSet;
  * so that the user is well-informed about the mapping being made.  Creation of mappings requires a
  * fairly elaborate state machine which is to be found in the CreateModel.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class CreateFrame extends FrameBase {

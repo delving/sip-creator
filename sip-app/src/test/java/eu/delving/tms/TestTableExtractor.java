@@ -13,7 +13,7 @@ import java.sql.SQLException;
  *  - the @Before function for your database of choice (createConnectionPostgres)
  *  - the @Test function of your choice (testDumpPRIMUS)
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class TestTableExtractor {

@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * An assertion about data content
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 @XStreamAlias("assert")

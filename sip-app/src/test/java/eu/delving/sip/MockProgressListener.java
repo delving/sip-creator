@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * Pretend to be a progress listener
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class MockProgressListener implements ProgressListener {

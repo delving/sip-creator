@@ -57,7 +57,7 @@ import java.util.TreeMap;
 /**
  * Make sure the right code is being generated
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 

@@ -59,7 +59,7 @@ import static eu.delving.sip.base.SwingHelper.scrollVH;
  * any node for other purposes.  There are controls to create selection criteria for choosing particular
  * records as the scan proceeds, and buttons for going to the first or the next record.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class InputFrame extends FrameBase {

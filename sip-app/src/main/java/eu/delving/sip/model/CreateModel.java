@@ -53,7 +53,7 @@ import static eu.delving.sip.model.CreateTransition.*;
  * well as a node mapping itself once it has been created.  There is a fairly elaborate state machine here
  * which takes care of all the changes that can be made and all the ways the UI should respond.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class CreateModel {

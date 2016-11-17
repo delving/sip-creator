@@ -24,7 +24,7 @@ package eu.delving.metadata;
 /**
  * What can change within a node mapping
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public enum NodeMappingChange {

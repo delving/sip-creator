@@ -46,7 +46,7 @@ import java.util.TreeMap;
  * path selected, so that the user interface can give people only a tiny
  * part of the whole mapping to deal with at one time.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class RecDefTree implements RecDefNodeListener {

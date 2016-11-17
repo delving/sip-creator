@@ -69,7 +69,7 @@ import static eu.delving.sip.base.SwingHelper.setEditable;
  * a code window or alternatively a dictionary, and choices about which operator to use.  Here you can also
  * revert to the default generated mapping code, and some lists of available functions and variables are provided.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class FieldMappingFrame extends FrameBase {

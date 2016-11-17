@@ -24,7 +24,7 @@ package eu.delving.sip.model;
 /**
  * Describe the create model at any given time.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public enum CreateState {

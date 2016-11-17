@@ -58,7 +58,7 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 /**
  * Connect to the culture hub using HTTP for fetching, uploading, and unlocking datasets.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class NetworkClient {

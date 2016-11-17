@@ -31,7 +31,7 @@ import java.awt.Component;
 /**
  * An entry in the NodeMappingListModel, with its associated cell renderer.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class NodeMappingEntry {

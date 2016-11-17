@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 /**
  * Superclass to handle the filtering of tree nodes, both source and target.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public abstract class FilterNode {

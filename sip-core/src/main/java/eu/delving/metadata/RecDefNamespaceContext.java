@@ -27,7 +27,7 @@ import java.util.*;
 /**
  * Build an XPath namespace context using the namespaces from a recdef
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class RecDefNamespaceContext implements NamespaceContext {

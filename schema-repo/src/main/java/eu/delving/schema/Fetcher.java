@@ -26,7 +26,7 @@ import java.io.IOException;
 /**
  * Defining how the text of the schemas are to be fetched
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public interface Fetcher {
