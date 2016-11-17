@@ -31,12 +31,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Make sure the path is working right
- *
- * @author Gerald de Jong <gerald@delving.eu>
- */
-
 public class TestPath {
 
     @Test

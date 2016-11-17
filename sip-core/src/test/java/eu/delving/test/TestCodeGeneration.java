@@ -42,6 +42,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
 import javax.xml.stream.XMLStreamException;
@@ -71,7 +73,7 @@ public class TestCodeGeneration {
         recDefModel.createRecDefTree(new SchemaVersion("test", "0.0.0"));
         URL mappingResource = getClass().getResource("/codegen/TestCodeGeneration-mapping.xml");
         recMapping = RecMapping.read(new File(mappingResource.getFile()), recDefModel);
-        recMapping.getRecDefTree().setListener(new ChattyListener());
+        recMapping.getRecDefTree().setListener(new LoggingListener());
         URL inputResource = getClass().getResource("/codegen/TestCodeGeneration-input.xml");
         input = FileUtils.readFileToString(new File(inputResource.getFile()));
         URL expectResource = getClass().getResource("/codegen/TestCodeGeneration-expect.xml");
@@ -118,25 +120,27 @@ public class TestCodeGeneration {
         };
     }
 
-    private static class ChattyListener implements RecDefNodeListener {
+    private static class LoggingListener implements RecDefNodeListener {
+
+        private static Logger LOG = LoggerFactory.getLogger(LoggingListener.class);
         @Override
         public void nodeMappingChanged(RecDefNode recDefNode, NodeMapping nodeMapping, NodeMappingChange change) {
-            System.out.println("Mapping changed: " + recDefNode);
+            LOG.info("Mapping changed: " + recDefNode);
         }
 
         @Override
         public void nodeMappingAdded(RecDefNode recDefNode, NodeMapping nodeMapping) {
-            System.out.println("Mapping added: " + recDefNode);
+            LOG.info("Mapping added: " + recDefNode);
         }
 
         @Override
         public void nodeMappingRemoved(RecDefNode recDefNode, NodeMapping nodeMapping) {
-            System.out.println("Mapping removed: " + recDefNode);
+            LOG.info("Mapping removed: " + recDefNode);
         }
 
         @Override
         public void populationChanged(RecDefNode recDefNode) {
-            System.out.println("Population changed: " + recDefNode);
+            LOG.info("Population changed: " + recDefNode);
         }
     }
 }

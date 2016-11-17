@@ -35,7 +35,6 @@ import eu.delving.sip.model.SourceTreeNode;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.MetadataParser;
 import eu.delving.stats.Stats;
-import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -52,16 +51,9 @@ import static eu.delving.sip.files.DataSetState.SOURCED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Make sure the storage is working
- *
- * @author Gerald de Jong <gerald@delving.eu>
- */
-
 @Ignore
 public class TestMappingValidation {
     private static final MockProgressListener PROGRESS_LISTENER = new MockProgressListener();
-    private Logger log = Logger.getLogger(getClass());
     private Mockery mock;
     private SourceTreeNode sourceTree;
 

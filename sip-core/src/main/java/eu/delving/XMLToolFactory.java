@@ -18,10 +18,6 @@ import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 
-/**
- * @author Gerald de Jong <gerald@delving.eu>
- */
-
 public class XMLToolFactory {
 
     private static XPathFactory XPATH_FACTORY;
