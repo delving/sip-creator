@@ -53,10 +53,7 @@ import static eu.delving.XStreamFactory.getStreamFor;
 /**
  * Gather all the statistics together, identifying whether they are from imported or source.  Also convert one
  * to the other.
- *
- *
  */
-
 @XStreamAlias("delving-statistics")
 public class Stats {
     public static final int DEFAULT_MAX_UNIQUE_VALUE_LENGTH = 40;
@@ -64,7 +61,6 @@ public class Stats {
     private static final int SMALL_SIZE = 100;
     private static final int SAMPLE_SIZE = 300;
     private static final int SAMPLE_MAX_VALUE_LENGTH = 100;
-    private static final int HISTOGRAM_MAX_STORAGE = 1024 * 512;
     private static final int HISTOGRAM_MAX_SIZE = 1000;
     private static final DecimalFormat PERCENT = new DecimalFormat("#0.00%");
     private static final double HISTOGRAM_OVERSAMPLING = 1.3;
@@ -218,10 +214,6 @@ public class Stats {
                 unique = uniqueness.isStillUnique(value);
                 if (!unique) uniqueness = null;
             }
-        }
-
-        public boolean hasValues() {
-            return sample != null;
         }
 
         public String getSummary() {

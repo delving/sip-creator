@@ -31,10 +31,7 @@ import java.net.URL;
 /**
  * Fetch XML resources using HTTP and cache them locally in a subdirectory beside all of the directories for
  * the datasets.  With the resources fetched, it becomes possible to work off-line.
- *
- *
  */
-
 public class CachedResourceResolver implements LSResourceResolver {
     private Context context;
 

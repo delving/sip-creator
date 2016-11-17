@@ -32,9 +32,7 @@ import java.util.regex.Pattern;
  * This is an extremely frequently used class which holds the prefix and localPart
  * of an XML tag, either for an attribute or an element.
  *
- *
  */
-
 public class Tag implements Comparable<Tag>, Serializable {
     private static final Pattern PAT = Pattern.compile("(([^:]*):)?([^\\[/]*)(\\[([^\\]]*)\\])?");
     private boolean attribute;

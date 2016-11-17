@@ -23,10 +23,7 @@ package eu.delving.metadata;
 
 /**
  * An assertion violated
- *
- *
  */
-
 public class AssertionException extends Exception {
     public AssertionException(String message) {
         super(message);

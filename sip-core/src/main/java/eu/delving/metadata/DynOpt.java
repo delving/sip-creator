@@ -26,10 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
  * A dynamic opt, with similar function to the opts in the record definition
- *
- *
  */
-
 @XStreamAlias("dyn-opt")
 public class DynOpt {
 

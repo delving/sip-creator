@@ -26,14 +26,9 @@ import org.mapdb.DBMaker;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- *
- *
- */
-
 public class Uniqueness {
     private static final int HOLD_THRESHOLD = 5000;
-    private Set<String> all = new HashSet<String>(HOLD_THRESHOLD * 3 / 2);
+    private Set<String> all = new HashSet<>(HOLD_THRESHOLD * 3 / 2);
     private boolean exceedsThreshold;
     private int maxValueSize;
 

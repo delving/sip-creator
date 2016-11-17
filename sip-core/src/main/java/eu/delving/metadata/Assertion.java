@@ -29,10 +29,7 @@ import java.util.List;
 
 /**
  * An assertion about data content
- *
- *
  */
-
 @XStreamAlias("assert")
 public class Assertion {
     @XStreamAsAttribute

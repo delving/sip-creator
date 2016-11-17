@@ -24,11 +24,9 @@ package eu.delving.metadata;
 /**
  * Covers exceptions that happen in this package
  *
- *
  */
-
 public class MetadataException extends Exception {
-    
+
     public MetadataException(String s) {
         super(s);
     }

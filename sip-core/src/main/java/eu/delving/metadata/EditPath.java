@@ -25,9 +25,7 @@ package eu.delving.metadata;
  * Combines a path in the RecDefTree with the edited code for that path so
  * that editing of code can be done for only one part of the tree at a time.
  *
- *
  */
-
 public class EditPath {
     private NodeMapping nodeMapping;
     private String editedCode;

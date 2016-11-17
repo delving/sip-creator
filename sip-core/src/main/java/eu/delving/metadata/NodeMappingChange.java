@@ -24,9 +24,7 @@ package eu.delving.metadata;
 /**
  * What can change within a node mapping
  *
- *
  */
-
 public enum NodeMappingChange {
     CODE,
     DOCUMENTATION,
