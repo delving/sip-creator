@@ -21,10 +21,8 @@
 
 package eu.delving.groovy;
 
-import eu.delving.metadata.CodeGenerator;
-import eu.delving.metadata.EditPath;
-import eu.delving.metadata.RecDefTree;
-import eu.delving.metadata.RecMapping;
+import eu.delving.metadata.OptList;
+import eu.delving.metadata.RecDef;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
@@ -61,37 +59,44 @@ import java.util.regex.Pattern;
 
 public class MappingRunner {
 
-    private final ScriptBinding binding = new ScriptBinding();
-    private Script script;
-    private RecMapping recMapping;
-    private String code;
+    private final ScriptBinding binding;
+    private final Script script;
+    private final String code;
 
     /**
      *
      * @param groovyCodeResource A factory for Groovy-scripts
-     * @param recMapping represents to mapping to be applied
-     * @param editPath represents an (optional) addendum to the recMapping
-     * @param trace if true, inserts a stacktrace-comment into the generated code
+     * @param code the Groovy code to be run
+     * @param facts the Mapping facts to be bound to the script that will be executed
+     * @param valueOptLookup ??
+     *
      */
     public MappingRunner(
         final GroovyCodeResource groovyCodeResource,
-        final RecMapping recMapping,
-        final EditPath editPath, final boolean trace) {
+        final String code,
+        final Map<String, String> facts,
+        final Map<String, Map<String, OptList.Opt>> valueOptLookup,
+        final RecDef recDef) {
 
-        this.recMapping = recMapping;
-        this.code = new CodeGenerator(recMapping).withEditPath(editPath).withTrace(trace).toRecordMappingCode();
+        this.code = code;
         this.script = groovyCodeResource.createMappingScript(code);
+        this.binding = new ScriptBinding();
+
         this.script.getBinding().setVariable("WORLD", binding);
-        GroovyNode factsNode = new GroovyNode(null, "facts");
-        for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
-            new GroovyNode(factsNode, entry.getKey(), entry.getValue());
-        }
+
+        GroovyNode factsNode = factsNodes(facts);
         this.binding._facts = Collections.singletonList(factsNode);
-        this.binding._optLookup = recMapping.getRecDefTree().getRecDef().valueOptLookup;
+
+        this.binding._optLookup = valueOptLookup;
+        this.binding.output = DOMBuilder.createFor(recDef);
     }
 
-    public RecDefTree getRecDefTree() {
-        return recMapping.getRecDefTree();
+    private GroovyNode factsNodes(Map<String, String> facts){
+        GroovyNode factsNode = new GroovyNode(null, "facts");
+        for (Map.Entry<String, String> entry : facts.entrySet()) {
+            new GroovyNode(factsNode, entry.getKey(), entry.getValue());
+        }
+        return factsNode;
     }
 
     public String getCode() {
@@ -101,7 +106,6 @@ public class MappingRunner {
     public Node runMapping(MetadataRecord metadataRecord) throws MappingException  {
         if (metadataRecord == null) throw new RuntimeException("Null input metadata record");
         try {
-            binding.output = DOMBuilder.createFor(recMapping.getRecDefTree().getRecDef());
             binding.input = Collections.singletonList(metadataRecord.getRootNode());
             return stripEmptyElements(script.run());
         }
@@ -117,7 +121,7 @@ public class MappingRunner {
                 SyntaxErrorMessage message = (SyntaxErrorMessage) o;
                 @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"}) SyntaxException se = message.getCause();
                 // line numbers will not match
-                out.append(String.format("Problem: %s%n", se.getOriginalMessage()));
+                out.append(String.format("Problem: %s\n", se.getOriginalMessage()));
             }
             throw new MappingException(out.toString(), e);
         }
@@ -127,7 +131,7 @@ public class MappingRunner {
         catch (Exception e) {
             String codeLines = fetchCodeLines(e);
             if (codeLines != null) {
-                throw new MappingException("Script Exception:%n" + codeLines, e);
+                throw new MappingException("Script Exception:\n" + codeLines, e);
             }
             else {
                 throw new MappingException("Unexpected: " + e.toString(), e);
@@ -143,7 +147,7 @@ public class MappingRunner {
 
     private void stripEmpty(Node node) {
         NodeList kids = node.getChildNodes();
-        List<Node> dead = new ArrayList<>();
+        List<Node> dead = new ArrayList<Node>();
         for (int walk = 0; walk < kids.getLength(); walk++) {
             Node kid = kids.item(walk);
             switch (kid.getNodeType()) {
@@ -189,7 +193,7 @@ public class MappingRunner {
         return null;
     }
 
-    public class ScriptBinding {
+    private class ScriptBinding {
         public Object _optLookup;
         public Object output;
         public Object input;

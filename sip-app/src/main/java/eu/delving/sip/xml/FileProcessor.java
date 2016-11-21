@@ -29,6 +29,7 @@ import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.AssertionException;
 import eu.delving.metadata.AssertionTest;
+import eu.delving.metadata.CodeGenerator;
 import eu.delving.metadata.MappingResult;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefTree;
@@ -171,7 +172,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     validator = dataSet.newValidator();
                     validator.setErrorHandler(null);
                 }
-                MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null, false);
+                final String code = new CodeGenerator(recMapping).withTrace(false).toRecordMappingCode();
+                MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, code,
+                    recMapping.getFacts(), recMapping.getRecDefTree().getRecDef().valueOptLookup,
+                    recMapping.getRecDefTree().getRecDef());
+
                 List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
                 MappingEngine engine = new MappingEngine(
                         walk, recordSource, mappingRunner, validator, assertionTests, consumer, allowInvalid, termination
