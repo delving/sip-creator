@@ -56,6 +56,17 @@ import static eu.delving.XStreamFactory.getStreamFor;
 @XStreamAlias("rec-mapping")
 public class RecMapping {
 
+    private static final String[][] HACK_VERSION_HINTS = {
+        {"icn", "1.0.0"},
+        {"abm", "1.0.0"},
+        {"tib", "1.0.1"},
+        {"ese", "3.4.0"},
+        {"aff", "0.1.0"},
+        {"itin", "1.0.0"},
+        {"lido", "1.0.0"},
+        {"ead", "1.2.3"},
+    };
+
     @XStreamAsAttribute
     String prefix;
 
@@ -274,17 +285,5 @@ public class RecMapping {
             throw new RuntimeException(e);
         }
     }
-
-    public static final String[][] HACK_VERSION_HINTS = {
-            {"icn", "1.0.0"},
-            {"abm", "1.0.0"},
-            {"tib", "1.0.1"},
-            {"ese", "3.4.0"},
-            {"aff", "0.1.0"},
-            {"itin", "1.0.0"},
-            {"lido", "1.0.0"},
-            {"ead", "1.2.3"},
-    };
-
 
 }
