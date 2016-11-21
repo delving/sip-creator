@@ -32,7 +32,6 @@ import java.io.IOException;
 public interface Fetcher {
 
     String SCHEMA_DIRECTORY = "/schema-repository.xml";
-    String FACT_DEFINITIONS = "/fact-definition-list_1.0.0.xml";
 
     String fetchList() throws IOException;
 
