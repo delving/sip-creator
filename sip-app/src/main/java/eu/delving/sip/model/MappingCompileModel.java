@@ -602,7 +602,9 @@ public class MappingCompileModel {
     }
 
     private void notifyCodeCompiled(String code) {
-        for (Listener listener : listeners) listener.codeCompiled(type, code);
+        for (Listener listener : listeners) {
+            listener.codeCompiled(type, code);
+        }
     }
 
     private void notifyMappingComplete(MappingResult mappingResult) {
