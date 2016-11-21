@@ -371,8 +371,8 @@ public class StorageImpl implements Storage {
             delete(here);
             here.mkdir();
             long streamLength = sipZipFile.length();
-            try {
-                InputStream inputStream = new FileInputStream(sipZipFile);
+
+            try (InputStream inputStream = new FileInputStream(sipZipFile) ){
                 ZipEntry zipEntry;
                 byte[] buffer = new byte[BLOCK_SIZE];
                 int bytesRead;
