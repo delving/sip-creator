@@ -59,12 +59,24 @@ import java.util.regex.Pattern;
  */
 
 public class MappingRunner {
+
     private final ScriptBinding binding = new ScriptBinding();
     private Script script;
     private RecMapping recMapping;
     private String code;
 
-    public MappingRunner(GroovyCodeResource groovyCodeResource, RecMapping recMapping, EditPath editPath, boolean trace) {
+    /**
+     *
+     * @param groovyCodeResource A factory for Groovy-scripts
+     * @param recMapping represents to mapping to be applied
+     * @param editPath represents an (optional) addendum to the recMapping
+     * @param trace if true, inserts a stacktrace-comment into the generated code
+     */
+    public MappingRunner(
+        final GroovyCodeResource groovyCodeResource,
+        final RecMapping recMapping,
+        final EditPath editPath, final boolean trace) {
+
         this.recMapping = recMapping;
         this.code = new CodeGenerator(recMapping).withEditPath(editPath).withTrace(trace).toRecordMappingCode();
         this.script = groovyCodeResource.createMappingScript(code);
