@@ -39,9 +39,7 @@ import java.util.Map;
  * For DSL aspects, the MappingCategory is automatically wrapped around the builder code
  * which does the mapping transformation.
  *
- *
  */
-
 public class GroovyCodeResource {
     private static final URL MAPPING_CATEGORY = GroovyCodeResource.class.getResource("/MappingCategory.groovy");
     private final ClassLoader classLoader;
@@ -55,15 +53,15 @@ public class GroovyCodeResource {
         String script = assertion.getScript();
         return new GroovyShell(getGroovyClassLoader()).parse(script);
     }
-    
+
     public Script createFunctionScript(MappingFunction function, Map<String,String> facts, String editedCode) {
         StringBuilder scriptCode = new StringBuilder();
         for (Map.Entry<String,String> entry : facts.entrySet()) {
-            scriptCode.append(String.format("String %s = '''%s'''\n", entry.getKey(), entry.getValue()));
+            scriptCode.append(String.format("String %s = '''%s'''%n", entry.getKey(), entry.getValue()));
         }
-        scriptCode.append("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'\n");
+        scriptCode.append(String.format("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'%n"));
         scriptCode.append(function.toCode(editedCode));
-        scriptCode.append(String.format("%s(param)\n", function.name));
+        scriptCode.append(String.format("%s(param)%n", function.name));
         return new GroovyShell(getGroovyClassLoader()).parse(scriptCode.toString());
     }
 

@@ -36,6 +36,7 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -85,7 +86,7 @@ public class MappingRunner {
         for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
             new GroovyNode(factsNode, entry.getKey(), entry.getValue());
         }
-        this.binding._facts = wrap(factsNode);
+        this.binding._facts = Collections.singletonList(factsNode);
         this.binding._optLookup = recMapping.getRecDefTree().getRecDef().valueOptLookup;
     }
 
@@ -101,14 +102,14 @@ public class MappingRunner {
         if (metadataRecord == null) throw new RuntimeException("Null input metadata record");
         try {
             binding.output = DOMBuilder.createFor(recMapping.getRecDefTree().getRecDef());
-            binding.input = wrap(metadataRecord.getRootNode());
+            binding.input = Collections.singletonList(metadataRecord.getRootNode());
             return stripEmptyElements(script.run());
         }
         catch (DiscardRecordException e) {
             throw e;
         }
         catch (MissingPropertyException e) {
-            throw new MappingException(metadataRecord, "Missing Property " + e.getProperty(), e);
+            throw new MappingException("Missing Property " + e.getProperty(), e);
         }
         catch (MultipleCompilationErrorsException e) {
             StringBuilder out = new StringBuilder();
@@ -116,20 +117,20 @@ public class MappingRunner {
                 SyntaxErrorMessage message = (SyntaxErrorMessage) o;
                 @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"}) SyntaxException se = message.getCause();
                 // line numbers will not match
-                out.append(String.format("Problem: %s\n", se.getOriginalMessage()));
+                out.append(String.format("Problem: %s%n", se.getOriginalMessage()));
             }
-            throw new MappingException(metadataRecord, out.toString(), e);
+            throw new MappingException(out.toString(), e);
         }
         catch (AssertionError e) {
-            throw new MappingException(metadataRecord, "The keyword 'assert' should not be used", e);
+            throw new MappingException("The keyword 'assert' should not be used", e);
         }
         catch (Exception e) {
             String codeLines = fetchCodeLines(e);
             if (codeLines != null) {
-                throw new MappingException(metadataRecord, "Script Exception:\n" + codeLines, e);
+                throw new MappingException("Script Exception:%n" + codeLines, e);
             }
             else {
-                throw new MappingException(metadataRecord, "Unexpected: " + e.toString(), e);
+                throw new MappingException("Unexpected: " + e.toString(), e);
             }
         }
     }
@@ -142,7 +143,7 @@ public class MappingRunner {
 
     private void stripEmpty(Node node) {
         NodeList kids = node.getChildNodes();
-        List<Node> dead = new ArrayList<Node>();
+        List<Node> dead = new ArrayList<>();
         for (int walk = 0; walk < kids.getLength(); walk++) {
             Node kid = kids.item(walk);
             switch (kid.getNodeType()) {
@@ -161,12 +162,6 @@ public class MappingRunner {
             }
         }
         for (Node kill : dead) node.removeChild(kill);
-    }
-
-    private List<GroovyNode> wrap(GroovyNode node) {
-        List<GroovyNode> array = new ArrayList<GroovyNode>(1);
-        array.add(node);
-        return array;
     }
 
     // a dirty hack which parses the exception's stack trace.  any better strategy welcome, but it works.
