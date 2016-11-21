@@ -41,7 +41,6 @@ import java.util.*;
  *
  *
  */
-
 @SuppressWarnings("unchecked")
 public class GroovyNode {
 
@@ -68,11 +67,11 @@ public class GroovyNode {
     }
 
     public GroovyNode(GroovyNode parent, String name, String nodeValue) {
-        this(parent, new QName(name), new TreeMap<String, String>(), nodeValue);
+        this(parent, new QName(name), new TreeMap<>(), nodeValue);
     }
 
     public GroovyNode(GroovyNode parent, QName qName, Object nodeValue) {
-        this(parent, qName, new TreeMap<String, String>(), nodeValue);
+        this(parent, qName, new TreeMap<>(), nodeValue);
     }
 
     public GroovyNode(GroovyNode parent, QName qName, Map<String, String> attributes, Object nodeValue) {
@@ -193,8 +192,14 @@ public class GroovyNode {
         return getByName(key);
     }
 
+    @Override
     public boolean equals(Object other) {
         return other != null && toString().equals(other.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return text().hashCode();
     }
 
     public String toString() {
