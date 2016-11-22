@@ -1,16 +1,14 @@
 package eu.delving.groovy;
 
-import eu.delving.metadata.CodeGenerator;
+import com.google.common.collect.ImmutableMap;
+import eu.delving.groovy.MappingRunner.MappingRun;
 import eu.delving.metadata.EditPath;
-import eu.delving.metadata.OptList;
 import eu.delving.metadata.RecDef;
-import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecDefTree;
 import eu.delving.metadata.RecMapping;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.w3c.dom.Node;
 
@@ -28,9 +26,6 @@ import static org.mockito.Mockito.when;
 public class MappingRunnerTest {
 
     @Mock
-    private GroovyCodeResource groovyCodeResource;
-
-    @Mock
     private RecMapping recMapping;
 
     @Mock
@@ -45,18 +40,28 @@ public class MappingRunnerTest {
     @Test
     public void runMapping() throws Exception {
 
-        RecDefNode rootNode = mock(RecDefNode.class);
         when(recMapping.getRecDefTree()).thenReturn(recDefTree);
         when(recDefTree.getRecDef()).thenReturn(recDef);
-        when(recDefTree.getRoot()).thenReturn(rootNode);
 
-        String code = new CodeGenerator(recMapping).withEditPath(editPath).withTrace(false).toRecordMappingCode();
+        final Map<String, String> facts = ImmutableMap.of("foo", "bar");
 
-        MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, code, recMapping.getFacts(),
-            recMapping.getRecDefTree().getRecDef().valueOptLookup, recDef);
+        String code = "groovy.xml.DOMBuilder.newInstance().parseText('<foo></foo>')";
+        GroovyCodeResource groovyCodeResource = new GroovyCodeResource(this.getClass().getClassLoader());
 
         MetadataRecord metadataRecord = mock(MetadataRecord.class);
-        Node node = mappingRunner.runMapping(metadataRecord);
+        GroovyNode rootGroovyNode = mock(GroovyNode.class);
+        when(metadataRecord.getRootNode()).thenReturn(rootGroovyNode);
+
+        final MappingRun mappingRun = MappingRun.MappingRunBuilder.aMappingRun()
+            .withCode(code)
+            .withFacts(facts)
+            .withGroovyCodeResource(groovyCodeResource)
+            .withMetadataRecord(metadataRecord)
+            .withRecDef(recDef)
+            .withValueOptLookup(recMapping.getRecDefTree().getRecDef().valueOptLookup)
+            .build();
+
+        Node node = MappingRunner.runMapping(mappingRun);
         assertNotNull(node);
 
     }

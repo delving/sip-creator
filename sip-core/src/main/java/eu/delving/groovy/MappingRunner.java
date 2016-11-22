@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,44 +55,24 @@ import java.util.regex.Pattern;
  * showing results while the user is adjusting the code of a single snippet, and only
  * gives that part of the record output.
  *
- *
  */
-
 public class MappingRunner {
 
-    private final ScriptBinding binding;
-    private final Script script;
-    private final String code;
-
-    /**
-     *
-     * @param groovyCodeResource A factory for Groovy-scripts
-     * @param code the Groovy code to be run
-     * @param facts the Mapping facts to be bound to the script that will be executed
-     * @param valueOptLookup ??
-     *
-     */
-    public MappingRunner(
-        final GroovyCodeResource groovyCodeResource,
-        final String code,
-        final Map<String, String> facts,
-        final Map<String, Map<String, OptList.Opt>> valueOptLookup,
-        final RecDef recDef) {
-
-        this.code = code;
-        this.script = groovyCodeResource.createMappingScript(code);
-        this.binding = new ScriptBinding();
-
-        this.script.getBinding().setVariable("WORLD", binding);
-
-        GroovyNode factsNode = factsNodes(facts);
-        this.binding._facts = Collections.singletonList(factsNode);
-
-        this.binding._optLookup = valueOptLookup;
-        this.binding.output = DOMBuilder.createFor(recDef);
+    private MappingRunner() {
     }
 
-    private GroovyNode factsNodes(Map<String, String> facts){
+    private static ScriptIO initScriptIO( final Map<String, String> facts,
+                                          final Map<String, Map<String, OptList.Opt>> valueOptLookup,
+                                          final RecDef recDef){
+        final ScriptIO scriptIO = new ScriptIO();
+        GroovyNode factsNode = factsNodes(facts);
+        scriptIO._facts = Collections.singletonList(factsNode);
+
+        scriptIO._optLookup = valueOptLookup;
+        scriptIO.output = DOMBuilder.createFor(recDef);
+        return scriptIO;
+    }
+    private static GroovyNode factsNodes(Map<String, String> facts){
         GroovyNode factsNode = new GroovyNode(null, "facts");
         for (Map.Entry<String, String> entry : facts.entrySet()) {
             new GroovyNode(factsNode, entry.getKey(), entry.getValue());
@@ -99,15 +80,19 @@ public class MappingRunner {
         return factsNode;
     }
 
-    public String getCode() {
-        return code;
-    }
+    public static Node runMapping(final MappingRun arguments) throws MappingException  {
 
-    public Node runMapping(MetadataRecord metadataRecord) throws MappingException  {
-        if (metadataRecord == null) throw new RuntimeException("Null input metadata record");
+        Objects.requireNonNull(arguments);
+        Objects.requireNonNull(arguments.metadataRecord);
+
+        final ScriptIO scriptIO = initScriptIO(arguments.facts, arguments.valueOptLookup, arguments.recDef);
+        scriptIO.input = Collections.singletonList(arguments.metadataRecord.getRootNode());
+
+        final Script script = arguments.groovyCodeResource.createMappingScript(arguments.code);
+
         try {
-            binding.input = Collections.singletonList(metadataRecord.getRootNode());
-            return stripEmptyElements(script.run());
+            Object result = script.run();
+            return stripEmptyElements(result);
         }
         catch (DiscardRecordException e) {
             throw e;
@@ -129,7 +114,7 @@ public class MappingRunner {
             throw new MappingException("The keyword 'assert' should not be used", e);
         }
         catch (Exception e) {
-            String codeLines = fetchCodeLines(e);
+            String codeLines = fetchCodeLines(arguments.code, e);
             if (codeLines != null) {
                 throw new MappingException("Script Exception:\n" + codeLines, e);
             }
@@ -139,15 +124,15 @@ public class MappingRunner {
         }
     }
 
-    private Node stripEmptyElements(Object nodeObject) {
+    private static Node stripEmptyElements(Object nodeObject) {
         Node node = (Node) nodeObject;
         stripEmpty(node);
         return node;
     }
 
-    private void stripEmpty(Node node) {
+    private static void stripEmpty(Node node) {
         NodeList kids = node.getChildNodes();
-        List<Node> dead = new ArrayList<Node>();
+        List<Node> dead = new ArrayList<>();
         for (int walk = 0; walk < kids.getLength(); walk++) {
             Node kid = kids.item(walk);
             switch (kid.getNodeType()) {
@@ -155,21 +140,27 @@ public class MappingRunner {
                     break;
                 case Node.TEXT_NODE:
                 case Node.CDATA_SECTION_NODE:
-                    if (kid.getTextContent().trim().isEmpty()) dead.add(kid);
+                    if (kid.getTextContent().trim().isEmpty()) {
+                        dead.add(kid);
+                    }
                     break;
                 case Node.ELEMENT_NODE:
                     stripEmpty(kid);
-                    if (!(kid.hasChildNodes() || kid.hasAttributes())) dead.add(kid);
+                    if (!(kid.hasChildNodes() || kid.hasAttributes())) {
+                        dead.add(kid);
+                    }
                     break;
                 default:
                     throw new RuntimeException("Node type not implemented: " + kid.getNodeType());
             }
         }
-        for (Node kill : dead) node.removeChild(kill);
+        for (Node kill : dead) {
+            node.removeChild(kill);
+        }
     }
 
     // a dirty hack which parses the exception's stack trace.  any better strategy welcome, but it works.
-    private String fetchCodeLines(Exception e) {
+    private static String fetchCodeLines(String code, Exception e) {
         StringWriter sw = new StringWriter();
         PrintWriter out = new PrintWriter(sw);
         e.printStackTrace(out);
@@ -193,10 +184,84 @@ public class MappingRunner {
         return null;
     }
 
-    private class ScriptBinding {
-        public Object _optLookup;
-        public Object output;
-        public Object input;
-        public Object _facts;
+    private static class ScriptIO {
+        Object _optLookup;
+        Object output;
+        Object input;
+        Object _facts;
+    }
+
+    public static class MappingRun {
+
+        public MappingRun(MetadataRecord metadataRecord, GroovyCodeResource groovyCodeResource,
+                          String code, Map<String, String> facts,
+                          Map<String, Map<String, OptList.Opt>> valueOptLookup, RecDef recDef) {
+            this.metadataRecord = metadataRecord;
+            this.groovyCodeResource = groovyCodeResource;
+            this.code = code;
+            this.facts = facts;
+            this.valueOptLookup = valueOptLookup;
+            this.recDef = recDef;
+        }
+
+        public final MetadataRecord metadataRecord;
+        public final GroovyCodeResource groovyCodeResource;
+        public final String code;
+        public final Map<String, String> facts;
+        public final Map<String, Map<String, OptList.Opt>> valueOptLookup;
+        public final RecDef recDef;
+
+
+        public static final class MappingRunBuilder {
+            public MetadataRecord metadataRecord;
+            public GroovyCodeResource groovyCodeResource;
+            public String code;
+            public Map<String, String> facts;
+            public Map<String, Map<String, OptList.Opt>> valueOptLookup;
+            public RecDef recDef;
+
+            private MappingRunBuilder() {
+            }
+
+            public static MappingRunBuilder aMappingRun() {
+                return new MappingRunBuilder();
+            }
+
+            public MappingRunBuilder withMetadataRecord(MetadataRecord metadataRecord) {
+                this.metadataRecord = metadataRecord;
+                return this;
+            }
+
+            public MappingRunBuilder withGroovyCodeResource(GroovyCodeResource groovyCodeResource) {
+                this.groovyCodeResource = groovyCodeResource;
+                return this;
+            }
+
+            public MappingRunBuilder withCode(String code) {
+                this.code = code;
+                return this;
+            }
+
+            public MappingRunBuilder withFacts(Map<String, String> facts) {
+                this.facts = facts;
+                return this;
+            }
+
+            public MappingRunBuilder withValueOptLookup(Map<String, Map<String, OptList.Opt>> valueOptLookup) {
+                this.valueOptLookup = valueOptLookup;
+                return this;
+            }
+
+            public MappingRunBuilder withRecDef(RecDef recDef) {
+                this.recDef = recDef;
+                return this;
+            }
+
+            public MappingRun build() {
+                MappingRun mappingRun = new MappingRun(metadataRecord, groovyCodeResource,
+                    code, facts, valueOptLookup, recDef);
+                return mappingRun;
+            }
+        }
     }
 }
