@@ -19,7 +19,7 @@ import java.net.URL;
 import java.util.Collections;
 
 /**
- * Designed not for user-feedback but for re-executing many Scripts, very often
+ * Designed not for user-feedback but for re-executing many scripts, very often.
  */
 public class BulkMappingRunner extends AbstractMappingRunner {
 
@@ -39,7 +39,6 @@ public class BulkMappingRunner extends AbstractMappingRunner {
         ENGINE = new GroovyScriptEngineImpl(CATEGORY_CLASSLOADER);
     }
 
-
     /**
      * @param recMapping represents to mapping to be applied
      * @param generatedCode the code to be executed against each record
@@ -56,7 +55,6 @@ public class BulkMappingRunner extends AbstractMappingRunner {
         }
 
     }
-
 
     @Override
     public Node runMapping(MetadataRecord metadataRecord) throws MappingException {

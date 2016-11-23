@@ -69,9 +69,6 @@ public abstract class AbstractMappingRunner implements MappingRunner{
         for (Node kill : dead) node.removeChild(kill);
     }
 
-
-
-
     protected class ScriptBinding {
         public Object _optLookup;
         public Object output;
