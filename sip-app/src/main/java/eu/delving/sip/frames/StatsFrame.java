@@ -52,7 +52,7 @@ import static eu.delving.sip.base.SwingHelper.scrollV;
 /**
  * Show the statistics bar charts and histograms for input, source, and output in various tabs.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class StatsFrame extends FrameBase {

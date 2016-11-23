@@ -29,7 +29,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * An observable map of facts, used in various places.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class FactModel {

@@ -24,11 +24,9 @@ package eu.delving.metadata;
 /**
  * Covers exceptions that happen in this package
  *
- * @author Gerald de Jong <gerald@delving.eu>
  */
-
 public class MetadataException extends Exception {
-    
+
     public MetadataException(String s) {
         super(s);
     }

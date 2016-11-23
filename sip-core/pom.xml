@@ -30,52 +30,19 @@
     <artifactId>sip-core</artifactId>
     <packaging>jar</packaging>
     <name>SIP-Core</name>
-    <version>1.0.10.1</version>
-    <description>
-        A Minimal set of classes shared between client and server, avoiding dependency on core module.
-    </description>
-    <inceptionYear>2010</inceptionYear>
-
-    <organization>
-        <name>Delving B.V.</name>
-        <url>http://www.delving.eu</url>
-    </organization>
-
-    <developers>
-        <developer>
-            <name>Sjoerd Siebinga</name>
-            <email>sjoerd@delving.eu</email>
-            <roles>
-                <role>developer</role>
-            </roles>
-        </developer>
-        <developer>
-            <name>Gerald de Jong</name>
-            <email>gerald@delving.eu</email>
-            <roles>
-                <role>developer</role>
-            </roles>
-        </developer>
-        <developer>
-            <name>Eric van der Meulen</name>
-            <email>eric@delving.eu</email>
-            <roles>
-                <role>developer</role>
-            </roles>
-        </developer>
-    </developers>
+    <version>1.0.11</version>
 
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-creator</artifactId>
-        <version>1.0.10.1</version>
+        <version>1.0.11</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>eu.delving</groupId>
             <artifactId>schema-repo</artifactId>
-            <version>1.0.10.1</version>
+            <version>1.0.11</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
@@ -139,6 +106,29 @@
         <dependency>
             <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

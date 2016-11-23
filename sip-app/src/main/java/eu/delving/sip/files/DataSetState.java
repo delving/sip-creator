@@ -24,7 +24,7 @@ package eu.delving.sip.files;
 /**
  * The different states that a data set can be in.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public enum DataSetState {

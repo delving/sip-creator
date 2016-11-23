@@ -36,7 +36,7 @@ import java.util.List;
 /**
  * A list of node mapping entries set up to change when the mapping changes, ready for placement in a JList.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class NodeMappingListModel extends AbstractListModel<NodeMappingEntry> {

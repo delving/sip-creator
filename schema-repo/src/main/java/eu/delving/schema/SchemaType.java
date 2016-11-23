@@ -24,7 +24,7 @@ package eu.delving.schema;
 /**
  * The different kinds of schemas that you can find in the repository
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public enum SchemaType {

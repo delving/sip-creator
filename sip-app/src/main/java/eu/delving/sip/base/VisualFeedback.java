@@ -52,7 +52,7 @@ import static org.apache.commons.lang.StringUtils.isWhitespace;
 /**
  * Give the user feedback in different ways, with pop-up alerts and various kinds of question dialogs.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class VisualFeedback implements Feedback {

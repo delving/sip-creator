@@ -44,7 +44,7 @@ import static eu.delving.sip.base.SwingHelper.setError;
  * input tree and the output XML.  This frame also shows the errors as reported by the compile/validate
  * system.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class OutputFrame extends FrameBase {

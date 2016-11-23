@@ -62,7 +62,7 @@ import java.util.TreeMap;
  * which are hard to work with due to their size.  Each bookmark can also include its own documentation,
  * which can instruct the mapper how to use the element to which it refers.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 @XStreamAlias("record-definition")

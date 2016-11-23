@@ -51,7 +51,7 @@ import static org.jfree.ui.TextAnchor.CENTER_RIGHT;
 /**
  * Build charts based on stats
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class ChartHelper {

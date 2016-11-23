@@ -30,42 +30,11 @@
     <artifactId>sip-app</artifactId>
     <packaging>jar</packaging>
     <name>SIP-App</name>
-    <version>1.0.10.1</version>
-    <inceptionYear>2008</inceptionYear>
-
-    <organization>
-        <name>Delving B.V.</name>
-        <url>http://www.delving.eu</url>
-    </organization>
-
-    <developers>
-        <developer>
-            <name>Sjoerd Siebinga</name>
-            <email>sjoerd@delving.eu</email>
-            <roles>
-                <role>developer</role>
-            </roles>
-        </developer>
-        <developer>
-            <name>Gerald de Jong</name>
-            <email>gerald@delving.eu</email>
-            <roles>
-                <role>developer</role>
-            </roles>
-        </developer>
-        <developer>
-            <name>Eric van der Meulen</name>
-            <email>eric@delving.eu</email>
-            <roles>
-                <role>developer</role>
-            </roles>
-        </developer>
-    </developers>
-
+    <version>1.0.11</version>
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-creator</artifactId>
-        <version>1.0.10.1</version>
+        <version>1.0.11</version>
     </parent>
 
     <build>
@@ -109,24 +78,12 @@
         <dependency>
             <groupId>eu.delving</groupId>
             <artifactId>sip-core</artifactId>
-            <version>1.0.10.1</version>
+            <version>1.0.11</version>
         </dependency>
         <dependency>
             <groupId>com.jgoodies</groupId>
             <artifactId>jgoodies-forms</artifactId>
             <version>1.7.2</version>
-        </dependency>
-        <dependency>
-            <groupId>postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>9.1-901.jdbc3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.24</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -140,6 +97,14 @@
             <groupId>com.fifesoft</groupId>
             <artifactId>rsyntaxtextarea</artifactId>
             <version>2.5.8</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Grouping all schemas into one list
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 @XStreamAlias("schemas")

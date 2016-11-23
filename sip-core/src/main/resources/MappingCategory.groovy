@@ -25,7 +25,7 @@ import eu.delving.groovy.GroovyNode
  * This category is used to give DSL features to the Groovy builder
  * code that does the mapping transformation.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class MappingCategory {

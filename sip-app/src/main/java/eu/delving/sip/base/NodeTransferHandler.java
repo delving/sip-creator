@@ -42,7 +42,7 @@ import java.util.TreeSet;
 /**
  * Handle the dragging and dropping of nodes
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class NodeTransferHandler extends TransferHandler {

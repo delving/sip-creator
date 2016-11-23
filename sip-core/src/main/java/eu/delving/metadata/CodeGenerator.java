@@ -32,11 +32,12 @@ import java.util.TreeSet;
 
 import static eu.delving.metadata.OptRole.CHILD;
 import static eu.delving.metadata.OptRole.ROOT;
-import static eu.delving.metadata.StringUtil.*;
-
-/**
- * @author Gerald de Jong <gerald@delving.eu>
- */
+import static eu.delving.metadata.StringUtil.getConstantFromGroovyCode;
+import static eu.delving.metadata.StringUtil.indentCode;
+import static eu.delving.metadata.StringUtil.stringToLines;
+import static eu.delving.metadata.StringUtil.tagToVariable;
+import static eu.delving.metadata.StringUtil.toGroovyFirstIdentifier;
+import static eu.delving.metadata.StringUtil.toGroovyIdentifier;
 
 public class CodeGenerator {
     public static final String ABSENT_IS_FALSE = "_absent_ = false";
@@ -87,7 +88,7 @@ public class CodeGenerator {
         }
         codeOut.line("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'");
         codeOut.line("// Functions from Mapping:");
-        Set<String> names = new TreeSet<String>();
+        Set<String> names = new TreeSet<>();
         for (MappingFunction function : recMapping.getFunctions()) {
             function.toCode(codeOut);
             names.add(function.name);
@@ -103,9 +104,7 @@ public class CodeGenerator {
             }
         }
         codeOut.line("// Dictionaries:");
-        for (NodeMapping nodeMapping : recDefTree.getNodeMappings()) {
-            toLookupCode(nodeMapping);
-        }
+        recDefTree.getNodeMappings().forEach(this::toLookupCode);
         codeOut.line("// DSL Category wraps Builder call:");
         codeOut.line("boolean _absent_ = true");
         codeOut.line("org.w3c.dom.Node outputNode");
@@ -488,9 +487,9 @@ public class CodeGenerator {
     }
 
     private Set<Path> getSiblingInputPathsOfChildren(RecDefNode recDefNode) {
-        List<NodeMapping> subMappings = new ArrayList<NodeMapping>();
+        List<NodeMapping> subMappings = new ArrayList<>();
         for (RecDefNode sub : recDefNode.getChildren()) sub.collectNodeMappings(subMappings);
-        Set<Path> inputPaths = new TreeSet<Path>();
+        Set<Path> inputPaths = new TreeSet<>();
         Path parent = null;
         for (NodeMapping subMapping : subMappings) {
             if (parent == null) {
@@ -608,7 +607,7 @@ public class CodeGenerator {
                     code.add(line);
                 }
                 else if (StringUtil.IF_ABSENT_PATTERN.matcher(line).matches()) {
-                    code = new ArrayList<String>();
+                    code = new ArrayList<>();
                     braceLevel++;
                 }
             }

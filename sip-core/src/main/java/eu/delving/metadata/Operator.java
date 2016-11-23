@@ -24,7 +24,7 @@ package eu.delving.metadata;
 /**
  * The different possible operators between a list and a closure in the generated code.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public enum Operator {

@@ -34,9 +34,7 @@ import java.util.regex.Pattern;
  * <p/>
  * Remove the frightening things from tag strings so that they can become proper Groovy variable names.
  *
- * @author Gerald de Jong <gerald@delving.eu>
  */
-
 public class StringUtil {
 
     public static String sanitizeId(String id) {
@@ -44,32 +42,6 @@ public class StringUtil {
     }
 
     public static final Pattern IF_ABSENT_PATTERN = Pattern.compile("^ *if *\\( *_absent_ *\\) *\\{ *$");
-
-    public static String csvEscapeXML(String value) {
-        StringBuilder tag = new StringBuilder();
-        for (char c : value.toCharArray()) {
-            switch (c) {
-                case '&':
-                    tag.append("&amp;");
-                    break;
-                case '<':
-                    tag.append("&lt;");
-                    break;
-                default:
-                    tag.append(c);
-            }
-        }
-        return tag.toString();
-    }
-
-    public static String csvTitleToTag(String title, int index) {
-        StringBuilder tag = new StringBuilder();
-        for (char c : title.toCharArray()) {
-            if (Character.isLetterOrDigit(c)) tag.append(Character.toLowerCase(c));
-        }
-        String tagString = tag.toString();
-        return tagString.isEmpty() ? String.format("column%d", index) : tagString;
-    }
 
     public static List<String> csvLineParse(String line) {
         List<String> strings = new ArrayList<String>();

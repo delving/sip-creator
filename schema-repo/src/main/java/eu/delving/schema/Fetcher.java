@@ -26,13 +26,12 @@ import java.io.IOException;
 /**
  * Defining how the text of the schemas are to be fetched
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public interface Fetcher {
 
     String SCHEMA_DIRECTORY = "/schema-repository.xml";
-    String FACT_DEFINITIONS = "/fact-definition-list_1.0.0.xml";
 
     String fetchList() throws IOException;
 

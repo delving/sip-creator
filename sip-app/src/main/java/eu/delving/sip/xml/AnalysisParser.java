@@ -42,10 +42,7 @@ import java.io.InputStream;
  * Analyze xml input and compile statistics. When analysis fails, the .error will be appended to the filename
  * of the erroneous file.
  *
- * @author Gerald de Jong <gerald@delving.eu>
- * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
-
 public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
     public static final int ELEMENT_STEP = 10000;
     private Stats stats = new Stats();

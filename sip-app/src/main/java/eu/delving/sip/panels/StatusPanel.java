@@ -41,7 +41,7 @@ import static eu.delving.sip.files.DataSetState.values;
 /**
  * The bottom of the main screen, below the desktop pane, intended to represent the workflow to users.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class StatusPanel extends JPanel {

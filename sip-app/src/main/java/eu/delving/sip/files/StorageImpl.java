@@ -69,7 +69,7 @@ import static eu.delving.sip.files.StorageHelper.*;
  * This is an implementation of the Storage interface, with most of the functionality built into the inner class
  * which implements the DataSet interface.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class StorageImpl implements Storage {
@@ -371,8 +371,8 @@ public class StorageImpl implements Storage {
             delete(here);
             here.mkdir();
             long streamLength = sipZipFile.length();
-            try {
-                InputStream inputStream = new FileInputStream(sipZipFile);
+
+            try (InputStream inputStream = new FileInputStream(sipZipFile) ){
                 ZipEntry zipEntry;
                 byte[] buffer = new byte[BLOCK_SIZE];
                 int bytesRead;

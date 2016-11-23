@@ -24,7 +24,7 @@ package eu.delving.sip.model;
 /**
  * Special version of FilterTreeModel which knows about special rec def things.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class RecDefTreeModel extends FilterTreeModel {

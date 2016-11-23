@@ -38,9 +38,7 @@ import java.util.Map;
  * The result of the mapping engine is wrapped in this class so that some post-processing and checking
  * can be done on the resulting Node tree.
  *
- * @author Gerald de Jong <gerald@delving.eu>
  */
-
 public class MappingResult {
     private XmlSerializer serializer;
     private Node root;

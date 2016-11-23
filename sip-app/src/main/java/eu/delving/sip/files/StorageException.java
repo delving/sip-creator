@@ -24,7 +24,7 @@ package eu.delving.sip.files;
 /**
  * Something went wrong with the files in storage
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class StorageException extends Exception {

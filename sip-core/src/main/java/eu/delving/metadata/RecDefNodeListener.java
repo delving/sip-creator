@@ -24,7 +24,7 @@ package eu.delving.metadata;
 /**
  * How can node mappings in a rec def node change?
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public interface RecDefNodeListener {

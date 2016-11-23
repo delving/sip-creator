@@ -35,7 +35,7 @@ import java.util.TreeMap;
  * Part of the record definition which attaches a list of options to an element.  When an option is chosen,
  * there are a number of descendant elements and attributes that can be given the option's values.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 @XStreamAlias("opt-list")

@@ -46,7 +46,7 @@ import static org.apache.commons.io.FileUtils.writeLines;
 /**
  * Describes how a report is written during dataset processing
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class ReportWriter {

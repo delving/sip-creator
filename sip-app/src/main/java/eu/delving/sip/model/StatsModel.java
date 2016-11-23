@@ -43,7 +43,7 @@ import static eu.delving.sip.files.Storage.MAX_UNIQUE_VALUE_LENGTH;
 /**
  * An observable hole to put the things related to analysis: statistics, analysis tree, some list models
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class StatsModel {

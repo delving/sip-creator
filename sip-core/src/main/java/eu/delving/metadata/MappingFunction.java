@@ -34,10 +34,7 @@ import java.util.TreeSet;
 /**
  * This class describes a utility function (closure) which is available in the mapping code so that
  * re-used code need not be repeated.
- *
- * @author Gerald de Jong <gerald@delving.eu>
  */
-
 @XStreamAlias("mapping-function")
 public class MappingFunction implements Comparable<MappingFunction> {
 
@@ -150,7 +147,7 @@ public class MappingFunction implements Comparable<MappingFunction> {
         @XStreamImplicit
         public SortedSet<MappingFunction> functions = new TreeSet<MappingFunction>();
     }
-    
+
     public static FunctionList read(InputStream inputStream) {
         return (FunctionList) XStreamFactory.getStreamFor(FunctionList.class).fromXML(inputStream);
     }

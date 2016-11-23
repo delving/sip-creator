@@ -39,7 +39,6 @@ import static eu.delving.sip.files.DataSetState.MAPPING;
  * need not be stored).  Processing also records statistics and a file containing the invalid records and a
  * report of the numbers afterward.
  *
- * @author Serkan Demirel <serkan@blackbuilt.nl>
  */
 
 public class ValidateAction extends AbstractAction {

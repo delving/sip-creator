@@ -3,7 +3,7 @@ package eu.delving.rdf;
 /**
  * Enumerating the CRM Properties
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public enum CRMProperty {

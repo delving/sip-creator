@@ -69,7 +69,6 @@ import static eu.delving.sip.frames.AllFrames.View.QUICK_MAPPING;
  * data directory and can be modified for subsequent runs of the program.  Useful changes should be copied
  * back into the default XML file eventually.
  *
- * @author Gerald de Jong
  */
 
 public class AllFrames {

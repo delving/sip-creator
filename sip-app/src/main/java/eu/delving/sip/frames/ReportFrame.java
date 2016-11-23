@@ -47,7 +47,7 @@ import static javax.swing.BorderFactory.createTitledBorder;
  * This frame shows the contents of the ReportFileModel which can contain multiple validation reports, shown in
  * multiple tabs.  The idea is that only after viewing these reports should you be deciding to upload a mapping.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class ReportFrame extends FrameBase implements ReportFileModel.Listener {

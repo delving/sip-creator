@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * One schema from the schema directory
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 @XStreamAlias("schema")

@@ -38,7 +38,7 @@ import java.util.Map;
 /**
  * Try out the ideas
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class SchemaRepository {

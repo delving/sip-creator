@@ -23,8 +23,9 @@ package eu.delving.sip.xml;
 
 import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MappingRunner;
+import eu.delving.groovy.MappingException;
+import eu.delving.groovy.AppMappingRunner;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.AssertionException;
@@ -60,7 +61,7 @@ import static eu.delving.sip.files.Storage.XSD_VALIDATION;
  * A validation report is produced. Output can be recorded for experts as well.  The processing is paused
  * for user input when invalid records are encountered.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork {
@@ -72,7 +73,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private final boolean allowInvalid;
     private final Listener listener;
     private ProgressListener progressListener;
-    private TransferQueue<MetadataRecord> recordSource = new LinkedTransferQueue<MetadataRecord>();
+    private TransferQueue<MetadataRecord> recordSource = new LinkedTransferQueue<>();
     private Stats stats;
     private Termination termination = new Termination();
 
@@ -171,10 +172,10 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     validator = dataSet.newValidator();
                     validator.setErrorHandler(null);
                 }
-                MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, recMapping, null, false);
+                MappingRunner MappingRunner = new AppMappingRunner(groovyCodeResource, recMapping, null, false);
                 List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
                 MappingEngine engine = new MappingEngine(
-                        walk, recordSource, mappingRunner, validator, assertionTests, consumer, allowInvalid, termination
+                        walk, recordSource, MappingRunner, validator, assertionTests, consumer, allowInvalid, termination
                 );
                 engine.start();
             }
@@ -322,7 +323,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     private class MappingEngine implements Runnable {
         private final BlockingQueue<MetadataRecord> recordSource;
-        private final MappingRunner mappingRunner;
+        private final MappingRunner MappingRunner;
         private final Validator validator;
         private final List<AssertionTest> assertionTests;
         private final Consumer consumer;
@@ -331,12 +332,12 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         private Thread thread;
         private XmlSerializer serializer = new XmlSerializer();
 
-        private MappingEngine(int index, BlockingQueue<MetadataRecord> recordSource, MappingRunner mappingRunner,
+        private MappingEngine(int index, BlockingQueue<MetadataRecord> recordSource, MappingRunner MappingRunner,
                               Validator validator, List<AssertionTest> assertionTests, Consumer consumer,
                               boolean allowInvalid, Termination termination
         ) {
             this.recordSource = recordSource;
-            this.mappingRunner = mappingRunner;
+            this.MappingRunner = MappingRunner;
             this.validator = validator;
             this.assertionTests = assertionTests;
             this.consumer = consumer;
@@ -361,8 +362,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         return;
                     }
                     try {
-                        Node node = mappingRunner.runMapping(record);
-                        MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, mappingRunner.getRecDefTree());
+                        Node node = MappingRunner.runMapping(record);
+                        MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, MappingRunner.getRecDefTree());
                         List<String> uriErrors = result.getUriErrors();
                         try {
                             if (!uriErrors.isEmpty()) {

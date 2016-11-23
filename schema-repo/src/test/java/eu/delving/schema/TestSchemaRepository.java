@@ -42,7 +42,7 @@ import static eu.delving.schema.SchemaType.*;
 /**
  * See if it works
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class TestSchemaRepository {

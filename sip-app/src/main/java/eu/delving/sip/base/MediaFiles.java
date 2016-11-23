@@ -37,7 +37,7 @@ import static eu.delving.XStreamFactory.getStreamFor;
 /**
  * XStream stuff for media-files.xml in the Media subdir of a dataset
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 @XStreamAlias("media-files")

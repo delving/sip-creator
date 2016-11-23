@@ -40,7 +40,7 @@ import static eu.delving.sip.base.SwingHelper.NORMAL_JOB_COLOR;
 /**
  * Show the live work model , and pop up a cancellation dialog when one is selected.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class WorkPanel extends JPanel {

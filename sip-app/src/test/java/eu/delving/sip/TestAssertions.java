@@ -55,11 +55,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-/**
- * Try out the assertion mechanism
- *
- * @author Gerald de Jong <gerald@delving.eu>
- */
 public class TestAssertions {
 
     private GroovyCodeResource groovyCodeResource;
@@ -86,7 +81,6 @@ public class TestAssertions {
         for (StructureTest structureTest : structureTests) {
             switch (structureTest.getViolation(icnDoc.getDocumentElement())) {
                 case NONE:
-//                    System.out.println("OK: " + structureTest);
                     break;
                 default:
                     Assert.fail();

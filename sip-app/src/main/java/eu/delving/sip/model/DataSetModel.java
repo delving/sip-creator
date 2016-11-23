@@ -49,7 +49,7 @@ import static eu.delving.sip.files.DataSetState.ABSENT;
  * name patterns.  Many classes throughout the SIP-Creator observe this model and the state changes are broadcast
  * in the Swing thread so that they can directly influence the GUI.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class DataSetModel implements RecDefModel {

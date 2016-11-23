@@ -1,6 +1,8 @@
 package eu.delving;
 
 import com.ctc.wstx.stax.WstxInputFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
@@ -18,12 +20,9 @@ import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 
-/**
- * @author Gerald de Jong <gerald@delving.eu>
- */
-
 public class XMLToolFactory {
 
+    private static Logger LOG = LoggerFactory.getLogger(XMLToolFactory.class);
     private static XPathFactory XPATH_FACTORY;
 
     static {
@@ -31,8 +30,8 @@ public class XMLToolFactory {
             XPATH_FACTORY = net.sf.saxon.xpath.XPathFactoryImpl.newInstance();
         }
         catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
+            LOG.error("Error initializing Xpath? ", e);
+            throw new RuntimeException(e);
         }
     }
 

@@ -28,7 +28,7 @@ import eu.delving.schema.xml.Schemas;
 /**
  * Produce an xstream for the repo
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class XStreamFactory {

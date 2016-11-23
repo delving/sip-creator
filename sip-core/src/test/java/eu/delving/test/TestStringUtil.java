@@ -29,12 +29,6 @@ import java.util.List;
 import static eu.delving.metadata.StringUtil.csvLineParse;
 import static org.junit.Assert.assertEquals;
 
-/**
- * Make sure the String Util
- *
- * @author Gerald de Jong <gerald@delving.eu>
- */
-
 public class TestStringUtil {
 
     @Test

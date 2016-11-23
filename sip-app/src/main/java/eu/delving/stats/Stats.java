@@ -29,6 +29,7 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 import eu.delving.metadata.Path;
+import org.mapdb.DBMaker;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -53,10 +54,7 @@ import static eu.delving.XStreamFactory.getStreamFor;
 /**
  * Gather all the statistics together, identifying whether they are from imported or source.  Also convert one
  * to the other.
- *
- * @author Gerald de Jong <gerald@delving.eu>
  */
-
 @XStreamAlias("delving-statistics")
 public class Stats {
     public static final int DEFAULT_MAX_UNIQUE_VALUE_LENGTH = 40;
@@ -64,7 +62,6 @@ public class Stats {
     private static final int SMALL_SIZE = 100;
     private static final int SAMPLE_SIZE = 300;
     private static final int SAMPLE_MAX_VALUE_LENGTH = 100;
-    private static final int HISTOGRAM_MAX_STORAGE = 1024 * 512;
     private static final int HISTOGRAM_MAX_SIZE = 1000;
     private static final DecimalFormat PERCENT = new DecimalFormat("#0.00%");
     private static final double HISTOGRAM_OVERSAMPLING = 1.3;
@@ -218,10 +215,6 @@ public class Stats {
                 unique = uniqueness.isStillUnique(value);
                 if (!unique) uniqueness = null;
             }
-        }
-
-        public boolean hasValues() {
-            return sample != null;
         }
 
         public String getSummary() {
@@ -396,6 +389,35 @@ public class Stats {
             fresh.count = count;
             fresh.value = value;
             return fresh;
+        }
+    }
+
+    public static class Uniqueness {
+        private static final int HOLD_THRESHOLD = 5000;
+        private Set<String> all = new HashSet<>(HOLD_THRESHOLD * 3 / 2);
+        private boolean exceedsThreshold;
+        private int maxValueSize;
+
+        public Uniqueness(int maxValueSize) {
+            this.maxValueSize = maxValueSize;
+        }
+
+        public boolean isStillUnique(String value) {
+            if (value.length() > maxValueSize) value = value.substring(0, maxValueSize);
+            if (all.contains(value)) return false;
+            all.add(value);
+            if (!exceedsThreshold && all.size() > HOLD_THRESHOLD) {
+                Set<String> dbSet = DBMaker.newTempHashSet();
+                dbSet.addAll(all);
+                all = dbSet;
+                exceedsThreshold = true;
+            }
+            return true;
+        }
+
+        public int getSize() {
+            if (all == null) return 0;
+            return all.size();
         }
     }
 

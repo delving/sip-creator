@@ -57,7 +57,7 @@ import java.util.regex.Pattern;
  * This is the grand model behind the whole SIP-Creator and it holds all of the other models.  Its state
  * corresponds that of a dataset with attention set specific record mapping within, described by its prefix.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class SipModel {

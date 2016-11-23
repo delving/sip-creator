@@ -41,7 +41,7 @@ import static eu.delving.sip.base.SwingHelper.REPORT_ERROR;
 /**
  * Handles navigation in a report file, optimizing where possible
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class ReportFile {

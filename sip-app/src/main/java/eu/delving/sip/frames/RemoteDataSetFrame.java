@@ -64,7 +64,7 @@ import static org.apache.commons.io.FileUtils.deleteQuietly;
 /**
  * Show the datasets both local and on the server, so all info about their status is unambiguous.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class RemoteDataSetFrame extends FrameBase {

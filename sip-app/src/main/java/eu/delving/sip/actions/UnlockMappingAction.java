@@ -34,7 +34,7 @@ import static eu.delving.sip.base.SwingHelper.ICON_UNLOCK;
 /**
  * Unlock this mapping
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class UnlockMappingAction extends AbstractAction implements Work {

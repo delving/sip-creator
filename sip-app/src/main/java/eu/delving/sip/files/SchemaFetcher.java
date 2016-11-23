@@ -39,7 +39,7 @@ import java.io.IOException;
 /**
  * Fetch schema text from the schema repository, checking first locally
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class SchemaFetcher implements Fetcher {

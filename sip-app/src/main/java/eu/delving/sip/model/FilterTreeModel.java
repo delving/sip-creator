@@ -34,7 +34,7 @@ import java.util.List;
  * Generic filter tree model containing filter tree nodes.  The masking of nodes that do not pass the filter
  * predicate is tricky business, especially since change events need to be propagated.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class FilterTreeModel implements TreeModel {

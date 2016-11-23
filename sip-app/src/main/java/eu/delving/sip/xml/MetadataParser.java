@@ -46,8 +46,8 @@ import static eu.delving.sip.files.Storage.RECORD_CONTAINER;
 /**
  * Iterate through the xml file, producing groovy node trees wrapped in MetadataRecord instances.
  *
- * @author Gerald de Jong <gerald@delving.eu>
- * @author Serkan Demirel <serkan@blackbuilt.nl>
+ *
+
  */
 
 public class MetadataParser {

@@ -39,7 +39,7 @@ import java.util.Map;
 /**
  * Gathering together a number of things that are done with the Swing library from many parts of the code.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class SwingHelper {

@@ -25,19 +25,11 @@ package eu.delving.groovy;
  * Something identifiable went wrong during mapping, so we record which record
  * was involved and why it went wrong.
  *
- * @author Gerald de Jong <gerald@delving.eu>
  */
-
 public class MappingException extends Exception {
 
-    private MetadataRecord metadataRecord;
-
-    public MappingException(MetadataRecord metadataRecord, String message, Throwable cause) {
+    public MappingException(String message, Throwable cause) {
         super(message, cause);
-        this.metadataRecord = metadataRecord;
     }
 
-    public MetadataRecord getMetadataRecord() {
-        return metadataRecord;
-    }
 }

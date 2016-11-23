@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 /**
  * The combination of prefix and version number
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class SchemaVersion implements Comparable<SchemaVersion> {

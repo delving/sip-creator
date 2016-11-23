@@ -29,10 +29,7 @@ import java.util.List;
 
 /**
  * An assertion about data content
- *
- * @author Gerald de Jong <gerald@delving.eu>
  */
-
 @XStreamAlias("assert")
 public class Assertion {
     @XStreamAsAttribute
@@ -57,18 +54,18 @@ public class Assertion {
         }
         else if (condition != null) {
             if (onFail != null) {
-                return String.format("if (!(%s)) {\n\"%s\"\n}", condition, onFail);
+                return String.format("if (!(%s)) {%n\"%s\"%n}", condition, onFail);
             }
             else {
-                return String.format("if (!(%s)) {\n\"Failed condition: %s\"\n}", condition, condition);
+                return String.format("if (!(%s)) {%n\"Failed condition: %s\"%n}", condition, condition);
             }
         }
         else if (allowed != null) {
-            StringBuilder out = new StringBuilder("if (!(it.toString() in [\n");
+            StringBuilder out = new StringBuilder(String.format("if (!(it.toString() in [%n"));
             for (String value : allowed) {
-                out.append(String.format("'''%s''',\n", value));
+                out.append(String.format("'''%s''',%n", value));
             }
-            out.append(String.format("])) {\n\"%s\"\n}", onFail));
+            out.append(String.format("])) {%n\"%s\"%n}", onFail));
             return out.toString();
         }
         else {

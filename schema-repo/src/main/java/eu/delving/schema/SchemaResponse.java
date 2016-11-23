@@ -25,7 +25,7 @@ package eu.delving.schema;
  * What you get back when you request a schema.  Tells if it has been validated with a hash (determines
  * whether you should cache what comes in.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class SchemaResponse {

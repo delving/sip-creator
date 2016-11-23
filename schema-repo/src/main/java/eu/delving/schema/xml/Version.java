@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * Within a schema you have different versions
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 @XStreamAlias("version")

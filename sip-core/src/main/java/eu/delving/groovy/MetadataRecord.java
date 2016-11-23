@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * GroovyList instances, and we also hold the record number and the total number
  * of records.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class MetadataRecord {

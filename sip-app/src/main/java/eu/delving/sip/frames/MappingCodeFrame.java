@@ -44,7 +44,7 @@ import static eu.delving.sip.base.SwingHelper.scrollVH;
  * This frame shows the entire builder that is responsible for transforming the input to output,
  * as well as the constants, dictionaries, and functions that it may have.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class MappingCodeFrame extends FrameBase {

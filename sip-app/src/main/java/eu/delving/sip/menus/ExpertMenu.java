@@ -49,7 +49,6 @@ import static eu.delving.sip.files.Storage.XSD_VALIDATION;
  * Special functions for experts, not to be spoken of in mixed company, or among people with potential heart
  * conditions.
  *
- * @author Gerald de Jong, Beautiful Code BV, <gerald@delving.eu>
  */
 
 public class ExpertMenu extends JMenu {

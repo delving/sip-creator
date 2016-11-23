@@ -45,7 +45,7 @@ import java.util.regex.Pattern;
 /**
  * Test the coordinate conversion functions
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class TestCoordinateConversion {

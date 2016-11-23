@@ -28,7 +28,6 @@ import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider
 import com.thoughtworks.xstream.io.naming.NoNameCoder;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 import eu.delving.XMLToolFactory;
-import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import javax.xml.namespace.NamespaceContext;
@@ -38,12 +37,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-/**
- * @author Gerald de Jong <gerald@delving.eu>
- */
-
 public class MapToCRM {
-    private static Logger LOG = Logger.getLogger(MapToCRM.class);
+
     private static final NamespaceContext NAMESPACE_CONTEXT = new XPathContext(new String[][]{
             {"lido", "http://www.lido-schema.org"}
     });

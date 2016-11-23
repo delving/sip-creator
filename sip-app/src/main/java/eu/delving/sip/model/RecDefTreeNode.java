@@ -46,7 +46,7 @@ import static eu.delving.sip.base.SwingHelper.*;
  * Represent an element of a record definition in the tree, including an HTML representation and the associated
  * cell renderer.
  *
- * @author Gerald de Jong <geralddejong@gmail.com>
+ *
  */
 
 public class RecDefTreeNode extends FilterNode {

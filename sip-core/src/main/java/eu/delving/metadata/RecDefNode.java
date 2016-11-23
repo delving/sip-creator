@@ -44,9 +44,8 @@ import static eu.delving.metadata.OptRole.ROOT;
  * all changes propagate out and the user interface code can deal
  * with node references.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
-
 public class RecDefNode implements Comparable<RecDefNode> {
     private RecDefNode parent;
     private Path path;
@@ -55,8 +54,8 @@ public class RecDefNode implements Comparable<RecDefNode> {
     private OptBox optBox;
     private DynOpt dynOpt;
     private String defaultPrefix;
-    private List<RecDefNode> children = new ArrayList<RecDefNode>();
-    private SortedMap<Path, NodeMapping> nodeMappings = new TreeMap<Path, NodeMapping>();
+    private List<RecDefNode> children = new ArrayList<>();
+    private SortedMap<Path, NodeMapping> nodeMappings = new TreeMap<>();
     private boolean populated;
     private RecDefNodeListener listener;
 

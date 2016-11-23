@@ -26,7 +26,7 @@ import java.io.File;
 /**
  * Locate the workspace and make sure the user has chosen a storage directory
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class HomeDirectory {

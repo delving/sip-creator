@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  * shown or not, depending on its type, and long term jobs also have an associated progress listener which
  * allows for cancellation as well as reporting of progress.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class WorkModel {

@@ -33,12 +33,6 @@ import javax.xml.xpath.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Test assertions
- *
- * @author Gerald de Jong <gerald@delving.eu>
- */
-
 public class AssertionTest {
     private Assertion assertion;
     private XPathExpression path;
@@ -46,7 +40,7 @@ public class AssertionTest {
     private Script script;
 
     public static List<AssertionTest> listFrom(RecDef recDef, GroovyCodeResource groovy) throws XPathFactoryConfigurationException, XPathExpressionException {
-        List<AssertionTest> tests = new ArrayList<AssertionTest>();
+        List<AssertionTest> tests = new ArrayList<>();
         if (recDef.assertionList == null) return tests;
         Factory factory = new Factory(new RecDefNamespaceContext(recDef.namespaces), groovy);
         for (Assertion assertion : recDef.assertionList.assertions) {

@@ -41,7 +41,7 @@ import java.util.List;
 /**
  * Save the mapping whenever things change.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class MappingSaveTimer implements MappingModel.ChangeListener, MappingModel.SetListener, ActionListener, Work.DataSetPrefixWork {

@@ -29,7 +29,6 @@ import java.util.Stack;
 /**
  * A path consisting of a stack of qnames
  *
- * @author Gerald de Jong, Beautiful Code BV, <gerald@delving.eu>
  */
 
 public class QNamePath implements Comparable<QNamePath>, Serializable {

@@ -36,7 +36,7 @@ import java.util.List;
  * just loads all of the lines of the file, which could be problematic if it is very large.  It should be made
  * more clever when time permits.
  *
- * @author Gerald de Jong <gerald@delving.eu>
+ *
  */
 
 public class ReportFileModel {

@@ -33,9 +33,7 @@ import java.util.List;
 /**
  * Test required and singular for an xpath
  *
- * @author Gerald de Jong <gerald@delving.eu>
  */
-
 public class StructureTest {
     private Path path;
     private boolean required;
