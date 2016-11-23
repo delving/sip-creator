@@ -24,6 +24,7 @@ package eu.delving.sip.model;
 import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingRunner;
+import eu.delving.groovy.AppMappingRunner;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.AssertionTest;
@@ -92,7 +93,7 @@ public class MappingCompileModel {
     private volatile boolean compiling;
     private ParseEar parseEar = new ParseEar();
     private boolean ignoreDocChanges;
-    private MappingRunner mappingRunner;
+    private MappingRunner MappingRunner;
     private MappingModelEar mappingModelEar = new MappingModelEar();
     private SipModel sipModel;
     private boolean trace;
@@ -213,7 +214,7 @@ public class MappingCompileModel {
 
     private void triggerCompile() {
         if (!enabled) return;
-        mappingRunner = null;
+        MappingRunner = null;
         triggerTimer.triggerSoon(COMPILE_DELAY);
     }
 
@@ -308,12 +309,12 @@ public class MappingCompileModel {
             if (metadataRecord == null) return;
             compiling = true;
             try {
-                if (mappingRunner == null) {
-                    mappingRunner = new MappingRunner(groovyCodeResource, recMapping, editPath, trace);
-                    notifyCodeCompiled(mappingRunner.getCode());
+                if (MappingRunner == null) {
+                    MappingRunner = new AppMappingRunner(groovyCodeResource, recMapping, editPath, trace);
+                    notifyCodeCompiled(MappingRunner.getCode());
                 }
                 try {
-                    Node node = mappingRunner.runMapping(metadataRecord);
+                    Node node = MappingRunner.runMapping(metadataRecord);
                     if (node == null) return;
                     boolean enableXSDValidation = sipModel.getPreferences().getBoolean(XSD_VALIDATION, false);
                     if (validator != null && enableXSDValidation) {
