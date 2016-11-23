@@ -27,7 +27,11 @@ import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyShell;
 import groovy.lang.GroovySystem;
 import groovy.lang.Script;
+import groovy.util.GroovyScriptEngine;
+import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl;
 
+import javax.script.CompiledScript;
+import javax.script.ScriptException;
 import java.io.*;
 import java.net.URL;
 import java.util.Map;
@@ -65,9 +69,13 @@ public class GroovyCodeResource {
         return new GroovyShell(getGroovyClassLoader()).parse(scriptCode.toString());
     }
 
-    public Script createMappingScript(String code) {
-        GroovyShell groovyShell = new GroovyShell(getGroovyClassLoader());
-        return groovyShell.parse(code);
+    public CompiledScript createMappingScript(String code) {
+        GroovyScriptEngineImpl groovyScriptEngine = new GroovyScriptEngineImpl(getGroovyClassLoader());
+        try {
+            return groovyScriptEngine.compile(code);
+        } catch (ScriptException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private GroovyClassLoader getGroovyClassLoader() {

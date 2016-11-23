@@ -33,6 +33,7 @@ import org.codehaus.groovy.syntax.SyntaxException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.script.CompiledScript;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -90,10 +91,10 @@ public class MappingRunner {
         final ScriptIO scriptIO = initScriptIO(arguments.facts, arguments.valueOptLookup, arguments.recDef);
         scriptIO.input = Collections.singletonList(arguments.metadataRecord.getRootNode());
 
-        final Script script = arguments.groovyCodeResource.createMappingScript(arguments.code);
+        CompiledScript script = arguments.groovyCodeResource.createMappingScript(arguments.code);
 
         try {
-            Object result = script.run();
+            Object result = script.eval();
             return stripEmptyElements(result);
         }
         catch (DiscardRecordException e) {

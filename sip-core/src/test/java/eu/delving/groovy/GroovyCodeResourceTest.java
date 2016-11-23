@@ -1,7 +1,8 @@
 package eu.delving.groovy;
 
-import groovy.lang.Script;
 import org.junit.Test;
+
+import javax.script.CompiledScript;
 
 import static org.junit.Assert.*;
 
@@ -14,14 +15,16 @@ public class GroovyCodeResourceTest {
         runSingle();
     }
 
-    private void runSingle() {
+    private void runSingle() throws Exception {
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(this.getClass().getClassLoader());
-        Script script = groovyCodeResource.createMappingScript(CODE);
+        CompiledScript script = groovyCodeResource.createMappingScript(CODE);
         assertNotNull(script);
+        Object result = script.eval();
+        assertNotNull(result);
     }
 
     @Test
-    public void testCreateThousandsOfScripts(){
+    public void testCreateThousandsOfScripts() throws Exception {
         for (int i = 0; i < 2000; i++ ) {
             runSingle();
         }
