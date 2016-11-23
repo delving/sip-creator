@@ -25,6 +25,8 @@ import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MappingRunner;
+import eu.delving.groovy.MappingRunner.MappingRun;
+import eu.delving.groovy.MappingRunner.MappingRun.MappingRunBuilder;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.AssertionException;
@@ -173,13 +175,18 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     validator.setErrorHandler(null);
                 }
                 final String code = new CodeGenerator(recMapping).withTrace(false).toRecordMappingCode();
-                MappingRunner mappingRunner = new MappingRunner(groovyCodeResource, code,
-                    recMapping.getFacts(), recMapping.getRecDefTree().getRecDef().valueOptLookup,
-                    recMapping.getRecDefTree().getRecDef());
 
+                final MappingRunBuilder mappingRunBuilderTemplate = MappingRunBuilder.aMappingRun()
+                    .withCode(code)
+                    .withRecDef(recMapping.getRecDefTree().getRecDef())
+                    .withFacts(recMapping.getFacts())
+                    .withGroovyCodeResource(groovyCodeResource)
+                    .withValueOptLookup(recMapping.getRecDefTree().getRecDef().valueOptLookup)
+                    .withRecDefTree(recMapping.getRecDefTree()
+                    );
                 List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
                 MappingEngine engine = new MappingEngine(
-                        walk, recordSource, mappingRunner, validator, assertionTests, consumer, allowInvalid, termination
+                        walk, recordSource, mappingRunBuilderTemplate, validator, assertionTests, consumer, allowInvalid, termination
                 );
                 engine.start();
             }
@@ -327,7 +334,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     private class MappingEngine implements Runnable {
         private final BlockingQueue<MetadataRecord> recordSource;
-        private final MappingRunner mappingRunner;
+        private final MappingRunBuilder mappingRunBuilderTemplate;
         private final Validator validator;
         private final List<AssertionTest> assertionTests;
         private final Consumer consumer;
@@ -336,12 +343,17 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         private Thread thread;
         private XmlSerializer serializer = new XmlSerializer();
 
-        private MappingEngine(int index, BlockingQueue<MetadataRecord> recordSource, MappingRunner mappingRunner,
-                              Validator validator, List<AssertionTest> assertionTests, Consumer consumer,
+        /**
+         * @param recordSource the records to process
+         * @param mappingRunBuilderTemplate has all the values set, except the actual MetadataRecord,
+         */
+        private MappingEngine(int index, BlockingQueue<MetadataRecord> recordSource,
+                              MappingRunBuilder mappingRunBuilderTemplate, Validator validator,
+                              List<AssertionTest> assertionTests, Consumer consumer,
                               boolean allowInvalid, Termination termination
         ) {
             this.recordSource = recordSource;
-            this.mappingRunner = mappingRunner;
+            this.mappingRunBuilderTemplate = mappingRunBuilderTemplate;
             this.validator = validator;
             this.assertionTests = assertionTests;
             this.consumer = consumer;
@@ -355,6 +367,9 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             thread.start();
         }
 
+        private synchronized MappingRun fromRecord(MetadataRecord metadataRecord){
+            return mappingRunBuilderTemplate.withMetadataRecord(metadataRecord).build();
+        }
         @Override
         public void run() {
             try {
@@ -366,8 +381,9 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         return;
                     }
                     try {
-                        Node node = mappingRunner.runMapping(record);
-                        MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, mappingRunner.getRecDefTree());
+                        MappingRun mappingRun = fromRecord(record);
+                        Node node = MappingRunner.runMapping(mappingRun);
+                        MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, mappingRun.recDefTree);
                         List<String> uriErrors = result.getUriErrors();
                         try {
                             if (!uriErrors.isEmpty()) {

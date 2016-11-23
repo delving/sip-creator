@@ -70,18 +70,17 @@ public class GroovyCodeResource {
         return groovyShell.parse(code);
     }
 
-    private synchronized GroovyClassLoader getGroovyClassLoader() {
-        if (categoryClassLoader == null) {
-            try {
-                categoryClassLoader = new GroovyClassLoader(this.classLoader);
-                String categoryCode = readResourceCode(MAPPING_CATEGORY);
-                categoryClassLoader.parseClass(categoryCode);
-            }
-            catch (Exception e) {
-                throw new RuntimeException("Cannot initialize Groovy Code Resource", e);
-            }
+    private GroovyClassLoader getGroovyClassLoader() {
+        try {
+            GroovyClassLoader categoryClassLoader = new GroovyClassLoader(this.classLoader);
+            String categoryCode = readResourceCode(MAPPING_CATEGORY);
+            categoryClassLoader.parseClass(categoryCode);
+            return new GroovyClassLoader(categoryClassLoader);
         }
-        return new GroovyClassLoader(categoryClassLoader);
+        catch (Exception e) {
+            throw new RuntimeException("Cannot initialize Groovy Code Resource", e);
+        }
+
     }
 
     private String readResourceCode(URL resource) throws IOException {

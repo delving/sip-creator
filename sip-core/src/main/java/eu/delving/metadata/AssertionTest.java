@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AssertionTest {
+
     private Assertion assertion;
     private XPathExpression path;
     private Binding binding = new Binding();

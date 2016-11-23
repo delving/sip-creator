@@ -23,6 +23,8 @@ package eu.delving.groovy;
 
 import eu.delving.metadata.OptList;
 import eu.delving.metadata.RecDef;
+import eu.delving.metadata.RecDefTree;
+import eu.delving.metadata.RecMapping;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
@@ -195,13 +197,15 @@ public class MappingRunner {
 
         public MappingRun(MetadataRecord metadataRecord, GroovyCodeResource groovyCodeResource,
                           String code, Map<String, String> facts,
-                          Map<String, Map<String, OptList.Opt>> valueOptLookup, RecDef recDef) {
+                          Map<String, Map<String, OptList.Opt>> valueOptLookup, RecDef recDef,
+                          RecDefTree recDefTree) {
             this.metadataRecord = metadataRecord;
             this.groovyCodeResource = groovyCodeResource;
             this.code = code;
             this.facts = facts;
             this.valueOptLookup = valueOptLookup;
             this.recDef = recDef;
+            this.recDefTree = recDefTree;
         }
 
         public final MetadataRecord metadataRecord;
@@ -210,7 +214,7 @@ public class MappingRunner {
         public final Map<String, String> facts;
         public final Map<String, Map<String, OptList.Opt>> valueOptLookup;
         public final RecDef recDef;
-
+        public final RecDefTree recDefTree;
 
         public static final class MappingRunBuilder {
             public MetadataRecord metadataRecord;
@@ -219,6 +223,7 @@ public class MappingRunner {
             public Map<String, String> facts;
             public Map<String, Map<String, OptList.Opt>> valueOptLookup;
             public RecDef recDef;
+            public RecDefTree recDefTree;
 
             private MappingRunBuilder() {
             }
@@ -257,9 +262,14 @@ public class MappingRunner {
                 return this;
             }
 
+            public MappingRunBuilder withRecDefTree(RecDefTree recDefTree) {
+                this.recDefTree = recDefTree;
+                return this;
+            }
+
             public MappingRun build() {
                 MappingRun mappingRun = new MappingRun(metadataRecord, groovyCodeResource,
-                    code, facts, valueOptLookup, recDef);
+                    code, facts, valueOptLookup, recDef, recDefTree);
                 return mappingRun;
             }
         }

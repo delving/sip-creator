@@ -32,6 +32,7 @@ import java.util.List;
  */
 @XStreamAlias("assert")
 public class Assertion {
+
     @XStreamAsAttribute
     public String xpath;
 

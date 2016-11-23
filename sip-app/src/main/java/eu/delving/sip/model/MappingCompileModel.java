@@ -23,6 +23,7 @@ package eu.delving.sip.model;
 
 import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlSerializer;
@@ -58,6 +59,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactoryConfigurationException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -305,51 +307,36 @@ public class MappingCompileModel {
 
         @Override
         public void run() {
-            if (metadataRecord == null) return;
+            if (metadataRecord == null) {
+                return;
+            }
             compiling = true;
             try {
-                if (mappingRunner == null) {
-                    mappingRunner = new MappingRunner(groovyCodeResource, recMapping, editPath, trace);
-                    notifyCodeCompiled(mappingRunner.getCode());
+                final String code = new CodeGenerator(recMapping).withEditPath(editPath).withTrace(trace).
+                    toRecordMappingCode();
+
+                final MappingRunner.MappingRun mappingRun = MappingRunner.MappingRun.MappingRunBuilder.aMappingRun()
+                    .withCode(code)
+                    .withFacts(recMapping.getFacts())
+                    .withGroovyCodeResource(groovyCodeResource)
+                    .withMetadataRecord(metadataRecord)
+                    .withRecDef(recMapping.getRecDefTree().getRecDef())
+                    .withValueOptLookup(recMapping.getRecDefTree().getRecDef().valueOptLookup)
+                    .withRecDefTree(recMapping.getRecDefTree())
+                    .build();
+                Node node = MappingRunner.runMapping(mappingRun);
+                notifyCodeCompiled(code);
+                if (node == null) {
+                    return;
                 }
-                try {
-                    Node node = mappingRunner.runMapping(metadataRecord);
-                    if (node == null) return;
-                    boolean enableXSDValidation = sipModel.getPreferences().getBoolean(XSD_VALIDATION, false);
-                    if (validator != null && enableXSDValidation) {
-                        ForgivingErrorHandler handler = new ForgivingErrorHandler();
-                        validator.setErrorHandler(handler);
-                        try {
-                            validator.validate(new DOMSource(node));
-                            handler.checkErrors();
-                            MappingResult result = new MappingResult(serializer, metadataRecord.getId(), node, recMapping.getRecDefTree());
-                            List<String> uriErrors = result.getUriErrors();
-                            if (!uriErrors.isEmpty()) {
-                                StringBuilder out = new StringBuilder();
-                                for (String uriError : result.getUriErrors()) {
-                                    out.append(uriError).append("\n");
-                                }
-                                compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
-                            } else {
-                                StringBuilder out = new StringBuilder();
-                                for (AssertionTest test : assertions) {
-                                    String violation = test.getViolation(node);
-                                    if (violation != null)
-                                        out.append(test).append(" : ").append(violation).append('\n');
-                                }
-                                if (out.length() > 0) {
-                                    compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
-                                } else {
-                                    notifyMappingComplete(result);
-                                    compilationComplete(Completion.JUST_FINE, node, null);
-                                }
-                            }
-                        } catch (SAXException e) {
-                            structureViolation(node, handler.getError());
-                        } finally {
-                            handler.reset();
-                        }
-                    } else {
+
+                boolean enableXSDValidation = sipModel.getPreferences().getBoolean(XSD_VALIDATION, false);
+                if (validator != null && enableXSDValidation) {
+                    ForgivingErrorHandler handler = new ForgivingErrorHandler();
+                    validator.setErrorHandler(handler);
+                    try {
+                        validator.validate(new DOMSource(node));
+                        handler.checkErrors();
                         MappingResult result = new MappingResult(serializer, metadataRecord.getId(), node, recMapping.getRecDefTree());
                         List<String> uriErrors = result.getUriErrors();
                         if (!uriErrors.isEmpty()) {
@@ -359,19 +346,50 @@ public class MappingCompileModel {
                             }
                             compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
                         } else {
-                            notifyMappingComplete(result);
-                            compilationComplete(Completion.JUST_FINE, node, null);
+                            StringBuilder out = new StringBuilder();
+                            for (AssertionTest test : assertions) {
+                                String violation = test.getViolation(node);
+                                if (violation != null)
+                                    out.append(test).append(" : ").append(violation).append('\n');
+                            }
+                            if (out.length() > 0) {
+                                compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
+                            } else {
+                                notifyMappingComplete(result);
+                                compilationComplete(Completion.JUST_FINE, node, null);
+                            }
                         }
+                    } catch (SAXException | XPathExpressionException e) {
+                        structureViolation(node, handler.getError());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
+                    finally {
+                        handler.reset();
+                    }
+                } else {
+                    MappingResult result = new MappingResult(serializer, metadataRecord.getId(), node, recMapping.getRecDefTree());
+                    List<String> uriErrors = result.getUriErrors();
+                    if (!uriErrors.isEmpty()) {
+                        StringBuilder out = new StringBuilder();
+                        for (String uriError : result.getUriErrors()) {
+                            out.append(uriError).append("\n");
+                        }
+                        compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
+                    } else {
+                        notifyMappingComplete(result);
+                        compilationComplete(Completion.JUST_FINE, node, null);
+                    }
+                }
 //                    else {
 //                        compilationComplete(Completion.UNVALIDATED, node, null);
 //                    }
-                    setMappingCode();
-                } catch (DiscardRecordException e) {
-                    compilationComplete(Completion.DISCARDED_RECORD, null, e.getMessage());
-                    setMappingCode();
-                }
-            } catch (Exception e) {
+                setMappingCode();
+            } catch (DiscardRecordException e) {
+                compilationComplete(Completion.DISCARDED_RECORD, null, e.getMessage());
+                setMappingCode();
+            }
+            catch (MappingException e) {
                 compilationComplete(Completion.UNEXPECTED, null, e.getMessage());
                 notifyStateChange(CompileState.ERROR);
             } finally {
@@ -394,10 +412,15 @@ public class MappingCompileModel {
             }
         }
 
-        private void structureViolation(Node node, String handlerError) throws XPathFactoryConfigurationException, XPathExpressionException {
+        private void structureViolation(Node node, String handlerError) {
             StringBuilder out = new StringBuilder();
             for (StructureTest test : StructureTest.listFrom(recMapping.getRecDefTree().getRecDef())) {
-                StructureTest.Violation violation = test.getViolation(node);
+                StructureTest.Violation violation = null;
+                try {
+                    violation = test.getViolation(node);
+                } catch (XPathExpressionException e) {
+                    throw new RuntimeException(e);
+                }
                 switch (violation) {
                     case REQUIRED:
                         out.append("\nRequired piece was missing:\n\t").append(test.toString()).append('\n');

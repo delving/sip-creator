@@ -41,9 +41,9 @@ public class StructureTest {
     private XPathExpression parent;
     private XPathExpression test;
 
-    public static List<StructureTest> listFrom(RecDef recDef) throws XPathFactoryConfigurationException {
+    public static List<StructureTest> listFrom(RecDef recDef) {
         StructureTest.Factory factory = new StructureTest.Factory(new RecDefNamespaceContext(recDef.namespaces));
-        List<StructureTest> tests = new ArrayList<StructureTest>();
+        List<StructureTest> tests = new ArrayList<>();
         collectStructureTests(recDef.root, Path.create(), tests, factory);
         return tests;
     }
@@ -124,7 +124,9 @@ public class StructureTest {
     private static void collectStructureTests(RecDef.Attr attr, Path path, List<StructureTest> tests, StructureTest.Factory factory) {
         try {
             path = path.child(attr.tag);
-            if (attr.required) tests.add(factory.create(path, attr.required, false));
+            if (attr.required) {
+                tests.add(factory.create(path, true, false));
+            }
         }
         catch (XPathExpressionException e) {
             throw new RuntimeException("XPath problem: " + path);

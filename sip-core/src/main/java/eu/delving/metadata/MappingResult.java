@@ -70,19 +70,20 @@ public class MappingResult {
         }
     }
 
-    public List<String> getUriErrors() throws XPathExpressionException {
-        List<String> errors = new ArrayList<String>();
+    public List<String> getUriErrors()  {
+        List<String> errors = new ArrayList<>();
         for (Map.Entry<String, XPathExpression> entry : recDefTree.getUriCheckPaths().entrySet()) {
-            NodeList nodeList = (NodeList) entry.getValue().evaluate(root, XPathConstants.NODESET);
-            for (int walk = 0; walk < nodeList.getLength(); walk++) {
-                Node node = nodeList.item(walk);
-                String content = node.getTextContent();
-                if (!uriCheck(content)) {
-                    errors.add(String.format(
-                            "At %s: not a URI: [%s]",
-                            entry.getKey(), content
-                    ));
+            try {
+                NodeList nodeList = (NodeList) entry.getValue().evaluate(root, XPathConstants.NODESET);
+                for (int walk = 0; walk < nodeList.getLength(); walk++) {
+                    Node node = nodeList.item(walk);
+                    String content = node.getTextContent();
+                    if (!uriCheck(content)) {
+                        errors.add(String.format("At %s: not a URI: [%s]", entry.getKey(), content));
+                    }
                 }
+            } catch (XPathExpressionException e) {
+                throw new RuntimeException(e);
             }
         }
         return errors;
