@@ -47,10 +47,7 @@ public class BulkMappingRunner extends AbstractMappingRunner {
 
         try {
             Node result = (Node) compiledScript.eval(bindings);
-            // clone the result to avoid hanging on to the object and therefore it's classloader
-            // Avoids permgen / metaspace issues
-            // TODO hans is this required?
-            return stripEmptyElements(result.cloneNode(true));
+            return stripEmptyElements(result);
         } catch (ScriptException e) {
             throw new RuntimeException(e);
         }
