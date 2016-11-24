@@ -24,20 +24,7 @@ import java.util.Collections;
 public class BulkMappingRunner extends AbstractMappingRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(BulkMappingRunner.class);
-
-    private static final URL MAPPING_CATEGORY = BulkMappingRunner.class.getResource("/MappingCategory.groovy");
-
-    private static final GroovyClassLoader CATEGORY_CLASSLOADER;
-    private static final GroovyScriptEngineImpl ENGINE;
     private CompiledScript compiledScript;
-
-    static {
-        CATEGORY_CLASSLOADER = new GroovyClassLoader(BulkMappingRunner.class.getClassLoader());
-        LOG.debug("Loading MappingCategory code");
-        String categoryCode = readResourceCode(MAPPING_CATEGORY);
-        CATEGORY_CLASSLOADER.parseClass(categoryCode);
-        ENGINE = new GroovyScriptEngineImpl(CATEGORY_CLASSLOADER);
-    }
 
     /**
      * @param recMapping represents to mapping to be applied
@@ -45,15 +32,13 @@ public class BulkMappingRunner extends AbstractMappingRunner {
      */
     public BulkMappingRunner(final RecMapping recMapping, final String generatedCode) {
         super(recMapping, generatedCode);
-
         try {
-            this.compiledScript = ENGINE.compile(generatedCode);
+            this.compiledScript = EngineHolder.getInstance().compile(generatedCode);
         } catch (ScriptException e) {
             // we don't expect non-compiling scripts in the bulk runner.
             LOG.error("Error compiling script: {}", e.getMessage());
             throw new RuntimeException(e);
         }
-
     }
 
     @Override
@@ -72,6 +57,7 @@ public class BulkMappingRunner extends AbstractMappingRunner {
             Node result = (Node) compiledScript.eval(bindings);
             // clone the result to avoid hanging on to the object and therefore it's classloader
             // Avoids permgen / metaspace issues
+            // TODO hans is this required?
             return stripEmptyElements(result.cloneNode(true));
         } catch (ScriptException e) {
             throw new RuntimeException(e);
@@ -79,33 +65,6 @@ public class BulkMappingRunner extends AbstractMappingRunner {
 
     }
 
-    private static String readResourceCode(URL resource) {
-        try {
-            InputStream in = resource.openStream();
-            Reader reader = new InputStreamReader(in);
-            return readCode(reader);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
-    private static String readCode(Reader reader) {
-        BufferedReader in = new BufferedReader(reader);
-        StringBuilder out = new StringBuilder();
-        String line;
-        try {
-            while ((line = in.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty() || line.startsWith("//")) {
-                    continue;
-                }
-                out.append(line).append('\n');
-            }
-            in.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return out.toString();
-    }
 
 }

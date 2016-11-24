@@ -70,7 +70,7 @@ public class BulkMappingRunnerTest {
      */
     @Test
     public void testHundredsOfRandomInvocations() throws MappingException {
-        nInvocations(100, true);
+        nInvocations(9000, true);
     }
 
     private void nInvocations(int n, boolean randomizeCode) {
