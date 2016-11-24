@@ -30,19 +30,19 @@
     <artifactId>sip-core</artifactId>
     <packaging>jar</packaging>
     <name>SIP-Core</name>
-    <version>1.0.13-SNAPSHOT</version>
+    <version>1.0.12</version>
 
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-creator</artifactId>
-        <version>1.0.13-SNAPSHOT</version>
+        <version>1.0.12</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>eu.delving</groupId>
             <artifactId>schema-repo</artifactId>
-            <version>1.0.13-SNAPSHOT</version>
+            <version>1.0.12</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
