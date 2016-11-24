@@ -58,7 +58,7 @@ public class BulkMappingRunnerTest {
      */
     @Test
     public void testHundredsOfInvocations() throws MappingException {
-        nInvocations(900, false);
+        nInvocations(100, false);
     }
 
     /**
@@ -67,10 +67,13 @@ public class BulkMappingRunnerTest {
      *
      * Also, if we don't manage to remove the compiled script from the engine's classloader, we will eventually
      * hit the metaspace limit.
+     *
+     * This test demonstrates what will happen if we get too many datasets or too many datasets that have
+     * had their-mapping code updated too often.
      */
     @Test
     public void testHundredsOfRandomInvocations() throws MappingException {
-        nInvocations(9000, true);
+        nInvocations(100, true);
     }
 
     private void nInvocations(int n, boolean randomizeCode) {
