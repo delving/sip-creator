@@ -1,8 +1,6 @@
 package eu.delving.groovy;
 
 import eu.delving.metadata.RecMapping;
-import groovy.lang.GroovyClassLoader;
-import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -10,12 +8,6 @@ import org.w3c.dom.Node;
 import javax.script.CompiledScript;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
 import java.util.Collections;
 
 /**
