@@ -54,6 +54,4 @@ public class BulkMappingRunner extends AbstractMappingRunner {
 
     }
 
-
-
 }
