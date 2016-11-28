@@ -133,7 +133,7 @@ public class MappingCategory {
         return list
     }
 
-    // run a closure on each member of the list
+    // keepRunning a closure on each member of the list
     static List multiply(List a, Closure closure) { // operator *
         a = unwrap(a)
         List output = new ArrayList();
@@ -157,7 +157,7 @@ public class MappingCategory {
         return output
     }
 
-    // run the closure once for the concatenated values
+    // keepRunning the closure once for the concatenated values
     static List multiply(List a, String delimiter) {
         a = unwrap(a)
         Iterator walk = a.iterator();
