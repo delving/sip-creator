@@ -36,18 +36,12 @@ public class BulkMappingRunner extends AbstractMappingRunner {
     @Override
     public Node runMapping(MetadataRecord metadataRecord) throws MappingException {
         LOG.debug("Running mapping");
-        SimpleBindings bindings = new SimpleBindings();
-        final ScriptBinding ourScriptIO = new ScriptBinding();
-        bindings.put("WORLD", ourScriptIO);
-
-        ourScriptIO._facts = initFactsNode(recMapping.getFacts());
-        ourScriptIO._optLookup = recMapping.getRecDefTree().getRecDef().valueOptLookup;
-        ourScriptIO.output = DOMBuilder.createFor(recMapping.getRecDefTree().getRecDef());
-        ourScriptIO.input = Collections.singletonList(metadataRecord.getRootNode());
-
+        SimpleBindings bindings = Utils.bindingsFor(recMapping.getFacts(),
+            recMapping.getRecDefTree().getRecDef(), metadataRecord.getRootNode(),
+            recMapping.getRecDefTree().getRecDef().valueOptLookup);
         try {
             Node result = (Node) compiledScript.eval(bindings);
-            return stripEmptyElements(result);
+            return Utils.stripEmptyElements(result);
         } catch (ScriptException e) {
             throw new RuntimeException(e);
         }
