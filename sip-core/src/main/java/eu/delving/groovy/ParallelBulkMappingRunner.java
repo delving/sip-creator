@@ -63,8 +63,8 @@ public class ParallelBulkMappingRunner implements Runnable {
         }
         try {
             executorService.shutdown();
-            boolean terminated = executorService.awaitTermination(8, TimeUnit.HOURS);
-            LOG.debug("Processing did not terminate within 8 hours, giving up.", terminated);
+            executorService.awaitTermination(1, TimeUnit.HOURS);
+            LOG.debug("Thread-pool cleaned up");
         } catch (InterruptedException e) {
             throw new RuntimeException("Unable to finish nicely", e);
         }
