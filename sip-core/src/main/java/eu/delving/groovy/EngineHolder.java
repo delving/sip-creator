@@ -27,7 +27,7 @@ public class EngineHolder {
 
     private EngineHolder() { }
 
-    static GroovyScriptEngineImpl getInstance(){
+    public static GroovyScriptEngineImpl getInstance(){
         if (INSTANCE == null) {
             synchronized (EngineHolder.class) {
                 if (INSTANCE == null) {
