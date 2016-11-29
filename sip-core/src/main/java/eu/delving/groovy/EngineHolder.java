@@ -17,7 +17,7 @@ import java.net.URL;
  * Thread-safe holder of the singleton Groovy scripting engine that processes our mappings
  * Intentional package access only.
  */
-class EngineHolder {
+public class EngineHolder {
 
     private static final Logger LOG = LoggerFactory.getLogger(EngineHolder.class);
 
