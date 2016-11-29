@@ -34,8 +34,8 @@ public class BulkMappingRunner extends AbstractMappingRunner {
     }
 
     @Override
-    public Node runMapping(MetadataRecord metadataRecord) throws MappingException {
-        LOG.debug("Running mapping");
+    public Node runMapping(final MetadataRecord metadataRecord) throws MappingException {
+        LOG.trace("Running mapping for record {}", metadataRecord);
         SimpleBindings bindings = Utils.bindingsFor(recMapping.getFacts(),
             recMapping.getRecDefTree().getRecDef(), metadataRecord.getRootNode(),
             recMapping.getRecDefTree().getRecDef().valueOptLookup);
