@@ -5,7 +5,6 @@ import eu.delving.groovy.ParallelBulkMappingRunner.SingleMappingJobResult;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefTree;
 import eu.delving.metadata.RecMapping;
-import org.awaitility.Awaitility;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +18,8 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.mock;
@@ -39,6 +39,8 @@ public class ParallelBulkMappingRunnerTest {
     private RecDef recDef;
 
     private CompiledScript compiledScript;
+
+    private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     @Before
     public void before() throws Exception {
@@ -60,7 +62,7 @@ public class ParallelBulkMappingRunnerTest {
         final ArrayBlockingQueue<MetadataRecord> input = new ArrayBlockingQueue<>(1000);
         final ArrayBlockingQueue<SingleMappingJobResult> output = new ArrayBlockingQueue<>(1000);
         ParallelBulkMappingRunner runner = new ParallelBulkMappingRunner(input, output, compiledScript,
-            recMapping, Runtime.getRuntime().availableProcessors());
+            recMapping, executorService);
 
         BufferedOutputStream diskSimulator = new BufferedOutputStream(ByteStreams.nullOutputStream());
         Thread processor = new Thread(runner);

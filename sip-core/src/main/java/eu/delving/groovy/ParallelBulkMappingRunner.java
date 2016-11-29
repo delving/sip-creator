@@ -31,19 +31,19 @@ public class ParallelBulkMappingRunner implements Runnable {
      * @param input the mapping-records to process
      * @param output the mapped nodes
      * @param script the Script as compiled by a ScriptEngine engine obtained from {@link EngineHolder#getInstance()}
-     * @param parallelism the amount of workers. Recommended not to equal to or lower than the amount of cores in this machine as
-     *                    this work is CPU-bound.
+     * @param executorService whose backing thread-pool's size is recommended to be equal to or lower than the amount
+     *                        of cores in this machine as this work is CPU-bound.
      */
     public ParallelBulkMappingRunner(final BlockingQueue<MetadataRecord> input,
                                      final BlockingQueue<SingleMappingJobResult> output,
                                      final CompiledScript script,
                                      final RecMapping recMapping,
-                                     final int parallelism) {
+                                     final ExecutorService executorService) {
         this.input = input;
         this.output = output;
         this.script = script;
         this.recMapping = recMapping;
-        this.executorService = Executors.newWorkStealingPool(parallelism);
+        this.executorService = executorService;
     }
 
     @Override
