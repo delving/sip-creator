@@ -15,28 +15,29 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Stops processing when it encounters a poison pill.
+ * Processes records in parallel, intended to be used for processing of a single dataset.
  */
 public class ParallelBulkMappingRunner implements Runnable {
+    private static final Logger LOG = LoggerFactory.getLogger(ParallelBulkMappingRunner.class);
 
     private final BlockingQueue<MetadataRecord> input;
     private final BlockingQueue<SingleMappingJobResult> output;
-    private static final Logger LOG = LoggerFactory.getLogger(ParallelBulkMappingRunner.class);
-    private ExecutorService executorService;
+    private final ExecutorService executorService;
     private final CompiledScript script;
     private final RecMapping recMapping;
     private boolean keepRunning = true;
 
     /**
      * @param input the mapping-records to process
-     * @param output the mapped node.
+     * @param output the mapped nodes
+     * @param script the Script as compiled by a ScriptEngine engine obtained from {@link EngineHolder#getInstance()}
      * @param parallelism the amount of workers. Recommended not to equal to or lower than the amount of cores in this machine as
      *                    this work is CPU-bound.
      */
-    public ParallelBulkMappingRunner(BlockingQueue<MetadataRecord> input,
-                                     BlockingQueue<SingleMappingJobResult> output,
-                                     CompiledScript script,
-                                     RecMapping recMapping,
+    public ParallelBulkMappingRunner(final BlockingQueue<MetadataRecord> input,
+                                     final BlockingQueue<SingleMappingJobResult> output,
+                                     final CompiledScript script,
+                                     final RecMapping recMapping,
                                      final int parallelism) {
         this.input = input;
         this.output = output;
@@ -75,7 +76,7 @@ public class ParallelBulkMappingRunner implements Runnable {
     private class SingleRecordProcessingJob implements Runnable {
         private final MetadataRecord metadataRecord;
 
-        SingleRecordProcessingJob(MetadataRecord metadataRecord) {
+        SingleRecordProcessingJob(final MetadataRecord metadataRecord) {
             this.metadataRecord = metadataRecord;
         }
 
