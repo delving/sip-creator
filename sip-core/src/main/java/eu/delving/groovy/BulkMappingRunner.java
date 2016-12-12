@@ -1,51 +1,39 @@
 package eu.delving.groovy;
 
-import eu.delving.metadata.RecMapping;
+import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Node;
 
+import javax.script.Bindings;
 import javax.script.CompiledScript;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
 
 /**
- * Designed not for user-feedback but for re-executing many scripts, very often.
+ * Designed not for user-feedback whether a mapping-script is correct but for re-executing many scripts, very often.
  */
-public class BulkMappingRunner extends AbstractMappingRunner {
+public class BulkMappingRunner implements MappingRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(BulkMappingRunner.class);
-    private CompiledScript compiledScript;
 
-    /**
-     * @param recMapping represents to mapping to be applied
-     * @param generatedCode the code to be executed against each record
-     */
-    public BulkMappingRunner(final RecMapping recMapping, final String generatedCode) {
-        super(recMapping, generatedCode);
-        try {
-            this.compiledScript = EngineHolder.getInstance().compile(generatedCode);
-        } catch (ScriptException e) {
-            // we don't expect non-compiling scripts in the bulk runner.
-            LOG.error("Error compiling script: {}", e.getMessage());
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
-    public Node runMapping(final MetadataRecord metadataRecord) throws MappingException {
-        LOG.trace("Running mapping for record {}", metadataRecord);
-        SimpleBindings bindings = Utils.bindingsFor(recMapping.getFacts(),
-            recMapping.getRecDefTree().getRecDef(), metadataRecord.getRootNode(),
-            recMapping.getRecDefTree().getRecDef().valueOptLookup);
+    public Optional<String> transform(final String record, final String scriptCode,
+                                      final Map<String, ?> additionalContext) {
         try {
-            Node result = (Node) compiledScript.eval(bindings);
-            return Utils.stripEmptyElements(result);
+            CompiledScript compiledScript = EngineHolder.getInstance().compile(scriptCode);
+            String result = (String) compiledScript.eval(createContext(record, additionalContext));
+            return Optional.ofNullable(result);
         } catch (ScriptException e) {
-            throw new RuntimeException(e);
+            LOG.error("Unexpected script compilation failure: {}", e);
+            throw new IllegalArgumentException(e);
         }
-
     }
 
+    private Bindings createContext(final String record, final Map<String, ?> additionalContext) {
+        final Map<String, Object> world = ImmutableMap.of("input", record, "_facts", additionalContext);
+        return new SimpleBindings(ImmutableMap.of("WORLD", world));
+    }
 }

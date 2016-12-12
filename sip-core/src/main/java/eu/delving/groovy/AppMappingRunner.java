@@ -35,6 +35,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,96 +58,16 @@ import static eu.delving.groovy.Utils.*;
  *
  */
 
-public class AppMappingRunner extends AbstractMappingRunner {
+public class AppMappingRunner implements MappingRunner {
 
     private final ScriptBinding binding = new ScriptBinding();
     private Script script;
 
-    /**
-     *
-     * @param groovyCodeResource A factory for Groovy-scripts
-     * @param recMapping represents to mapping to be applied
-     * @param editPath represents an (optional) addendum to the recMapping
-     * @param trace if true, inserts a stacktrace-comment into the generated code
-     */
-    public AppMappingRunner(
-        final GroovyCodeResource groovyCodeResource,
-        final RecMapping recMapping,
-        final EditPath editPath, final boolean trace) {
-        super(recMapping, new CodeGenerator(recMapping).withEditPath(editPath).withTrace(trace).toRecordMappingCode());
-        this.script = groovyCodeResource.createMappingScript(code);
-        this.script.getBinding().setVariable("WORLD", binding);
-        GroovyNode factsNode = new GroovyNode(null, "facts");
-        for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
-            new GroovyNode(factsNode, entry.getKey(), entry.getValue());
-        }
-        this.binding._facts = initFactsNode(recMapping.getFacts());
-        this.binding._optLookup = recMapping.getRecDefTree().getRecDef().valueOptLookup;
-    }
+
 
 
     @Override
-    public Node runMapping(MetadataRecord metadataRecord) throws MappingException  {
-        if (metadataRecord == null) throw new RuntimeException("Null input metadata record");
-        try {
-            binding.output = DOMBuilder.createFor(recMapping.getRecDefTree().getRecDef());
-            binding.input = Collections.singletonList(metadataRecord.getRootNode());
-            return stripEmptyElements(script.run());
-        }
-        catch (DiscardRecordException e) {
-            throw e;
-        }
-        catch (MissingPropertyException e) {
-            throw new MappingException("Missing Property " + e.getProperty(), e);
-        }
-        catch (MultipleCompilationErrorsException e) {
-            StringBuilder out = new StringBuilder();
-            for (Object o : e.getErrorCollector().getErrors()) {
-                SyntaxErrorMessage message = (SyntaxErrorMessage) o;
-                @SuppressWarnings({"ThrowableResultOfMethodCallIgnored"}) SyntaxException se = message.getCause();
-                // line numbers will not match
-                out.append(String.format("Problem: %s%n", se.getOriginalMessage()));
-            }
-            throw new MappingException(out.toString(), e);
-        }
-        catch (AssertionError e) {
-            throw new MappingException("The keyword 'assert' should not be used", e);
-        }
-        catch (Exception e) {
-            String codeLines = fetchCodeLines(e);
-            if (codeLines != null) {
-                throw new MappingException("Script Exception:%n" + codeLines, e);
-            }
-            else {
-                throw new MappingException("Unexpected: " + e.toString(), e);
-            }
-        }
+    public Optional<String> transform(String record, String scriptCode, Map<String, ?> additionalContext) throws IllegalArgumentException {
+        return Optional.empty();
     }
-
-    // a dirty hack which parses the exception's stack trace.  any better strategy welcome, but it works.
-    private String fetchCodeLines(Exception e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter out = new PrintWriter(sw);
-        e.printStackTrace(out);
-        String trace = sw.toString();
-        Pattern pattern = Pattern.compile("Script1.groovy:([0-9]*)");
-        Matcher matcher = pattern.matcher(trace);
-        if (matcher.find()) {
-            StringBuilder sb = new StringBuilder();
-            int lineNumber = Integer.parseInt(matcher.group(1));
-            for (String line : code.split("\n")) {
-                lineNumber--;
-                if (Math.abs(lineNumber) <= 2) {
-                    sb.append(lineNumber == 0 ? ">>>" : "   ");
-                    sb.append(line).append('\n');
-                }
-            }
-            sb.append("----------- What happened ------------\n");
-            sb.append(e.toString());
-            return sb.toString();
-        }
-        return null;
-    }
-
-
 }

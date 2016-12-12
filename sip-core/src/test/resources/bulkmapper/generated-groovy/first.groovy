@@ -387,4 +387,3 @@ use (MappingCategory) {
    }
    outputNode
 }
-// ----------------------------------
