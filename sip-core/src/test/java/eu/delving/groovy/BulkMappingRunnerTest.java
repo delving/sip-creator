@@ -24,7 +24,7 @@ public class BulkMappingRunnerTest {
     private static Logger LOG = LoggerFactory.getLogger(BulkMappingRunnerTest.class);
 
     private static final String CODE_TEMPLATE = "groovy.xml.DOMBuilder.newInstance().parseText('<foo><bar>%s</bar></foo>')";
-    private final String NON_RANDOM_CODE = String.format(CODE_TEMPLATE, "bar");
+    public static final String NON_RANDOM_CODE = String.format(CODE_TEMPLATE, "bar");
 
     @Mock
     private RecMapping recMapping;
@@ -57,8 +57,13 @@ public class BulkMappingRunnerTest {
      * This mimics the same dataset being processed many times, without that dataset's mapping-code changing.
      */
     @Test
-    public void testHundredsOfInvocations() throws MappingException {
-        nInvocations(100, false);
+    public void testManyInvocations() throws MappingException {
+        int num = 100;
+        long start = System.currentTimeMillis();
+        nInvocations(num, false);
+        long end = System.currentTimeMillis();
+        LOG.debug("processed {} records in an estimated time of {} ms", num, (end - start));
+
     }
 
     /**
@@ -72,7 +77,7 @@ public class BulkMappingRunnerTest {
      * had their-mapping code updated too often.
      */
     @Test
-    public void testHundredsOfRandomInvocations() throws MappingException {
+    public void testManyRandomInvocations() throws MappingException {
         nInvocations(100, true);
     }
 

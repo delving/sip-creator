@@ -23,7 +23,6 @@ package eu.delving.groovy;
 
 import eu.delving.metadata.CodeGenerator;
 import eu.delving.metadata.EditPath;
-import eu.delving.metadata.RecDefTree;
 import eu.delving.metadata.RecMapping;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
@@ -31,16 +30,15 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage;
 import org.codehaus.groovy.syntax.SyntaxException;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static eu.delving.groovy.Utils.*;
 
 /**
  * This core class takes a RecMapping and execute the code that it can generate to

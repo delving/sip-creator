@@ -25,21 +25,28 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import eu.delving.XStreamFactory;
 import eu.delving.metadata.Hasher;
-import eu.delving.sip.Application;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.HomeDirectory;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.AbstractHttpEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import java.io.File;
@@ -48,6 +55,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
@@ -65,6 +74,7 @@ public class NetworkClient {
     private static final int BLOCK_SIZE = 1024;
     private final SipModel sipModel;
     private final HttpClient httpClient;
+    private final HttpClientContext httpClientContext;
     public final NarthexCredentials narthexCredentials;
     private volatile boolean loggedIn;
 
@@ -106,10 +116,35 @@ public class NetworkClient {
         String narthexPassword();
     }
 
-    public NetworkClient(SipModel sipModel, HttpClient httpClient, NarthexCredentials narthexCredentials) {
+    public NetworkClient(SipModel sipModel, NarthexCredentials narthexCredentials) {
         this.sipModel = sipModel;
-        this.httpClient = httpClient;
         this.narthexCredentials = narthexCredentials;
+
+        try {
+            URL url = new URL(narthexCredentials.narthexUrl());
+            String hostname = url.getHost();
+            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(narthexCredentials.narthexUser(),
+                narthexCredentials.narthexPassword());
+            AuthScope narthexRealm = new AuthScope(hostname, -1, "narthex");
+            credentialsProvider.setCredentials(narthexRealm, credentials);
+
+            AuthCache authCache = new BasicAuthCache();
+            authCache.put(new HttpHost(hostname, -1, url.getProtocol()), new BasicScheme());
+
+            // Add AuthCache to the execution context
+            final HttpClientContext context = HttpClientContext.create();
+            context.setCredentialsProvider(credentialsProvider);
+            context.setAuthCache(authCache);
+            this.httpClientContext = context;
+
+            HttpClientBuilder builder = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider);
+            builder = HttpClientFactory.handleProxy(narthexCredentials.narthexUrl(), builder);
+            this.httpClient = builder.build();
+
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public interface NarthexListListener {
@@ -160,14 +195,16 @@ public class NetworkClient {
         @Override
         public void run() {
             try {
-                HttpPost post = createNarthexLoginRequest();
-                String json = String.format(
-                        "{ \"username\":\"%s\", \"password\":\"%s\" }",
-                        narthexCredentials.narthexUser(), narthexCredentials.narthexPassword()
+                // if we can fetch the list of sipzips, we are ok
+                String requestUrl = String.format(
+                    "%s/sip-app",
+                    narthexCredentials.narthexUrl()
                 );
-                post.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
-                HttpResponse response = httpClient.execute(post);
+                feedback().info("GET " + requestUrl);
+                HttpGet get =  new HttpGet(requestUrl);
+                HttpResponse response = httpClient.execute(get, httpClientContext);
                 Code code = Code.from(response);
+
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     switch (code) {
@@ -201,14 +238,6 @@ public class NetworkClient {
             return Job.LOGIN;
         }
 
-        private HttpPost createNarthexLoginRequest() {
-            String requestUrl = String.format(
-                    "%s/login",
-                    narthexCredentials.narthexUrl()
-            );
-            feedback().info("POST " + requestUrl);
-            return new HttpPost(requestUrl);
-        }
     }
 
     private class NarthexListFetcher implements Work {
@@ -223,7 +252,7 @@ public class NetworkClient {
             try {
                 HttpGet get = createNarthexListRequest();
                 get.setHeader("Accept", "text/xml");
-                HttpResponse response = httpClient.execute(get);
+                HttpResponse response = httpClient.execute(get, httpClientContext);
                 Code code = Code.from(response);
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
@@ -290,7 +319,7 @@ public class NetworkClient {
             boolean success = false;
             try {
                 HttpGet get = createSipZipDownloadRequest();
-                HttpResponse response = httpClient.execute(get);
+                HttpResponse response = httpClient.execute(get, httpClientContext);
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     Code code = Code.from(response);
@@ -366,7 +395,7 @@ public class NetworkClient {
             String requestUrl = String.format(
                     "%s/sip-app/%s",
                     narthexCredentials.narthexUrl(),
-                    dataSet.getSpec()
+                    dataSet.getSpec().trim()
             );
             feedback().info("GET " + requestUrl);
             return new HttpGet(requestUrl);
@@ -391,7 +420,7 @@ public class NetworkClient {
                 feedback().info("Uploading SIP-Zip " + sipZipFile.getName() + " to Narthex dataset " + datasetName);
                 HttpPost sipZipPost = createSipZipUploadRequest(sipZipFile, progressListener);
                 FileEntity fileEntity = (FileEntity) sipZipPost.getEntity();
-                HttpResponse sipZipResponse = httpClient.execute(sipZipPost);
+                HttpResponse sipZipResponse = httpClient.execute(sipZipPost, httpClientContext);
                 Code code = Code.from(sipZipResponse);
                 if (code != Code.OK && !fileEntity.abort) {
                     reportResponse(Code.from(sipZipResponse), sipZipResponse.getStatusLine());
@@ -420,7 +449,7 @@ public class NetworkClient {
             String requestUrl = String.format(
                     "%s/sip-app/%s/%s",
                     narthexCredentials.narthexUrl(),
-                    datasetName,
+                    datasetName.trim(),
                     file.getName()
             );
             feedback().info("POST " + requestUrl);
