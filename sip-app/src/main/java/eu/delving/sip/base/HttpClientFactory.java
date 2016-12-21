@@ -22,11 +22,6 @@
 package eu.delving.sip.base;
 
 import org.apache.http.HttpHost;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.net.InetSocketAddress;
@@ -36,31 +31,20 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-/**
- * Create the HttpClient correctly
- *
- *
- */
-
 public class HttpClientFactory {
 
-    public static final CookieStore COOKIE_STORE = new BasicCookieStore();
 
-    public static HttpClient createLinkCheckClient() {
-        return HttpClientBuilder.create().disableAutomaticRetries().build();
-    }
-
-    public static HttpClient createHttpClient(String serverUrl) {
-        RequestConfig requestConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY).build();
-        HttpClientBuilder builder = HttpClientBuilder.create()
-                .disableAutomaticRetries()
-                .setDefaultRequestConfig(requestConfig)
-                .setDefaultCookieStore(COOKIE_STORE);
+    public static HttpClientBuilder createHttpClient(String serverUrl) {
+        HttpClientBuilder builder = HttpClientBuilder.create().disableAutomaticRetries();
         handleProxy(serverUrl, builder);
-        return builder.build();
+        return builder;
     }
 
-    private static void handleProxy(String serverUrl, HttpClientBuilder builder) {
+    /**
+     *
+     * @return the decorated builder
+     */
+    public static HttpClientBuilder handleProxy(String serverUrl, HttpClientBuilder builder) {
         try {
             List<Proxy> proxies = ProxySelector.getDefault().select(new URI(serverUrl));
             for (Proxy proxy : proxies) {
@@ -70,6 +54,7 @@ public class HttpClientFactory {
                 int port = addr.getPort();
                 builder.setProxy(new HttpHost(host, port));
             }
+            return builder;
         }
         catch (URISyntaxException e) {
             throw new RuntimeException("Bad address: " + serverUrl, e);

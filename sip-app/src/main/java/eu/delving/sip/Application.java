@@ -27,6 +27,7 @@ import eu.delving.schema.SchemaRepository;
 import eu.delving.sip.actions.UnlockMappingAction;
 import eu.delving.sip.actions.ValidateAction;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.HttpClientFactory;
 import eu.delving.sip.base.NetworkClient;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
@@ -125,7 +126,7 @@ public class Application {
         feedback = new VisualFeedback(home, desktop, preferences);
         // todo: be sure to set this
         String serverUrl = preferences.get("serverUrl", "http://localhost:9000/narthex");
-        HttpClient httpClient = createHttpClient(serverUrl);
+        HttpClient httpClient = createHttpClient(serverUrl).build();
         SchemaRepository schemaRepository;
         try {
             schemaRepository = new SchemaRepository(new SchemaFetcher(httpClient));
@@ -138,7 +139,8 @@ public class Application {
         context.setStorage(storage);
         context.setHttpClient(httpClient);
         sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, preferences);
-        NetworkClient networkClient = new NetworkClient(sipModel, httpClient, new NetworkClient.NarthexCredentials() {
+
+        NetworkClient networkClient = new NetworkClient(sipModel, new NetworkClient.NarthexCredentials() {
 
             @Override
             public boolean areSet() {
