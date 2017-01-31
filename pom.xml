@@ -27,7 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.delving</groupId>
     <artifactId>sip-creator</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.2SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>SIP-Creator</name>
     <description>
