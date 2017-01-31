@@ -162,12 +162,12 @@ public class Application {
 
             @Override
             public String narthexUrl() {
-                return sipModel.getPreferences().get(NARTHEX_URL, "").replaceAll("[/#]+$", "").trim();
+                return sipModel.getPreferences().get(NARTHEX_URL, "http://delving.org/narthex").replaceAll("[/#]+$", "").trim();
             }
 
             @Override
             public String narthexUser() {
-                return sipModel.getPreferences().get(NARTHEX_USERNAME, "").trim();
+                return sipModel.getPreferences().get(NARTHEX_USERNAME, "admin").trim();
             }
 
             @Override
