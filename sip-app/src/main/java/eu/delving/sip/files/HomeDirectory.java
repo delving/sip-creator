@@ -33,10 +33,12 @@ public class HomeDirectory {
     public static final File WORKSPACE_DIR = new File(System.getProperty("user.home"), "PocketMapper");
     public static final File WORK_DIR = new File(WORKSPACE_DIR, "work");
     public static final File UP_DIR = new File(WORKSPACE_DIR, "up");
+    public static final File RECORD_DIR = new File(WORKSPACE_DIR, "records");
 
     static {
         if (!WORKSPACE_DIR.exists()) WORKSPACE_DIR.mkdirs();
         if (!UP_DIR.exists()) UP_DIR.mkdirs();
         if (!WORK_DIR.exists()) WORK_DIR.mkdirs();
+        if (!RECORD_DIR.exists()) RECORD_DIR.mkdirs();
     }
 }
