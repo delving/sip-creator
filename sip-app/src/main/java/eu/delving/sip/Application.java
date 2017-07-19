@@ -317,7 +317,7 @@ public class Application {
                     "Busy",
                     "There are jobs busy, are you sure you want to exit?"
             );
-            if (exitAnyway) return;
+            if (!exitAnyway) return;
         }
         sipProperties.saveProperties();
         System.exit(0);
