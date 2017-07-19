@@ -38,7 +38,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
-import java.util.prefs.Preferences;
+import java.util.Properties;
 
 import static eu.delving.sip.files.Storage.NARTHEX_DATASET_NAME;
 import static eu.delving.sip.files.Storage.NARTHEX_PASSWORD;
@@ -58,10 +58,10 @@ import static org.apache.commons.lang.StringUtils.isWhitespace;
 public class VisualFeedback implements Feedback {
     private JDesktopPane desktop;
     private Log log;
-    private Preferences preferences;
+    private Properties preferences;
     private PasswordFetcher passwordFetcher;
 
-    public VisualFeedback(JFrame frame, JDesktopPane desktop, Preferences preferences) {
+    public VisualFeedback(JFrame frame, JDesktopPane desktop, Properties preferences) {
         this.desktop = desktop;
         this.preferences = preferences;
         this.passwordFetcher = new PasswordFetcher(frame);
@@ -274,7 +274,6 @@ public class VisualFeedback implements Feedback {
     }
 
     private class PasswordFetcher implements ActionListener {
-        private static final String PASSWORD = "Password";
         private JDialog dialog;
         private JPasswordField passwordField = new JPasswordField(15);
         private JCheckBox savePassword = new JCheckBox("Save password");
@@ -287,7 +286,7 @@ public class VisualFeedback implements Feedback {
             ok.addActionListener(this);
             ok.setEnabled(false);
             this.dialog.getRootPane().setDefaultButton(ok);
-            String savedPassword = preferences.get(PASSWORD, "");
+            String savedPassword = preferences.getProperty(NARTHEX_PASSWORD, "");
             savePassword.setSelected(!savedPassword.isEmpty());
             passwordField.getDocument().addDocumentListener(new DocumentListener() {
                 @Override
@@ -340,7 +339,7 @@ public class VisualFeedback implements Feedback {
         public void actionPerformed(ActionEvent actionEvent) {
             password.setLength(0);
             password.append(new String(passwordField.getPassword()));
-            preferences.put(PASSWORD, savePassword.isSelected() ? password.toString() : "");
+            preferences.setProperty(NARTHEX_PASSWORD, savePassword.isSelected() ? password.toString() : "");
             dialog.setVisible(false);
         }
     }

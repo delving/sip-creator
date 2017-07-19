@@ -45,6 +45,7 @@ import eu.delving.sip.menus.ExpertMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.SipProperties;
 import eu.delving.sip.panels.StatusPanel;
 import eu.delving.sip.panels.WorkPanel;
 import org.apache.http.HttpResponse;
@@ -103,8 +104,10 @@ public class Application {
     private ExpertMenu expertMenu;
     private CreateSipZipAction createSipZipAction;
     private UnlockMappingAction unlockMappingAction;
+    private SipProperties sipProperties;
 
     private Application(final File storageDir) throws StorageException {
+        sipProperties = new SipProperties();
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         desktop = new JDesktopPane();
         desktop.setMinimumSize(new Dimension(800, 600));
@@ -122,10 +125,9 @@ public class Application {
                 resizeTimer.restart();
             }
         });
-        Preferences preferences = Preferences.userNodeForPackage(SipModel.class);
-        feedback = new VisualFeedback(home, desktop, preferences);
+        feedback = new VisualFeedback(home, desktop, sipProperties.getProp());
         // todo: be sure to set this
-        String serverUrl = preferences.get("serverUrl", "http://localhost:9000/narthex");
+        String serverUrl = sipProperties.getProp().getProperty(NARTHEX_URL, "http://delving.org/narthex");
         HttpClient httpClient = createHttpClient(serverUrl).build();
         SchemaRepository schemaRepository;
         try {
@@ -138,13 +140,16 @@ public class Application {
         Storage storage = new StorageImpl(storageDir, schemaRepository, new CachedResourceResolver(context));
         context.setStorage(storage);
         context.setHttpClient(httpClient);
-        sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, preferences);
+        sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, sipProperties);
 
         NetworkClient networkClient = new NetworkClient(sipModel, new NetworkClient.NarthexCredentials() {
 
+            private SipProperties sipProperties = new SipProperties();
+            private Properties props = sipProperties.getProp();
+
             @Override
             public boolean areSet() {
-                return !(narthexUrl().isEmpty() || narthexUser().isEmpty());
+                return !(narthexUrl().isEmpty() && narthexUser().isEmpty() && narthexPassword().isEmpty());
             }
 
             @Override
@@ -153,26 +158,28 @@ public class Application {
                 fields.put(NARTHEX_URL, narthexUrl());
                 fields.put(NARTHEX_USERNAME, narthexUser());
                 fields.put(NARTHEX_PASSWORD, narthexPassword());
+
                 if (sipModel.getFeedback().getNarthexCredentials(fields)) {
-                    sipModel.getPreferences().put(NARTHEX_URL, fields.get(NARTHEX_URL));
-                    sipModel.getPreferences().put(NARTHEX_USERNAME, fields.get(NARTHEX_USERNAME));
-                    sipModel.getPreferences().put(NARTHEX_PASSWORD, fields.get(NARTHEX_PASSWORD));
+                    props.setProperty(NARTHEX_URL, fields.get(NARTHEX_URL));
+                    props.setProperty(NARTHEX_USERNAME, fields.get(NARTHEX_USERNAME));
+                    props.setProperty(NARTHEX_PASSWORD, fields.get(NARTHEX_PASSWORD));
+                    sipProperties.saveProperties();
                 }
             }
 
             @Override
             public String narthexUrl() {
-                return sipModel.getPreferences().get(NARTHEX_URL, "http://delving.org/narthex").replaceAll("[/#]+$", "").trim();
+                return props.getProperty(NARTHEX_URL, "http://delving.org/narthex").replaceAll("[/#]+$", "").trim();
             }
 
             @Override
             public String narthexUser() {
-                return sipModel.getPreferences().get(NARTHEX_USERNAME, "admin").trim();
+                return props.getProperty(NARTHEX_USERNAME, "admin").trim();
             }
 
             @Override
             public String narthexPassword() {
-                return sipModel.getPreferences().get(NARTHEX_PASSWORD, "").trim();
+                return props.getProperty(NARTHEX_PASSWORD, "").trim();
             }
         });
         createSipZipAction = new CreateSipZipAction();
@@ -312,6 +319,7 @@ public class Application {
             );
             if (exitAnyway) return;
         }
+        sipProperties.saveProperties();
         System.exit(0);
     }
 

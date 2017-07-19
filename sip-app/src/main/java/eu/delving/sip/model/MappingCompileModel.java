@@ -316,7 +316,7 @@ public class MappingCompileModel {
                 try {
                     Node node = MappingRunner.runMapping(metadataRecord);
                     if (node == null) return;
-                    boolean enableXSDValidation = sipModel.getPreferences().getBoolean(XSD_VALIDATION, false);
+                    boolean enableXSDValidation = sipModel.getPreferences().getProperty(XSD_VALIDATION, "false").contentEquals("true");
                     if (validator != null && enableXSDValidation) {
                         ForgivingErrorHandler handler = new ForgivingErrorHandler();
                         validator.setErrorHandler(handler);

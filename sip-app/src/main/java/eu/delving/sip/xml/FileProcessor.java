@@ -166,7 +166,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             int engineCount = Runtime.getRuntime().availableProcessors();
             info(String.format("Processing with %d engines", engineCount));
             for (int walk = 0; walk < engineCount; walk++) {
-                boolean enableXSDValidation = sipModel.getPreferences().getBoolean(XSD_VALIDATION, false);
+                boolean enableXSDValidation = sipModel.getPreferences().getProperty(XSD_VALIDATION, "false").contentEquals("true");
                 Validator validator = null;
                 if (enableXSDValidation) {
                     validator = dataSet.newValidator();

@@ -48,8 +48,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,12 +61,13 @@ import java.util.regex.Pattern;
  */
 
 public class SipModel {
+    private  SipProperties sipProperties;
     private JDesktopPane desktop;
     private AllFrames.ViewSelector viewSelector;
     private WorkModel workModel;
     private Storage storage;
     private GroovyCodeResource groovyCodeResource;
-    private Preferences preferences;
+    private Properties preferences;
     private Feedback feedback;
     private FunctionCompileModel functionCompileModel;
     private MappingCompileModel recordCompileModel;
@@ -90,12 +91,13 @@ public class SipModel {
         boolean accept(MetadataRecord record);
     }
 
-    public SipModel(JDesktopPane desktop, Storage storage, GroovyCodeResource groovyCodeResource, final Feedback feedback, Preferences preferences) throws StorageException {
+    public SipModel(JDesktopPane desktop, Storage storage, GroovyCodeResource groovyCodeResource, final Feedback feedback, SipProperties sipProperties) throws StorageException {
         this.desktop = desktop;
         this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
-        this.preferences = preferences;
+        this.sipProperties = sipProperties;
+        this.preferences = sipProperties.getProp();
         this.workModel = new WorkModel(feedback);
         dataSetModel = new DataSetModel(this);
         functionCompileModel = new FunctionCompileModel(this, groovyCodeResource);
@@ -149,6 +151,9 @@ public class SipModel {
         statsModel = new StatsModel(this);
     }
 
+    public void saveProperties() {
+        sipProperties.saveProperties();
+    }
     public void shutdown() {
         dataSetModel.shutdown();
         mappingSaveTimer.shutdown();
@@ -176,7 +181,7 @@ public class SipModel {
         return workModel;
     }
 
-    public Preferences getPreferences() {
+    public Properties getPreferences() {
         return preferences;
     }
 
@@ -366,7 +371,7 @@ public class SipModel {
 
     public void processFile(boolean allowInvalid, FileProcessor.Listener listener) {
         final DataSet dataSet = getDataSetModel().getDataSet();
-        final String narthexUrl = getPreferences().get(Storage.NARTHEX_URL, "");
+        final String narthexUrl = getPreferences().getProperty(Storage.NARTHEX_URL, "");
         dataSet.deleteResults();
         getMappingModel().setLocked(true);
         exec(new FileProcessor(

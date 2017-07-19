@@ -177,7 +177,7 @@ public class ExpertMenu extends JMenu {
     private class ToggleXSDValidation extends JCheckBoxMenuItem implements ItemListener {
         public ToggleXSDValidation() {
             super("Toggle XSD Validation");
-            boolean state = sipModel.getPreferences().getBoolean(XSD_VALIDATION, false);
+            boolean state = sipModel.getPreferences().getProperty(XSD_VALIDATION, "false").contentEquals("true");
             setState(state);
             addItemListener(this);
         }
@@ -186,7 +186,8 @@ public class ExpertMenu extends JMenu {
         public void itemStateChanged(ItemEvent e) {
             int state = e.getStateChange();
             boolean selected = state == ItemEvent.SELECTED;
-            sipModel.getPreferences().putBoolean(XSD_VALIDATION, selected);
+            sipModel.getPreferences().setProperty(XSD_VALIDATION, String.valueOf(selected));
+            sipModel.saveProperties();
         }
     }
 
