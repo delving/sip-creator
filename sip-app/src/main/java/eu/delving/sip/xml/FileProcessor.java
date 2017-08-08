@@ -78,7 +78,12 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private Termination termination = new Termination();
 
     private void info(String message) {
-        sipModel.getFeedback().info(message);
+        if (sipModel != null) {
+            sipModel.getFeedback().info(message);
+        }
+        else {
+            System.out.println(message);
+        }
     }
 
     public interface Listener {
@@ -186,6 +191,39 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         catch (Exception e) {
             termination.dueToException(e);
             sipModel.getFeedback().alert("File processing setup problem", e);
+        }
+    }
+
+    public void runHeadless(boolean enableXSDValidation) {
+        try {
+            MetadataParser parser = new MetadataParser(getDataSet().openSourceInputStream(), 0);
+            ReportWriter reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
+            XmlOutput xmlOutput = new XmlOutput(getDataSet().targetOutput(), recDef().getNamespaceMap());
+            // this.stats = createStats();
+            Consumer consumer = new Consumer(reportWriter, xmlOutput);
+            QueueFiller queueFiller = new QueueFiller(parser, recordSource, consumer);
+            int engineCount = Runtime.getRuntime().availableProcessors();
+            System.out.println(String.format("Processing with %d engines", engineCount));
+            for (int walk = 0; walk < engineCount; walk++) {
+                Validator validator = null;
+                if (enableXSDValidation) {
+                    validator = dataSet.newValidator();
+                    validator.setErrorHandler(null);
+                }
+                MappingRunner MappingRunner = new AppMappingRunner(groovyCodeResource, recMapping, null, false);
+                List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
+                MappingEngine engine = new MappingEngine(
+                    walk, recordSource, MappingRunner, validator, assertionTests, consumer, allowInvalid, termination
+                );
+                engine.start();
+            }
+            queueFiller.start();
+            System.out.println(Thread.currentThread().getName() + " about to consume");
+            consumer.run();
+        }
+        catch (Exception e) {
+            termination.dueToException(e);
+            info("File processing setup problem: " + e);
         }
     }
 
@@ -454,7 +492,9 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         void normalCompletion() {
             completed = true;
-            listener.succeeded(FileProcessor.this);
+            if (listener != null) {
+                listener.succeeded(FileProcessor.this);
+            }
         }
 
         void dueToCancellation() {
@@ -468,11 +508,19 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         synchronized void dueToException(MetadataRecord failedRecord, Exception exception) {
             if (this.exception == null) { // only show one of them
-                sipModel.getFeedback().alert("Problem processing", exception);
+                if (sipModel != null) {
+                    sipModel.getFeedback().alert("Problem processing", exception);
+                }
+                else {
+                    System.out.println("Problem processing: ");
+                    exception.printStackTrace();
+                }
             }
             this.failedRecord = failedRecord;
             this.exception = exception;
-            listener.failed(FileProcessor.this);
+            if (listener != null) {
+                listener.failed(FileProcessor.this);
+            }
         }
 
         synchronized void askHowToProceed(MetadataRecord failedRecord, Exception exception) {

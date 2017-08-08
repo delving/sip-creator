@@ -122,7 +122,9 @@ public class MetadataParser {
                     if (node != null) {
                         if (path.equals(RECORD_CONTAINER)) {
                             metadataRecord = factory.fromGroovyNode(node, recordIndex++, recordCount);
-                            progressListener.setProgress(recordIndex);
+                            if (progressListener != null) {
+                                progressListener.setProgress(recordIndex);
+                            }
                             node = null;
                         }
                         else {

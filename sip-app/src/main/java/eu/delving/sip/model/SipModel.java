@@ -341,12 +341,12 @@ public class SipModel {
         }));
     }
 
-    private class Generator implements FileProcessor.UriGenerator {
+    public static class Generator implements FileProcessor.UriGenerator {
         private final String spec;
         private final String prefix;
         private final Matcher matcher;
 
-        private Generator(String narthexUrl, String spec, String prefix) {
+        public Generator(String narthexUrl, String spec, String prefix) {
             this.spec = spec;
             this.prefix = prefix;
             this.matcher = Pattern.compile("(https?://[^/]+).*").matcher(narthexUrl);
