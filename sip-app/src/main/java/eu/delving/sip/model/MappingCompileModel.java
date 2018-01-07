@@ -293,7 +293,8 @@ public class MappingCompileModel {
         CONTENT_VIOLATION,
         MISSING_FIELD,
         DISCARDED_RECORD,
-        UNEXPECTED
+        UNEXPECTED,
+        RDF_VIOLATION
     }
 
     private class MappingJob implements Work.DataSetPrefixWork {
@@ -353,7 +354,16 @@ public class MappingCompileModel {
                     } else {
                         MappingResult result = new MappingResult(serializer, metadataRecord.getId(), node, recMapping.getRecDefTree());
                         List<String> uriErrors = result.getUriErrors();
-                        if (!uriErrors.isEmpty()) {
+                        List<String> rdfErrors = result.getRDFErrors();
+                        if (!rdfErrors.isEmpty()) {
+                            StringBuilder out = new StringBuilder();
+                            for (String rdfError : result.getRDFErrors()) {
+                                out.append(rdfError).append("\n");
+                            }
+                            compilationComplete(Completion.RDF_VIOLATION, node, out.toString());
+
+                        }
+                        else if (!uriErrors.isEmpty()) {
                             StringBuilder out = new StringBuilder();
                             for (String uriError : result.getUriErrors()) {
                                 out.append(uriError).append("\n");
