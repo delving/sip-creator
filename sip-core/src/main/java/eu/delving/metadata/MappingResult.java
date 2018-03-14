@@ -22,17 +22,22 @@
 package eu.delving.metadata;
 
 import eu.delving.groovy.XmlSerializer;
+import org.apache.jena.rdf.model.Model;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.jena.rdf.model.ModelFactory;
+
 
 /**
  * The result of the mapping engine is wrapped in this class so that some post-processing and checking
@@ -88,12 +93,30 @@ public class MappingResult {
         return errors;
     }
 
+    public List<String> getRDFErrors() {
+        List<String> errors = new ArrayList<String>();
+        try {
+            Model mm = ModelFactory.createDefaultModel().read(new StringReader(toRDF()), null, "RDF/XML");
+        } catch (Exception e) {
+            errors.add(e.toString());
+        }
+        return errors;
+    }
+
     public Node root() {
         return root;
     }
 
     public String toXml() {
         return serializer.toXml(root, recDefTree != null);
+    }
+
+    public String toRDF() {
+        String rdf = toString();
+        rdf = rdf.replaceAll("naa:RDF|edm:RDF", "rdf:RDF");
+        rdf = rdf.replaceAll(" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"", "");
+        rdf = rdf.replaceAll("<rdf:RDF ", "$0xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" ");
+        return rdf;
     }
 
     public String toString() {
