@@ -30,7 +30,7 @@
     <artifactId>sip-cli</artifactId>
     <packaging>jar</packaging>
     <name>SIP-CLI</name>
-    <version>2017.1-SNAPSHOT</version>
+    <version>1.1.4</version>
     <inceptionYear>2013</inceptionYear>
 
     <organization>
@@ -48,7 +48,7 @@
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-creator</artifactId>
-        <version>1.1.2-SNAPSHOT</version>
+        <version>1.1.4</version>
     </parent>
 
     <build>
@@ -98,7 +98,7 @@
         <dependency>
             <groupId>eu.delving</groupId>
             <artifactId>sip-core</artifactId>
-            <version>1.1.2-SNAPSHOT</version>
+            <version>1.1.4</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -113,7 +113,7 @@
         <dependency>
             <groupId>eu.delving</groupId>
             <artifactId>sip-app</artifactId>
-            <version>1.1.2-SNAPSHOT</version>
+            <version>1.1.4</version>
         </dependency>
     </dependencies>
 </project>

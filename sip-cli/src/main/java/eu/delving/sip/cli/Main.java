@@ -196,18 +196,18 @@ public class Main {
         RecDefModel recDefModel = new RecDefModelImpl(dataSet);
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(Main.class.getClassLoader());
         RecMapping recMapping = dataSet.getRecMapping(recDefModel);
-        SipModel.Generator generator = new SipModel.Generator(narthexUrl, dataSet.getSpec(), recMapping.getPrefix());
-        FileProcessor fileProcessor = new FileProcessor(
-            null,
-            dataSet,
-            recMapping,
-            allowInvalid,
-            groovyCodeResource,
-            generator,
-            null
-        );
+        //SipModel.Generator generator = new SipModel.Generator(narthexUrl, dataSet.getSpec(), recMapping.getPrefix());
+        //FileProcessor fileProcessor = new FileProcessor(
+            //null,
+            //dataSet,
+            //recMapping,
+            //allowInvalid,
+            //groovyCodeResource,
+            //generator,
+            //null
+        //);
 
-        fileProcessor.runHeadless(xsdValidation);
+        //fileProcessor.runHeadless(xsdValidation);
 
         return false;
     }

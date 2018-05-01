@@ -29,6 +29,8 @@ import org.w3c.dom.NodeList;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -95,10 +97,9 @@ public class MappingResult {
 
     public List<String> getRDFErrors() {
         List<String> errors = new ArrayList<String>();
-        try {
-            Model mm = ModelFactory.createDefaultModel().read(new StringReader(toRDF()), null, "RDF/XML");
-        } catch (Exception e) {
-            errors.add(e.toString());
+        String error = MappingResult.hasRDFError(toRDF());
+        if (error.length() > 0) {
+            errors.add(error);
         }
         return errors;
     }
@@ -121,5 +122,15 @@ public class MappingResult {
 
     public String toString() {
         return toXml();
+    }
+
+    public static String hasRDFError(String rdf) {
+        try {
+            InputStream in = new ByteArrayInputStream(rdf.getBytes("UTF-8"));
+            Model mm = ModelFactory.createDefaultModel().read(in, null, "RDF/XML");
+        } catch (Exception e) {
+            return e.toString();
+        }
+        return "";
     }
 }

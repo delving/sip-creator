@@ -179,7 +179,16 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public boolean hasUriCheck() {
         if (isAttr()) {
-            return attr.uriCheck;
+            if (attr.tag.equals(new Tag(true, "rdf", "about", null))){
+                return true;
+
+            } else if (attr.tag.equals(new Tag(true, "rdf", "resource", null))){
+                return true;
+
+            } else {
+                return attr.uriCheck;
+            }
+
         }
         else {
             return elem.uriCheck;
