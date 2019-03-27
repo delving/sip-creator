@@ -73,7 +73,7 @@ public class CodeGenerator {
     }
 
     private void generate() {
-        codeOut.line("// SIP-Creator Generated Mapping Code");
+        codeOut.line("// /SIP-Creator Generated Mapping Code");
         codeOut.line("// ----------------------------------");
         codeOut.line("// Discarding:");
         codeOut.line("import eu.delving.groovy.DiscardRecordException");
@@ -361,6 +361,9 @@ public class CodeGenerator {
                         trace();
 
                         codeOut.line_("%s (", tag.toBuilderCall());
+                        if (nodeMapping.toString() == "rdf:resource") {
+                            // TODO catch resource mapping and potentially write out other structure.
+                        }
                         codeOut.line_("%s : {", sub.getTag().toBuilderCall());
                         codeOut.start(nodeMapping);
                         toAttributeCode(nodeMapping, groovyParams);
