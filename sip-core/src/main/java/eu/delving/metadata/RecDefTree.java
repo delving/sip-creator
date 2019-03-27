@@ -62,7 +62,7 @@ public class RecDefTree implements RecDefNodeListener {
             tree.resolve();
         }
         catch (XPathExpressionException e) {
-            throw new RuntimeException("XPath problem");
+            throw new RuntimeException("XPath problem: " + e.toString());
         }
         return tree;
     }
