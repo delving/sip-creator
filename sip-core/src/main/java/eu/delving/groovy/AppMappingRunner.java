@@ -113,9 +113,9 @@ public class AppMappingRunner extends AbstractMappingRunner {
             throw new MappingException("The keyword 'assert' should not be used", e);
         }
         catch (Exception e) {
-            String codeLines = fetchCodeLines(e);
+            String codeLines = fetchCodeLines(e, metadataRecord);
             if (codeLines != null) {
-                throw new MappingException("Script Exception:%n" + codeLines, e);
+                throw new MappingException("Script Exception:%n" + codeLines + metadataRecord.getId(), e);
             }
             else {
                 throw new MappingException("Unexpected: " + e.toString(), e);
@@ -124,7 +124,7 @@ public class AppMappingRunner extends AbstractMappingRunner {
     }
 
     // a dirty hack which parses the exception's stack trace.  any better strategy welcome, but it works.
-    private String fetchCodeLines(Exception e) {
+    private String fetchCodeLines(Exception e, MetadataRecord metadataRecord) {
         StringWriter sw = new StringWriter();
         PrintWriter out = new PrintWriter(sw);
         e.printStackTrace(out);
@@ -133,14 +133,19 @@ public class AppMappingRunner extends AbstractMappingRunner {
         Matcher matcher = pattern.matcher(trace);
         if (matcher.find()) {
             StringBuilder sb = new StringBuilder();
+            sb.append(String.format("Record number: %s\n", metadataRecord.getRecordNumber()));
+            sb.append(String.format("Record identifier: %s\n", metadataRecord.getId()));
+            sb.append(String.format("Source Record:\n %s\n", metadataRecord.toString()));
+            sb.append("--------------- Groovy Code ---------------\n");
             int lineNumber = Integer.parseInt(matcher.group(1));
             for (String line : code.split("\n")) {
                 lineNumber--;
                 if (Math.abs(lineNumber) <= 2) {
                     sb.append(lineNumber == 0 ? ">>>" : "   ");
-                    sb.append(line).append('\n');
                 }
+                sb.append(line).append('\n');
             }
+
             sb.append("----------- What happened ------------\n");
             sb.append(e.toString());
             return sb.toString();
