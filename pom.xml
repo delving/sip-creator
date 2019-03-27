@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyri
   ~
@@ -19,21 +19,14 @@
   ~ See the Licence for the specific language governing
   ~ permissions and limitations under the Licence.
   -->
-
-<project
-        xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.delving</groupId>
     <artifactId>sip-creator</artifactId>
     <version>1.1.5</version>
     <packaging>pom</packaging>
     <name>SIP-Creator</name>
-    <description>
-        This parent project defines the version management, repositories, etc for all the other modules.
-    </description>
-
+    <description>This parent project defines the version management, repositories, etc for all the other modules.</description>
     <repositories>
         <repository>
             <id>releases</id>
@@ -49,7 +42,6 @@
             </snapshots>
         </repository>
     </repositories>
-
     <distributionManagement>
         <repository>
             <id>artifactory.delving.org</id>
@@ -62,7 +54,6 @@
             <url>http://artifactory.delving.org/artifactory/delving</url>
         </snapshotRepository>
     </distributionManagement>
-
     <build>
         <plugins>
             <plugin>
@@ -87,7 +78,6 @@
                             <propertyName>surefireArgLine</propertyName>
                         </configuration>
                     </execution>
-
                     <execution>
                         <id>post-unit-test</id>
                         <phase>prepare-package</phase>
@@ -95,7 +85,6 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
-
                 </executions>
             </plugin>
             <plugin>
@@ -167,14 +156,11 @@
             </plugin>
         </plugins>
     </build>
-
-
     <modules>
         <module>schema-repo</module>
         <module>sip-core</module>
         <module>sip-app</module>
     </modules>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -218,7 +204,7 @@
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.3.1</version>
+                <version>[4.3.6,)</version>
             </dependency>
             <dependency>
                 <groupId>commons-lang</groupId>
@@ -312,11 +298,8 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
-
 </project>
-
