@@ -27,13 +27,10 @@ import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -91,6 +88,9 @@ public class WorkModel {
                         for (JobContext context : jobContexts) {
                             if (context.isDone()) jobContexts.remove(context);
                         }
+                    }
+                    catch (NoSuchElementException e) {
+                        break;
                     }
                     catch (InterruptedException e) {
                         break;
