@@ -1,5 +1,0 @@
-recordCount=3
-uniqueElementPath=/pockets/pocket/@id
-recordRootPath=/pockets/pocket/
-#SIPCreator - facts=
-pockets=true
