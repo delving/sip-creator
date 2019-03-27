@@ -105,7 +105,7 @@ public class Tag implements Comparable<Tag>, Serializable {
         }
     }
 
-    private Tag(boolean attribute, String prefix, String localName, String opt) {
+    Tag(boolean attribute, String prefix, String localName, String opt) {
         if (prefix != null && prefix.isEmpty()) prefix = null;
         this.attribute = attribute;
         this.prefix = prefix;
