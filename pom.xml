@@ -28,31 +28,37 @@
     <name>SIP-Creator</name>
     <description>This parent project defines the version management, repositories, etc for all the other modules.</description>
     <repositories>
-        <!--<repository>-->
-            <!--<id>releases</id>-->
-            <!--<name>delving</name>-->
-            <!--<url>http://artifactory.delving.org/artifactory/libs-release</url>-->
-        <!--</repository>-->
-        <!--<repository>-->
-            <!--<id>snapshots</id>-->
-            <!--<name>delving</name>-->
-            <!--<url>http://artifactory.delving.org/artifactory/libs-snapshot</url>-->
-            <!--<snapshots>-->
-                <!--<enabled>true</enabled>-->
-            <!--</snapshots>-->
-        <!--</repository>-->
+        <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>github</id>
+            <name>GitHub Delving Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/delving/sip-creator</url>
+        </repository>
+        <repository>
+            <id>mygrid-repository</id>
+            <name>myGrid Respository</name>
+            <url>http://www.mygrid.org.uk/maven/repository</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases />
+        </repository>
     </repositories>
     <distributionManagement>
-        <!--<repository>-->
-            <!--<id>artifactory.delving.org</id>-->
-            <!--<name>artifactory.delving.org-releases</name>-->
-            <!--<url>http://artifactory.delving.org/artifactory/delving</url>-->
-        <!--</repository>-->
-        <!--<snapshotRepository>-->
-            <!--<id>artifactory.delving.org</id>-->
-            <!--<name>artifactory.delving.org-snapshots</name>-->
-            <!--<url>http://artifactory.delving.org/artifactory/delving</url>-->
-        <!--</snapshotRepository>-->
+        <repository>
+            <id>github</id>
+            <name>GitHub Delving Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/delving/sip-creator</url>
+        </repository>
     </distributionManagement>
     <build>
         <plugins>

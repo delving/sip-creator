@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright 2011, 2012 Delving BV
   ~
@@ -19,25 +19,17 @@
   ~ See the Licence for the specific language governing
   ~ permissions and limitations under the Licence.
   -->
-
-<project
-        xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
-        >
-
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>sip-core</artifactId>
     <packaging>jar</packaging>
     <name>SIP-Core</name>
     <version>1.1.5</version>
-
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-creator</artifactId>
         <version>1.1.5</version>
     </parent>
-
     <dependencies>
         <dependency>
             <groupId>eu.delving</groupId>
@@ -87,15 +79,20 @@
             <version>2.11.0</version>
         </dependency>
         <dependency>
-            <groupId>org.apache</groupId>
-            <artifactId>cup-runtime</artifactId>
-            <version>10k</version>
+            <groupId>com.github.vbmacher</groupId>
+            <artifactId>java-cup-runtime</artifactId>
+            <version>11b</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache</groupId>
-            <artifactId>xerces-resolver</artifactId>
-            <version>2.11.0</version>
-        </dependency>
+        <!-- <dependency> -->
+        <!-- <groupId>org.apache</groupId> -->
+        <!-- <artifactId>cup-runtime</artifactId> -->
+        <!-- <version>10k</version> -->
+        <!-- </dependency> -->
+        <!-- <dependency> -->
+            <!-- <groupId>org.apache</groupId> -->
+            <!-- <artifactId>xerces-resolver</artifactId> -->
+            <!-- <version>2.11.0</version> -->
+        <!-- </dependency> -->
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
@@ -142,5 +139,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>
