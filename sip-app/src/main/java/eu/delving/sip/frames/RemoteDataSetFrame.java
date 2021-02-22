@@ -46,14 +46,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.*;
 
 import static eu.delving.sip.base.NetworkClient.SipEntry;
 import static eu.delving.sip.base.SwingHelper.ICON_DOWNLOAD;
@@ -63,8 +59,6 @@ import static org.apache.commons.io.FileUtils.deleteQuietly;
 
 /**
  * Show the datasets both local and on the server, so all info about their status is unambiguous.
- *
- *
  */
 
 public class RemoteDataSetFrame extends FrameBase {
@@ -76,6 +70,8 @@ public class RemoteDataSetFrame extends FrameBase {
     private final JList<UploadItem> uploadList;
     private final NetworkClient networkClient;
     private final JTextField filterField = new JTextField(16);
+    private final JButton workItemSortModeButton = new JButton();
+    private final JButton workItemCleanUpButton = new JButton("Delete all files");
     private NetworkClient.SipZips sipZips;
     private DownloadItem selectedDownload;
     private WorkItem selectedWorkItem;
@@ -132,15 +128,39 @@ public class RemoteDataSetFrame extends FrameBase {
                 uploadModel.setFilter(pattern);
             }
         });
-//        filterField.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                String pattern = filterField.getText().trim();
-//                downloadModel.setFilter(pattern);
-//                workItemModel.setFilter(pattern);
-//                uploadModel.setFilter(pattern);
-//            }
-//        });
+
+        workItemSortModeButton.addActionListener(e -> {
+            workItemModel.toggleSortMode();
+            updateWorkItemSortModeButton();
+        });
+        updateWorkItemSortModeButton();
+
+        workItemCleanUpButton.addActionListener(e -> {
+            String title = "Delete all local datasets";
+            String message = "This action will delete all files in "
+                + HomeDirectory.WORK_DIR
+                + ". Do you want to continue?";
+            boolean userConfirmed = sipModel.getFeedback().confirm(title, message);
+            if (userConfirmed) {
+                try {
+                    workItemModel.deleteAllLocalDatasets();
+                } catch (IOException ex) {
+                    String feedback = "Unable to delete all local datasets."
+                        + "\nConsider manually deleting all files in the directory "
+                        + HomeDirectory.WORK_DIR
+                        + " to finish the clean up of local datasets and prevent further errors."
+                        + "\nRestart the application once you have done this.";
+                    sipModel.getFeedback().alert(feedback, ex);
+                }
+            }
+        });
+    }
+
+    private void updateWorkItemSortModeButton() {
+        if (workItemModel.sortMode == SortMode.DATE)
+            workItemSortModeButton.setText("Sort by name");
+        else
+            workItemSortModeButton.setText("Sort by date");
     }
 
     @Override
@@ -169,11 +189,15 @@ public class RemoteDataSetFrame extends FrameBase {
 
     private JPanel createSouth() {
         JPanel r = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel c = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JPanel l = new JPanel(new FlowLayout(FlowLayout.LEFT));
         l.add(createFilterPanel());
+        c.add(workItemSortModeButton);
+        c.add(workItemCleanUpButton);
         r.add(new JButton(REFRESH_ACTION));
         JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
         p.add(l);
+        p.add(c);
         p.add(r);
         return p;
     }
@@ -281,18 +305,13 @@ public class RemoteDataSetFrame extends FrameBase {
         }
     };
 
-    class WorkItem implements Comparable<WorkItem> {
+    class WorkItem {
         private final DataSet dataset;
         public final DateTime dateTime;
 
         WorkItem(DataSet dataset) {
             this.dataset = dataset;
             this.dateTime = StorageHelper.dateTimeFromSipZip(dataset.getSipFile());
-        }
-
-        @Override
-        public int compareTo(WorkItem other) {
-            return other.dateTime.compareTo(dateTime);
         }
     }
 
@@ -405,23 +424,34 @@ public class RemoteDataSetFrame extends FrameBase {
                 for (SipEntry entry : sipZips.available) remoteFiles.add(entry.file);
             // clear
             int size = getSize();
-            downloadItems.clear(); // todo: maybe this should be after fireInterval after all
             fireIntervalRemoved(this, 0, size);
             Map<String, DownloadItem> downloadItemMap = new TreeMap<String, DownloadItem>();
             for (String remote : remoteFiles) {
                 DownloadItem item = downloadItemMap.get(remote);
                 if (item == null) downloadItemMap.put(remote, new DownloadItem(remote, datasetMap.containsKey(remote)));
             }
+            downloadItems.clear();
             downloadItems.addAll(downloadItemMap.values());
             activateFilter();
             fireIntervalAdded(this, 0, getSize());
         }
     }
 
+    enum SortMode {
+        NAME,
+        DATE
+    }
+
     class WorkItemModel extends AbstractListModel<WorkItem> {
         private List<WorkItem> workItems = new ArrayList<WorkItem>();
         private String filter = "";
         private Map<Integer, Integer> index;
+        private SortMode sortMode = SortMode.DATE;
+
+        public void toggleSortMode() {
+            sortMode = sortMode == SortMode.DATE ? SortMode.NAME : SortMode.DATE;
+            setFilter(this.filter);
+        }
 
         @Override
         public int getSize() {
@@ -474,9 +504,50 @@ public class RemoteDataSetFrame extends FrameBase {
                     workItems.add(new WorkItem(dataSet));
                 }
             }
-            Collections.sort(workItems);
+
+            Collections.sort(workItems, (o1, o2) -> {
+                if (sortMode == SortMode.DATE)
+                    return o2.dateTime.compareTo(o1.dateTime);
+                return o1.dataset.getSipFile().getName().compareTo(o1.dataset.getSipFile().getName());
+            });
             activateFilter();
             fireIntervalAdded(this, 0, getSize());
+        }
+
+        public void deleteAllLocalDatasets() throws IOException {
+            Path workDir = HomeDirectory.WORK_DIR.toPath();
+            FileVisitor<Path> cleanUpVisitor =  new FileVisitor<Path>() {
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                    throw exc;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    if(!dir.equals(workDir)) {
+                        Files.delete(dir);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            };
+
+            try {
+                Files.walkFileTree(workDir, cleanUpVisitor);
+            } finally {
+                downloadModel.refreshDownloads();
+                refreshWorkItems();
+            }
         }
     }
 
