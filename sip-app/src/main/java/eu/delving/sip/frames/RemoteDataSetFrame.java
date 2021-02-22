@@ -46,6 +46,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
 import static eu.delving.sip.base.NetworkClient.SipEntry;
@@ -68,6 +71,7 @@ public class RemoteDataSetFrame extends FrameBase {
     private final NetworkClient networkClient;
     private final JTextField filterField = new JTextField(16);
     private final JButton workItemSortModeButton = new JButton();
+    private final JButton workItemCleanUpButton = new JButton("Delete all files");
     private NetworkClient.SipZips sipZips;
     private DownloadItem selectedDownload;
     private WorkItem selectedWorkItem;
@@ -130,6 +134,26 @@ public class RemoteDataSetFrame extends FrameBase {
             updateWorkItemSortModeButton();
         });
         updateWorkItemSortModeButton();
+
+        workItemCleanUpButton.addActionListener(e -> {
+            String title = "Delete all local datasets";
+            String message = "This action will delete all files in "
+                + HomeDirectory.WORK_DIR
+                + ". Do you want to continue?";
+            boolean userConfirmed = sipModel.getFeedback().confirm(title, message);
+            if (userConfirmed) {
+                try {
+                    workItemModel.deleteAllLocalDatasets();
+                } catch (IOException ex) {
+                    String feedback = "Unable to delete all local datasets."
+                        + "\nConsider manually deleting all files in the directory "
+                        + HomeDirectory.WORK_DIR
+                        + " to finish the clean up of local datasets and prevent further errors."
+                        + "\nRestart the application once you have done this.";
+                    sipModel.getFeedback().alert(feedback, ex);
+                }
+            }
+        });
     }
 
     private void updateWorkItemSortModeButton() {
@@ -169,6 +193,7 @@ public class RemoteDataSetFrame extends FrameBase {
         JPanel l = new JPanel(new FlowLayout(FlowLayout.LEFT));
         l.add(createFilterPanel());
         c.add(workItemSortModeButton);
+        c.add(workItemCleanUpButton);
         r.add(new JButton(REFRESH_ACTION));
         JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
         p.add(l);
@@ -487,6 +512,42 @@ public class RemoteDataSetFrame extends FrameBase {
             });
             activateFilter();
             fireIntervalAdded(this, 0, getSize());
+        }
+
+        public void deleteAllLocalDatasets() throws IOException {
+            Path workDir = HomeDirectory.WORK_DIR.toPath();
+            FileVisitor<Path> cleanUpVisitor =  new FileVisitor<Path>() {
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                    throw exc;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    if(!dir.equals(workDir)) {
+                        Files.delete(dir);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            };
+
+            try {
+                Files.walkFileTree(workDir, cleanUpVisitor);
+            } finally {
+                downloadModel.refreshDownloads();
+                refreshWorkItems();
+            }
         }
     }
 
