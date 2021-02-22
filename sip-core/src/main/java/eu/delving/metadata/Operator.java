@@ -33,6 +33,7 @@ public enum Operator {
     COMMA_DELIM("Comma-Delimited", "* ', ' *"),
     SEMI_DELIM("Semicolon-Delimited", "* '; ' *"),
     SPACE_DELIM("Space-Delimited", "* ' ' *"),
+    PIPE_DELIM("Pipe-Delimited", "* '|' * "),
     AS_ARRAY("As-Array", ">>");
 
     private final String display;
