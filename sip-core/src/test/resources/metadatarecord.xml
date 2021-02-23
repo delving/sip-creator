@@ -1,0 +1,50 @@
+<input>
+    <record xmlns:oai_enb="http://www.openarchives.org/OAI/2.0/oai_enb/" xmlns:dc="http://dublincore.org/documents/dcmi-namespace/" xmlns:mmm="http://api.memorix-maior.nl/REST/3.0/" xmlns:enb_dc="http://purl.org/enb_dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <header>
+      <identifier>enb_112.beeldmateriaal:957193e3-f3a9-6e4d-97ff-9f7390c41e86:005ff52b-4c5e-9a79-5ee9-50bcc65c8a77</identifier>
+      <datestamp>2019-05-29T23:38:02Z</datestamp>
+    </header>
+    <metadata>
+      <oai_enb:dc xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/          http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+        <enb_dc:set_title>Beeldmateriaal</enb_dc:set_title>
+        <enb_dc:tenant>enb_112</enb_dc:tenant>
+        <enb_dc:tenantname>Stichting Heemkundekring 'Willem van Strijen'</enb_dc:tenantname>
+        <enb_dc:col_entiteit>957193e3-f3a9-6e4d-97ff-9f7390c41e86</enb_dc:col_entiteit>
+        <enb_dc:entity_uuid>005ff52b-4c5e-9a79-5ee9-50bcc65c8a77</enb_dc:entity_uuid>
+        <enb_dc:dcterms_identifier>BM300081</enb_dc:dcterms_identifier>
+        <enb_dc:spectrum_collection_name></enb_dc:spectrum_collection_name>
+        <enb_dc:dcterms_type>Foto</enb_dc:dcterms_type>
+        <enb_dc:dcterms_title>Johan en Diny Goverde</enb_dc:dcterms_title>
+        <enb_dc:dcterms_description>&lt;p&gt;Johan en Diny Goverde in de kapsalon van hun vader/moeder Driek Goverde en Cornelia Jacobs. Johan heeft de kapsalon in 1938 overgenonem van zijn vader. Diny beheerde de toiletartikelen en parfumeriëen in de winkel naast de kapsalon.&lt;/p&gt;</enb_dc:dcterms_description>
+        <enb_dc:dcterms_subject></enb_dc:dcterms_subject>
+        <enb_dc:dcterms_medium></enb_dc:dcterms_medium>
+        <enb_dc:internal_notes1>A1.003.Gov.007</enb_dc:internal_notes1>
+        <enb_dc:subcollectienaam></enb_dc:subcollectienaam>
+        <enb_dc:geos>
+          <enb_dc:geo>
+            <enb_dc:straatnaam>Langenoordstraat</enb_dc:straatnaam>
+            <enb_dc:nummer>66</enb_dc:nummer>
+            <enb_dc:geonameid>2743947</enb_dc:geonameid>
+            <enb_dc:name>Zevenbergen</enb_dc:name>
+            <enb_dc:country_name>Nederland</enb_dc:country_name>
+            <enb_dc:country_code>NL</enb_dc:country_code>
+            <enb_dc:admin1_name>Noord-Brabant</enb_dc:admin1_name>
+            <enb_dc:admin2_name>Gemeente Moerdijk</enb_dc:admin2_name>
+          </enb_dc:geo>
+        </enb_dc:geos>
+      </oai_enb:dc>
+    </metadata>
+    <about>
+      <mmm:memorix xsi:schemaLocation="http://api.memorix-maior.nl/REST/3.0/ http://api.memorix-maior.nl/REST/3.0/MRX-API-ANY.xsd">
+        <image>
+          <thumbnail_small>http://images.memorix.nl/enb_112/thumb/220x220/d582440d-731a-5578-0517-e1a70faa88c1.jpg</thumbnail_small>
+          <thumbnail_large>http://images.memorix.nl/enb_112/thumb/500x500/d582440d-731a-5578-0517-e1a70faa88c1.jpg</thumbnail_large>
+          <mimetype>image/jpeg</mimetype>
+          <filename>BM300081.jpg</filename>
+          <dzi>http://images.memorix.nl/enb_112/deepzoom/d582440d-731a-5578-0517-e1a70faa88c1.dzi</dzi>
+        </image>
+        <url>http://api.memorix-maior.nl/collectiebeheer/oai-pmh?verb=GetRecord&amp;metadataPrefix=oai_enb&amp;tenant=enb&amp;key=30afd54c-8a05-11e5-a67e-00155d012a81&amp;identifier=enb_112.beeldmateriaal:957193e3-f3a9-6e4d-97ff-9f7390c41e86:005ff52b-4c5e-9a79-5ee9-50bcc65c8a77</url>
+      </mmm:memorix>
+    </about>
+  </record>
+</input>

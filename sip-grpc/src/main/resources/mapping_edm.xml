@@ -1,0 +1,497 @@
+<rec-mapping prefix="edm" schemaVersion="5.2.6" locked="false">
+  <facts>
+    <entry>
+      <string>baseUrl</string>
+      <string>http://data.brabantcloud.nl</string>
+    </entry>
+    <entry>
+      <string>schemaVersions</string>
+      <string>edm_5.2.6</string>
+    </entry>
+    <entry>
+      <string>provider</string>
+      <string>Brabant Cloud</string>
+    </entry>
+    <entry>
+      <string>rights</string>
+      <string>http://creativecommons.org/publicdomain/mark/1.0/</string>
+    </entry>
+    <entry>
+      <string>name</string>
+      <string>Beeldmateriaal, Stichting Heemkundekring &quot;Willem van Strijen&quot;</string>
+    </entry>
+    <entry>
+      <string>language</string>
+      <string>NL</string>
+    </entry>
+    <entry>
+      <string>dataProvider</string>
+      <string>Stichting Heemkundekring &quot;Willem van Strijen&quot;</string>
+    </entry>
+    <entry>
+      <string>spec</string>
+      <string>enb-112-beeldmateriaal</string>
+    </entry>
+  </facts>
+  <functions>
+    <mapping-function name="createEDMWebResource">
+      <groovy-code>
+        <string>StringBuilder out = new StringBuilder()</string>
+        <string>for (char c : it.toString().chars) {</string>
+        <string>switch (c) {</string>
+        <string>case &apos; &apos;:</string>
+        <string>out.append(&apos;%20&apos;)</string>
+        <string>break;</string>
+        <string>case &apos;[&apos;:</string>
+        <string>out.append(&apos;%5B&apos;)</string>
+        <string>break;</string>
+        <string>case &apos;]&apos;:</string>
+        <string>out.append(&apos;%5D&apos;)</string>
+        <string>break;</string>
+        <string>case &apos;\\&apos;:</string>
+        <string>out.append(&apos;%5C&apos;)</string>
+        <string>break;</string>
+        <string>default:</string>
+        <string>out.append(c);</string>
+        <string>}</string>
+        <string>}</string>
+        <string>identifier = out.toString()</string>
+        <string>&quot;${baseUrl}/resource/webresource/${spec}/${identifier}&quot;</string>
+      </groovy-code>
+    </mapping-function>
+    <mapping-function name="create_geoname_uri">
+      <sample-input>
+        <string>123</string>
+      </sample-input>
+      <groovy-code>
+        <string>&quot;http://sws.geonames.org/${it}&quot;</string>
+      </groovy-code>
+    </mapping-function>
+    <mapping-function name="extractYear">
+      <sample-input>
+        <string>23-12-1977</string>
+        <string>1980</string>
+        <string>1981-02-22</string>
+      </sample-input>
+      <groovy-code>
+        <string>year = ~/([0-9]{4})/</string>
+        <string>year_month = ~/([0-9]{4})-[0-9]{2}/</string>
+        <string>year_month_day = ~/([0-9]{4})-[0-9]{2}-[0-9]{2}/</string>
+        <string>itt = it.toString()</string>
+        <string>if (year.matcher(itt).matches()) {</string>
+        <string>itt.replaceAll(year, &apos;$1&apos;)</string>
+        <string>}</string>
+        <string>else if (year_month.matcher(itt).matches()) {</string>
+        <string>itt.replaceAll(year_month, &apos;$1&apos;)</string>
+        <string>}</string>
+        <string>else if (year_month_day.matcher(itt).matches()) {</string>
+        <string>itt.replaceAll(year_month_day, &apos;$1&apos;)</string>
+        <string>}</string>
+        <string>else {</string>
+        <string>try {</string>
+        <string>yearclean = year.matcher(itt)[0][0]</string>
+        <string>if (year.matcher(yearclean).matches()) {yearclean}</string>
+        <string>}</string>
+        <string>catch(e) {}</string>
+        <string>}</string>
+      </groovy-code>
+    </mapping-function>
+    <mapping-function name="remove_whitespace">
+      <sample-input>
+        <string>sjoerd  cris</string>
+        <string>1980 -</string>
+        <string>sjoerd</string>
+      </sample-input>
+      <groovy-code>
+        <string>&quot;${it}&quot;.replaceAll(&quot;[ ]{2,15}&quot;, &quot; &quot;).replaceAll(&quot; \$&quot;, &quot;&quot;)</string>
+      </groovy-code>
+    </mapping-function>
+    <mapping-function name="switch_dates">
+      <sample-input>
+        <string>1970-10-01</string>
+        <string>1970</string>
+        <string>1970-10</string>
+        <string>1970-00</string>
+      </sample-input>
+      <groovy-code>
+        <string>def items = it.split(&quot;-&quot;)</string>
+        <string>if (items.size() == 3) {&quot;${items[2]}-${items[1]}-${items[0]}&quot;.replace(&quot;00-&quot;, &quot;&quot;)}</string>
+        <string>else if (items.size() == 2) {&quot;${items[1]}-${items[0]}&quot;.replace(&quot;00-&quot;, &quot;&quot;)}</string>
+        <string>else if (items.size() == 1) {&quot;${items[0]}&quot;.replace(&quot;00-&quot;, &quot;&quot;)}</string>
+      </groovy-code>
+    </mapping-function>
+    <mapping-function name="toDecade">
+      <sample-input>
+        <string>1988</string>
+        <string>1865</string>
+        <string>2010</string>
+      </sample-input>
+      <groovy-code>
+        <string>if (it.toString().matches(&quot;[0-9]*&quot;) == false) return &quot;&quot;</string>
+        <string>year = it.toString().toInteger()</string>
+        <string>return decadeString =  (year - (year % 10))  + &apos; – &apos; + (year - (year % 10 ) + 10)</string>
+      </groovy-code>
+    </mapping-function>
+    <mapping-function name="toDecadeRanges">
+      <sample-input>
+        <string>1941 - 1978</string>
+      </sample-input>
+      <groovy-code>
+        <string>it = it.replaceAll(&quot;^-&quot;,&quot;&quot;).replaceAll(&quot;-\$&quot;, &quot;&quot;).replaceAll(&quot;\\[|\\]&quot;,&quot;&quot;)</string>
+        <string>parts = it.split(&quot; - &quot;)</string>
+        <string>if (parts.size() &gt; 1 ) {</string>
+        <string>first = parts[0]</string>
+        <string>last  = parts[1]</string>
+        <string>if (first.toString().matches(&quot;[0-9]*&quot;) == false || last.toString().matches(&quot;[0-9]*&quot;) == false) return &quot;&quot;</string>
+        <string>firstYear = first.toString().toInteger()</string>
+        <string>lastYear = last.toString().toInteger()</string>
+        <string>firstDecade = (firstYear - (firstYear %10))</string>
+        <string>lastDecade = (lastYear - (lastYear %10))</string>
+        <string>// return decadeString =  (year - (year % 10))  + &apos; – &apos; + (year - (year % 10 ) + 10)</string>
+        <string>decades = []</string>
+        <string>currentDecade = firstDecade</string>
+        <string>decadesNr = ((lastDecade - firstDecade) / 10) +1</string>
+        <string>for (int i = 0; i &lt; decadesNr; i++) {</string>
+        <string>decadeString = (currentDecade - (currentDecade % 10))  + &apos; – &apos; + (currentDecade - (currentDecade % 10 ) + 10)</string>
+        <string>decades.push(decadeString)</string>
+        <string>currentDecade = currentDecade + 10</string>
+        <string>}</string>
+        <string>return decades</string>
+        <string>} else {</string>
+        <string>year = parts[0]</string>
+        <string>if (year.toString().matches(&quot;[0-9]*&quot;) == false) return &quot;&quot;</string>
+        <string>year = year.toString().toInteger()</string>
+        <string>return  decadeString =  (year - (year % 10))  + &apos; – &apos; + (year - (year % 10 ) + 10)</string>
+        <string>}</string>
+      </groovy-code>
+    </mapping-function>
+    <mapping-function name="youTube">
+      <groovy-code>
+        <string>&quot;${it}&quot;.replaceAll(&apos;&lt;a href=&quot;https://www.youtube.com&apos;,&apos;&lt;a target=&quot;_blank&quot; href=&quot;https://www.youtube.com&apos;)</string>
+      </groovy-code>
+    </mapping-function>
+  </functions>
+  <dyn-opts>
+    <dyn-opt path="/edm:RDF/edm:Agent" value="creator"/>
+    <dyn-opt path="/edm:RDF/edm:Agent" value="subjectDepicted"/>
+    <dyn-opt path="/edm:RDF/edm:Agent" value="publisher"/>
+  </dyn-opts>
+  <node-mappings>
+    <node-mapping inputPath="/input" outputPath="/edm:RDF"/>
+    <node-mapping inputPath="/input" outputPath="/edm:RDF/ore:Aggregation/@rdf:about">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/aggregation/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/edm:RDF/ore:Aggregation/edm:aggregatedCHO/@rdf:resource">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:tenantname" outputPath="/edm:RDF/ore:Aggregation/edm:dataProvider"/>
+    <node-mapping inputPath="/input/record/about/mmm:memorix/image" outputPath="/edm:RDF/ore:Aggregation/edm:hasView"/>
+    <node-mapping inputPath="/input/record/about/mmm:memorix/image/thumbnail_large" outputPath="/edm:RDF/ore:Aggregation/edm:hasView/@rdf:resource">
+      <groovy-code>
+        <string>_image.thumbnaillarge * { _thumbnaillarge -&gt;</string>
+        <string>&quot;${_thumbnaillarge}&quot;.replaceAll(&apos;^http&apos;,&apos;https&apos;)</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/@id" outputPath="/edm:RDF/ore:Aggregation/edm:isShownAt/@rdf:resource">
+      <groovy-code>
+        <string>_input[&apos;@id&apos;] * { _id -&gt;</string>
+        <string>&quot;http://heemkundezevenbergen.nl/databanken/index.html?diw-id=brabantcloud_enb-112-beeldmateriaal_$_id&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/about/mmm:memorix/image/thumbnail_large" outputPath="/edm:RDF/ore:Aggregation/edm:isShownBy/@rdf:resource">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>if (!_record.getValueNodes(&quot;thumbnaillarge&quot;).isEmpty()) {</string>
+        <string>def localId = _record.getValueNodes(&quot;thumbnaillarge&quot;).first()</string>
+        <string>&quot;${localId}&quot;.replaceAll(&apos;^http&apos;,&apos;https&apos;)</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/about/mmm:memorix/image/thumbnail_small" outputPath="/edm:RDF/ore:Aggregation/edm:object/@rdf:resource">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>if (!_record.getValueNodes(&quot;thumbnailsmall&quot;).isEmpty()) {</string>
+        <string>def localId = _record.getValueNodes(&quot;thumbnailsmall&quot;).first()</string>
+        <string>&quot;${localId}&quot;.replaceAll(&apos;^http&apos;,&apos;https&apos;)</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/provider" outputPath="/edm:RDF/ore:Aggregation/edm:provider"/>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/ore:Aggregation/edm:rights/@rdf:resource">
+      <groovy-code>
+        <string>https://rightsstatements.org/vocab/InC/1.0/</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/edm:RDF/edm:ProvidedCHO/@rdf:about">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator" outputPath="/edm:RDF/edm:ProvidedCHO/dc:creator"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator" outputPath="/edm:RDF/edm:ProvidedCHO/dc:creator/@rdf:resource">
+      <groovy-code>
+        <string>&quot;${createEDMAgentUri(_enbdccreator.enbdcpersonuuid_)}&quot;.replaceAll(&quot;http://&quot;,&quot;https://&quot;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:datering" outputPath="/edm:RDF/edm:ProvidedCHO/dc:date"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:dcterms_description" outputPath="/edm:RDF/edm:ProvidedCHO/dc:description">
+      <groovy-code>
+        <string>&quot;${youTube(_enbdcdctermsdescription)}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:dcterms_medium" outputPath="/edm:RDF/edm:ProvidedCHO/dc:format"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:dcterms_identifier" outputPath="/edm:RDF/edm:ProvidedCHO/dc:identifier"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher" outputPath="/edm:RDF/edm:ProvidedCHO/dc:publisher"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher" outputPath="/edm:RDF/edm:ProvidedCHO/dc:publisher/@rdf:resource">
+      <groovy-code>
+        <string>&quot;${createEDMAgentUri(_enbdcpublisher.enbdcpersonuuid_)}&quot;.replaceAll(&quot;http://&quot;,&quot;https://&quot;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:dcterms_rights" outputPath="/edm:RDF/edm:ProvidedCHO/dc:rights"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:dcterms_subject" outputPath="/edm:RDF/edm:ProvidedCHO/dc:subject">
+      <groovy-code>
+        <string>&quot;${_enbdcdctermssubject}&quot;.capitalize()</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:controlled_subjects/enb_dc:controlled_subjects_item/term" outputPath="/edm:RDF/edm:ProvidedCHO/dc:subject">
+      <groovy-code>
+        <string>&quot;${_term}&quot;.capitalize()</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:dcterms_title" outputPath="/edm:RDF/edm:ProvidedCHO/dc:title"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:dcterms_type" outputPath="/edm:RDF/edm:ProvidedCHO/dc:type">
+      <groovy-code>
+        <string>&quot;${_enbdcdctermstype}&quot;.capitalize()</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc" outputPath="/edm:RDF/edm:ProvidedCHO/dcterms:created">
+      <groovy-code>
+        <string>start = switch_dates(_oaienbdc.enbdcdctermstemporalstart_)</string>
+        <string>end = switch_dates(_oaienbdc.enbdcdctermstemporalend_)</string>
+        <string>if (start &amp;&amp; end &amp;&amp; start != end) {</string>
+        <string>&quot;${start} – ${end}&quot;</string>
+        <string>}</string>
+        <string>else if (start) {</string>
+        <string>&quot;${start}&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:sizes/enb_dc:size" outputPath="/edm:RDF/edm:ProvidedCHO/dcterms:extent">
+      <groovy-code>
+        <string>&quot;${_enbdcsize.enbdcsizetype_}: ${_enbdcsize.enbdcvalue_} ${_enbdcsize.enbdcunit_}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo" outputPath="/edm:RDF/edm:ProvidedCHO/dcterms:spatial"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo" outputPath="/edm:RDF/edm:ProvidedCHO/dcterms:spatial/@rdf:resource">
+      <groovy-code>
+        <string>&quot;${create_geoname_uri(_enbdcgeo.enbdcgeonameid_)}&quot;.replaceAll(&apos;^http&apos;,&apos;https&apos;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/edm:ProvidedCHO/edm:type">
+      <groovy-code>
+        <string>IMAGE</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/about/mmm:memorix/image" outputPath="/edm:RDF/edm:WebResource"/>
+    <node-mapping inputPath="/input/record/about/mmm:memorix/image/thumbnail_large" outputPath="/edm:RDF/edm:WebResource/@rdf:about">
+      <groovy-code>
+        <string>_image.thumbnaillarge * { _thumbnaillarge -&gt;</string>
+        <string>&quot;${_thumbnaillarge}&quot;.replaceAll(&apos;^http&apos;,&apos;https&apos;)</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/about/mmm:memorix/image/mimetype" outputPath="/edm:RDF/edm:WebResource/ebucore:hasMimeType"/>
+    <node-mapping inputPath="/input/record/about/mmm:memorix/image/dzi" outputPath="/edm:RDF/edm:WebResource/nave:deepZoomUrl">
+      <groovy-code>
+        <string>&quot;${_dzi}&quot;.replaceAll(&apos;^http&apos;,&apos;https&apos;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/about/mmm:memorix/image/thumbnail_small" outputPath="/edm:RDF/edm:WebResource/nave:resourceSortOrder">
+      <groovy-code>
+        <string>&quot;${_input.record[0].about[0].mmmmemorix[0].image.collect{thumb -&gt; return thumb.thumbnailsmall[0]}.indexOf(_thumbnailsmall) + 1}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/about/mmm:memorix/image/thumbnail_small" outputPath="/edm:RDF/edm:WebResource/nave:thumbSmall">
+      <groovy-code>
+        <string>&quot;${_thumbnailsmall}&quot;.replaceAll(&apos;^http&apos;,&apos;https&apos;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/about/mmm:memorix/image/thumbnail_large" outputPath="/edm:RDF/edm:WebResource/nave:thumbLarge">
+      <groovy-code>
+        <string>&quot;${_thumbnaillarge}&quot;.replaceAll(&apos;^http&apos;,&apos;https&apos;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/edm:WebResource/nave:allowDeepZoom">
+      <groovy-code>
+        <string>true</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/edm:WebResource/nave:allowSourceDownload">
+      <groovy-code>
+        <string>false</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/edm:WebResource/nave:allowPublicWebView">
+      <groovy-code>
+        <string>true</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator" outputPath="/edm:RDF/edm:Agent[creator]"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator" outputPath="/edm:RDF/edm:Agent[creator]/@rdf:about">
+      <groovy-code>
+        <string>&quot;${createEDMAgentUri(_enbdccreator.enbdcpersonuuid_)}&quot;.replaceAll(&quot;http://&quot;,&quot;https://&quot;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator" outputPath="/edm:RDF/edm:Agent[creator]/skos:prefLabel">
+      <groovy-code>
+        <string>remove_whitespace(&quot;${_enbdccreator.enbdcname_} ${_enbdccreator.enbdcsurnameprefix_} ${_enbdccreator.enbdcsurname_}&quot;).replaceAll(&apos; $&apos;,&apos;&apos;).replaceAll(&apos;^ &apos;,&apos;&apos;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator/enb_dc:name_of_organization" outputPath="/edm:RDF/edm:Agent[creator]/skos:prefLabel"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator" outputPath="/edm:RDF/edm:Agent[creator]/nave:creatorLabel">
+      <groovy-code>
+        <string>remove_whitespace(&quot;${_enbdccreator.enbdcname_} ${_enbdccreator.enbdcsurnameprefix_} ${_enbdccreator.enbdcsurname_}&quot;).replaceAll(&apos; $&apos;,&apos;&apos;).replaceAll(&apos;^ &apos;,&apos;&apos;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator/enb_dc:name_of_organization" outputPath="/edm:RDF/edm:Agent[creator]/nave:creatorLabel"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator/enb_dc:name_of_organization" outputPath="/edm:RDF/edm:Agent[creator]/nave:organisationLabel"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject" outputPath="/edm:RDF/edm:Agent[subjectDepicted]"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject" outputPath="/edm:RDF/edm:Agent[subjectDepicted]/@rdf:about">
+      <groovy-code>
+        <string>&quot;${createEDMAgentUri(_enbdcpersonsubject.enbdcpersonuuid_)}&quot;.replaceAll(&apos;^http&apos;,&apos;https&apos;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject" outputPath="/edm:RDF/edm:Agent[subjectDepicted]/skos:prefLabel">
+      <groovy-code>
+        <string>remove_whitespace(&quot;${_enbdcpersonsubject.enbdcname_} ${_enbdcpersonsubject.enbdcsurnameprefix_} ${_enbdcpersonsubject.enbdcsurname_}&quot;).replaceAll(&apos; $&apos;,&apos;&apos;).replaceAll(&apos;^ &apos;,&apos;&apos;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject/enb_dc:name_of_organization" outputPath="/edm:RDF/edm:Agent[subjectDepicted]/skos:prefLabel"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject" outputPath="/edm:RDF/edm:Agent[subjectDepicted]/nave:depictedSubjectLabel">
+      <groovy-code>
+        <string>remove_whitespace(&quot;${_enbdcpersonsubject.enbdcname_} ${_enbdcpersonsubject.enbdcsurnameprefix_} ${_enbdcpersonsubject.enbdcsurname_}&quot;).replaceAll(&apos; $&apos;,&apos;&apos;).replaceAll(&apos;^ &apos;,&apos;&apos;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject/enb_dc:name_of_organization" outputPath="/edm:RDF/edm:Agent[subjectDepicted]/nave:depictedSubjectLabel"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject/enb_dc:name_of_organization" outputPath="/edm:RDF/edm:Agent[subjectDepicted]/nave:organisationLabel"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher" outputPath="/edm:RDF/edm:Agent[publisher]"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher" outputPath="/edm:RDF/edm:Agent[publisher]/@rdf:about">
+      <groovy-code>
+        <string>&quot;${createEDMAgentUri(_enbdcpublisher.enbdcpersonuuid_)}&quot;.replaceAll(&quot;http://&quot;,&quot;https://&quot;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher" outputPath="/edm:RDF/edm:Agent[publisher]/skos:prefLabel">
+      <groovy-code>
+        <string>remove_whitespace(&quot;${_enbdcpublisher.enbdcname_} ${_enbdcpublisher.enbdcsurnameprefix_} ${_enbdcpublisher.enbdcsurname_}&quot;).replaceAll(&apos; $&apos;,&apos;&apos;).replaceAll(&apos;^ &apos;,&apos;&apos;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher/enb_dc:name_of_organization" outputPath="/edm:RDF/edm:Agent[publisher]/skos:prefLabel"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher" outputPath="/edm:RDF/edm:Agent[publisher]/nave:publisherLabel">
+      <groovy-code>
+        <string>remove_whitespace(&quot;${_enbdcpublisher.enbdcname_} ${_enbdcpublisher.enbdcsurnameprefix_} ${_enbdcpublisher.enbdcsurname_}&quot;).replaceAll(&apos; $&apos;,&apos;&apos;).replaceAll(&apos;^ &apos;,&apos;&apos;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher/enb_dc:name_of_organization" outputPath="/edm:RDF/edm:Agent[publisher]/nave:publisherLabel"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher/enb_dc:name_of_organization" outputPath="/edm:RDF/edm:Agent[publisher]/nave:organisationLabel"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo" outputPath="/edm:RDF/edm:Place"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo" outputPath="/edm:RDF/edm:Place/@rdf:about">
+      <groovy-code>
+        <string>&quot;${create_geoname_uri(_enbdcgeo.enbdcgeonameid_)}&quot;.replaceAll(&apos;^http&apos;,&apos;https&apos;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo/enb_dc:name" outputPath="/edm:RDF/edm:Place/skos:prefLabel"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo" outputPath="/edm:RDF/edm:Place/nave:address">
+      <groovy-code>
+        <string>remove_whitespace(&quot;${_enbdcgeo.enbdcstraatnaam_} ${_enbdcgeo.enbdcnummer_}&quot;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo/enb_dc:name" outputPath="/edm:RDF/edm:Place/nave:city"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo/enb_dc:admin2_name" outputPath="/edm:RDF/edm:Place/nave:municipality"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo/enb_dc:specificatie_plaats" outputPath="/edm:RDF/edm:Place/nave:specificationPlace"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo/enb_dc:straatnaam" outputPath="/edm:RDF/edm:Place/nave:street"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo/enb_dc:nummer" outputPath="/edm:RDF/edm:Place/nave:streetNr"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:tenantname" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:collection"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:set_title" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:collectionType"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:spectrum_collection_name" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:collectionPart">
+      <groovy-code>
+        <string>&quot;${_enbdcspectrumcollectionname}&quot;.capitalize()</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:date">
+      <groovy-code>
+        <string>start = switch_dates(_oaienbdc.enbdcdctermstemporalstart_)</string>
+        <string>end = switch_dates(_oaienbdc.enbdcdctermstemporalend_)</string>
+        <string>if (start &amp;&amp; end &amp;&amp; start != end) {</string>
+        <string>toDecadeRanges(&quot;${extractYear(start)} - ${extractYear(end)}&quot;)</string>
+        <string>}</string>
+        <string>else if (start) {</string>
+        <string>&quot;${toDecadeRanges(extractYear(start))}&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:geojson" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:geojson"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:person"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:person/@rdf:resource">
+      <groovy-code>
+        <string>&quot;${createEDMAgentUri(_enbdcpersonsubject.enbdcpersonuuid_)}&quot;.replaceAll(&apos;^http&apos;,&apos;https&apos;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo/enb_dc:name" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:place"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:dcterms_temporal_end" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:productionEnd">
+      <groovy-code>
+        <string>&quot;${switch_dates(_enbdcdctermstemporalend)}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:dcterms_temporal_start" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:productionStart">
+      <groovy-code>
+        <string>&quot;${switch_dates(_enbdcdctermstemporalstart)}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:controlled_subjects/enb_dc:controlled_subjects_item/term" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:subjectAatLabel"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:subjectDepicted"/>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:subjectDepicted/@rdf:resource">
+      <groovy-code>
+        <string>&quot;${createEDMAgentUri(_enbdcpersonsubject.enbdcpersonuuid_)}&quot;.replaceAll(&quot;http://&quot;,&quot;https://&quot;)</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/oai_enb:dc/enb_dc:subcollectienaam" outputPath="/edm:RDF/nave:BrabantCloudResource/nave:subcollectionPart">
+      <groovy-code>
+        <string>&quot;${_enbdcsubcollectienaam}&quot;.capitalize()</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/header/identifier" outputPath="/edm:RDF/nave:Museometrie/nave:acquisitionYear"/>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:DelvingResource/nave:featured">
+      <groovy-code>
+        <string>&apos;false&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:DelvingResource/nave:allowDeepZoom">
+      <groovy-code>
+        <string>true</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:DelvingResource/nave:allowLinkedOpenData">
+      <groovy-code>
+        <string>&apos;true&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:DelvingResource/nave:allowSourceDownload">
+      <groovy-code>
+        <string>false</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:DelvingResource/nave:public">
+      <groovy-code>
+        <string>&apos;true&apos;</string>
+      </groovy-code>
+    </node-mapping>
+  </node-mappings>
+</rec-mapping>

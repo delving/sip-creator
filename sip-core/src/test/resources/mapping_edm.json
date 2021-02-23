@@ -1,0 +1,2718 @@
+{
+    "rec-mapping": {
+        "Space": "",
+        "Local": "rec-mapping"
+    },
+    "Attrlocked": "false",
+    "Attrprefix": "edm",
+    "AttrschemaVersion": "5.2.6",
+    "dyn-opts": {
+        "dyn-opts": {
+            "Space": "",
+            "Local": "dyn-opts"
+        },
+        "dyn-opt": [
+            {
+                "dyn-opt": {
+                    "Space": "",
+                    "Local": "dyn-opt"
+                },
+                "Attrpath": "/edm:RDF/edm:Agent",
+                "Attrvalue": "creator"
+            },
+            {
+                "dyn-opt": {
+                    "Space": "",
+                    "Local": "dyn-opt"
+                },
+                "Attrpath": "/edm:RDF/edm:Agent",
+                "Attrvalue": "subjectDepicted"
+            },
+            {
+                "dyn-opt": {
+                    "Space": "",
+                    "Local": "dyn-opt"
+                },
+                "Attrpath": "/edm:RDF/edm:Agent",
+                "Attrvalue": "publisher"
+            }
+        ]
+    },
+    "facts": {
+        "facts": {
+            "Space": "",
+            "Local": "facts"
+        },
+        "entry": [
+            {
+                "entry": {
+                    "Space": "",
+                    "Local": "entry"
+                },
+                "string": [
+                    {
+                        "string": {
+                            "Space": "",
+                            "Local": "string"
+                        },
+                        "Text": "baseUrl"
+                    },
+                    {
+                        "string": {
+                            "Space": "",
+                            "Local": "string"
+                        },
+                        "Text": "http://data.brabantcloud.nl"
+                    }
+                ]
+            },
+            {
+                "entry": {
+                    "Space": "",
+                    "Local": "entry"
+                },
+                "string": [
+                    {
+                        "string": {
+                            "Space": "",
+                            "Local": "string"
+                        },
+                        "Text": "schemaVersions"
+                    },
+                    {
+                        "string": {
+                            "Space": "",
+                            "Local": "string"
+                        },
+                        "Text": "edm_5.2.6"
+                    }
+                ]
+            },
+            {
+                "entry": {
+                    "Space": "",
+                    "Local": "entry"
+                },
+                "string": [
+                    {
+                        "string": {
+                            "Space": "",
+                            "Local": "string"
+                        },
+                        "Text": "provider"
+                    },
+                    {
+                        "string": {
+                            "Space": "",
+                            "Local": "string"
+                        },
+                        "Text": "Brabant Cloud"
+                    }
+                ]
+            },
+            {
+                "entry": {
+                    "Space": "",
+                    "Local": "entry"
+                },
+                "string": [
+                    {
+                        "string": {
+                            "Space": "",
+                            "Local": "string"
+                        },
+                        "Text": "rights"
+                    },
+                    {
+                        "string": {
+                            "Space": "",
+                            "Local": "string"
+                        },
+                        "Text": "http://creativecommons.org/publicdomain/mark/1.0/"
+                    }
+                ]
+            },
+            {
+                "entry": {
+                    "Space": "",
+                    "Local": "entry"
+                },
+                "string": [
+                    {
+                        "string": {
+                            "Space": "",
+                            "Local": "string"
+                        },
+                        "Text": "name"
+                    },
+                    {
+                        "string": {
+                            "Space": "",
+                            "Local": "string"
+                        },
+                        "Text": "Beeldmateriaal, Stichting Heemkundekring \"Willem van Strijen\""
+                    }
+                ]
+            },
+            {
+                "entry": {
+                    "Space": "",
+                    "Local": "entry"
+                },
+                "string": [
+                    {
+                        "string": {
+                            "Space": "",
+                            "Local": "string"
+                        },
+                        "Text": "language"
+                    },
+                    {
+                        "string": {
+                            "Space": "",
+                            "Local": "string"
+                        },
+                        "Text": "NL"
+                    }
+                ]
+            },
+            {
+                "entry": {
+                    "Space": "",
+                    "Local": "entry"
+                },
+                "string": [
+                    {
+                        "string": {
+                            "Space": "",
+                            "Local": "string"
+                        },
+                        "Text": "dataProvider"
+                    },
+                    {
+                        "string": {
+                            "Space": "",
+                            "Local": "string"
+                        },
+                        "Text": "Stichting Heemkundekring \"Willem van Strijen\""
+                    }
+                ]
+            },
+            {
+                "entry": {
+                    "Space": "",
+                    "Local": "entry"
+                },
+                "string": [
+                    {
+                        "string": {
+                            "Space": "",
+                            "Local": "string"
+                        },
+                        "Text": "spec"
+                    },
+                    {
+                        "string": {
+                            "Space": "",
+                            "Local": "string"
+                        },
+                        "Text": "enb-112-beeldmateriaal"
+                    }
+                ]
+            }
+        ]
+    },
+    "functions": {
+        "functions": {
+            "Space": "",
+            "Local": "functions"
+        },
+        "mapping-function": [
+            {
+                "mapping-function": {
+                    "Space": "",
+                    "Local": "mapping-function"
+                },
+                "Attrname": "createEDMWebResource",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "StringBuilder out = new StringBuilder()"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "for (char c : it.toString().chars) {"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "switch (c) {"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "case ' ':"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "out.append('%20')"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "break;"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "case '[':"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "out.append('%5B')"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "break;"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "case ']':"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "out.append('%5D')"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "break;"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "case '\\\\':"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "out.append('%5C')"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "break;"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "default:"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "out.append(c);"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "identifier = out.toString()"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${baseUrl}/resource/webresource/${spec}/${identifier}\""
+                        }
+                    ]
+                }
+            },
+            {
+                "mapping-function": {
+                    "Space": "",
+                    "Local": "mapping-function"
+                },
+                "Attrname": "create_geoname_uri",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"http://sws.geonames.org/${it}\""
+                        }
+                    ]
+                },
+                "sample-input": {
+                    "sample-input": {
+                        "Space": "",
+                        "Local": "sample-input"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "123"
+                        }
+                    ]
+                }
+            },
+            {
+                "mapping-function": {
+                    "Space": "",
+                    "Local": "mapping-function"
+                },
+                "Attrname": "extractYear",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "year = ~/([0-9]{4})/"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "year_month = ~/([0-9]{4})-[0-9]{2}/"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "year_month_day = ~/([0-9]{4})-[0-9]{2}-[0-9]{2}/"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "itt = it.toString()"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "if (year.matcher(itt).matches()) {"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "itt.replaceAll(year, '$1')"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "else if (year_month.matcher(itt).matches()) {"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "itt.replaceAll(year_month, '$1')"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "else if (year_month_day.matcher(itt).matches()) {"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "itt.replaceAll(year_month_day, '$1')"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "else {"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "try {"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "yearclean = year.matcher(itt)[0][0]"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "if (year.matcher(yearclean).matches()) {yearclean}"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "catch(e) {}"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        }
+                    ]
+                },
+                "sample-input": {
+                    "sample-input": {
+                        "Space": "",
+                        "Local": "sample-input"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "23-12-1977"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "1980"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "1981-02-22"
+                        }
+                    ]
+                }
+            },
+            {
+                "mapping-function": {
+                    "Space": "",
+                    "Local": "mapping-function"
+                },
+                "Attrname": "remove_whitespace",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${it}\".replaceAll(\"[ ]{2,15}\", \" \").replaceAll(\" \\$\", \"\")"
+                        }
+                    ]
+                },
+                "sample-input": {
+                    "sample-input": {
+                        "Space": "",
+                        "Local": "sample-input"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "sjoerd  cris"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "1980 -"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "sjoerd"
+                        }
+                    ]
+                }
+            },
+            {
+                "mapping-function": {
+                    "Space": "",
+                    "Local": "mapping-function"
+                },
+                "Attrname": "switch_dates",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "def items = it.split(\"-\")"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "if (items.size() == 3) {\"${items[2]}-${items[1]}-${items[0]}\".replace(\"00-\", \"\")}"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "else if (items.size() == 2) {\"${items[1]}-${items[0]}\".replace(\"00-\", \"\")}"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "else if (items.size() == 1) {\"${items[0]}\".replace(\"00-\", \"\")}"
+                        }
+                    ]
+                },
+                "sample-input": {
+                    "sample-input": {
+                        "Space": "",
+                        "Local": "sample-input"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "1970-10-01"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "1970"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "1970-10"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "1970-00"
+                        }
+                    ]
+                }
+            },
+            {
+                "mapping-function": {
+                    "Space": "",
+                    "Local": "mapping-function"
+                },
+                "Attrname": "toDecade",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "if (it.toString().matches(\"[0-9]*\") == false) return \"\""
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "year = it.toString().toInteger()"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "return decadeString =  (year - (year % 10))  + ' \u2013 ' + (year - (year % 10 ) + 10)"
+                        }
+                    ]
+                },
+                "sample-input": {
+                    "sample-input": {
+                        "Space": "",
+                        "Local": "sample-input"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "1988"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "1865"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "2010"
+                        }
+                    ]
+                }
+            },
+            {
+                "mapping-function": {
+                    "Space": "",
+                    "Local": "mapping-function"
+                },
+                "Attrname": "toDecadeRanges",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "it = it.replaceAll(\"^-\",\"\").replaceAll(\"-\\$\", \"\").replaceAll(\"\\\\[|\\\\]\",\"\")"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "parts = it.split(\" - \")"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "if (parts.size() > 1 ) {"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "first = parts[0]"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "last  = parts[1]"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "if (first.toString().matches(\"[0-9]*\") == false || last.toString().matches(\"[0-9]*\") == false) return \"\""
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "firstYear = first.toString().toInteger()"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "lastYear = last.toString().toInteger()"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "firstDecade = (firstYear - (firstYear %10))"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "lastDecade = (lastYear - (lastYear %10))"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "// return decadeString =  (year - (year % 10))  + ' \u2013 ' + (year - (year % 10 ) + 10)"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "decades = []"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "currentDecade = firstDecade"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "decadesNr = ((lastDecade - firstDecade) / 10) +1"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "for (int i = 0; i < decadesNr; i++) {"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "decadeString = (currentDecade - (currentDecade % 10))  + ' \u2013 ' + (currentDecade - (currentDecade % 10 ) + 10)"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "decades.push(decadeString)"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "currentDecade = currentDecade + 10"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "return decades"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "} else {"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "year = parts[0]"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "if (year.toString().matches(\"[0-9]*\") == false) return \"\""
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "year = year.toString().toInteger()"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "return  decadeString =  (year - (year % 10))  + ' \u2013 ' + (year - (year % 10 ) + 10)"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        }
+                    ]
+                },
+                "sample-input": {
+                    "sample-input": {
+                        "Space": "",
+                        "Local": "sample-input"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "1941 - 1978"
+                        }
+                    ]
+                }
+            },
+            {
+                "mapping-function": {
+                    "Space": "",
+                    "Local": "mapping-function"
+                },
+                "Attrname": "youTube",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${it}\".replaceAll('<a href=\"https://www.youtube.com','<a target=\"_blank\" href=\"https://www.youtube.com')"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "node-mappings": {
+        "node-mappings": {
+            "Space": "",
+            "Local": "node-mappings"
+        },
+        "node-mapping": [
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input",
+                "AttroutputPath": "/edm:RDF"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input",
+                "AttroutputPath": "/edm:RDF/ore:Aggregation/@rdf:about",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${baseUrl}/resource/aggregation/${spec}/${_uniqueIdentifier.sanitizeURI()}\""
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input",
+                "AttroutputPath": "/edm:RDF/ore:Aggregation/edm:aggregatedCHO/@rdf:resource",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}\""
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:tenantname",
+                "AttroutputPath": "/edm:RDF/ore:Aggregation/edm:dataProvider"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/about/mmm:memorix/image",
+                "AttroutputPath": "/edm:RDF/ore:Aggregation/edm:hasView"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/about/mmm:memorix/image/thumbnail_large",
+                "AttroutputPath": "/edm:RDF/ore:Aggregation/edm:hasView/@rdf:resource",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "_image.thumbnaillarge * { _thumbnaillarge ->"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${_thumbnaillarge}\".replaceAll('^http','https')"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/@id",
+                "AttroutputPath": "/edm:RDF/ore:Aggregation/edm:isShownAt/@rdf:resource",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "_input['@id'] * { _id ->"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"http://heemkundezevenbergen.nl/databanken/index.html?diw-id=brabantcloud_enb-112-beeldmateriaal_$_id\""
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/about/mmm:memorix/image/thumbnail_large",
+                "AttroutputPath": "/edm:RDF/ore:Aggregation/edm:isShownBy/@rdf:resource",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "_input.record * { _record ->"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "if (!_record.getValueNodes(\"thumbnaillarge\").isEmpty()) {"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "def localId = _record.getValueNodes(\"thumbnaillarge\").first()"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${localId}\".replaceAll('^http','https')"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/about/mmm:memorix/image/thumbnail_small",
+                "AttroutputPath": "/edm:RDF/ore:Aggregation/edm:object/@rdf:resource",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "_input.record * { _record ->"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "if (!_record.getValueNodes(\"thumbnailsmall\").isEmpty()) {"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "def localId = _record.getValueNodes(\"thumbnailsmall\").first()"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${localId}\".replaceAll('^http','https')"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/facts/provider",
+                "AttroutputPath": "/edm:RDF/ore:Aggregation/edm:provider"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/constant",
+                "AttroutputPath": "/edm:RDF/ore:Aggregation/edm:rights/@rdf:resource",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "https://rightsstatements.org/vocab/InC/1.0/"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/@rdf:about",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}\""
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dc:creator"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dc:creator/@rdf:resource",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${createEDMAgentUri(_enbdccreator.enbdcpersonuuid_)}\".replaceAll(\"http://\",\"https://\")"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:datering",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dc:date"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:dcterms_description",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dc:description",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${youTube(_enbdcdctermsdescription)}\""
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:dcterms_medium",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dc:format"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:dcterms_identifier",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dc:identifier"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dc:publisher"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dc:publisher/@rdf:resource",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${createEDMAgentUri(_enbdcpublisher.enbdcpersonuuid_)}\".replaceAll(\"http://\",\"https://\")"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:dcterms_rights",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dc:rights"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:dcterms_subject",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dc:subject",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${_enbdcdctermssubject}\".capitalize()"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:controlled_subjects/enb_dc:controlled_subjects_item/term",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dc:subject",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${_term}\".capitalize()"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:dcterms_title",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dc:title"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:dcterms_type",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dc:type",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${_enbdcdctermstype}\".capitalize()"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dcterms:created",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "start = switch_dates(_oaienbdc.enbdcdctermstemporalstart_)"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "end = switch_dates(_oaienbdc.enbdcdctermstemporalend_)"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "if (start && end && start != end) {"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${start} \u2013 ${end}\""
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "else if (start) {"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${start}\""
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:sizes/enb_dc:size",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dcterms:extent",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${_enbdcsize.enbdcsizetype_}: ${_enbdcsize.enbdcvalue_} ${_enbdcsize.enbdcunit_}\""
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dcterms:spatial"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/dcterms:spatial/@rdf:resource",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${create_geoname_uri(_enbdcgeo.enbdcgeonameid_)}\".replaceAll('^http','https')"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/constant",
+                "AttroutputPath": "/edm:RDF/edm:ProvidedCHO/edm:type",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "IMAGE"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/about/mmm:memorix/image",
+                "AttroutputPath": "/edm:RDF/edm:WebResource"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/about/mmm:memorix/image/thumbnail_large",
+                "AttroutputPath": "/edm:RDF/edm:WebResource/@rdf:about",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "_image.thumbnaillarge * { _thumbnaillarge ->"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${_thumbnaillarge}\".replaceAll('^http','https')"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/about/mmm:memorix/image/mimetype",
+                "AttroutputPath": "/edm:RDF/edm:WebResource/ebucore:hasMimeType"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/about/mmm:memorix/image/dzi",
+                "AttroutputPath": "/edm:RDF/edm:WebResource/nave:deepZoomUrl",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${_dzi}\".replaceAll('^http','https')"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/about/mmm:memorix/image/thumbnail_small",
+                "AttroutputPath": "/edm:RDF/edm:WebResource/nave:resourceSortOrder",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${_input.record[0].about[0].mmmmemorix[0].image.collect{thumb -> return thumb.thumbnailsmall[0]}.indexOf(_thumbnailsmall) + 1}\""
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/about/mmm:memorix/image/thumbnail_small",
+                "AttroutputPath": "/edm:RDF/edm:WebResource/nave:thumbSmall",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${_thumbnailsmall}\".replaceAll('^http','https')"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/about/mmm:memorix/image/thumbnail_large",
+                "AttroutputPath": "/edm:RDF/edm:WebResource/nave:thumbLarge",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${_thumbnaillarge}\".replaceAll('^http','https')"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/constant",
+                "AttroutputPath": "/edm:RDF/edm:WebResource/nave:allowDeepZoom",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "true"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/constant",
+                "AttroutputPath": "/edm:RDF/edm:WebResource/nave:allowSourceDownload",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "false"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/constant",
+                "AttroutputPath": "/edm:RDF/edm:WebResource/nave:allowPublicWebView",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "true"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator",
+                "AttroutputPath": "/edm:RDF/edm:Agent[creator]"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator",
+                "AttroutputPath": "/edm:RDF/edm:Agent[creator]/@rdf:about",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${createEDMAgentUri(_enbdccreator.enbdcpersonuuid_)}\".replaceAll(\"http://\",\"https://\")"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator",
+                "AttroutputPath": "/edm:RDF/edm:Agent[creator]/skos:prefLabel",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "remove_whitespace(\"${_enbdccreator.enbdcname_} ${_enbdccreator.enbdcsurnameprefix_} ${_enbdccreator.enbdcsurname_}\").replaceAll(' $','').replaceAll('^ ','')"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator/enb_dc:name_of_organization",
+                "AttroutputPath": "/edm:RDF/edm:Agent[creator]/skos:prefLabel"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator",
+                "AttroutputPath": "/edm:RDF/edm:Agent[creator]/nave:creatorLabel",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "remove_whitespace(\"${_enbdccreator.enbdcname_} ${_enbdccreator.enbdcsurnameprefix_} ${_enbdccreator.enbdcsurname_}\").replaceAll(' $','').replaceAll('^ ','')"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator/enb_dc:name_of_organization",
+                "AttroutputPath": "/edm:RDF/edm:Agent[creator]/nave:creatorLabel"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:creators/enb_dc:creator/enb_dc:name_of_organization",
+                "AttroutputPath": "/edm:RDF/edm:Agent[creator]/nave:organisationLabel"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject",
+                "AttroutputPath": "/edm:RDF/edm:Agent[subjectDepicted]"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject",
+                "AttroutputPath": "/edm:RDF/edm:Agent[subjectDepicted]/@rdf:about",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${createEDMAgentUri(_enbdcpersonsubject.enbdcpersonuuid_)}\".replaceAll('^http','https')"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject",
+                "AttroutputPath": "/edm:RDF/edm:Agent[subjectDepicted]/skos:prefLabel",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "remove_whitespace(\"${_enbdcpersonsubject.enbdcname_} ${_enbdcpersonsubject.enbdcsurnameprefix_} ${_enbdcpersonsubject.enbdcsurname_}\").replaceAll(' $','').replaceAll('^ ','')"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject/enb_dc:name_of_organization",
+                "AttroutputPath": "/edm:RDF/edm:Agent[subjectDepicted]/skos:prefLabel"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject",
+                "AttroutputPath": "/edm:RDF/edm:Agent[subjectDepicted]/nave:depictedSubjectLabel",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "remove_whitespace(\"${_enbdcpersonsubject.enbdcname_} ${_enbdcpersonsubject.enbdcsurnameprefix_} ${_enbdcpersonsubject.enbdcsurname_}\").replaceAll(' $','').replaceAll('^ ','')"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject/enb_dc:name_of_organization",
+                "AttroutputPath": "/edm:RDF/edm:Agent[subjectDepicted]/nave:depictedSubjectLabel"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject/enb_dc:name_of_organization",
+                "AttroutputPath": "/edm:RDF/edm:Agent[subjectDepicted]/nave:organisationLabel"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher",
+                "AttroutputPath": "/edm:RDF/edm:Agent[publisher]"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher",
+                "AttroutputPath": "/edm:RDF/edm:Agent[publisher]/@rdf:about",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${createEDMAgentUri(_enbdcpublisher.enbdcpersonuuid_)}\".replaceAll(\"http://\",\"https://\")"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher",
+                "AttroutputPath": "/edm:RDF/edm:Agent[publisher]/skos:prefLabel",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "remove_whitespace(\"${_enbdcpublisher.enbdcname_} ${_enbdcpublisher.enbdcsurnameprefix_} ${_enbdcpublisher.enbdcsurname_}\").replaceAll(' $','').replaceAll('^ ','')"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher/enb_dc:name_of_organization",
+                "AttroutputPath": "/edm:RDF/edm:Agent[publisher]/skos:prefLabel"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher",
+                "AttroutputPath": "/edm:RDF/edm:Agent[publisher]/nave:publisherLabel",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "remove_whitespace(\"${_enbdcpublisher.enbdcname_} ${_enbdcpublisher.enbdcsurnameprefix_} ${_enbdcpublisher.enbdcsurname_}\").replaceAll(' $','').replaceAll('^ ','')"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher/enb_dc:name_of_organization",
+                "AttroutputPath": "/edm:RDF/edm:Agent[publisher]/nave:publisherLabel"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:publishers/enb_dc:publisher/enb_dc:name_of_organization",
+                "AttroutputPath": "/edm:RDF/edm:Agent[publisher]/nave:organisationLabel"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo",
+                "AttroutputPath": "/edm:RDF/edm:Place"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo",
+                "AttroutputPath": "/edm:RDF/edm:Place/@rdf:about",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${create_geoname_uri(_enbdcgeo.enbdcgeonameid_)}\".replaceAll('^http','https')"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo/enb_dc:name",
+                "AttroutputPath": "/edm:RDF/edm:Place/skos:prefLabel"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo",
+                "AttroutputPath": "/edm:RDF/edm:Place/nave:address",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "remove_whitespace(\"${_enbdcgeo.enbdcstraatnaam_} ${_enbdcgeo.enbdcnummer_}\")"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo/enb_dc:name",
+                "AttroutputPath": "/edm:RDF/edm:Place/nave:city"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo/enb_dc:admin2_name",
+                "AttroutputPath": "/edm:RDF/edm:Place/nave:municipality"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo/enb_dc:specificatie_plaats",
+                "AttroutputPath": "/edm:RDF/edm:Place/nave:specificationPlace"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo/enb_dc:straatnaam",
+                "AttroutputPath": "/edm:RDF/edm:Place/nave:street"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo/enb_dc:nummer",
+                "AttroutputPath": "/edm:RDF/edm:Place/nave:streetNr"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:tenantname",
+                "AttroutputPath": "/edm:RDF/nave:BrabantCloudResource/nave:collection"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:set_title",
+                "AttroutputPath": "/edm:RDF/nave:BrabantCloudResource/nave:collectionType"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:spectrum_collection_name",
+                "AttroutputPath": "/edm:RDF/nave:BrabantCloudResource/nave:collectionPart",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${_enbdcspectrumcollectionname}\".capitalize()"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc",
+                "AttroutputPath": "/edm:RDF/nave:BrabantCloudResource/nave:date",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "start = switch_dates(_oaienbdc.enbdcdctermstemporalstart_)"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "end = switch_dates(_oaienbdc.enbdcdctermstemporalend_)"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "if (start && end && start != end) {"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "toDecadeRanges(\"${extractYear(start)} - ${extractYear(end)}\")"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "else if (start) {"
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${toDecadeRanges(extractYear(start))}\""
+                        },
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "}"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:geojson",
+                "AttroutputPath": "/edm:RDF/nave:BrabantCloudResource/nave:geojson"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject",
+                "AttroutputPath": "/edm:RDF/nave:BrabantCloudResource/nave:person"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject",
+                "AttroutputPath": "/edm:RDF/nave:BrabantCloudResource/nave:person/@rdf:resource",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${createEDMAgentUri(_enbdcpersonsubject.enbdcpersonuuid_)}\".replaceAll('^http','https')"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:geos/enb_dc:geo/enb_dc:name",
+                "AttroutputPath": "/edm:RDF/nave:BrabantCloudResource/nave:place"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:dcterms_temporal_end",
+                "AttroutputPath": "/edm:RDF/nave:BrabantCloudResource/nave:productionEnd",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${switch_dates(_enbdcdctermstemporalend)}\""
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:dcterms_temporal_start",
+                "AttroutputPath": "/edm:RDF/nave:BrabantCloudResource/nave:productionStart",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${switch_dates(_enbdcdctermstemporalstart)}\""
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:controlled_subjects/enb_dc:controlled_subjects_item/term",
+                "AttroutputPath": "/edm:RDF/nave:BrabantCloudResource/nave:subjectAatLabel"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject",
+                "AttroutputPath": "/edm:RDF/nave:BrabantCloudResource/nave:subjectDepicted"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:person_subjects/enb_dc:person_subject",
+                "AttroutputPath": "/edm:RDF/nave:BrabantCloudResource/nave:subjectDepicted/@rdf:resource",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${createEDMAgentUri(_enbdcpersonsubject.enbdcpersonuuid_)}\".replaceAll(\"http://\",\"https://\")"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/metadata/oai_enb:dc/enb_dc:subcollectienaam",
+                "AttroutputPath": "/edm:RDF/nave:BrabantCloudResource/nave:subcollectionPart",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "\"${_enbdcsubcollectienaam}\".capitalize()"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/input/record/header/identifier",
+                "AttroutputPath": "/edm:RDF/nave:Museometrie/nave:acquisitionYear"
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/constant",
+                "AttroutputPath": "/edm:RDF/nave:DelvingResource/nave:featured",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "'false'"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/constant",
+                "AttroutputPath": "/edm:RDF/nave:DelvingResource/nave:allowDeepZoom",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "true"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/constant",
+                "AttroutputPath": "/edm:RDF/nave:DelvingResource/nave:allowLinkedOpenData",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "'true'"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/constant",
+                "AttroutputPath": "/edm:RDF/nave:DelvingResource/nave:allowSourceDownload",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "false"
+                        }
+                    ]
+                }
+            },
+            {
+                "node-mapping": {
+                    "Space": "",
+                    "Local": "node-mapping"
+                },
+                "AttrinputPath": "/constant",
+                "AttroutputPath": "/edm:RDF/nave:DelvingResource/nave:public",
+                "groovy-code": {
+                    "groovy-code": {
+                        "Space": "",
+                        "Local": "groovy-code"
+                    },
+                    "string": [
+                        {
+                            "string": {
+                                "Space": "",
+                                "Local": "string"
+                            },
+                            "Text": "'true'"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
