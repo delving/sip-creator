@@ -187,6 +187,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             queueFiller.start();
             info(Thread.currentThread().getName() + " about to consume");
             consumer.run();
+            System.out.println("Done");
         }
         catch (Exception e) {
             termination.dueToException(e);
