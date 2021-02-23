@@ -15,6 +15,8 @@ import eu.delving.sip.xml.FileProcessor;
 import org.apache.http.client.HttpClient;
 import org.junit.experimental.categories.Category;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -29,6 +31,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static eu.delving.sip.base.HttpClientFactory.createHttpClient;
 import static eu.delving.sip.files.Storage.NARTHEX_URL;
@@ -45,14 +48,34 @@ public class MappingEngineTest {
         return new SchemaRepository(new SchemaFetcher(httpClient));
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"aidsmemorial__2016_07_25_20_52.sip.zip"})
-    public void test_file_processor(String filename) throws Exception {
-        Path workDir = new File("/home/q/PocketMapper/work/").toPath();
-        String sipId = filename.split("__")[0];
-        String rdfFilename = sipId + "__edm.xml";
 
-        Source expectedXml = Input.fromStream(getClass().getResourceAsStream("/mapped/" + rdfFilename)).build();
+    private static Stream<Arguments> testData() {
+        return Stream.of(
+            Arguments.of(
+                "aidsmemorial__2016_07_25_20_52.sip.zip",
+                "mapping_edm.xml",
+                "edm_5.2.6_record-definition.xml",
+                "edm"),
+            Arguments.of(
+                "2-24-01-08-art__2021_02_11_11_37.sip.zip",
+                "FF9F5FE58279B40C9CB8251F5AEF657B__mapping_naa.xml",
+                "naa_0.0.16_record-definition.xml",
+                "naa")
+        );
+    }
+
+    @MethodSource("testData")
+    @ParameterizedTest
+    public void test_file_processor(String sipFilename, String mappingFilename, String recDefFilename, String orgId) throws Exception {
+        Path workDir = new File("/home/q/PocketMapper/work/").toPath();
+        String sipId = sipFilename.split("__")[0];
+        String rdfFilename = sipId + "__" + orgId + ".xml";
+
+        System.out.println("|" + rdfFilename + "|");
+        System.out.println("|2-24-01-08-art__naa.xml|");
+        InputStream in = getClass().getResourceAsStream("/mapped/" + rdfFilename);
+        assert(in != null);
+        Source expectedXml = Input.fromStream(in).build();
 
         ProgressListener progressListener = mock(ProgressListener.class);
 
@@ -71,9 +94,9 @@ public class MappingEngineTest {
         when(sipModel.getFeedback()).thenReturn(feedback);
         when(sipModel.getStatsModel()).thenReturn(statsModel);
 
-        File sipFile = workDir.resolve(filename).toFile();
-        Path mappingFile = sipFile.toPath().resolve("mapping_edm.xml");
-        Path recFile = sipFile.toPath().resolve("edm_5.2.6_record-definition.xml");
+        File sipFile = workDir.resolve(sipFilename).toFile();
+        Path mappingFile = sipFile.toPath().resolve(mappingFilename);
+        Path recFile = sipFile.toPath().resolve(recDefFilename);
 
         RecDef recDef = RecDef.read(new FileInputStream(recFile.toFile()));
         RecDefTree recDefTree = RecDefTree.create(recDef);
@@ -97,7 +120,7 @@ public class MappingEngineTest {
         fileProcessor.setProgressListener(progressListener);
         fileProcessor.run();
 
-        Path rdfFile = workDir.resolve(filename).resolve(rdfFilename);
+        Path rdfFile = workDir.resolve(sipFilename).resolve(rdfFilename);
         Assert.assertTrue(Files.exists(rdfFile));
 
         Source actualXml = Input.fromPath(rdfFile).build();
