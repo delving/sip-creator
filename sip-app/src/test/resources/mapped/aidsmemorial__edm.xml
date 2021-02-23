@@ -1,5 +1,129 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="urn:ebu:metadata-schema:ebuCore_2014" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2216">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2216">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2216">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
+      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB05-groot-web.jpg">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB05-groot-web.jpg">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
+      </edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2216">
+      <dc:date>04-12-2010</dc:date>
+      <dc:format>380 x 380</dc:format>
+      <dc:identifier>ND05</dc:identifier>
+      <dc:subject>quiltblok 05 bevat een van de drie naamvlaggen die Gart Zeebregts/van Gennip in zomer 1988 aan Jeannette Kok van de Belangenvereniging van Mensen met Aids BMA, de voorganganger van de Hiv Vereniging overhandigde (NV013 Afrivan Victims, gemaakt door Gart's broer Paul), een tweede naamvlag voor Martin Krijsen, bestuurslid BMA (NV014-II), een naamvlag voor een vriend in de Verenigde Staten (NV019 Kenneth Baldwin), een naamvlag voor drie vrienden waarvan een uit Uruguay (NV026 Juan Colman), een naamvlag voor een homo-activist in Apeldoorn (NV021 Hans van Rijswijk), een naamvlag voor een homo-activist en COC medewerker in Haarlem (NV017 Ben Venema), en een naamvlag voor een student beeldende kunst uit Goes (NV023).</dc:subject>
+      <dc:subject>quiltblok 05 is gewijd aan de Hiv Vereniging afdeling Noord-Holland en de provincie Zeeland.</dc:subject>
+      <dcterms:spatial>Nederland 7/8 (niet NV013), Afrika 1/8 (NV013), Verenigde Staten 1/8 (NV019), Uruguay 1/8 (NV026), Gelderland 1/8 (NV021), Haarlem 1/8 (NV017), Zeeland (N023)</dcterms:spatial>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB05-groot-web.jpg">
+   </edm:WebResource>
+   <nave:DcnResource>
+      <nave:technique>quilting</nave:technique>
+      <nave:material>overwegend katoen met applicaties</nave:material>
+      <nave:location>NAMEN Project Nederland</nave:location>
+      <nave:province>nvt</nave:province>
+   </nave:DcnResource>
+</rdf:Description>
+<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2212">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2212">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2212">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
+      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB09-groot-web.jpg">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB09-groot-web.jpg">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
+      </edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2212">
+      <dc:date>03-12-2010</dc:date>
+      <dc:format>380 x 380</dc:format>
+      <dc:identifier>ND09</dc:identifier>
+      <dc:subject>quiltblok 09 bevat de naamvlag voor Edwin Bakker, journalist bij de Gay Krant en auteur van Rick's Report (NV066), een naamvlag voor de voorzitter van de afdeling Rotterdam van de Hiv Vereniging (NV067 Willem Boode), de naamvlag voor de oprichter van de seropositievengroep in Limburg wiens buddy zich bewust heeft laten besmetten met hiv (NV06 Hans Odenhoven), en de naamvlag voor een Braziliaanse immigrant (NV068 Clovis de Cantanhede Serejo Jr.).</dc:subject>
+      <dc:subject>quiltblok 09 is gewijd aan de Hiv Vereniging afdeling Limburg.</dc:subject>
+      <dcterms:spatial>Nederland 8/8, Brazili? 1/8 (NV068), Gelderland 2/8 (NV061, NV066), Twente (NV071), Rijnmond (N067), Limburg (NV065)</dcterms:spatial>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB09-groot-web.jpg">
+   </edm:WebResource>
+   <nave:DcnResource>
+      <nave:technique>quilting</nave:technique>
+      <nave:material>overwegend katoen met applicaties</nave:material>
+      <nave:location>NAMEN Project Nederland</nave:location>
+      <nave:province>nvt</nave:province>
+   </nave:DcnResource>
+</rdf:Description>
+<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2215">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2215">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2215">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
+      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB06-grooot-web.jpg">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB06-grooot-web.jpg">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
+      </edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2215">
+      <dc:date>04-12-2010</dc:date>
+      <dc:format>380 x 380</dc:format>
+      <dc:identifier>ND06</dc:identifier>
+      <dc:subject>quiltblok 06 bevat de naamvlag voor een Australi?r met goed herinneringen aan Amsterdam (NV033 Keith Robinson) en die voor een Brit die Amsterdam tot zijn nieuw thuis maakte (NV052 Colin Lloyd), een naamvlag voor de medeoprichter van de afdeling Noord van de Hiv Vereniging in Groningen (NV053 Piet Stutvoet) en een naamvlag voor vader, moeder en dochter (NV046 Chris, Karin en Caressa van Horck).</dc:subject>
+      <dc:subject>quiltblok 06 is gewijd aan kinderen en hun families.</dc:subject>
+      <dcterms:spatial>Nederland 8/8, Australi? 1/8 (NV033), Groot-Brittanni? 1/8 (NV052), provincie Groningen (NV053), Limburg 1/8 (NV046)</dcterms:spatial>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB06-grooot-web.jpg">
+   </edm:WebResource>
+   <nave:DcnResource>
+      <nave:technique>quilting</nave:technique>
+      <nave:material>overwegend katoen met applicaties</nave:material>
+      <nave:location>NAMEN Project Nederland</nave:location>
+      <nave:province>nvt</nave:province>
+   </nave:DcnResource>
+</rdf:Description>
+<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2210">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2210">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2210">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
+      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB012-groot-web.jpg">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB012-groot-web.jpg">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
+      </edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2210">
+      <dc:date>03-12-2010</dc:date>
+      <dc:format>380 x 380</dc:format>
+      <dc:identifier>ND12</dc:identifier>
+      <dc:subject>quiltblok 12 bevat de naamvalg voorzanger Ren? Klijn die zijn aids in de Schreeuw van de Leeuw openbaart, zijn lied Mr. Blue werd heel bekend (NV094), de naamvlag voor Paul van Ettekoven die het eerste Veilig Vrijen Festival organiseerde en zich als buddy opzettelijk liet infecteren (NV086), een naamvlag voor beeldend kunstenaar Melle Visser geboren op Schiermonnikoog (NV095) en twee naamvlaggen voor immigranten, een uit Malta (NV091 Henri Scerri) en een uit Duitsland (NV087 Gerhard Hendriok).</dc:subject>
+      <dc:subject>quiltblok 12 is gewijd aan zangers en zangeressen.</dc:subject>
+      <dcterms:spatial>Nederland 8/8, Haaglanden 1/8 (NV094), provincie Utrecht 1/8 (NV088), Limburg (NV086)</dcterms:spatial>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB012-groot-web.jpg">
+   </edm:WebResource>
+   <nave:DcnResource>
+      <nave:technique>quilting</nave:technique>
+      <nave:material>overwegend katoen met applicaties</nave:material>
+      <nave:location>NAMEN Project Nederland</nave:location>
+      <nave:province>nvt</nave:province>
+   </nave:DcnResource>
+</rdf:Description>
 <rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2214">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2214">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2214">
@@ -23,6 +147,99 @@
       <edm:type>IMAGE</edm:type>
    </edm:ProvidedCHO>
    <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB07groot-web.jpg">
+   </edm:WebResource>
+   <nave:DcnResource>
+      <nave:technique>quilting</nave:technique>
+      <nave:material>overwegend katoen met applicaties</nave:material>
+      <nave:location>NAMEN Project Nederland</nave:location>
+      <nave:province>nvt</nave:province>
+   </nave:DcnResource>
+</rdf:Description>
+<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/158">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/158">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/158">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
+      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB01-groot-web.jpg">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB01-groot-web.jpg">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
+      </edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/158">
+      <dc:date>21-11-2007</dc:date>
+      <dc:format>380 x 380</dc:format>
+      <dc:identifier>ND01</dc:identifier>
+      <dc:subject>quiltblok 01 bevat een van de drie naamvlaggen die Gart Zeebrets/van Gennip in zomer 1988 aan Jeannette Kok van de Belangenvereniging van Mensen met Aids BMA, de voorganger van de Hiv Vereniging overhandigde (NV006 Leo van Hoof), de naamvlag voor een gevangenisarts (NV003 Coen Smit, lange tijd de vroegst overledene met een naamvlag), de naamvlag voor een medewerker van de Australische ambassade in Den Haag (NV011 Martin Golding), de naamvlag voor een bestuurslid van de BMA (NV014-I Martin Kruijsen) en een van twee namvlaggen voor moslems (NV018 Abdelnacer uit Algerije).</dc:subject>
+      <dc:subject>quiltblok 01 is gewijd aan Noordafrika.</dc:subject>
+      <dcterms:spatial>Nederland 8/8, Algerije 1/8 (NV018), Australi? 1/8 (NV011), Brabant 1/8 (NV006)</dcterms:spatial>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB01-groot-web.jpg">
+   </edm:WebResource>
+   <nave:DcnResource>
+      <nave:technique>quilting</nave:technique>
+      <nave:material>overwegend katoen met applicaties</nave:material>
+      <nave:location>NAMEN Project Nederland</nave:location>
+      <nave:province>nvt</nave:province>
+   </nave:DcnResource>
+</rdf:Description>
+<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2213">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2213">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2213">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
+      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB08-groot-web.jpg">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB08-groot-web.jpg">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
+      </edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2213">
+      <dc:date>03-12-2010</dc:date>
+      <dc:format>380 x 380</dc:format>
+      <dc:identifier>ND08</dc:identifier>
+      <dc:subject>quiltblok 08 bevat een van de drie naamvlaggen voor Joden (NV063 Co Wijtvliet), twee naamvlaggen voor homopartners naast elkaar (NV035 Kees Vis, NV063 Co Wijtvliet), een naamvlag voor een aidsactivist in Groningen (NV032 Jan Teo ter Haar), en twee naamvlaggen voor leermannen (NV032 Jan Teo ter Haar, NV059 Ren? Steijn).</dc:subject>
+      <dc:subject>quiltblok 08 is gewijd aan de Motorsport Club Amsterdam.</dc:subject>
+      <dcterms:spatial>Nederland 8/8, Gelderland 1/8 (NV060), Haaglanden 1/8 (NV059), Friesland 1/8 (NV032), provincie Groningen 1/8 (NV032)</dcterms:spatial>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB08-groot-web.jpg">
+   </edm:WebResource>
+   <nave:DcnResource>
+      <nave:technique>quilting</nave:technique>
+      <nave:material>overwegend katoen met applicaties</nave:material>
+      <nave:location>NAMEN Project Nederland</nave:location>
+      <nave:province>nvt</nave:province>
+   </nave:DcnResource>
+</rdf:Description>
+<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/166">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/166">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/166">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
+      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB03-groot-web.jpg">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB03-groot-web.jpg">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
+      </edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/166">
+      <dc:date>21-11-2007</dc:date>
+      <dc:format>380 x 380</dc:format>
+      <dc:identifier>ND03</dc:identifier>
+      <dc:subject>quiltblok 03 bevat naamvlaggen voor een emigrant naar Australi? (NV038 Hans Brockhoff) en voor de stichter van de Australische Quilt (NV034 Andrew Carter), en een naamvlag voor een Italiaans immigrant met een bijzonder grafsteen op St. Barbara, Amsterdam (NV041 Salavatore Mormone).</dc:subject>
+      <dc:subject>quiltblok 03 is gewijd aan alle emigranten.</dc:subject>
+      <dcterms:spatial>Nederland 7/8 (niet NV034), Australi? 2/8 (NV038 NV034), Itali? 1/8 (NV041), Brabant 2/8 (NV024 NV028)</dcterms:spatial>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB03-groot-web.jpg">
    </edm:WebResource>
    <nave:DcnResource>
       <nave:technique>quilting</nave:technique>
@@ -124,96 +341,34 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2212">
-   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2212">
-      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2212">
+<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/179">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/179">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/179">
       </edm:aggregatedCHO>
       <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
-      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB09-groot-web.jpg">
+      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB016-groot-web.jpg">
       </edm:isShownBy>
-      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB09-groot-web.jpg">
+      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB016-groot-web.jpg">
       </edm:object>
       <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
       <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
       </edm:rights>
    </ore:Aggregation>
-   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2212">
-      <dc:date>03-12-2010</dc:date>
-      <dc:format>380 x 380</dc:format>
-      <dc:identifier>ND09</dc:identifier>
-      <dc:subject>quiltblok 09 bevat de naamvlag voor Edwin Bakker, journalist bij de Gay Krant en auteur van Rick's Report (NV066), een naamvlag voor de voorzitter van de afdeling Rotterdam van de Hiv Vereniging (NV067 Willem Boode), de naamvlag voor de oprichter van de seropositievengroep in Limburg wiens buddy zich bewust heeft laten besmetten met hiv (NV06 Hans Odenhoven), en de naamvlag voor een Braziliaanse immigrant (NV068 Clovis de Cantanhede Serejo Jr.).</dc:subject>
-      <dc:subject>quiltblok 09 is gewijd aan de Hiv Vereniging afdeling Limburg.</dc:subject>
-      <dcterms:spatial>Nederland 8/8, Brazili? 1/8 (NV068), Gelderland 2/8 (NV061, NV066), Twente (NV071), Rijnmond (N067), Limburg (NV065)</dcterms:spatial>
-      <edm:type>IMAGE</edm:type>
-   </edm:ProvidedCHO>
-   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB09-groot-web.jpg">
-   </edm:WebResource>
-   <nave:DcnResource>
-      <nave:technique>quilting</nave:technique>
-      <nave:material>overwegend katoen met applicaties</nave:material>
-      <nave:location>NAMEN Project Nederland</nave:location>
-      <nave:province>nvt</nave:province>
-   </nave:DcnResource>
-</rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/158">
-   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/158">
-      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/158">
-      </edm:aggregatedCHO>
-      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
-      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB01-groot-web.jpg">
-      </edm:isShownBy>
-      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB01-groot-web.jpg">
-      </edm:object>
-      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
-      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
-      </edm:rights>
-   </ore:Aggregation>
-   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/158">
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/179">
       <dc:date>21-11-2007</dc:date>
       <dc:format>380 x 380</dc:format>
-      <dc:identifier>ND01</dc:identifier>
-      <dc:subject>quiltblok 01 bevat een van de drie naamvlaggen die Gart Zeebrets/van Gennip in zomer 1988 aan Jeannette Kok van de Belangenvereniging van Mensen met Aids BMA, de voorganger van de Hiv Vereniging overhandigde (NV006 Leo van Hoof), de naamvlag voor een gevangenisarts (NV003 Coen Smit, lange tijd de vroegst overledene met een naamvlag), de naamvlag voor een medewerker van de Australische ambassade in Den Haag (NV011 Martin Golding), de naamvlag voor een bestuurslid van de BMA (NV014-I Martin Kruijsen) en een van twee namvlaggen voor moslems (NV018 Abdelnacer uit Algerije).</dc:subject>
-      <dc:subject>quiltblok 01 is gewijd aan Noordafrika.</dc:subject>
-      <dcterms:spatial>Nederland 8/8, Algerije 1/8 (NV018), Australi? 1/8 (NV011), Brabant 1/8 (NV006)</dcterms:spatial>
+      <dc:identifier>ND16</dc:identifier>
+      <dc:subject>quiltblok 16 werd in zijn geheel gemaakt door de Hiv Vereniging Nederland afdeling Brabant. Twee naamvlaagen zijn voor immigranten uit Suriname (NV131) en de Kaapverdische Eilanden/ Portugal (NV132).</dc:subject>
+      <dc:subject>quiltblok 16 is gewijd aan 'De Gebroeders' vaarvakanties voor mensen met hiv.</dc:subject>
+      <dcterms:spatial>Nederland 8/8, Brabant 8/8, Suriname 1/8 (NV131), Kaapverdische Eilanden/ Portugal 1/8 (NV132)</dcterms:spatial>
       <edm:type>IMAGE</edm:type>
    </edm:ProvidedCHO>
-   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB01-groot-web.jpg">
+   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB016-groot-web.jpg">
    </edm:WebResource>
    <nave:DcnResource>
       <nave:technique>quilting</nave:technique>
       <nave:material>overwegend katoen met applicaties</nave:material>
-      <nave:location>NAMEN Project Nederland</nave:location>
-      <nave:province>nvt</nave:province>
-   </nave:DcnResource>
-</rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2215">
-   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2215">
-      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2215">
-      </edm:aggregatedCHO>
-      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
-      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB06-grooot-web.jpg">
-      </edm:isShownBy>
-      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB06-grooot-web.jpg">
-      </edm:object>
-      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
-      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
-      </edm:rights>
-   </ore:Aggregation>
-   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2215">
-      <dc:date>04-12-2010</dc:date>
-      <dc:format>380 x 380</dc:format>
-      <dc:identifier>ND06</dc:identifier>
-      <dc:subject>quiltblok 06 bevat de naamvlag voor een Australi?r met goed herinneringen aan Amsterdam (NV033 Keith Robinson) en die voor een Brit die Amsterdam tot zijn nieuw thuis maakte (NV052 Colin Lloyd), een naamvlag voor de medeoprichter van de afdeling Noord van de Hiv Vereniging in Groningen (NV053 Piet Stutvoet) en een naamvlag voor vader, moeder en dochter (NV046 Chris, Karin en Caressa van Horck).</dc:subject>
-      <dc:subject>quiltblok 06 is gewijd aan kinderen en hun families.</dc:subject>
-      <dcterms:spatial>Nederland 8/8, Australi? 1/8 (NV033), Groot-Brittanni? 1/8 (NV052), provincie Groningen (NV053), Limburg 1/8 (NV046)</dcterms:spatial>
-      <edm:type>IMAGE</edm:type>
-   </edm:ProvidedCHO>
-   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB06-grooot-web.jpg">
-   </edm:WebResource>
-   <nave:DcnResource>
-      <nave:technique>quilting</nave:technique>
-      <nave:material>overwegend katoen met applicaties</nave:material>
-      <nave:location>NAMEN Project Nederland</nave:location>
+      <nave:location>Hiv Vereniging afd. Brabant, Tilburg</nave:location>
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
@@ -240,161 +395,6 @@
       <edm:type>IMAGE</edm:type>
    </edm:ProvidedCHO>
    <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB02-groot-web.jpg">
-   </edm:WebResource>
-   <nave:DcnResource>
-      <nave:technique>quilting</nave:technique>
-      <nave:material>overwegend katoen met applicaties</nave:material>
-      <nave:location>NAMEN Project Nederland</nave:location>
-      <nave:province>nvt</nave:province>
-   </nave:DcnResource>
-</rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2216">
-   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2216">
-      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2216">
-      </edm:aggregatedCHO>
-      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
-      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB05-groot-web.jpg">
-      </edm:isShownBy>
-      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB05-groot-web.jpg">
-      </edm:object>
-      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
-      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
-      </edm:rights>
-   </ore:Aggregation>
-   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2216">
-      <dc:date>04-12-2010</dc:date>
-      <dc:format>380 x 380</dc:format>
-      <dc:identifier>ND05</dc:identifier>
-      <dc:subject>quiltblok 05 bevat een van de drie naamvlaggen die Gart Zeebregts/van Gennip in zomer 1988 aan Jeannette Kok van de Belangenvereniging van Mensen met Aids BMA, de voorganganger van de Hiv Vereniging overhandigde (NV013 Afrivan Victims, gemaakt door Gart's broer Paul), een tweede naamvlag voor Martin Krijsen, bestuurslid BMA (NV014-II), een naamvlag voor een vriend in de Verenigde Staten (NV019 Kenneth Baldwin), een naamvlag voor drie vrienden waarvan een uit Uruguay (NV026 Juan Colman), een naamvlag voor een homo-activist in Apeldoorn (NV021 Hans van Rijswijk), een naamvlag voor een homo-activist en COC medewerker in Haarlem (NV017 Ben Venema), en een naamvlag voor een student beeldende kunst uit Goes (NV023).</dc:subject>
-      <dc:subject>quiltblok 05 is gewijd aan de Hiv Vereniging afdeling Noord-Holland en de provincie Zeeland.</dc:subject>
-      <dcterms:spatial>Nederland 7/8 (niet NV013), Afrika 1/8 (NV013), Verenigde Staten 1/8 (NV019), Uruguay 1/8 (NV026), Gelderland 1/8 (NV021), Haarlem 1/8 (NV017), Zeeland (N023)</dcterms:spatial>
-      <edm:type>IMAGE</edm:type>
-   </edm:ProvidedCHO>
-   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB05-groot-web.jpg">
-   </edm:WebResource>
-   <nave:DcnResource>
-      <nave:technique>quilting</nave:technique>
-      <nave:material>overwegend katoen met applicaties</nave:material>
-      <nave:location>NAMEN Project Nederland</nave:location>
-      <nave:province>nvt</nave:province>
-   </nave:DcnResource>
-</rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2210">
-   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2210">
-      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2210">
-      </edm:aggregatedCHO>
-      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
-      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB012-groot-web.jpg">
-      </edm:isShownBy>
-      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB012-groot-web.jpg">
-      </edm:object>
-      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
-      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
-      </edm:rights>
-   </ore:Aggregation>
-   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2210">
-      <dc:date>03-12-2010</dc:date>
-      <dc:format>380 x 380</dc:format>
-      <dc:identifier>ND12</dc:identifier>
-      <dc:subject>quiltblok 12 bevat de naamvalg voorzanger Ren? Klijn die zijn aids in de Schreeuw van de Leeuw openbaart, zijn lied Mr. Blue werd heel bekend (NV094), de naamvlag voor Paul van Ettekoven die het eerste Veilig Vrijen Festival organiseerde en zich als buddy opzettelijk liet infecteren (NV086), een naamvlag voor beeldend kunstenaar Melle Visser geboren op Schiermonnikoog (NV095) en twee naamvlaggen voor immigranten, een uit Malta (NV091 Henri Scerri) en een uit Duitsland (NV087 Gerhard Hendriok).</dc:subject>
-      <dc:subject>quiltblok 12 is gewijd aan zangers en zangeressen.</dc:subject>
-      <dcterms:spatial>Nederland 8/8, Haaglanden 1/8 (NV094), provincie Utrecht 1/8 (NV088), Limburg (NV086)</dcterms:spatial>
-      <edm:type>IMAGE</edm:type>
-   </edm:ProvidedCHO>
-   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB012-groot-web.jpg">
-   </edm:WebResource>
-   <nave:DcnResource>
-      <nave:technique>quilting</nave:technique>
-      <nave:material>overwegend katoen met applicaties</nave:material>
-      <nave:location>NAMEN Project Nederland</nave:location>
-      <nave:province>nvt</nave:province>
-   </nave:DcnResource>
-</rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/166">
-   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/166">
-      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/166">
-      </edm:aggregatedCHO>
-      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
-      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB03-groot-web.jpg">
-      </edm:isShownBy>
-      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB03-groot-web.jpg">
-      </edm:object>
-      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
-      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
-      </edm:rights>
-   </ore:Aggregation>
-   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/166">
-      <dc:date>21-11-2007</dc:date>
-      <dc:format>380 x 380</dc:format>
-      <dc:identifier>ND03</dc:identifier>
-      <dc:subject>quiltblok 03 bevat naamvlaggen voor een emigrant naar Australi? (NV038 Hans Brockhoff) en voor de stichter van de Australische Quilt (NV034 Andrew Carter), en een naamvlag voor een Italiaans immigrant met een bijzonder grafsteen op St. Barbara, Amsterdam (NV041 Salavatore Mormone).</dc:subject>
-      <dc:subject>quiltblok 03 is gewijd aan alle emigranten.</dc:subject>
-      <dcterms:spatial>Nederland 7/8 (niet NV034), Australi? 2/8 (NV038 NV034), Itali? 1/8 (NV041), Brabant 2/8 (NV024 NV028)</dcterms:spatial>
-      <edm:type>IMAGE</edm:type>
-   </edm:ProvidedCHO>
-   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB03-groot-web.jpg">
-   </edm:WebResource>
-   <nave:DcnResource>
-      <nave:technique>quilting</nave:technique>
-      <nave:material>overwegend katoen met applicaties</nave:material>
-      <nave:location>NAMEN Project Nederland</nave:location>
-      <nave:province>nvt</nave:province>
-   </nave:DcnResource>
-</rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2213">
-   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2213">
-      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2213">
-      </edm:aggregatedCHO>
-      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
-      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB08-groot-web.jpg">
-      </edm:isShownBy>
-      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB08-groot-web.jpg">
-      </edm:object>
-      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
-      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
-      </edm:rights>
-   </ore:Aggregation>
-   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2213">
-      <dc:date>03-12-2010</dc:date>
-      <dc:format>380 x 380</dc:format>
-      <dc:identifier>ND08</dc:identifier>
-      <dc:subject>quiltblok 08 bevat een van de drie naamvlaggen voor Joden (NV063 Co Wijtvliet), twee naamvlaggen voor homopartners naast elkaar (NV035 Kees Vis, NV063 Co Wijtvliet), een naamvlag voor een aidsactivist in Groningen (NV032 Jan Teo ter Haar), en twee naamvlaggen voor leermannen (NV032 Jan Teo ter Haar, NV059 Ren? Steijn).</dc:subject>
-      <dc:subject>quiltblok 08 is gewijd aan de Motorsport Club Amsterdam.</dc:subject>
-      <dcterms:spatial>Nederland 8/8, Gelderland 1/8 (NV060), Haaglanden 1/8 (NV059), Friesland 1/8 (NV032), provincie Groningen 1/8 (NV032)</dcterms:spatial>
-      <edm:type>IMAGE</edm:type>
-   </edm:ProvidedCHO>
-   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB08-groot-web.jpg">
-   </edm:WebResource>
-   <nave:DcnResource>
-      <nave:technique>quilting</nave:technique>
-      <nave:material>overwegend katoen met applicaties</nave:material>
-      <nave:location>NAMEN Project Nederland</nave:location>
-      <nave:province>nvt</nave:province>
-   </nave:DcnResource>
-</rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2209">
-   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2209">
-      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2209">
-      </edm:aggregatedCHO>
-      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
-      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB013-groot-web_1.jpg">
-      </edm:isShownBy>
-      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB013-groot-web_1.jpg">
-      </edm:object>
-      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
-      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
-      </edm:rights>
-   </ore:Aggregation>
-   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2209">
-      <dc:date>03-12-2010</dc:date>
-      <dc:format>380 x 380</dc:format>
-      <dc:identifier>ND13</dc:identifier>
-      <dc:subject>quiltblok 13 is een van de drie blokken in hun geheel zijn gemaakt door de Hiv Vereniging Nederland afdeling Rotterdam-Rijnmond. Ze bevat de enige naamvlaggen voor een Zwartafrikaan (NV109, NV111 Jean Siemda, Ivoorkust) en nog eens twee naamvlaggen voor immigranten (NV108 Hugo de Roode, Indonesi?, NV104 Rick Broekers, Australi?).</dc:subject>
-      <dc:subject>quiltblok 13 is gewijd aan immigranten uit Zwartafrika.</dc:subject>
-      <dcterms:spatial>Nederland 8/8, Rijnmond 8/8, Ivoorkust 2/8 (NV109, NV111)</dcterms:spatial>
-      <edm:type>IMAGE</edm:type>
-   </edm:ProvidedCHO>
-   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB013-groot-web_1.jpg">
    </edm:WebResource>
    <nave:DcnResource>
       <nave:technique>quilting</nave:technique>
@@ -434,65 +434,34 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2206">
-   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2206">
-      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2206">
+<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2209">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2209">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2209">
       </edm:aggregatedCHO>
       <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
-      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB015-groot-web_1.jpg">
+      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB013-groot-web_1.jpg">
       </edm:isShownBy>
-      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB015-groot-web_1.jpg">
+      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB013-groot-web_1.jpg">
       </edm:object>
       <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
       <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
       </edm:rights>
    </ore:Aggregation>
-   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2206">
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2209">
       <dc:date>03-12-2010</dc:date>
       <dc:format>380 x 380</dc:format>
-      <dc:identifier>ND15</dc:identifier>
-      <dc:subject>quiltblok 15 bevat vier naamvlaggen voor mensen van de Hiv Vereniging Nederland afdeling Noord (NV098 Cees Bunschoten uit Hoogersmilde, NV096 Jos Harms uit Emmen, NV123 Jurjen van den Berg uit Drachten, NV124 Egbert Scheel uit Weidum), twee ervan tonen Friese pompebl?den. Een naamvlag is voor een immigrant uit de Verenigde Staten (NV116 Joel Toner). Jurjen van den Berg verwierf faam als 'meester met aids' in een basisschool, Egbert Scheel als Nieuwe Fries die moeiteloos taal en tradities leerde.</dc:subject>
-      <dc:subject>quiltblok 15 is gewijd aan de Hiv Vereniging Nederland afd. Noord.</dc:subject>
-      <dcterms:spatial>Nederland 8/8, Drenthe 2/8 (NV098 NV096), Friesland 2/8 (NV123 NV124), Limburg 1/8 (NV119), VS (NV116)</dcterms:spatial>
+      <dc:identifier>ND13</dc:identifier>
+      <dc:subject>quiltblok 13 is een van de drie blokken in hun geheel zijn gemaakt door de Hiv Vereniging Nederland afdeling Rotterdam-Rijnmond. Ze bevat de enige naamvlaggen voor een Zwartafrikaan (NV109, NV111 Jean Siemda, Ivoorkust) en nog eens twee naamvlaggen voor immigranten (NV108 Hugo de Roode, Indonesi?, NV104 Rick Broekers, Australi?).</dc:subject>
+      <dc:subject>quiltblok 13 is gewijd aan immigranten uit Zwartafrika.</dc:subject>
+      <dcterms:spatial>Nederland 8/8, Rijnmond 8/8, Ivoorkust 2/8 (NV109, NV111)</dcterms:spatial>
       <edm:type>IMAGE</edm:type>
    </edm:ProvidedCHO>
-   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB015-groot-web_1.jpg">
+   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB013-groot-web_1.jpg">
    </edm:WebResource>
    <nave:DcnResource>
       <nave:technique>quilting</nave:technique>
       <nave:material>overwegend katoen met applicaties</nave:material>
       <nave:location>NAMEN Project Nederland</nave:location>
-      <nave:province>nvt</nave:province>
-   </nave:DcnResource>
-</rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/179">
-   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/179">
-      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/179">
-      </edm:aggregatedCHO>
-      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
-      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB016-groot-web.jpg">
-      </edm:isShownBy>
-      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB016-groot-web.jpg">
-      </edm:object>
-      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
-      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
-      </edm:rights>
-   </ore:Aggregation>
-   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/179">
-      <dc:date>21-11-2007</dc:date>
-      <dc:format>380 x 380</dc:format>
-      <dc:identifier>ND16</dc:identifier>
-      <dc:subject>quiltblok 16 werd in zijn geheel gemaakt door de Hiv Vereniging Nederland afdeling Brabant. Twee naamvlaagen zijn voor immigranten uit Suriname (NV131) en de Kaapverdische Eilanden/ Portugal (NV132).</dc:subject>
-      <dc:subject>quiltblok 16 is gewijd aan 'De Gebroeders' vaarvakanties voor mensen met hiv.</dc:subject>
-      <dcterms:spatial>Nederland 8/8, Brabant 8/8, Suriname 1/8 (NV131), Kaapverdische Eilanden/ Portugal 1/8 (NV132)</dcterms:spatial>
-      <edm:type>IMAGE</edm:type>
-   </edm:ProvidedCHO>
-   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB016-groot-web.jpg">
-   </edm:WebResource>
-   <nave:DcnResource>
-      <nave:technique>quilting</nave:technique>
-      <nave:material>overwegend katoen met applicaties</nave:material>
-      <nave:location>Hiv Vereniging afd. Brabant, Tilburg</nave:location>
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
@@ -527,29 +496,29 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2203">
-   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2203">
-      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2203">
+<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2206">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2206">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2206">
       </edm:aggregatedCHO>
       <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
-      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB20-groot-web.jpg">
+      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB015-groot-web_1.jpg">
       </edm:isShownBy>
-      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB20-groot-web.jpg">
+      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB015-groot-web_1.jpg">
       </edm:object>
       <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
       <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
       </edm:rights>
    </ore:Aggregation>
-   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2203">
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2206">
       <dc:date>03-12-2010</dc:date>
       <dc:format>380 x 380</dc:format>
-      <dc:identifier>ND20</dc:identifier>
-      <dc:subject>quiltblok 20 is in zijn geheel door de Hiv Vereniging afd. Rotterdam-Rijnmond gemaakt. Een van de naamvlaggen werd door een vriend gemaakt (NV159 Paolo Casalati), de andere seven naamvlaggen door de quiltgroep Rotterdam, waardoor ze qua stijl uniformer zijn. Het bevat onder meer de naamvlag voor Ron Wichman, de naamgever voor het Ron Wichmanhuis.</dc:subject>
-      <dc:subject>quiltblok 20 is gewijd aan Ron Wichman.</dc:subject>
-      <dcterms:spatial>Nederland 8/8, Suriname 1/8 (NV162), Itali? 1/8 (NV159), Rijnmond 6/8 NV159, NV163, NV160, NV161, NV164, NV165), Haaglanden 2/8 (NV166, NV165)</dcterms:spatial>
+      <dc:identifier>ND15</dc:identifier>
+      <dc:subject>quiltblok 15 bevat vier naamvlaggen voor mensen van de Hiv Vereniging Nederland afdeling Noord (NV098 Cees Bunschoten uit Hoogersmilde, NV096 Jos Harms uit Emmen, NV123 Jurjen van den Berg uit Drachten, NV124 Egbert Scheel uit Weidum), twee ervan tonen Friese pompebl?den. Een naamvlag is voor een immigrant uit de Verenigde Staten (NV116 Joel Toner). Jurjen van den Berg verwierf faam als 'meester met aids' in een basisschool, Egbert Scheel als Nieuwe Fries die moeiteloos taal en tradities leerde.</dc:subject>
+      <dc:subject>quiltblok 15 is gewijd aan de Hiv Vereniging Nederland afd. Noord.</dc:subject>
+      <dcterms:spatial>Nederland 8/8, Drenthe 2/8 (NV098 NV096), Friesland 2/8 (NV123 NV124), Limburg 1/8 (NV119), VS (NV116)</dcterms:spatial>
       <edm:type>IMAGE</edm:type>
    </edm:ProvidedCHO>
-   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB20-groot-web.jpg">
+   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB015-groot-web_1.jpg">
    </edm:WebResource>
    <nave:DcnResource>
       <nave:technique>quilting</nave:technique>
@@ -589,29 +558,29 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/184">
-   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/184">
-      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/184">
+<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2203">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2203">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2203">
       </edm:aggregatedCHO>
       <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
-      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/Quilt-21_new.jpg">
+      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB20-groot-web.jpg">
       </edm:isShownBy>
-      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/Quilt-21_new.jpg">
+      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB20-groot-web.jpg">
       </edm:object>
       <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
       <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
       </edm:rights>
    </ore:Aggregation>
-   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/184">
-      <dc:date>29-11-2009</dc:date>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2203">
+      <dc:date>03-12-2010</dc:date>
       <dc:format>380 x 380</dc:format>
-      <dc:identifier>ND21</dc:identifier>
-      <dc:subject>quiltblok 21 bevat drie naamvlaggen voor mensen in Gelderland (NV150 Douwe Elsinga, bestuurslid Hiv Vereniging afd. Gelderland, NV168 Joop Bouwmans, lid Hiv Vereniging afd. Gelderland, NV152 Kees Rademaker, kunstschilder), een naamvlag voor een voorzitter van de Hiv Vereniging (NV167 Peter Zuidervliet), een naamvlag voor homoactivist MarCo Ex (NV169), een naamvlag voor een immigrant uit Thailand (NV170 Charun Palkrasai) en een naamvlag voor de Isra?lische zangeres Ofra Haza (NV157).</dc:subject>
-      <dc:subject>quiltblok 21 is gewijd aan kunstenaars.</dc:subject>
-      <dcterms:spatial>Nederland 7/8, Israel 1/8 (NV157), Thailand 1/8 (NV170), Gelderland 3/8 (NV150, NV168, NV152), provincie Groningen 1/8 (NV158)</dcterms:spatial>
+      <dc:identifier>ND20</dc:identifier>
+      <dc:subject>quiltblok 20 is in zijn geheel door de Hiv Vereniging afd. Rotterdam-Rijnmond gemaakt. Een van de naamvlaggen werd door een vriend gemaakt (NV159 Paolo Casalati), de andere seven naamvlaggen door de quiltgroep Rotterdam, waardoor ze qua stijl uniformer zijn. Het bevat onder meer de naamvlag voor Ron Wichman, de naamgever voor het Ron Wichmanhuis.</dc:subject>
+      <dc:subject>quiltblok 20 is gewijd aan Ron Wichman.</dc:subject>
+      <dcterms:spatial>Nederland 8/8, Suriname 1/8 (NV162), Itali? 1/8 (NV159), Rijnmond 6/8 NV159, NV163, NV160, NV161, NV164, NV165), Haaglanden 2/8 (NV166, NV165)</dcterms:spatial>
       <edm:type>IMAGE</edm:type>
    </edm:ProvidedCHO>
-   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/Quilt-21_new.jpg">
+   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB20-groot-web.jpg">
    </edm:WebResource>
    <nave:DcnResource>
       <nave:technique>quilting</nave:technique>

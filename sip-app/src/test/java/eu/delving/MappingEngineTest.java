@@ -1,13 +1,10 @@
 package eu.delving;
 
 import eu.delving.groovy.GroovyCodeResource;
-import eu.delving.metadata.CachedResourceResolver;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefTree;
 import eu.delving.metadata.RecMapping;
-import eu.delving.rdf.MapToCRM;
 import eu.delving.schema.SchemaRepository;
-import eu.delving.sip.Application;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.*;
 import eu.delving.sip.model.Feedback;
@@ -17,21 +14,20 @@ import eu.delving.sip.model.StatsModel;
 import eu.delving.sip.xml.FileProcessor;
 import org.apache.http.client.HttpClient;
 import org.junit.experimental.categories.Category;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.testng.Assert;
+import org.xmlunit.builder.Input;
+import org.xmlunit.diff.*;
 
+import javax.xml.transform.Source;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 import static eu.delving.sip.base.HttpClientFactory.createHttpClient;
@@ -56,14 +52,7 @@ public class MappingEngineTest {
         String sipId = filename.split("__")[0];
         String rdfFilename = sipId + "__edm.xml";
 
-//        InputStream in = getClass().getResourceAsStream("/mapped/" + rdfFilename);
-//        ArrayList<String> expectedLines = new ArrayList<>();
-//        try(BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
-//            String line;
-//            while((line = reader.readLine()) != null) {
-//                expectedLines.add(line);
-//            }
-//        }
+        Source expectedXml = Input.fromStream(getClass().getResourceAsStream("/mapped/" + rdfFilename)).build();
 
         ProgressListener progressListener = mock(ProgressListener.class);
 
@@ -111,7 +100,11 @@ public class MappingEngineTest {
         Path rdfFile = workDir.resolve(filename).resolve(rdfFilename);
         Assert.assertTrue(Files.exists(rdfFile));
 
-        List<String> actualLines = Files.readAllLines(rdfFile);
-//        Assert.assertEquals(expectedLines, actualLines);
+        Source actualXml = Input.fromPath(rdfFile).build();
+        DifferenceEngine diff = new DOMDifferenceEngine();
+        diff.addDifferenceListener((comparison, comparisonResult) -> {
+            Assert.fail("found a difference: " + comparison);
+        });
+        diff.compare(expectedXml, actualXml);
     }
 }
