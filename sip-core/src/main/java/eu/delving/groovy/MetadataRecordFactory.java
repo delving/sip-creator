@@ -59,6 +59,7 @@ public class MetadataRecordFactory {
     }
 
     public MetadataRecord fromGroovyNode(GroovyNode rootNode, int recordNumber, int recordCount) {
+        // TODO record count is never used
         return MetadataRecord.create(rootNode, recordNumber, recordCount);
     }
 

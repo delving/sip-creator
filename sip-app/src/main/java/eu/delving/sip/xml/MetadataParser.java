@@ -121,6 +121,7 @@ public class MetadataParser {
                 case XMLEvent.END_ELEMENT:
                     if (node != null) {
                         if (path.equals(RECORD_CONTAINER)) {
+                            // TODO record count is never used
                             metadataRecord = factory.fromGroovyNode(node, recordIndex++, recordCount);
                             if (progressListener != null) {
                                 progressListener.setProgress(recordIndex);
