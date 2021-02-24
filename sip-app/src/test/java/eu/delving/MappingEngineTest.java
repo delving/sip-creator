@@ -64,25 +64,81 @@ public class MappingEngineTest {
         );
     }
 
+    private Feedback createFeedback() {
+        return new Feedback() {
+            @Override
+            public void info(String message) {
+                System.out.println("info: " + message);
+            }
+
+            @Override
+            public void alert(String message) {
+                System.err.println("alert: " + message);
+            }
+
+            @Override
+            public void alert(String message, Throwable throwable) {
+                System.err.println("alert: " + message);
+                System.err.println(throwable);
+            }
+
+            @Override
+            public String ask(String question) {
+                System.out.println("ask: " + question);
+                return null;
+            }
+
+            @Override
+            public String ask(String question, String defaultValue) {
+                System.out.println("ask: question=" + question + ", defaultValue=" + defaultValue);
+                return null;
+            }
+
+            @Override
+            public boolean confirm(String title, String message) {
+                System.out.println("confirm: title=" + title + ", message=" + message);
+                return false;
+            }
+
+            @Override
+            public boolean form(String title, Object... components) {
+                throw new IllegalStateException();
+            }
+
+            @Override
+            public String getHubPassword() {
+                throw new IllegalStateException();
+            }
+
+            @Override
+            public boolean getNarthexCredentials(Map<String, String> fields) {
+                throw new IllegalStateException();
+            }
+        };
+    }
+
+    private InputStream readTestData(String filename) {
+        InputStream testData = getClass().getResourceAsStream("/mapped/" + filename);
+        assert(testData != null);
+        return testData;
+    }
+
     @MethodSource("testData")
     @ParameterizedTest
     public void test_file_processor(String sipFilename, String mappingFilename, String recDefFilename, String orgId) throws Exception {
-        Path workDir = new File("/home/q/PocketMapper/work/").toPath();
+        Path workDir = HomeDirectory.WORK_DIR.toPath();
+
         String sipId = sipFilename.split("__")[0];
         String rdfFilename = sipId + "__" + orgId + ".xml";
 
-        System.out.println("|" + rdfFilename + "|");
-        System.out.println("|2-24-01-08-art__naa.xml|");
-        InputStream in = getClass().getResourceAsStream("/mapped/" + rdfFilename);
-        assert(in != null);
+
+        InputStream in = readTestData(rdfFilename);
+
         Source expectedXml = Input.fromStream(in).build();
 
         ProgressListener progressListener = mock(ProgressListener.class);
 
-        Feedback feedback = mock(Feedback.class);
-        doAnswer((Answer<Void>) invocationOnMock -> {
-            throw (Throwable)invocationOnMock.getArgument(1);
-        }).when(feedback).alert(Mockito.anyString(), Mockito.any());
+        Feedback feedback = createFeedback();
 
         StatsModel statsModel = mock(StatsModel.class);
         when(statsModel.getRecordCount()).thenReturn(0);
