@@ -170,7 +170,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             QueueFiller queueFiller = new QueueFiller(parser, recordSource, consumer);
             int engineCount = Runtime.getRuntime().availableProcessors();
             info(String.format("Processing with %d engines", engineCount));
-            for (int walk = 0; walk < engineCount; walk++) {
+            for (int walk = 0; walk < 1; walk++) {
                 boolean enableXSDValidation = sipModel.getPreferences().getProperty(XSD_VALIDATION, "false").contentEquals("true");
                 Validator validator = null;
                 if (enableXSDValidation) {
@@ -187,7 +187,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             queueFiller.start();
             info(Thread.currentThread().getName() + " about to consume");
             consumer.run();
-            System.out.println("Done");
         }
         catch (Exception e) {
             termination.dueToException(e);
