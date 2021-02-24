@@ -330,7 +330,7 @@ public class Application {
         home.dispose();
     }
 
-    private class ResolverContext implements CachedResourceResolver.Context {
+    public  static class ResolverContext implements CachedResourceResolver.Context {
         private Storage storage;
         private HttpClient httpClient;
 
