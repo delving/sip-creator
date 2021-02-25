@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <rdf:RDF xmlns:premis="http://www.loc.gov/premis/rdf/v3/" xmlns:schema="http://schema.org/" xmlns:bf="http://id.loc.gov/ontologies/bibframe/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:iiif="http://iiif.io/api/image/2#" xmlns:agrl="http://d-nb.info/standards/elementset/agrelon#" xmlns:naa="https://archief.nl/def/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:geo="http://www.opengis.net/ont/geosparql#" xmlns:sd="http://www.w3.org/ns/sparql-service-description#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:cidoc-crm="http://www.cidoc-crm.org/cidoc-crm/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:sem="http://semanticweb.cs.vu.nl/2009/11/sem/" xmlns:dcat="https://www.w3.org/TR/vocab-dcat-2/" xmlns:nao="https://archief.nl/def/ontologie/" xmlns:prov="http://www.w3.org/ns/prov#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:nav="https://archief.nl/def/vocabulaire/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:void="http://rdfs.org/ns/void#" xmlns:adms="http://www.w3.org/ns/adms#" xmlns:org="http://www.w3.org/ns/org#" xmlns:svcs="http://rdfs.org/sioc/services#" xmlns:ov="http://open.vocab.org/terms/" xmlns:vcard="http://www.w3.org/2006/vcard/ns#" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:cs="http://www.kulttuurisampo.fi/ebkr/" xmlns:dbo="http://dbpedia.org/ontology/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:eac-cpf="http://www3.iath.virginia.edu/eac/cpf/" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:pnv="https://w3id.org/pnv#" xmlns:frbr_core="http://purl.org/vocab/frbr/core#" xmlns:odrl="http://www.w3.org/ns/odrl/2/" xmlns:vs="http://www.w3.org/2003/06/sw-vocab-status/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:hg="http://rdf.histograph.io/" xmlns:frbroo="http://iflastandards.info/ns/fr/frbr/frbroo/" xmlns:cc="http://creativecommons.org/ns#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/7EA6F4CC20191D7FE05309F0900A4002">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/7EA6F4CC20191D7FE05309F0900A4002">
    <ore:Aggregation rdf:about="https://archief.nl/doc/Fotocollectie/2.24.01.08.art">
       <nao:isAggregatietype rdf:resource="https://archief.nl/def/Fotocollectie">
       </nao:isAggregatietype>
@@ -44,7 +44,7 @@
       <schema:encodingFormat>application/rdf+xml</schema:encodingFormat>
    </schema:DataDownload>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8955DED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8955DED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8955DED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -127,7 +127,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD89569CD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD89569CD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD89569CD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -179,7 +179,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD895750D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD895750D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD895750D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -232,7 +232,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8A6A0AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8A6A0AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8A6A0AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -283,7 +283,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8A6ABED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8A6ABED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8A6ABED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -334,7 +334,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8A6B7CD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8A6B7CD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8A6B7CD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -386,7 +386,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BE1E6D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BE1E6D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BE1E6D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -451,7 +451,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BE2A4D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BE2A4D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BE2A4D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -516,7 +516,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BE3F8D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BE3F8D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BE3F8D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -581,7 +581,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BE4C0D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BE4C0D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BE4C0D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -646,7 +646,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BE588D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BE588D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BE588D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -711,7 +711,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BE650D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BE650D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BE650D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -773,7 +773,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BE718D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BE718D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BE718D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -835,7 +835,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BE7F4D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BE7F4D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BE7F4D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -901,7 +901,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BE8B2D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BE8B2D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BE8B2D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -967,7 +967,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BE97AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BE97AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BE97AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -1033,7 +1033,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BEA42D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BEA42D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BEA42D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -1099,7 +1099,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BEB00D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BEB00D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BEB00D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -1165,7 +1165,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BEBC8D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BEBC8D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BEBC8D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -1231,7 +1231,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BEC86D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BEC86D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BEC86D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -1297,7 +1297,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BED44D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BED44D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BED44D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -1363,7 +1363,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BEE02D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BEE02D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BEE02D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -1429,7 +1429,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BEECAD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BEECAD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BEECAD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -1495,7 +1495,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BEFA6D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BEFA6D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BEFA6D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -1561,7 +1561,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BF06ED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BF06ED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BF06ED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -1623,7 +1623,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BF140D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BF140D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BF140D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -1687,7 +1687,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BF208D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BF208D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BF208D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -1751,7 +1751,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BF2D0D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BF2D0D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BF2D0D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -1815,7 +1815,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BF384D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BF384D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BF384D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -1881,7 +1881,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BF442D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BF442D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BF442D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -1947,7 +1947,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BF500D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BF500D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BF500D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2013,7 +2013,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BF5BED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BF5BED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BF5BED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2079,7 +2079,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BF672D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BF672D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BF672D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2137,7 +2137,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BF974D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BF974D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BF974D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2195,7 +2195,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BFA5AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BFA5AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BFA5AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2254,7 +2254,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BFB2CD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BFB2CD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BFB2CD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2311,7 +2311,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BFBEAD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BFBEAD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BFBEAD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2369,7 +2369,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BFCB2D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BFCB2D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BFCB2D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2427,7 +2427,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BFD66D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BFD66D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BFD66D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2484,7 +2484,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BFE24D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BFE24D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BFE24D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2541,7 +2541,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BFEE2D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BFEE2D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BFEE2D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2595,7 +2595,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8BFFBED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8BFFBED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8BFFBED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2648,7 +2648,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C007CD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C007CD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C007CD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2714,7 +2714,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C013AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C013AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C013AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2769,7 +2769,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C01F8D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C01F8D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C01F8D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2835,7 +2835,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C02B6D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C02B6D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C02B6D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2901,7 +2901,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C037ED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C037ED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C037ED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -2956,7 +2956,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C090AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C090AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C090AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3016,7 +3016,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C09D2D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C09D2D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C09D2D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3076,7 +3076,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C0A90D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C0A90D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C0A90D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3130,7 +3130,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C0B4ED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C0B4ED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C0B4ED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3183,7 +3183,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C0C0CD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C0C0CD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C0C0CD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3236,7 +3236,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C0CCAD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C0CCAD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C0CCAD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3289,7 +3289,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C0D92D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C0D92D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C0D92D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3342,7 +3342,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C0E50D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C0E50D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C0E50D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3395,7 +3395,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C0F18D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C0F18D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C0F18D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3448,7 +3448,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C0FD6D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C0FD6D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C0FD6D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3503,7 +3503,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C131ED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C131ED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C131ED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3554,7 +3554,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C1904D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C1904D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C1904D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3606,7 +3606,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C19B8D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C19B8D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C19B8D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3658,7 +3658,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C1A76D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C1A76D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C1A76D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3710,7 +3710,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C1B34D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C1B34D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C1B34D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3763,7 +3763,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C1BE8D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C1BE8D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C1BE8D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3816,7 +3816,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C1CA6D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C1CA6D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C1CA6D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3868,7 +3868,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C1D5AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C1D5AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C1D5AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3920,7 +3920,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C1E18D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C1E18D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C1E18D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -3973,7 +3973,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C1EEAD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C1EEAD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C1EEAD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4026,7 +4026,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C1FA8D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C1FA8D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C1FA8D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4078,7 +4078,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C2070D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C2070D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C2070D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4130,7 +4130,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C212ED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C212ED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C212ED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4182,7 +4182,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C21E2D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C21E2D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C21E2D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4234,7 +4234,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C2296D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C2296D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C2296D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4286,7 +4286,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C234AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C234AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C234AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4338,7 +4338,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C2426D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C2426D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C2426D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4390,7 +4390,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C24EED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C24EED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C24EED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4442,7 +4442,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C25A2D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C25A2D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C25A2D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4494,7 +4494,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C27DCD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C27DCD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C27DCD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4548,7 +4548,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C289AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C289AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C289AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4602,7 +4602,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C2958D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C2958D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C2958D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4653,7 +4653,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C2A20D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C2A20D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C2A20D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4705,7 +4705,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C2AE8D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C2AE8D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C2AE8D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4756,7 +4756,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C2BA6D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C2BA6D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C2BA6D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4807,7 +4807,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C2C64D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C2C64D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C2C64D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4858,7 +4858,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C2D2CD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C2D2CD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C2D2CD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4909,7 +4909,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C2DEAD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C2DEAD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C2DEAD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -4960,7 +4960,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C2EA8D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C2EA8D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C2EA8D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5012,7 +5012,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C5838D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C5838D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C5838D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5067,7 +5067,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C5CACD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C5CACD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C5CACD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5130,7 +5130,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C5D6AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C5D6AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C5D6AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5193,7 +5193,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C5E1ED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C5E1ED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C5E1ED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5258,7 +5258,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C5EE6D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C5EE6D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C5EE6D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5322,7 +5322,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C5FA4D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C5FA4D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C5FA4D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5386,7 +5386,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C6B48D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C6B48D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C6B48D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5452,7 +5452,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C6C1AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C6C1AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C6C1AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5520,7 +5520,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C6CD8D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C6CD8D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C6CD8D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5588,7 +5588,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C78E0D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C78E0D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C78E0D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5641,7 +5641,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C7994D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C7994D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C7994D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5693,7 +5693,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C7A52D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C7A52D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C7A52D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5745,7 +5745,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C7B06D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C7B06D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C7B06D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5797,7 +5797,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C7BBAD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C7BBAD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C7BBAD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5849,7 +5849,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C7C78D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C7C78D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C7C78D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5901,7 +5901,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C81B4D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C81B4D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C81B4D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -5955,7 +5955,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8C8272D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C8272D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C8272D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6008,7 +6008,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CB6CAD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CB6CAD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CB6CAD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6060,7 +6060,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CB846D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CB846D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CB846D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6112,7 +6112,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CB918D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CB918D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CB918D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6186,7 +6186,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CB9D6D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CB9D6D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CB9D6D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6253,7 +6253,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CBA94D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CBA94D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CBA94D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6308,7 +6308,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CBB52D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CBB52D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CBB52D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6361,7 +6361,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CBC42D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CBC42D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CBC42D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6417,7 +6417,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CBD28D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CBD28D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CBD28D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6472,7 +6472,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CC002D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CC002D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CC002D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6529,7 +6529,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CC0D4D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CC0D4D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CC0D4D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6584,7 +6584,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CC19CD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CC19CD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CC19CD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6641,7 +6641,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CC25AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CC25AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CC25AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6726,7 +6726,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CC318D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CC318D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CC318D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6783,7 +6783,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CC62ED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CC62ED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CC62ED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6843,7 +6843,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CC714D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CC714D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CC714D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6904,7 +6904,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CC7E6D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CC7E6D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CC7E6D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -6965,7 +6965,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CC8A4D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CC8A4D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CC8A4D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7025,7 +7025,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CC958D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CC958D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CC958D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7085,7 +7085,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CD326D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CD326D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CD326D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7138,7 +7138,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CD3E4D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CD3E4D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CD3E4D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7191,7 +7191,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CD4A2D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CD4A2D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CD4A2D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7244,7 +7244,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CD56AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CD56AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CD56AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7297,7 +7297,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CD632D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CD632D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CD632D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7350,7 +7350,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CD92AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CD92AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CD92AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7417,7 +7417,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CD9E8D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CD9E8D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CD9E8D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7484,7 +7484,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CDAA6D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CDAA6D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CDAA6D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7551,7 +7551,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CDB64D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CDB64D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CDB64D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7618,7 +7618,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CDC2CD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CDC2CD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CDC2CD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7685,7 +7685,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CDCE0D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CDCE0D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CDCE0D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7752,7 +7752,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CDD9ED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CDD9ED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CDD9ED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7819,7 +7819,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CDE5CD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CDE5CD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CDE5CD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7886,7 +7886,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CFB08D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CFB08D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CFB08D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7942,7 +7942,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CFBC6D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CFBC6D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CFBC6D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -7994,7 +7994,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CFC84D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CFC84D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CFC84D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -8046,7 +8046,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CFD42D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CFD42D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CFD42D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -8098,7 +8098,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CFE0AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CFE0AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CFE0AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -8150,7 +8150,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CFEBED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CFEBED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CFEBED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -8203,7 +8203,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8CFF7CD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8CFF7CD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8CFF7CD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -8256,7 +8256,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D003AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D003AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D003AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -8309,7 +8309,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D00F8D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D00F8D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D00F8D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -8363,7 +8363,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D01B6D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D01B6D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D01B6D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -8417,7 +8417,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D5120D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D5120D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D5120D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -8475,7 +8475,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D6C28D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D6C28D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D6C28D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -8526,7 +8526,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D6CFAD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D6CFAD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D6CFAD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -8577,7 +8577,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D6DC2D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D6DC2D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D6DC2D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -8628,7 +8628,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D6E8AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D6E8AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D6E8AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -8679,7 +8679,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D6F48D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D6F48D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D6F48D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -8730,7 +8730,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D7010D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D7010D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D7010D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -8824,7 +8824,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D70CED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D70CED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D70CED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -8936,7 +8936,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D7196D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D7196D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D7196D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -9041,7 +9041,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D7254D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D7254D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D7254D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -9134,7 +9134,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D731CD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D731CD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D731CD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -9229,7 +9229,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D8820D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D8820D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D8820D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -9282,7 +9282,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D88DED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D88DED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D88DED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -9336,7 +9336,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D89A6D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D89A6D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D89A6D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -9389,7 +9389,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D8A64D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D8A64D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D8A64D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -9442,7 +9442,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D91B2D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D91B2D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D91B2D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -9499,7 +9499,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D927AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D927AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D927AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -9556,7 +9556,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D9342D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D9342D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D9342D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -9613,7 +9613,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D941ED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D941ED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D941ED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -9670,7 +9670,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D94E6D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D94E6D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D94E6D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -9727,7 +9727,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D95AED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D95AED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D95AED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -9790,7 +9790,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D9676D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D9676D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D9676D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -9852,7 +9852,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D9734D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D9734D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D9734D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -9914,7 +9914,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D97FCD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D97FCD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D97FCD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -9979,7 +9979,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D98C4D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D98C4D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D98C4D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -10061,7 +10061,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D998CD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D998CD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D998CD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -10143,7 +10143,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D9A54D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D9A54D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D9A54D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -10225,7 +10225,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D9B1CD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D9B1CD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D9B1CD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -10307,7 +10307,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D9BE4D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D9BE4D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D9BE4D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -10389,7 +10389,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D9CACD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D9CACD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D9CACD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -10471,7 +10471,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8D9D6AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8D9D6AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8D9D6AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -10553,7 +10553,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8DD94CD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8DD94CD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8DD94CD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -10606,7 +10606,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8DDA14D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8DDA14D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8DDA14D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -10659,7 +10659,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8DEDCED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8DEDCED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8DEDCED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -10710,7 +10710,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8DEE96D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8DEE96D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8DEE96D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -10761,7 +10761,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8DEF5ED0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8DEF5ED0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8DEF5ED0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -10812,7 +10812,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8DF332D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8DF332D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8DF332D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -10863,7 +10863,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8DF3FAD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8DF3FAD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8DF3FAD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -10914,7 +10914,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8DF4C2D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8DF4C2D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8DF4C2D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -10965,7 +10965,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8E06F6D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8E06F6D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8E06F6D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11030,7 +11030,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8E07B4D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8E07B4D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8E07B4D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11095,7 +11095,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8E0F34D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8E0F34D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8E0F34D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11153,7 +11153,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8E0FF2D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8E0FF2D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8E0FF2D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11212,7 +11212,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8E10B0D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8E10B0D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8E10B0D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11271,7 +11271,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8E523CD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8E523CD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8E523CD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11329,7 +11329,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8E552AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8E552AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8E552AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11388,7 +11388,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8E5D4AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8E5D4AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8E5D4AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11448,7 +11448,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8E5E12D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8E5E12D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8E5E12D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11513,7 +11513,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8E5ED0D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8E5ED0D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8E5ED0D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11578,7 +11578,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8E5F84D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8E5F84D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8E5F84D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11643,7 +11643,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8E6042D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8E6042D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8E6042D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11708,7 +11708,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD8E60F6D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8E60F6D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8E60F6D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11773,7 +11773,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD90BC02D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD90BC02D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD90BC02D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11825,7 +11825,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD90BCCAD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD90BCCAD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD90BCCAD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11879,7 +11879,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD90BD88D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD90BD88D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD90BD88D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11933,7 +11933,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD90BE46D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD90BE46D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD90BE46D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -11987,7 +11987,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD90BF04D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD90BF04D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD90BF04D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -12041,7 +12041,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD90BFB8D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD90BFB8D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD90BFB8D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -12093,7 +12093,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD90C080D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD90C080D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD90C080D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -12145,7 +12145,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD90C152D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD90C152D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD90C152D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -12199,7 +12199,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD90C21AD0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD90C21AD0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD90C21AD0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>
@@ -12253,7 +12253,7 @@
    <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
    </nav:Agent>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/2-24-01-08-art_/AD90C2D8D0B4102DBCF8003048976D84">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD90C2D8D0B4102DBCF8003048976D84">
    <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD90C2D8D0B4102DBCF8003048976D84">
       <nao:aet>foto</nao:aet>
       <rdfs:label>Record over foto</rdfs:label>

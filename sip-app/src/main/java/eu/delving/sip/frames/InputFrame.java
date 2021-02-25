@@ -181,13 +181,13 @@ public class InputFrame extends FrameBase {
                 toolTip = String.format("Size: %d", ((List) node.getNodeValue()).size());
             }
             else {
-                String truncated = node.text();
+                String truncated = node.text;
                 if (truncated.contains("\n") || truncated.length() >= MAX_LENGTH) {
                     int index = truncated.indexOf('\n');
                     if (index > 0) truncated = truncated.substring(0, index);
                     if (truncated.length() >= MAX_LENGTH) truncated = truncated.substring(0, MAX_LENGTH);
                     string = String.format("<html><b>%s</b> = %s ...</html>", node.getNodeName(), truncated);
-                    toolTip = tameTooltipText(node.text());
+                    toolTip = tameTooltipText(node.text);
                 }
                 else {
                     string = String.format("<html><b>%s</b> = %s</html>", node.getNodeName(), truncated);

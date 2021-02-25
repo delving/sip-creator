@@ -292,24 +292,25 @@ public class DOMBuilder extends BuilderSupport {
     }
 
     private List<String> unpack(List list) {
-        List<String> result = new ArrayList<String>();
+        if (list.isEmpty()) return null;
+        List<String> result = new ArrayList<String>(list.size());
         unpack(list, result);
-        return result.isEmpty() ? null : result;
+        return result;
     }
 
     private void unpack(List from, List<String> to) {
         for (Object member : from) {
-            if (member instanceof List) {
-                unpack((List) member, to);
-            }
-            else if (member instanceof Object[]) {
-                unpack(Arrays.asList((Object[]) member), to);
-            }
-            else if (member instanceof String) {
+            if (member instanceof String) {
                 to.add((String) member);
             }
             else if (!(member instanceof Node)) {
                 to.add(member.toString());
+            }
+            else if (member instanceof List) {
+                unpack((List) member, to);
+            }
+            else if (member instanceof Object[]) {
+                unpack(Arrays.asList((Object[]) member), to);
             }
             else {
                 throw new RuntimeException("unpack: " + member.getClass());

@@ -30,6 +30,8 @@ import groovy.lang.Script;
 
 import java.io.*;
 import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -44,6 +46,7 @@ public class GroovyCodeResource {
     private static final URL MAPPING_CATEGORY = GroovyCodeResource.class.getResource("/MappingCategory.groovy");
     private final ClassLoader classLoader;
     private GroovyClassLoader categoryClassLoader;
+    private Map<Long, Script> mappingScriptsByCode = Collections.synchronizedMap(new HashMap<>());
 
     public GroovyCodeResource(ClassLoader classLoader) {
         this.classLoader = classLoader;
@@ -66,8 +69,25 @@ public class GroovyCodeResource {
     }
 
     public Script createMappingScript(String code) {
+        long codeId = code.hashCode() + Thread.currentThread().getId();
+        Script script = mappingScriptsByCode.get(codeId);
+        if(script != null) {
+            return script;
+        }
+
         GroovyShell groovyShell = new GroovyShell(getGroovyClassLoader());
-        return groovyShell.parse(code);
+        script = groovyShell.parse(code);
+
+        mappingScriptsByCode.put(codeId, script);
+//        System.out.println(code);
+//        System.out.println("*****************************************************************************************");
+//        System.out.println("*****************************************************************************************");
+//        System.out.println("*****************************************************************************************");
+        return script;
+    }
+
+    public void clearMappingScripts() {
+        mappingScriptsByCode.clear();
     }
 
     private synchronized GroovyClassLoader getGroovyClassLoader() {

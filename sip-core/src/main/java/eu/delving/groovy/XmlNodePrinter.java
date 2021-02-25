@@ -293,7 +293,7 @@ public class XmlNodePrinter {
         if (node == null) {
             throw new IllegalArgumentException("GroovyNode must not be null!");
         }
-        return node.children().isEmpty() && node.text().length() == 0;
+        return node.children.isEmpty() && node.text.length() == 0;
     }
 
     private String getName(Object object) {

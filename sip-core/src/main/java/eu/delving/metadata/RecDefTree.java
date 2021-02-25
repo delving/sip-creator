@@ -146,6 +146,8 @@ public class RecDefTree implements RecDefNodeListener {
     private void resolve() throws XPathExpressionException {
         for (Path uriCheckPath :collectUriCheckPaths()) {
             String path = uriCheckPath.toString();
+            if(path.endsWith("@rdf:resource") || path.endsWith("@rdf:about"))
+                continue;
             uriCheckPaths.put(path, createPath().compile(path));
         }
         root.checkPopulated();

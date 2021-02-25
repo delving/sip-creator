@@ -23,19 +23,22 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.testng.Assert;
+import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
-import org.xmlunit.diff.DOMDifferenceEngine;
-import org.xmlunit.diff.DifferenceEngine;
+import org.xmlunit.diff.*;
 
 import javax.xml.transform.Source;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Stream;
 
 import static eu.delving.sip.base.HttpClientFactory.createHttpClient;
 import static eu.delving.sip.files.Storage.NARTHEX_URL;
+import static eu.delving.sip.files.Storage.XSD_VALIDATION;
 import static org.mockito.Mockito.mock;
 
 @RunWith(Parameterized.class)
@@ -44,21 +47,30 @@ public class MappingEngineTest {
 
     private static Stream<Arguments> testData() {
         return Stream.of(
-            Arguments.of(
+//            Arguments.of(
+//                "rijksmuseum__2021_02_15_06_51.sip.zip",
+//                "mapping_edm.xml",
+//                "edm_5.2.6_record-definition.xml",
+//                "edm",
+//                false)
+             Arguments.of(
                 "aidsmemorial__2016_07_25_20_52.sip.zip",
                 "mapping_edm.xml",
                 "edm_5.2.6_record-definition.xml",
-                "edm"),
-            Arguments.of(
+                "edm",
+                false)
+            , Arguments.of(
                 "2-24-01-08-art__2021_02_11_11_37.sip.zip",
                 "FF9F5FE58279B40C9CB8251F5AEF657B__mapping_naa.xml",
                 "naa_0.0.16_record-definition.xml",
-                "naa"),
-            Arguments.of(
+                "naa",
+                false)
+            , Arguments.of(
                 "bronbeek__2019_09_30_18_26.sip.zip",
                 "D8D1BA57946413A33FD02E3B61109305__mapping_edm.xml",
                 "edm_5.2.6_record-definition.xml",
-                "edm"
+                "edm",
+                false
             )
         );
     }
@@ -113,7 +125,8 @@ public class MappingEngineTest {
 
             @Override
             public boolean form(String title, Object... components) {
-                throw new IllegalStateException();
+                System.out.println("form: title=" + title + ", components=" + Arrays.toString(components));
+                return false;
             }
 
             @Override
@@ -128,10 +141,14 @@ public class MappingEngineTest {
         };
     }
 
-    private SipModel createSipModel() throws StorageException, IOException {
+    private SipModel createSipModel(boolean enableXsdValidation) throws StorageException, IOException {
         Feedback feedback = createFeedback();
 
         SipProperties sipProperties = new SipProperties();
+        Properties xsdValidationEnabled = new Properties(sipProperties.getProp());
+        xsdValidationEnabled.setProperty(XSD_VALIDATION, Boolean.toString(enableXsdValidation));
+        sipProperties.setProp(xsdValidationEnabled);
+
         String serverUrl = sipProperties.getProp().getProperty(NARTHEX_URL, "http://delving.org/narthex");
         HttpClient httpClient = createHttpClient(serverUrl).build();
         SchemaRepository schemaRepository = new SchemaRepository(new SchemaFetcher(httpClient));
@@ -145,19 +162,23 @@ public class MappingEngineTest {
             storage,
             groovyCodeResource,
             feedback,
-            new SipProperties()
+            sipProperties
         );
     }
 
     private InputStream readTestData(String filename) {
         InputStream testData = getClass().getResourceAsStream("/mapped/" + filename);
-        assert(testData != null);
+        assert (testData != null);
         return testData;
     }
 
     @MethodSource("testData")
     @ParameterizedTest
-    public void test_file_processor(String sipFilename, String mappingFilename, String recDefFilename, String orgId) throws Exception {
+    public void test_file_processor(String sipFilename,
+                                    String mappingFilename,
+                                    String recDefFilename,
+                                    String orgId,
+                                    boolean enableXsdValidation) throws Exception {
         Path workDir = HomeDirectory.WORK_DIR.toPath();
         File sipFile = workDir.resolve(sipFilename).toFile();
         Path mappingFile = sipFile.toPath().resolve(mappingFilename);
@@ -165,7 +186,7 @@ public class MappingEngineTest {
 
         FileProcessor.Listener listener = mock(FileProcessor.Listener.class);
         ProgressListener progressListener = mock(ProgressListener.class);
-        processSourceXML(sipFile, mappingFile, recDefFile, listener, progressListener);
+        processSourceXML(sipFile, mappingFile, recDefFile, listener, progressListener, enableXsdValidation);
 
         String sipPrefix = sipFilename.split("__")[0];
         String controlXMLFilename = sipPrefix + "__" + orgId + ".xml";
@@ -180,12 +201,18 @@ public class MappingEngineTest {
                                   Path mappingFile,
                                   Path recDefFile,
                                   FileProcessor.Listener listener,
-                                  ProgressListener progressListener) throws IOException, StorageException {
-        SipModel sipModel = createSipModel();
+                                  ProgressListener progressListener,
+                                  boolean enableXsdValidation) throws IOException, StorageException {
+        SipModel sipModel = createSipModel(enableXsdValidation);
         RecMapping recMapping = getRecMapping(mappingFile, recDefFile);
+        sipModel.getMappingModel().setRecMapping(recMapping);
         DataSet sourceXML = new StorageImpl.DataSetImpl(sipFile, createSchemaRepository());
         sourceXML.getDataSetFacts(); // will actually initialize data facts and prevent null pointer later on
-        FileProcessor.UriGenerator uriGenerator = new SipModel.Generator("http://localhost/narthex/", sourceXML.getSpec(), "");
+
+        FileProcessor.UriGenerator uriGenerator = new SipModel.Generator(
+            "http://delving.org/narthex",
+            sourceXML.getSpec(),
+            sipModel.getMappingModel().getPrefix());
 
         FileProcessor fileProcessor = new FileProcessor(
             sipModel,
@@ -203,8 +230,7 @@ public class MappingEngineTest {
     private RecMapping getRecMapping(Path mappingFile, Path recFile) throws FileNotFoundException, UnsupportedEncodingException {
         RecDef recDef = RecDef.read(new FileInputStream(recFile.toFile()));
         RecDefTree recDefTree = RecDefTree.create(recDef);
-        RecMapping mappingDef = RecMapping.read(new FileInputStream(mappingFile.toFile()), recDefTree);
-        return mappingDef;
+        return RecMapping.read(new FileInputStream(mappingFile.toFile()), recDefTree);
     }
 
     private void compareXMLs(InputStream controlXMLStream, Path outputXMLFile) {
@@ -213,5 +239,20 @@ public class MappingEngineTest {
         DifferenceEngine diff = new DOMDifferenceEngine();
         diff.addDifferenceListener((comparison, comparisonResult) -> Assertions.fail("found a difference: " + comparison));
         diff.compare(expectedXml, actualXml);
+//        Diff diff = DiffBuilder
+//            .compare(expectedXml)
+//            .withTest(actualXml)
+//            .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
+//            .ignoreWhitespace()
+//            .checkForSimilar()
+//            .build();
+//
+//
+//        if (diff.hasDifferences()) {
+//            for (Difference d : diff.getDifferences()) {
+//                System.out.println(d);
+//            }
+//            Assert.fail("Differences found");
+//        }
     }
 }
