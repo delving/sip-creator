@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2013-02-22-1-37">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2013-02-22-1-37">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2013-02-22-1-37">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=56888">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2013%5C2013_02_22-1_37.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2013%5C2013_02_22-1_37.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2013-02-22-1-37">
+      <dc:description>Doos met 80 diapositieven Nederlands Nieuw Guinea, 1950-1960. 6 x 6 cm. 1. K.L.M. hotel 't Rif, Biak. 7. Haven Hollandia. 8. Beaver van de Kroonduif, Biak. 9. Huis in Sentani. 10. Kwonset familie Jannink, Sentani. 15. Dojolama, kampongfoto's 16. Dojolama, Sentanimeer. 19. Polikliniek, Dojolama. 20. Koninginnefeest 1960, Volksdansen. 21. Koninginnefeest 1960, Volksdansen. 22. Koninginnefeest 1960, Volksdansen. 23. Koninginnefeest 1960, Volksdansen. 24. Koninginnefeest 1960, Volksdansen. 31. Poelau Nau 32. 1961/12/01, hijsen Papoea-vlag. 33. 1961/12/01, hijsen Papoea-vlag. 34. 1961/12/01, hijsen Papoea-vlag. 35. Sangei, kerkdienst 1961/10/31. 36. Sangei, kerkdienst 1961/10/31. 37. Sangei, kerkdienst 1961/10/31. 38. Haven Sangei. 39. Haven Sangei. 40. Onze prauw in Sangei. 41. Picnic in Sangei. 42. Kampong Sangei. 43. Kampong Sangei. 44. Kampong Sangei. 50. Joop op toernee. 51. Schoolkinderen, Mambuij 56. Zonsondergang Nubuai. 57. Zonsondergang Rasawa. 59. Posthuis Seimeangga. 60. Kepala. 62. Kinderen, Rasawa. 63. Mekkie, Rasawa. 64. Kampong Paradoi. 65. Rie + klapper, Waupoka. 67. Kampong Waupoka. 68. Polikliniek Waupoka. 69. Terug van patient, Waupoka. 70. Onderweg op tournee. 71. Onderweg op tournee. 72. Onderweg op tournee, Rumaterai. 76. Odo, Blijdorp, Seroei. 77. Odo, Blijdorp, Seroei. 78. Odo, Blijdorp, Seroei. 79. Haven, K.P.M. boot, Seroei. 80. Haven steiger, Seroei. 81. Haven steiger, Seroei. 82. Haven steiger, Seroei. 83. Hoofdstraat Seroei. 84. Hoofdstraat Seroei. 85. Gebroken hartenlaantje, Seroei. 86. Passar, Seroei. 87. Tuinpassant[ ], Seroei. 88. Leproserie, Seroei. 89. Leproserie, Seroei. 90. Leproserie, Seroei. 91. Leproserie, Seroei. 92. Leproserie, Seroei. 93. Waren, volzicht. 94. Waren, haventje. 96. Overzicht Waren, bestuurspost. 98. Weg naar steiger, Waren. 99. Zonsondergang, Waren. 100. Zonsondergang, Waren. 101. Kali, Waren. 116. Huis, blok, Waren. 117. Joop. Vuilverbranden. 118. Strand, Waren. 119. Rie, strand Waren. 120. Joop, strand Waren. 121. Strand, Waren. 122. Strand, Waren. 123. Tijger-orchidee. 124. Buren Waren. 125. Kali Waren 126. Overstekende papoea's. 127. Afscheid Waren. DUT</dc:description>
+      <dc:identifier>2013/02/22-1/37</dc:identifier>
+      <dc:title>Doos met 80 diapositieven Nederlands Nieuw Guinea, 1950-1960 Doos met 80 diapositieven Nederlands Nieuw Guinea, 1950-1960</dc:title>
+      <dc:type>diapositief</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2013%5C2013_02_22-1_37.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2013\2013_02_22-1_37.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2013\2013_02_22-1_37.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

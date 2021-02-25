@@ -58,10 +58,11 @@ public class MetadataParser {
     private Path path = Path.create();
     private MetadataRecordFactory factory = new MetadataRecordFactory(namespaces);
     private ProgressListener progressListener;
+    private boolean isSourceExhausted;
 
     public MetadataParser(InputStream inputStream, int recordCount) throws XMLStreamException {
         this.inputStream = inputStream;
-        this.recordCount = recordCount;
+        System.out.println(recordCount);
         this.input = XMLToolFactory.xmlInputFactory().createXMLStreamReader("Metadata", inputStream);
     }
 
@@ -72,10 +73,13 @@ public class MetadataParser {
 
     @SuppressWarnings("unchecked")
     public synchronized MetadataRecord nextRecord() throws XMLStreamException, IOException, CancelException {
-        MetadataRecord metadataRecord = MetadataRecord.poisonPill();
+        if (isSourceExhausted) {
+            return null;
+        }
+        MetadataRecord metadataRecord = null;
         GroovyNode node = null;
         StringBuilder value = new StringBuilder();
-        while (metadataRecord.isPoison()) {
+        while (metadataRecord == null) {
             switch (input.getEventType()) {
                 case XMLEvent.START_DOCUMENT:
                     break;
@@ -138,6 +142,7 @@ public class MetadataParser {
                     path = path.parent();
                     break;
                 case XMLEvent.END_DOCUMENT: {
+                    isSourceExhausted = true;
                     break;
                 }
             }
