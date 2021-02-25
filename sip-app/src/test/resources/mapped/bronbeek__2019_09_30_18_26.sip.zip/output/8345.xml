@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2010-12-02-1-42702a">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2010-12-02-1-42702a">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42702a">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=51144">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42702_a.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42702_a.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42702a">
+      <dc:description>Afdeling: Insulair Zuidoost AziÃ« Objectnaam: oorsieraad Titel: subang Rubriek: (niet ingevoerd) Datumlabel: voor 1912 Materiaal: email, edelstenen gesmeed, Ã©mail cloisonnÃ©, roodgebeitst, ajour-bewerkt Emailadres: toelichting: Het paar oorsieraden is gemaakt van roodgebeitst goud. De voorzijde van de oorsieraden bestaat uit een rond plaatje goud, dat versierd is met een groot bloemmotief. Het gouden plaatje heeft langs de zijrand licht omhoogstaande, puntige versieringen en in het midden is een grote, doorzichtige edelsteen (?) in een gouden zetting aangebracht. Verder zijn aan de voorzijde verschillende bloembladmotieven, kleine bloemmotieven en halve cirkels aangebracht. Een deel van deze versieringen is opgevuld met Ã©mail cloisonnÃ© in lichtblauw, wit en blauw. Daarnaast zijn kleine, doorzichtige edelsteentjes (?) in gouden zettingen aangebracht. Bij Ã©Ã©n rand van versieringen is het gouden plaatje gedeeltelijk opengewerkt (ajour). De achterzijde van het oorsieraad wordt gevormd door een cilinder (H 0,9; Diam 3,3) die aan het uiteinde een omgebogen rand heeft. Deze omgebogen rand is versierd met in vieren gedeelde vierkantjes die gedeeltelijk opgevuld zijn met lichtblauwe en blauwe email. Midden op de achterzijde is een in vijven gedeelde ruitvorm van goudraad aangebracht, die opgevuld is met lichtblauw, blauw en wit email. De oorsieraden zijn aan de achterzijde op enkele plaatsen een beetje ingedeukt. Het email is op verschillende plaatsen (deels) weggesleten. Afmetingen: Geheel: 1,5 x 5,5 cm Herkomst: J.L.H. Beijens Media: 3235 a Publicaties over het object: Mus: Wassing-Visser, R. ; titel: Sieraden en Lichaamsversiering uit IndonesiÃ«^Delft 1984. pg 29, 82 Met dank aan: Dergelijke oorsieraden werden door meisjes en getrouwde vrouwen in het oor gedragen, hetgeen wijde oorgaten vereiste (wassing-Visser 1984: 82). In het verleden werd de emailleerkunst voornamelijk in Aceh bedreven, waar de vroegste contacten met de islam zijn geweest. Hoewel enigszins grof, heeft het emailleren hier toch een zeker hoogtepunt bereikt door de combinatie van kleuren en het lijnenspel van de cloisons. Het werd voornamelijk toegepast voor de versiering van luxe wapens, dozen en borstsieraden. De in het basismateriaal aangebrachte verdieping, bestemd voor de email-laag werd verkregen door drijfwerk (Ã©mail champlevÃ©) of door dun metaaldraad, gebogen in de vorm van bloemen of bladeren, op het basismetaal te solderen (Ã©mail cloisonnÃ©). Een variant op deze laatste methode was het gebruik van filigraindraad om de cloisons te markeren (de Moor 1983: 48). Vooral de Acehers, Makassaren en Buginezen maken veel gebruik van het beitsen, een methode om de lichte kleur van een laag goudgehalte donkerder te maken en te doen lijken op het roodgeel van zuiver goud. ... Vooral in Aceh wordt roodbeitsen vaak toegepast op gouden sieraden die met filigrain zijn versierd. Ook hierbij gebruikt men een mengsel van salpeter, aluin en zout (de Moor 1983: 57-58). Bruikleen van: Gemeente Nijmegen collectie: J.L.H. Beijens Huidige standplaats: [3235 a] Depot, LB V, 23 [LB V 23] hoofdmateriaal: goud DUT</dc:description>
+      <dc:identifier>2010/12/02-1-42702a</dc:identifier>
+      <dc:title>geen titel</dc:title>
+      <dc:type>oorsieraad</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42702_a.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5Cbeijensready%5C2010_12_02-1-42702_a.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1%5C2010_12_02-1-42702_a.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42702_a.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42702_a.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42702_a.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42702_a.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42702_a.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42702_a.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

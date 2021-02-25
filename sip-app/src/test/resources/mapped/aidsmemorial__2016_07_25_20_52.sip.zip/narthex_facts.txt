@@ -1,0 +1,12 @@
+#SIPCreator - facts
+baseUrl=http://data.collectienederland.nl
+country=Netherlands
+dataProvider=stichting NAMENproject Nederland
+language=nl
+name=Nederlandse AIDS Memorial Quilt
+orgId=dcn
+provider=Rijksdienst voor het Cultureel Erfgoed
+rights=http://creativecommons.org/licenses/by/3.0/
+schemaVersions=edm_5.2.6
+spec=aidsmemorial
+type=IMAGE

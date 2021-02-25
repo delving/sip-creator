@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2010-12-02-1-42729">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2010-12-02-1-42729">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42729">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=51171">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42729.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42729.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42729">
+      <dc:description>Afdeling: Insulair Zuidoost AziÃ« Objectnaam: kohlfles Rubriek: (niet ingevoerd) Datumlabel: voor 1912 Materiaal: verf (?) gesmeed, gegoten, ingekerfd, geverfd (?) Emailadres: toelichting: Het kohlflesje is uit koper gegoten en heeft een stopje. Het flesje is plat druppelvormig en heeft een rechthoekig voetje. Het druppelvomrige deel bestaat uit twee op elkaar gesmeede helften. Op de voor- en achterzijde van het flesje is in reliÃ«f een rank- en bloemmotief ingegoten. De ruimtes tussen de motieven zijn opgevuld met zwarte verf (?). Het voetje is eveneens met een ingegoten rank- en bloemmotief versierd en de tussenruimtes zijn voor een deel opgevuld met zwarte verf. Langs de bovenrand van het flesje is een zeshoekige rand aangebracht. Het stopje is lampionvormig met bovenop een plat sikkelvormig ornament versierd met ingekerfde streepjes. In het midden van de sikkelvorm is een stervormige versiering aangebracht. Aan de onderkant van het stopje is een staafje bevestigd dat zich in de hals van het flesje bevindt. Aan dit staafje zit donkergrijs kohlpoeder. Het stopje is door middel van een schroefdraad op het flesje bevestigd. Op verschillende plaatsen is de verf weggesleten. Het voorwerp heeft waarschijnlijk "Sumatra no 204" als nummer van de lijst behorende bij de Beijens-collectie. Afmetingen: Geheel: 9 x 3 cm Herkomst: J.L.H. Beijens Media: 3262 Publicaties over het object: Mus: Fischer, H.W. ; titel: Catalogus van 's Rijks Ethnographisch Museum, deel VI AtjÃ¨h, Gajo- en Alaslanden ; uitg: Leiden 1912. pg 88 Met dank aan: Bij nummer 204 van de Sumatra-lijst behorened bij de Beijens-collectie staat de volgende tekst: 2 koperen vaasjes. Atjeh. ter bewaring van oogledenzwartsel. afkomstig uit Mekka. Wordt gebruikt voor de bewaring van een zwart poeder (tjeula) waarmede mannen en vrouwen zich oogranden bestrijken, eene gewoonte uit ArabiÃ« door bedevaartgangers overgebracht (Fischer 1912: 88). Bruikleen van: Gemeente Nijmegen collectie: J.L.H. Beijens Huidige standplaats: [3262] Depot, LB I, 38 [LB I 38] hoofdmateriaal: koper DUT</dc:description>
+      <dc:identifier>2010/12/02-1-42729</dc:identifier>
+      <dc:title>geen titel</dc:title>
+      <dc:type>kohlfles</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42729.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5Cbeijensready%5C2010_12_02-1-42729.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1%5C2010_12_02-1-42729.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42729.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42729.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42729.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42729.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42729.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42729.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

@@ -1,0 +1,857 @@
+<rec-mapping prefix="naa" schemaVersion="0.0.16" locked="true">
+  <facts>
+    <entry>
+      <string>baseUrl</string>
+      <string>https://archief.nl</string>
+    </entry>
+    <entry>
+      <string>schemaVersions</string>
+      <string>naa_0.0.16</string>
+    </entry>
+    <entry>
+      <string>provider</string>
+      <string>nationaalarchief</string>
+    </entry>
+    <entry>
+      <string>rights</string>
+      <string>http://rightsstatements.org/vocab/InC/1.0/</string>
+    </entry>
+    <entry>
+      <string>name</string>
+      <string>2.24.01.08-art</string>
+    </entry>
+    <entry>
+      <string>language</string>
+      <string>NL</string>
+    </entry>
+    <entry>
+      <string>dataProvider</string>
+      <string>nationaalarchief</string>
+    </entry>
+    <entry>
+      <string>orgId</string>
+      <string>NL-HaNA</string>
+    </entry>
+    <entry>
+      <string>spec</string>
+      <string>2-24-01-08-art</string>
+    </entry>
+  </facts>
+  <functions/>
+  <dyn-opts>
+    <dyn-opt path="/naa:RDF/nao:Archiefbeschrijving/dcterms:subject" value="fotoserie_link"/>
+    <dyn-opt path="/naa:RDF/nao:Archiefbeschrijving/dcterms:subject" value="geo_gtaa"/>
+    <dyn-opt path="/naa:RDF/nao:Archiefbeschrijving/dcterms:subject" value="naam_gtaa"/>
+    <dyn-opt path="/naa:RDF/nao:Archiefbeschrijving/dcterms:subject" value="persoon_gtaa"/>
+    <dyn-opt path="/naa:RDF/nao:Archiefbeschrijving/dcterms:subject" value="fotocollectie_link"/>
+    <dyn-opt path="/naa:RDF/skos:Concept" value="FotoSerie"/>
+    <dyn-opt path="/naa:RDF/skos:Concept" value="persoon"/>
+    <dyn-opt path="/naa:RDF/skos:Concept" value="naam"/>
+    <dyn-opt path="/naa:RDF/skos:Concept" value="geo"/>
+    <dyn-opt path="/naa:RDF/skos:Concept" value="FotoCollectie"/>
+  </dyn-opts>
+  <node-mappings>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF"/>
+    <node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/ore:Aggregation/@rdf:about">
+      <groovy-code>
+        <string>/* tenant switch */</string>
+        <string>if (&quot;${orgId}&quot; == &quot;NL-HaNA&quot;) {</string>
+        <string>&quot;${baseUrl}&quot;</string>
+        <string>} else {</string>
+        <string>baseUrl = &quot;https://${orgId}.archief.nl&quot;</string>
+        <string>}</string>
+        <string>/* Groep soort Beeldbank of Nadere toegang */</string>
+        <string>if (_input.dcsubjectsoort_ == &quot;Beeldbank&quot; ) {</string>
+        <string>&quot;${baseUrl}/doc/Fotocollectie/&quot; + NA_lowercase_spec()</string>
+        <string>} else if (_input.dcsubjectsoort_ == &quot;Nadere toegangen&quot;) {</string>
+        <string>&quot;${baseUrl}/doc/&quot; + NA_lowercase_spec()</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/ore:Aggregation/nao:isAggregatietype/@rdf:resource">
+      <groovy-code>
+        <string>if (_input.dcsubjectsoort_ == &quot;Beeldbank&quot; ) {</string>
+        <string>&quot;${baseUrl}/def/Fotocollectie&quot;</string>
+        <string>} else if (_input.dcsubjectsoort_ == &quot;Nadere toegangen&quot; ) {</string>
+        <string>&quot;${baseUrl}/def/Index&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/ore:Aggregation/rdfs:label">
+      <groovy-code>
+        <string>if (_input.dcsubjectsoort_ == &quot;Beeldbank&quot;) {</string>
+        <string>&quot;Fotocollectie ${_input.dcsubjectabbreviation_}&quot;</string>
+        <string>} else if (_input.dcsubjectsoort_ == &quot;Nadere toegangen&quot;) {</string>
+        <string>&quot;${_input.dcsubjectabbreviation_} (Nadere Toegang)&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/ore:Aggregation/rdfs:label/@xml:lang">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&quot;nl&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/ore:Aggregation/skos:prefLabel">
+      <groovy-code>
+        <string>if (_input.dcsubjectsoort_ == &quot;Beeldbank&quot;) {</string>
+        <string>&quot;${_input.dcsubjectabbreviation_}&quot;</string>
+        <string>} else if (_input.dcsubjectsoort_ == &quot;Nadere toegangen&quot;) {</string>
+        <string>&quot;${_input.dcsubjectabbreviation_}&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/ore:Aggregation/skos:prefLabel/@xml:lang">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&quot;nl&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/ore:Aggregation/dc:title">
+      <groovy-code>
+        <string>if (_input.dcsubjectsoort_)</string>
+        <string>if (_input.dcsubjecttitel_) {</string>
+        <string>&quot;${_input.dcsubjecttitel_}&quot;</string>
+        <string>} else {</string>
+        <string>&quot;${_input.dcsubjectabbreviation_}&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/@id" outputPath="/naa:RDF/ore:Aggregation/nao:uuid">
+      <groovy-code>
+        <string>if (_input.dcsubjectsoort_)</string>
+        <string>&quot;${_id}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/ore:Aggregation/nao:ntCode">
+      <groovy-code>
+        <string>if (_input.dcsubjectsoort_)</string>
+        <string>&quot;${_dcidentifiercode}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/@id" outputPath="/naa:RDF/ore:Aggregation/dc:identifier">
+      <groovy-code>
+        <string>if (_input.dcsubjectsoort_)</string>
+        <string>&quot;${_id}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/ore:Aggregation/dcterms:creator/@rdf:resource">
+      <groovy-code>
+        <string>if (_input.dcsubjectsoort_)</string>
+        <string>if (_input.dcsubjectaet_ == &quot;dossier&quot;) {</string>
+        <string>&quot;${baseUrl}/id/organisatie/Binnenlandse_Strijdkrachten&quot;</string>
+        <string>} else {</string>
+        <string>&quot;${baseUrl}/id/organisatie/&quot; + NA_urilify(_facts.dataProvider_)</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/language" outputPath="/naa:RDF/ore:Aggregation/dc:language">
+      <groovy-code>
+        <string>if (_input.dcsubjectsoort_)</string>
+        <string>&quot;${_language}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/dataProvider" outputPath="/naa:RDF/ore:Aggregation/dcterms:publisher">
+      <groovy-code>
+        <string>if (_input.dcsubjectsoort_)</string>
+        <string>&quot;${_dataProvider}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/ore:Aggregation/dcterms:publisher/@xml:lang">
+      <groovy-code>
+        <string>if (_input.dcsubjectsoort_)</string>
+        <string>&quot;nl&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/ore:Aggregation/dc:coverage">
+      <groovy-code>
+        <string>if (_input.dcsubjectsoort_ == &quot;Nadere toegangen&quot;) {</string>
+        <string>if (_input.dcsubjectdatering_) {</string>
+        <string>&quot;${_input.dcsubjectdatering_}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/ore:Aggregation/edm:begin">
+      <groovy-code>
+        <string>if (_input.dcsubjectsoort_ == &quot;Nadere toegangen&quot;) {</string>
+        <string>if (_input.dcdatebegin_) {</string>
+        <string>&quot;${_input.dcdatebegin_}&quot;</string>
+        <string>} else if (_input.dcsubjectbeginjaar_) {</string>
+        <string>&quot;${_input.dcsubjectbeginjaar_}&quot;</string>
+        <string>} else if (_input.dcdescriptiondateringgeschat_) {</string>
+        <string>&quot;${_input.dcdescriptiondateringgeschat_}&quot;.take(4)</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/ore:Aggregation/edm:end">
+      <groovy-code>
+        <string>if (_input.dcsubjectsoort_ == &quot;Nadere toegangen&quot;) {</string>
+        <string>if (_input.dcdateend_) {</string>
+        <string>&quot;${_input.dcdateend_}&quot;.take(4)</string>
+        <string>} else if (_input.dcsubjecteindjaar_) {</string>
+        <string>&quot;${_input.dcsubjecteindjaar_}&quot;.take(4)</string>
+        <string>} else if (_input.dcdescriptiondateringgeschat_) {</string>
+        <string>&quot;${_input.dcdescriptiondateringgeschat_}&quot;.reverse().take(4).reverse()</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Recordaggregatie/@rdf:about">
+      <groovy-code>
+        <string>if ((_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot; )) {</string>
+        <string>&quot;${baseUrl}/doc/fotorecord/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+        <string>} else if ((_input.dcsubjectrecordsoort_ == &quot;NTRecord&quot; )) {</string>
+        <string>&quot;${baseUrl}/doc/indexrecord/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Recordaggregatie/nao:aet">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string> _record.dcsubjectaet * { _dcsubjectaet -&gt;</string>
+        <string>  &quot;${_dcsubjectaet}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record" outputPath="/naa:RDF/nao:Recordaggregatie/rdfs:label">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_)</string>
+        <string>if (_input.dcsubjectaet_ == &quot;dossier&quot;) {</string>
+        <string>&quot;Archivalreference ${_input.dcidentifierregistratienummer_} Collectie Binnenlandse Strijdkrachten&quot;</string>
+        <string>} else if (_input.dcsubjectaet_) {</string>
+        <string>&quot;Record over ${_input.dcsubjectaet_}&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record" outputPath="/naa:RDF/nao:Recordaggregatie/skos:prefLabel">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_)</string>
+        <string>if (_input.dcsubjectaet_ == &quot;dossier&quot;) {</string>
+        <string>&quot;Archivalreference ${_input.dcidentifierregistratienummer_} Collectie Binnenlandse Strijdkrachten&quot;</string>
+        <string>} else {</string>
+        <string>&quot;Record over ${_input.dcsubjectaet_}&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/@id" outputPath="/naa:RDF/nao:Recordaggregatie/dc:identifier">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_)</string>
+        <string>&quot;${_id}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Recordaggregatie/edm:isShownAt/@rdf:resource">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot;)</string>
+        <string>&quot;${_input.dctermshasParthandle_}&quot;</string>
+        <string>else if (_input.dcsubjectrecordsoort_ == &quot;NTRecord&quot;)</string>
+        <string>&quot;http://hdl.handle.net/10648/${_uniqueIdentifier}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Recordaggregatie/edm:isShownBy/@rdf:resource">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot;)</string>
+        <string>&quot;https://service.archief.nl/gaf/image-service/${hyphenateGUID(_uniqueIdentifier)}&quot;.sanitizeURI()</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record" outputPath="/naa:RDF/nao:Recordaggregatie/ore:isAggregatedBy/@rdf:resource">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_)</string>
+        <string>_input.record * { _record -&gt;</string>
+        <string>&quot;${baseUrl}/doc/&quot; + NA_lowercase_spec()</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/@id" outputPath="/naa:RDF/nao:Recordaggregatie/ore:aggregates/@rdf:resource">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot;) {</string>
+        <string>&quot;${baseUrl}/doc/beschrijving/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+        <string>} else if (_input.dcsubjectrecordsoort_ == &quot;NTRecord&quot;) {</string>
+        <string>if (_input.dcsubjectrecordsoort_) {</string>
+        <string>&quot;${baseUrl}/doc/beschrijving/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Recordaggregatie/nao:isAggregatietype/@rdf:resource">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot;) {</string>
+        <string>&quot;${baseUrl}/def/FotoRecord&quot;</string>
+        <string>} else if (_input.dcsubjectrecordsoort_ == &quot;NTRecord&quot;) {</string>
+        <string>&quot;${baseUrl}/def/IndexRecord&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:identifier.guid" outputPath="/naa:RDF/nao:Archiefeenheid/@rdf:about">
+      <groovy-code>
+        <string>if (_input.dcidentifierahdid_)</string>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.dcidentifierguid * { _dcidentifierguid -&gt;</string>
+        <string>&quot;${baseUrl}/doc/foto/${_dcidentifierguid}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record" outputPath="/naa:RDF/nao:Archiefeenheid/rdf:type/@rdf:resource">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot;)</string>
+        <string>_input.record * { _record -&gt;</string>
+        <string>&quot;http://www.w3.org/ns/odrl/2/Asset&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:identifier.guid" outputPath="/naa:RDF/nao:Archiefeenheid/rdfs:label">
+      <groovy-code>
+        <string>if (_input.dcidentifierahdid_)</string>
+        <string>&quot;Archiefeenheid van ${_dcidentifierguid}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:identifier.guid" outputPath="/naa:RDF/nao:Archiefeenheid/skos:prefLabel">
+      <groovy-code>
+        <string>if (_input.dcidentifierahdid_)</string>
+        <string>&quot;Archiefeenheid van ${_dcidentifierguid}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Archiefeenheid/nao:Archiefeenheidstype">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot;)</string>
+        <string>&quot;${baseUrl}/def/Foto&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:identifier.bestanddeelnummer" outputPath="/naa:RDF/nao:Archiefeenheid/nao:dossiernummer"/>
+    <node-mapping inputPath="/input/record/dc:identifier.file-uuid" outputPath="/naa:RDF/nao:Archiefeenheid/dc:identifier"/>
+    <node-mapping inputPath="/input/record/dc:format" outputPath="/naa:RDF/nao:Archiefeenheid/dc:format"/>
+    <node-mapping inputPath="/input/record/dc:type" outputPath="/naa:RDF/nao:Archiefeenheid/nao:isMateriaaltype/@rdf:resource">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.dctype * { _dctype -&gt;</string>
+        <string>def materiaal = _dctype</string>
+        <string>if (materiaal == &quot;Albumpagina&quot;) {</string>
+        <string>&quot;https://archief.nl/id/concept/900dcb52-5668-46f9-acdd-db22e8498fdc&quot;</string>
+        <string>}</string>
+        <string>else if (materiaal == &quot;Dia (kleur)&quot;) {</string>
+        <string>&quot;https://archief.nl/id/concept/a727a445-22d5-4f2a-94c2-6749ea4baca0&quot;</string>
+        <string>}</string>
+        <string>else if (materiaal == &quot;Document&quot;) {</string>
+        <string>&quot;https://archief.nl/id/concept/c6cb534f-5134-4e86-8e86-b5634dd2fee2&quot;</string>
+        <string>}</string>
+        <string>else if (materiaal == &quot;Drukwerk&quot;) {</string>
+        <string>&quot;https://archief.nl/id/concept/644d9693-de71-40a9-b0c3-08260493974e&quot;</string>
+        <string>}</string>
+        <string>else if (materiaal == &quot;Foto (kleur)&quot;) {</string>
+        <string>&quot;https://archief.nl/id/concept/9eadd910-eb09-4690-baf3-354198c6dd60&quot;</string>
+        <string>}</string>
+        <string>else if (materiaal == &quot;Foto (zwart/wit)&quot;) {</string>
+        <string>&quot;https://archief.nl/id/concept/89360c07-5a4c-4d6a-91d4-c9b5b0b271e1&quot;</string>
+        <string>}</string>
+        <string>else if (materiaal == &quot;Fotokopie&quot;) {</string>
+        <string>&quot;https://archief.nl/id/concept/e509cd2e-31ae-489a-8a8d-3639ceb20556&quot;</string>
+        <string>}</string>
+        <string>else if (materiaal == &quot;Glasnegatief&quot;) {</string>
+        <string>&quot;https://archief.nl/id/concept/d66308c7-ba3e-465e-a42b-8f6d90c4779b&quot;</string>
+        <string>}</string>
+        <string>else if (materiaal == &quot;Lantaarnplaatje (glasdia)&quot;) {</string>
+        <string>&quot;https://archief.nl/id/concept/6cbebf66-ac7f-46a9-9f73-8a8d01d6e655&quot;</string>
+        <string>}</string>
+        <string>else if (materiaal == &quot;Negatief (6x6)&quot;) {</string>
+        <string>&quot;https://archief.nl/id/concept/252d7e6c-9721-4e5f-98f3-679a766ed4ce&quot;</string>
+        <string>}</string>
+        <string>else if (materiaal == &quot;Negatief (9x12)&quot;) {</string>
+        <string>&quot;https://archief.nl/id/concept/d43712bd-e50d-4e30-97f9-a07455ce6e1c&quot;</string>
+        <string>}</string>
+        <string>else if (materiaal == &quot;Negatief (kleur)&quot;) {</string>
+        <string>&quot;https://archief.nl/id/concept/254c61cb-d37c-42aa-a293-f02912a68fc5&quot;</string>
+        <string>}</string>
+        <string>else if (materiaal == &quot;Negatief (zwart/wit)&quot;) {</string>
+        <string>&quot;https://archief.nl/id/concept/9f8115c1-3923-4c08-8a8c-9bd3ab86a949&quot;</string>
+        <string>}</string>
+        <string>else if (materiaal == &quot;Prent&quot;) {</string>
+        <string>&quot;https://archief.nl/id/concept/d9d5f9f2-47b4-4702-aa01-ccf165e5c6d8&quot;</string>
+        <string>}</string>
+        <string>else if (materiaal == &quot;Tekening&quot;) {</string>
+        <string>&quot;https://archief.nl/id/concept/538e9d16-c40b-4295-89ea-d702ee7cbe92&quot;</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:subject.bronverwijzing" outputPath="/naa:RDF/nao:Archiefeenheid/nao:archiefLink">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_) {</string>
+        <string>if (_dcsubjectbronverwijzing){</string>
+        <string>&quot;${_dcsubjectbronverwijzing}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dcterms:hasPart.media" outputPath="/naa:RDF/nao:Archiefeenheid/nao:archiefLink"/>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Archiefeenheid/nao:archiefLink/@xml:lang">
+      <groovy-code>
+        <string>if (_input.dcsubjectbronverwijzing_)</string>
+        <string>&quot;nl&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/@id" outputPath="/naa:RDF/nao:Archiefbeschrijving/@rdf:about">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot;) {</string>
+        <string>&quot;${baseUrl}/doc/beschrijving/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+        <string>} else if (_input.dcsubjectrecordsoort_ == &quot;NTRecord&quot;) {</string>
+        <string>if (_input.dcsubjectrecordsoort_) {</string>
+        <string>&quot;${baseUrl}/doc/beschrijving/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Archiefbeschrijving/rdfs:label">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_)</string>
+        <string>&quot;Beschrijving van ${_uniqueIdentifier}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Archiefbeschrijving/rdfs:label/@xml:lang">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_ == &quot;NTRecord&quot;) {</string>
+        <string>if (_input.dcsubjectxprsvolledigenaam_) {</string>
+        <string>&quot;nl&quot;</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Archiefbeschrijving/skos:prefLabel">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_)</string>
+        <string>&quot;Beschrijving van ${_uniqueIdentifier}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Archiefbeschrijving/skos:prefLabel/@xml:lang">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_ == &quot;NTRecord&quot;) {</string>
+        <string>if (_input.dcsubjectxprsvolledigenaam_) {</string>
+        <string>&quot;nl&quot;</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Archiefbeschrijving/dc:description">
+      <groovy-code>
+        <string>if (_input.dcsubjectaet_ == &quot;dossier&quot;)</string>
+        <string>&quot;${_input.dcsubjectbeschrijvinginhoud_}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:description" outputPath="/naa:RDF/nao:Archiefbeschrijving/dc:description"/>
+    <node-mapping inputPath="/input/record/dcterms:hasPart.fileids" outputPath="/naa:RDF/nao:Archiefbeschrijving/edm:hasView/@rdf:resource">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.dctermshasPartfileids * { _dctermshasPartfileids -&gt;</string>
+        <string>image = _dctermshasPartfileids.split(&quot;\\|&quot;)</string>
+        <string>if (image.size() &gt; 0) {</string>
+        <string>&quot;https://service.test.archief.nl/gaf/api/file/v1/thumb/${image.first()}&quot;.sanitizeURI()</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:subject.persoon" outputPath="/naa:RDF/nao:Archiefbeschrijving/ov:describes">
+      <groovy-code>
+        <string>&quot;${_dcsubjectpersoon}&quot;.split(&quot;\n \\|&quot;);</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:subject.algemeen" outputPath="/naa:RDF/nao:Archiefbeschrijving/dc:subject">
+      <groovy-code>
+        <string>&quot;${_dcsubjectalgemeen}&quot;.split(&quot;\n \\|&quot;);</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dcterms:subject.algemeen/dc:description.gtaa" outputPath="/naa:RDF/nao:Archiefbeschrijving/dcterms:subject"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.algemeen/dc:description.gtaa/dc:description.uri" outputPath="/naa:RDF/nao:Archiefbeschrijving/dcterms:subject/@rdf:resource"/>
+    <node-mapping inputPath="/input/record/dcterms:isPartOf.reeks" outputPath="/naa:RDF/nao:Archiefbeschrijving/dcterms:subject[fotoserie_link]/@rdf:resource">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.dctermsisPartOfreeks * { _dctermsisPartOfreeks -&gt;</string>
+        <string>&quot;${baseUrl}/doc/Fotoserie/&quot;  + NA_urilify(_input.dctermsisPartOfreeks_);</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dcterms:subject.geo/dc:description.gtaa" outputPath="/naa:RDF/nao:Archiefbeschrijving/dcterms:subject[geo_gtaa]"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.geo/dc:description.gtaa/dc:description.uri" outputPath="/naa:RDF/nao:Archiefbeschrijving/dcterms:subject[geo_gtaa]/@rdf:resource"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.naam/dc:description.gtaa" outputPath="/naa:RDF/nao:Archiefbeschrijving/dcterms:subject[naam_gtaa]"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.naam/dc:description.gtaa/dc:description.uri" outputPath="/naa:RDF/nao:Archiefbeschrijving/dcterms:subject[naam_gtaa]/@rdf:resource"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.persoon/dc:description.gtaa" outputPath="/naa:RDF/nao:Archiefbeschrijving/dcterms:subject[persoon_gtaa]"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.persoon/dc:description.gtaa/dc:description.uri" outputPath="/naa:RDF/nao:Archiefbeschrijving/dcterms:subject[persoon_gtaa]/@rdf:resource"/>
+    <node-mapping inputPath="/input/record/dcterms:isPartOf.collectie" outputPath="/naa:RDF/nao:Archiefbeschrijving/dcterms:subject[fotocollectie_link]/@rdf:resource">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.dctermsisPartOfcollectie * { _dctermsisPartOfcollectie -&gt;</string>
+        <string>&quot;${baseUrl}/doc/Fotocollectie/&quot;  + NA_urilify(_dctermsisPartOfcollectie);</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:identifier.guid" outputPath="/naa:RDF/nao:Archiefbeschrijving/foaf:primaryTopic/@rdf:resource">
+      <groovy-code>
+        <string>if (_input.dcidentifierahdid_)</string>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.dcidentifierguid * { _dcidentifierguid -&gt;</string>
+        <string>&quot;${baseUrl}/doc/foto/${_dcidentifierguid}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:description.dateringgeschat" outputPath="/naa:RDF/nao:Archiefbeschrijving/dc:coverage"/>
+    <node-mapping inputPath="/input/record/dc:subject.geo" outputPath="/naa:RDF/nao:Archiefbeschrijving/dcterms:spatial">
+      <groovy-code>
+        <string>&quot;${_dcsubjectgeo}&quot;.split(&quot;\n \\|&quot;);</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dcterms:creator.vervaardiger" outputPath="/naa:RDF/nao:Archiefbeschrijving/dc:creator"/>
+    <node-mapping inputPath="/input/record/dcterms:creator.vervaardiger" outputPath="/naa:RDF/nao:Archiefbeschrijving/dcterms:creator/@rdf:resource">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.dctermscreatorvervaardiger * { _dctermscreatorvervaardiger -&gt;</string>
+        <string>&quot;${baseUrl}/${orgId}/id/vervaardiger/&quot; + NA_urilify(_input.dctermscreatorvervaardiger_);</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:description.opmerkingen" outputPath="/naa:RDF/nao:Archiefbeschrijving/rdfs:comment"/>
+    <node-mapping inputPath="/input/record/dcterms:rights" outputPath="/naa:RDF/nao:Archiefbeschrijving/odrl:hasPolicy/@rdf:resource">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.dctermsrights * { _dctermsrights -&gt;</string>
+        <string>&quot;${baseUrl}/def/Policy/&quot;  + NA_urilify(_input.dctermsrights_);</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dcterms:hasPart.fileids" outputPath="/naa:RDF/edm:WebResource/@rdf:about">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.dctermshasPartfileids * { _dctermshasPartfileids -&gt;</string>
+        <string>image = _dctermshasPartfileids.split(&quot;\\|&quot;)</string>
+        <string>if (image.size() &gt; 0) {</string>
+        <string>&quot;https://service.test.archief.nl/gaf/api/file/v1/thumb/${image.first()}&quot;.sanitizeURI()</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dcterms:hasPart.fileids" outputPath="/naa:RDF/edm:WebResource/nao:thumbnail">
+      <groovy-code>
+        <string>image = _dctermshasPartfileids.split(&quot;\\|&quot;)</string>
+        <string>if (image.size() &gt; 0) {</string>
+        <string>//&quot;https://service.test.archief.nl/gaf/api/file/v1/thumb/${image.first()}&quot;.sanitizeURI()</string>
+        <string>&quot;https://images.memorix.nl/naa/thumb/1280x1280/${image.first()}.jpg&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/pnv:Person/@rdf:about">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_) {</string>
+        <string>if (_input.dcsubjectaet_ == &quot;lidmateninschrijving&quot; || _input.dcsubjectaet_ == &quot;militair&quot; || _input.dcsubjectaet_ == &quot;persoon&quot;){</string>
+        <string>&quot;${baseUrl}/id/persoon/${_uniqueIdentifier}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/pnv:Person/rdfs:label">
+      <groovy-code>
+        <string>if (_input.dcsubjectxprsvolledigenaam_) {</string>
+        <string>&quot;${_input.dcsubjectxprsvolledigenaam_}&quot;</string>
+        <string>} else  if (_input.dcsubjectxvolledigenaam_) {</string>
+        <string>&quot;${_input.dcsubjectxvolledigenaam_}&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/pnv:Person/rdfs:label/@xml:lang">
+      <groovy-code>
+        <string>if (_input.dcsubjectxprsvolledigenaam_)</string>
+        <string>&quot;nl&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/pnv:Person/skos:prefLabel">
+      <groovy-code>
+        <string>if (_input.dcsubjectxprsvolledigenaam_) {</string>
+        <string>&quot;${_input.dcsubjectxprsvolledigenaam_}&quot;</string>
+        <string>} else  if (_input.dcsubjectxvolledigenaam_) {</string>
+        <string>&quot;${_input.dcsubjectxvolledigenaam_}&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/pnv:Person/skos:prefLabel/@xml:lang">
+      <groovy-code>
+        <string>if (_input.dcsubjectxprsvolledigenaam_)</string>
+        <string>&quot;nl&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:subject.geslacht" outputPath="/naa:RDF/pnv:Person/nav:heeftGeslacht">
+      <groovy-code>
+        <string>if (_input.dcsubjectgeslacht_ == &quot;man&quot; || _input.dcsubjectgeslacht_ == &quot;m&quot;) {</string>
+        <string>/*term voor man of m*/</string>
+        <string>&quot;${baseUrl}/id/concept/360fd956-9c1d-4b71-a449-b7cc55572350&quot;</string>
+        <string>} else if (_input.dcsubjectgeslacht_ == &quot;vrouw&quot; || _input.dcsubjectgeslacht_ == &quot;v&quot;) {</string>
+        <string>/*term voor vrouw of v*/</string>
+        <string>&quot;${baseUrl}/id/concept/5431529f-1c2f-4c2c-b7cf-8fdcf3fa6ed6&quot;</string>
+        <string>} else {</string>
+        <string>/*onbekend*/</string>
+        <string>&quot;${baseUrl}/id/concept/b4589c2c-6c01-4148-9ecd-d82f3d8d4399&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/pnv:Person/pnv:hasName/pnv:PersonName/pnv:literalName">
+      <groovy-code>
+        <string>if (_input.dcsubjectxprsvolledigenaam_) {</string>
+        <string>&quot;${_input.dcsubjectxprsvolledigenaam_}&quot;</string>
+        <string>} else if (_input.dcsubjectxvolledigenaam_) {</string>
+        <string>&quot;${_input.dcsubjectxvolledigenaam_}&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/odrl:Policy/@rdf:about">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot;) {</string>
+        <string>&quot;${baseUrl}/def/Policy/&quot;  + NA_urilify(_input.dctermsrights_);</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dcterms:rights" outputPath="/naa:RDF/odrl:Policy/rdfs:label"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.algemeen/dc:description.gtaa" outputPath="/naa:RDF/skos:Concept"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.algemeen/dc:description.gtaa/dc:description.uri" outputPath="/naa:RDF/skos:Concept/@rdf:about"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.algemeen/dc:description.gtaa/dc:description.title" outputPath="/naa:RDF/skos:Concept/rdfs:label"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.algemeen/dc:description.gtaa/dc:description.title" outputPath="/naa:RDF/skos:Concept/skos:prefLabel"/>
+    <node-mapping inputPath="/input/record/dcterms:isPartOf.reeks" outputPath="/naa:RDF/skos:Concept[FotoSerie]/@rdf:about">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.dctermsisPartOfreeks * { _dctermsisPartOfreeks -&gt;</string>
+        <string>&quot;${baseUrl}/doc/Fotoserie/&quot;  + NA_urilify(_input.dctermsisPartOfreeks_);</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dcterms:isPartOf.reeks" outputPath="/naa:RDF/skos:Concept[FotoSerie]/rdfs:label">
+      <groovy-code>
+        <string>&quot;Fotoserie: ${_dctermsisPartOfreeks}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dcterms:isPartOf.reeks" outputPath="/naa:RDF/skos:Concept[FotoSerie]/skos:prefLabel"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.persoon/dc:description.gtaa" outputPath="/naa:RDF/skos:Concept[persoon]"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.persoon/dc:description.gtaa/dc:description.uri" outputPath="/naa:RDF/skos:Concept[persoon]/@rdf:about"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.persoon/dc:description.gtaa/dc:description.title" outputPath="/naa:RDF/skos:Concept[persoon]/rdfs:label"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.persoon/dc:description.gtaa/dc:description.title" outputPath="/naa:RDF/skos:Concept[persoon]/skos:prefLabel"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.naam/dc:description.gtaa" outputPath="/naa:RDF/skos:Concept[naam]"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.naam/dc:description.gtaa/dc:description.uri" outputPath="/naa:RDF/skos:Concept[naam]/@rdf:about"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.naam/dc:description.gtaa/dc:description.title" outputPath="/naa:RDF/skos:Concept[naam]/rdfs:label"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.naam/dc:description.gtaa/dc:description.title" outputPath="/naa:RDF/skos:Concept[naam]/skos:prefLabel"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.geo/dc:description.gtaa" outputPath="/naa:RDF/skos:Concept[geo]"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.geo/dc:description.gtaa/dc:description.uri" outputPath="/naa:RDF/skos:Concept[geo]/@rdf:about"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.geo/dc:description.gtaa/dc:description.title" outputPath="/naa:RDF/skos:Concept[geo]/rdfs:label"/>
+    <node-mapping inputPath="/input/record/dcterms:subject.geo/dc:description.gtaa/dc:description.title" outputPath="/naa:RDF/skos:Concept[geo]/skos:prefLabel"/>
+    <node-mapping inputPath="/input/record/dcterms:isPartOf.collectie" outputPath="/naa:RDF/skos:Concept[FotoCollectie]/@rdf:about">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.dctermsisPartOfcollectie * { _dctermsisPartOfcollectie -&gt;</string>
+        <string>&quot;${baseUrl}/doc/Fotocollectie/&quot;  + NA_urilify(_dctermsisPartOfcollectie);</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dcterms:isPartOf.collectie" outputPath="/naa:RDF/skos:Concept[FotoCollectie]/rdfs:label"/>
+    <node-mapping inputPath="/input/record/dcterms:isPartOf.collectie" outputPath="/naa:RDF/skos:Concept[FotoCollectie]/skos:prefLabel"/>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nav:Agent/@rdf:about">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot;)</string>
+        <string>&quot;${baseUrl}/${orgId}/id/vervaardiger/&quot; + NA_urilify(_input.dctermscreatorvervaardiger_);</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nav:Agent/rdfs:label">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot; &amp;&amp; _input.dctermscreatorvervaardiger_)</string>
+        <string>&quot;${_input.dctermscreatorvervaardiger_} (vervaardiger)&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nav:Agent/rdfs:label/@xml:lang">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot; &amp;&amp; _input.dctermscreatorvervaardiger_)</string>
+        <string>&quot;nl&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nav:Agent/skos:prefLabel">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot; &amp;&amp; _input.dctermscreatorvervaardiger_)</string>
+        <string>&quot;${_input.dctermscreatorvervaardiger_}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/nav:Agent/skos:prefLabel/@xml:lang">
+      <groovy-code>
+        <string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot; &amp;&amp; _input.dctermscreatorvervaardiger_)</string>
+        <string>&quot;nl&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/schema:Organization/@rdf:about">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&quot;${baseUrl}/id/nationaal_archief&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/schema:Organization/schema:name">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&quot;Nationaal Archief&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/schema:Organization/schema:url">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&quot;https://www.nationaalarchief.nl/&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/schema:Organization/schema:sameAs">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&quot;https://ror.org/0546dmt59&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/schema:DataCatalog/@rdf:about">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&apos;https://archief.nl/doc/LinkedOpenDataNationaalArchief&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/schema:DataCatalog/schema:name">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&apos;Linked Open Data Nationaal Archief&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/language" outputPath="/naa:RDF/schema:DataCatalog/schema:name/@xml:lang">
+      <groovy-code>
+        <string>_facts.language * { _language -&gt;</string>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&quot;${_language}&quot;.toLowerCase()</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/schema:DataCatalog/schema:description">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&apos;Deze DataCatalog is een verzameling van metadata-sets mbt de Linked Open Data van het Nationaal Archief&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/language" outputPath="/naa:RDF/schema:DataCatalog/schema:description/@xml:lang">
+      <groovy-code>
+        <string>_facts.language * { _language -&gt;</string>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&quot;${_language}&quot;.toLowerCase()</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/schema:DataCatalog/schema:publisher/@rdf:resource">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&quot;${baseUrl}/id/nationaal_archief&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/schema:DataCatalog/schema:dataset/@rdf:resource">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.dcdescriptiondataset * { _dcdescriptiondataset -&gt;</string>
+        <string>_dcdescriptiondataset.dcidentifiercode * { _dcidentifiercode -&gt;</string>
+        <string>&quot;${baseUrl}/id/dataset/${_dcidentifiercode}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/schema:Dataset/@rdf:about">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.dcdescriptiondataset * { _dcdescriptiondataset -&gt;</string>
+        <string>_dcdescriptiondataset.dcidentifiercode * { _dcidentifiercode -&gt;</string>
+        <string>&quot;${baseUrl}/id/dataset/${_dcidentifiercode}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/schema:Dataset/schema:identifier">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&quot;${_dcidentifiercode}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/schema:Dataset/schema:name">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&quot;${_dcidentifiercode}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/schema:Dataset/schema:description">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&quot;Dataset: ${_dcidentifiercode}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/schema:Dataset/schema:distribution/@rdf:resource">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.dcdescriptiondataset * { _dcdescriptiondataset -&gt;</string>
+        <string>_dcdescriptiondataset.dcidentifiercode * { _dcidentifiercode -&gt;</string>
+        <string>&quot;${baseUrl}/id/datadownload/${_dcidentifiercode}_rdf&quot;</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/schema:Dataset/schema:publisher/@rdf:resource">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&apos;https://archief.nl/id/nationaal_archief&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/schema:Dataset/schema:includedInDataCatalog/@rdf:resource">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&apos;https://archief.nl/doc/LinkedOpenDataNationaalArchief&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/schema:DataDownload/@rdf:about">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.dcdescriptiondataset * { _dcdescriptiondataset -&gt;</string>
+        <string>_dcdescriptiondataset.dcidentifiercode * { _dcidentifiercode -&gt;</string>
+        <string>&quot;${baseUrl}/id/datadownload/${_dcidentifiercode}_rdf&quot;</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/schema:DataDownload/schema:name">
+      <groovy-code>
+        <string>if (_input.dcsubjectsoort_)</string>
+        <string>&quot;${_dcidentifiercode} (RDF)&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/language" outputPath="/naa:RDF/schema:DataDownload/schema:name/@xml:lang">
+      <groovy-code>
+        <string>_facts.language * { _language -&gt;</string>
+        <string>&quot;${_language}&quot;.toLowerCase()</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/naa:RDF/schema:DataDownload/schema:encodingFormat">
+      <groovy-code>
+        <string>if(_input.dcsubjectsoort_)</string>
+        <string>&apos;application/rdf+xml&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/dc:description.dataset/dc:subject.wijzigingsdatum" outputPath="/naa:RDF/schema:DataDownload/schema:dateModified">
+      <groovy-code>
+        <string>if (_input.dcsubjectsoort_)</string>
+        <string>&quot;${_dcsubjectwijzigingsdatum}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+  </node-mappings>
+</rec-mapping>

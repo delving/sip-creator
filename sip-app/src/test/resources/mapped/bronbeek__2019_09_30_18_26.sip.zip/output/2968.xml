@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1999-11-12-5-5-1">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1999-11-12-5-5-1">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1999-11-12-5-5-1">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=21124">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1999%5C1999_11_12-5-5_1.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1999%5C1999_11_12-5-5_1.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1999-11-12-5-5-1">
+      <dc:description>Foto. Kleur. Reunie op kasteel van Rhoon, 18 juni 1987 ter gelegenheid van het zeventig-jarig bestaan van de Gezagvoerdersclub (opgericht in Falmouth 17 januari 1917). Stencil bijgevoegd met namen van geportreteerden [opgeborgen in hangmap van schenkster]: Het Kasteel van Rhoon 18 juni 1987. Ter gelegenheid van het 70-jarig bestaan van de Gezagvoerdersclub (opgericht in Falmouth 17 jan. 1917). - tekening afgebeelde personen voor identificatie, daarna lijst met namen. 1 M.C. v.d. Ouden 2 Mevr V.d. Boom 3 Mevr Smit 4 W.J.A. Schoevaars 5 P. Cammel 6 Mevr Koppenol 7 H.P.C. Fikenscher 8 B. Blok 9 J.G. Verschoor 10 W.K. v.d. Berg 11 Mevr Bronsveld 12 J.G. Verschoor Jr. 13 C. Koppenol 14 M. van Ommen 15 J.L. Kimmelaar 16 J. Geluk 17 J.H.P. van Hoogen 18 Mevr Schoevaars 19 G.W.H. van Doorn 20 M.J. Teunissen 21 N. Hanse 22 C.B. Verseyden 23 H.L. van Dam 24 Mevr van Dam 25 C. Bruin 26 P.J.A. Boot 27 W. Mesker 28 Mevr Verseyden 29 I.J.L. Risseeuw 30 F. van der Straaten 31 Mevr Risseeuw 32 J.J. Bronsveld 33 P.J.M. v.d. Boom 34 J. de Jager 35 W. van Klink 36 A. van 't Sant 37 A. Verwaal 38 Mevr van Hoogen 39 Mevr Welter 40 W. Wolthers 41 Mevr Fikenscher 42 Mevr Dubbeldam 43 J.J.M. Meily 44 Y. Dubbeldam 45 N. van der Kooy 46 Mevr van der Hoeven 47 G.J. Zaaijer 48 Mevr van Aalst 49 L.C.J. Welter 50 B. van der Hoeven 51 I.P. Gazan 52 E.K. van Melle 53 Mevr van der Kooy 54 J. Woestenburg 55 Mevr Meily 56 A. van der Windt 57 Mevr Cammel 58 Mevr van Klink 59 Mevr v.d. Ouden 60 Mevr van Ommen 61 Mevr Geluk 62 Mevr Goedknegt 63 Mevr Woestenburg 64 Mevr Blok 65 Mevr Bruin 66 Mevr Hanse 67 Mevr van den Berg 68 Mevr van der Straaten 69 Mevr Zaaijer 70 Mevr de Jager 71 Mevr Wolthers 72 Mevr Mesker 73 Mevr van 't Sant 74 Mevr Boot Foto komt uit schenking foto's m.b.t. de reunie's van VK-KNIL o.a. op Bronbeek. In kleur en zwart-wit. Totaal 17 foto's (inv.nrs 1999/11/12-5-5/1 t/m 1999/11/12-5-5/17). DUT</dc:description>
+      <dc:identifier>1999/11/12-5-5/1</dc:identifier>
+      <dc:title>Reunie op kasteel van Rhoon ter gelegenheid van het zeventig-jarig bestaan van de Gezagvoerdersclub Reunie op kasteel van Rhoon ter gelegenheid van het zeventig-jarig bestaan van d</dc:title>
+      <dc:type>foto</dc:type>
+      <dcterms:created>18 juni 1987</dcterms:created>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1999%5C1999_11_12-5-5_1.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1999\1999_11_12-5-5_1.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1999\1999_11_12-5-5_1.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

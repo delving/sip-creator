@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2010-12-02-1-42837">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2010-12-02-1-42837">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42837">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=51279">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42837.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42837.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42837">
+      <dc:description>Afdeling: Insulair Zuidoost AziÃ« Objectnaam: koran Rubriek: (niet ingevoerd) Datumlabel: voor 1904 Materiaal: leer, papier gedrukt, geschreven, gelooid, bewerkt Emailadres: toelichting: De koran is geschreven in arabisch schrift en is gebonden in een bewerkte, rode, leren band. Het boek is met zwarte inkt gedrukt en met rode inkt zijn met de hand aanvullingen gemaakt. Op enkele plaatsen zijn ook met zwarte inkt aantekeningen gemaakt. De arabische tekst staat binnen rechthoekige kaders en hiernaast zijn bloem- en rankmotieven afgedrukt. De titel- en de afsluitpagina bevatten tekst binnen een ovaal kader. De tweede en derde en de op Ã©Ã©n na laatste en op twee na laatste pagina's zijn rond de tekst rijk geornamenteerd. Achterin de koran is een opdracht geschreven (zie associatie-opmerkingen) Het boek heeft blauw gemarmerde schutbladen. De leren band heeft een overslag die aan het uiteinde enigszins in een driehoekvorm uitloopt. De leren band is versierd met ingehamerde motieven. Op de voor- en achterzijde van de leren band is rondom een rand van golfmotieven ingehamerd. Aan weerszijden van deze rand zijn lijnen aangebracht. Binnen dit kader is een rand van bloem- en bladmotieven ingehamerd en in het midden zijn twee kleine bloemmotieven met hiertussen een ovaalvorm met puntige uiteinden en geschulpte randen aangebracht. De ovaalvorm is opgevuld met bloem- en bladmotieven. De rug van de leren band is onbewerkt. Het deel van de overslag dat zich normaal gesproken voor de bladzijden bevindt, is langs de boven- en onderrand versierd met een rand van golfmotieven. Om deze randen en langs de lengte-zijden van de overslag zijn lijnen ingehamerd. In het midden is dit deel van de overslag versierd met twee bloemmotieven en een rechthoekige vorm, waarvan de korte zijden halfrond zijn. Deze laatstgenoemde vorm is opgevuld met arabische tekens. Het deel van de overslag dat om het boek wordt gevouwen, is rondom versierd met ingehamerde lijnen en langs de rechte zijden met een rand van golfmotieven. In het midden van deze "driehoekige" zijde is een bloemmotief ingehamerd. De overslag is naar binnen gevouwen, omdat deze niet goed meer om de bladzijden past: waarschijnlijk is het papier in de loop der jaren uitgezet. Het leer is op enkele plaatsen licht verschoten. Op het leer zijn verschillende kale plekjes en donkere vlekjes zichtbaar. Het voorwerp heeft waarschijnlijk "Sumatra no 486" als nummer van de lijst behorende bij de Beijens-collectie. Afmetingen: Geheel: 21,5 x 14,2 x 4,1 cm Herkomst: J.L.H. Beijens Media: 3370 Publicaties over het object: Mus: Fischer, H.W, ; titel: Catalogus van 's Rijks Ethnographisch Museum, deel VI AtjÃ¨h, Gajo- en Alaslanden ; uitg: Leiden 1912. pg 200, 201 Met dank aan: Op de laatste bladzijde van de koran is de volgende opdracht geschreven: Koran buitgemaakt door H.J.C. Rijnen, Kapitein Postcomdt van Samalanga, bij de overvalling van de schuilplaats van Teungkoe AloÃ«e (?) Keutapang bekend oelama (?) in het gebergte boven Samalnga in het voorjaar 1904 en geschonken aan zijn oud collega J.L.H. Beijens te Nijmegen, met vriendelijke groeten Rijnen. Het herkomstgebied van de koran is tijdens het verblijf in Volkenkundig Museum te Rotterdam geplaats in de Bataklanden, maar volgens de lijst behorende bij de Beijens- collectie is de koran afkomstig uit Aceh. Bruikleen van: Gemeente Nijmegen collectie: J.L.H. Beijens Huidige standplaats: [3370] Depot, LB V, 16 [LB V 16] [14-nov-2002] hoofdmateriaal: papier DUT</dc:description>
+      <dc:identifier>2010/12/02-1-42837</dc:identifier>
+      <dc:title>geen titel</dc:title>
+      <dc:type>koran</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42837.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5Cbeijensready%5C2010_12_02-1-42837.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1%5C2010_12_02-1-42837.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42837.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42837.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42837.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42837.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42837.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42837.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

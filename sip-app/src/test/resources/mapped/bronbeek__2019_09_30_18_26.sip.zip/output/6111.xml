@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2006-08-28-1">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2006-08-28-1">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2006-08-28-1">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=40362">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_06_26-4-3_verso.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_06_26-4-3_verso.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2006-08-28-1">
+      <dc:description>Fotoalbum. 48 paginaÂ´s met 48 fotoÂ´s. Politieschool te Soekaboemi. Waarschijnlijk in de periode 1920-1930. 1. Staf der Politieschool. 2. Afscheid van de familie Keijzer. De jazz voor de politiesocieteit "Ons genoegen". 3. De Centrale Administratie. 4. De kerk waarin gevestigd kantoren der Directie, Centrale Administratie en Bibliotheek. 5. De wacht "in Â´t geweer". [Opleidingsschool voor het personeel der Politie] 6. Wachtparade Â´s middags om 5 uur. 7. Woningen voor de leerlingen aan den "de Vogelweg". 8. Een blok kazerne-woningen voor de recruten. 9. Eetzaal voor ongehuwde recruten. 10. De binnenplaats van de ziekeninrichtingen van de Opleidingsschool. 11. De muziektent met jazzband. 12. Interieur Societeit "ons Genoegen". 13. Waschplaats. 14. Bij den Barbier. 15. Kinderbewaarplaats. 16. Kinderspeeltuin. 17. Vrouwenloods (keuken gehuwden) 18. Centrale keuken "het fourageeren". 19. Central keuken. Gereed voor het signaal: "Â´t Is voor den Kok in de keuken geweest; Â´t is voor den Kok in de keuken". 20. Goudvischkweekerij voor de menage. 21. Leeren loopen. 22. Spieren uitrekken. 23. Uitval. 24. Gymnastiek met de karabijn. 25. Gymnastiek met de karabijn. 26. Sport. 27. Oefeningen op het Exercitieveld. 28. Het leeren hanteeren van de karabijn. 29. De Adspirant-Commissarissen hebben hun klassen verzameld. 30. "Presenteert Sabel!" 31. Op marsch. 32. Het floretschermen wordt beoefend. 33. Een klas leerlingen Mantri-Politie. [Fotogrammetrische Opname, Systeem Heindl] 34. De Aula, gereed voor een lezing. 35. Een demonstratie in de Aula. 36. De schietbaan in vogelvlucht gezien van den kogelvanger. 37. Opgelegd schieten. 38. "Staande vrije hand". 39. "Salvovuur aan!". 40. "Vuur!". 41. Het droevig overschot van aanrijdingen. [Veldpolitie 2 Pangkalpinang] 42. Interieur Centrale Werkplaats. [Indian] 43. Gereed voor het rij-onderwijs. 44. Op marsch 45. Na een goed geslaagde tocht. 46. Demonstratie-materiaal. Vervoer van een Gans. 47. Opleiding Politieopziener. [Fotogrammetrische Opname, Systeem Heindl] 48. Practische Opleiding in de Speurkunst. DUT</dc:description>
+      <dc:identifier>2006/08/28-1</dc:identifier>
+      <dc:title>Politieschool te Soekabumi Politieschool te Soekabumi</dc:title>
+      <dc:type>fotoalbum</dc:type>
+      <dcterms:created>1920-1930</dcterms:created>
+      <dcterms:extent>Algemeen: 9 7/16 x 12 5/8 x 1 3/16in. (24 x 32 x 3cm)</dcterms:extent>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_06_26-4-3_verso.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_08_28-1-verso.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_08_28-1-recto.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_08_28-1-ccp.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_08_28-1-45.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_08_28-1-44a.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_08_28-1-44.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_08_28-1-31.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_08_28-1-24.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_06_26-4-3_verso.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_08_28-1-verso.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_08_28-1-recto.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_08_28-1-ccp.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_08_28-1-45.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_08_28-1-44a.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_08_28-1-44.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_08_28-1-31.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_08_28-1-24.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_06_26-4-3_verso.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_08_28-1-verso.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_08_28-1-recto.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_08_28-1-ccp.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_08_28-1-45.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_08_28-1-44a.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_08_28-1-44.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_08_28-1-31.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_08_28-1-24.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

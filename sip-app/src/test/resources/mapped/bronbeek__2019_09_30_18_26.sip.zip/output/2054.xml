@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1994-07-06-1">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1994-07-06-1">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1994-07-06-1">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=12023">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1994%5C1994_07_06-1m.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1994%5C1994_07_06-1m.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1994-07-06-1">
+      <dc:description>Karabijn. M95, Steyr 1897 nr. 2204 G. lade gemerkt op Ã©Ã©nzijde met R (recrutenkarabijn). Onderzoek Bas Martens &amp; Guus de Vries: OMSCHRIJVING - Wapensoort : Karabijn, repeteer - Benaming, type &amp; fabrikant : Rekrutenkarabijn M95 Marechaussee KNIL, Steyr 1897 - Kaliber : 6,5 x 53,5 R - Serienummer : 2204 G, Grendel 6114, lade 5383 D - Andere belangrijke merken : R in cirkel op de kolf TOESTAND - Roestvorming ja/nee : Binnenkant bovenband, magazijn en schroeven, loop en onderkant staartstuk; instabiel - Mist onderdelen : Nee - Andere beschadigingen : Gebruiksslijtage - Oordeel algehele toestand : Redelijk BIJZONDERHEDEN - Aanwezige accessoires : Geen - Evt. andere bijzonderheden : Plaatje korpsmerk verwijderd en ruimte opgevuld met houten inzetstuk GEBRUIKT IN INDIE : Ja - Toelichting : De karabijn M95 marechaussee was van 1898 tot 1942 de belangrijkste KNILkarabijn. Deze versie was bedoeld om recruten ermee vertrouwd te maken BEOORDELING &amp; ADVIES - Categorie : B - Advies : Exposeren Zie boek 'Nederlandse vuurwapens, KNIL en Militaire Luchtvaart 1897-1942' van De Vries en Martens, blz. 76: een van de weinig marrechaussee karabijnen MET bajonethaft. DUT</dc:description>
+      <dc:identifier>1994/07/06-1</dc:identifier>
+      <dc:title>Rekrutenkarabijn Model 1895 Marechaussee KNIL, Steyr 1897 Rekrutenkarabijn Model 1895 Marechaussee KNIL, Steyr 1897</dc:title>
+      <dc:type>karabijn</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1994%5C1994_07_06-1m.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1994%5C1994_07_06-1z.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1994\1994_07_06-1m.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1994\1994_07_06-1z.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1994\1994_07_06-1m.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1994\1994_07_06-1z.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>
