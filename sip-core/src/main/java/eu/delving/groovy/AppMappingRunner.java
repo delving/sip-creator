@@ -90,7 +90,6 @@ public class AppMappingRunner extends AbstractMappingRunner {
         if (metadataRecord == null) throw new RuntimeException("Null input metadata record");
         try {
             binding.output = DOMBuilder.createFor(recMapping.getRecDefTree().getRecDef());
-            GroovyNode root = metadataRecord.getRootNode();
             binding.input = Collections.singletonList(metadataRecord.getRootNode());
             return stripEmptyElements(script.run());
         }

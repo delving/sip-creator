@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2010-12-02-1-43216">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2010-12-02-1-43216">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-43216">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=51658">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-43216.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-43216.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-43216">
+      <dc:description>Kris met schede Afdeling: Insulair Zuidoost AziÃ« Objectnaam: kris &amp; schede Titel: keris Rubriek: (niet ingevoerd) Datumlabel: voor 1912 Materiaal: metaal, hout, gesmeed, gesneden toelichting: Kris met geslangeld lemmet, type dapoer loek met elf bochten. De naam van deze kris luidt tjarngsoka (de tak van de sokaboom zie ook nr. 43092). Met pedjettan, tikel alis kembang katjang, lambeh gadjah en grÃ¨nÃ¨ng. Het lemmet is gedamasceerd en het gebruikte pamormotief is beras woetah (rondgestrooide rijstkorrels). De mendak of selut ontbreekt bij deze kris! De greep is afkomstig uit Solo, de basis of boengkoel is rond onversierd, daarboven is de ukiran zevenkantig, naar boven licht gebogen en knopvormig met op het concave gedeelte twee uitgesneden maskers. Boven het bovenste masker een wratvormig uitsteeksel (de zgn. tjitak). Het geheel is gemaakt van donkerbruin gepolijst hout. (zie ook nr. 43070). De schede is afkomstig uit Djokja en bestaat uit twee onderdelen: de warongka is een tussenvorm (tanggal) en heet bajemman. Het geheel is gemaakt van lichtbruin gevlamd hout. De gandar is voorzien vaneen overschede van koperkleurig metaal, onversierd en aan de voorzijde opengewerkt. Deze overschede heet pendoq slorok. Lemmet: L 32,8 Br 7 D 0,9. Greep: L 9,7 Br 2,6 D 3,5. Schede: L 40 Br 13,3 D 2,3. Gandar: L 34 Br 2,2 D 4,1. Warongka: L 13,3 Br 2,3 D 4,8. Afmetingen: Geheel: 48,6 x 13,3 x 2,6 cm Herkomst: J.L.H.Beijens Media: 3749 Publicaties over het object: Literatuur: zie nr. 41899 en nr. 43058. Bruikleen van: Gemeente Nijmegen collectie: J.L.H. Beijens Huidige standplaats: [3749] Depot, 24, L c [24 L c] DUT</dc:description>
+      <dc:identifier>2010/12/02-1-43216</dc:identifier>
+      <dc:title>geen titel</dc:title>
+      <dc:type>kris</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-43216.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5Cbeijensready%5C2010_12_02-1-43216.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-43216.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-43216.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-43216.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-43216.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

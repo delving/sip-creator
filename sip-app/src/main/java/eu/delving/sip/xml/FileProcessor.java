@@ -43,18 +43,18 @@ import eu.delving.stats.Stats;
 import org.w3c.dom.Node;
 
 import javax.swing.*;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactoryConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.LinkedTransferQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TransferQueue;
 
 import static eu.delving.sip.files.Storage.XSD_VALIDATION;
 
@@ -75,9 +75,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private final boolean allowInvalid;
     private final Listener listener;
     private ProgressListener progressListener;
-    private TransferQueue<MetadataRecord> recordSource = new LinkedTransferQueue<>();
     private Stats stats;
-    private Termination termination = new Termination();
+    private final Termination termination = new Termination();
 
     private void info(String message) {
         if (sipModel != null) {
@@ -168,13 +167,14 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             MetadataParser parser = new MetadataParser(getDataSet().openSourceInputStream(), sipModel.getStatsModel().getRecordCount());
             parser.setProgressListener(progressListener);
             ReportWriter reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
-            XmlOutput xmlOutput = new XmlOutput(getDataSet().targetOutput(), recDef().getNamespaceMap());
+
+            File outputDir = createEmptyOutputDir();
+
             this.stats = createStats();
-            Consumer consumer = new Consumer(reportWriter, xmlOutput);
-            QueueFiller queueFiller = new QueueFiller(parser, recordSource, consumer);
-            int engineCount = Runtime.getRuntime().availableProcessors();
+            Consumer consumer = new Consumer(reportWriter, outputDir, recDef().getNamespaceMap());
+            int engineCount = Math.max(Runtime.getRuntime().availableProcessors() - 2, 4);
             info(String.format("Processing with %d engines", engineCount));
-            for (int walk = 0; walk < Math.min(engineCount, 1); walk++) {
+            for (int walk = 0; walk < 1; walk++) {
                 boolean enableXSDValidation = sipModel.getPreferences().getProperty(XSD_VALIDATION, "false").contentEquals("true");
                 Validator validator = null;
                 if (enableXSDValidation) {
@@ -182,11 +182,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     validator.setErrorHandler(null);
                 }
                 MappingEngine engine = new MappingEngine(
-                        walk, recordSource, validator, consumer, allowInvalid, termination
+                        walk, parser, validator, consumer, allowInvalid, termination
                 );
+                consumer.register(engine);
                 engine.start();
             }
-            queueFiller.start();
             info(Thread.currentThread().getName() + " about to consume");
             consumer.run();
         }
@@ -196,75 +196,20 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
     }
 
-//    public void runHeadless(boolean enableXSDValidation) {
-//        groovyCodeResource.clearMappingScripts();
-//        try {
-//            MetadataParser parser = new MetadataParser(getDataSet().openSourceInputStream(), 0);
-//            ReportWriter reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
-//            XmlOutput xmlOutput = new XmlOutput(getDataSet().targetOutput(), recDef().getNamespaceMap());
-//            // this.stats = createStats();
-//            Consumer consumer = new Consumer(reportWriter, xmlOutput);
-//            QueueFiller queueFiller = new QueueFiller(parser, recordSource, consumer);
-//            int engineCount = Runtime.getRuntime().availableProcessors();
-//            System.out.println(String.format("Processing with %d engines", engineCount));
-//            for (int walk = 0; walk < engineCount; walk++) {
-//                Validator validator = null;
-//                if (enableXSDValidation) {
-//                    validator = dataSet.newValidator();
-//                    validator.setErrorHandler(null);
-//                }
-//                MappingRunner MappingRunner = new AppMappingRunner(groovyCodeResource, recMapping, null, false);
-//                List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
-//                MappingEngine engine = new MappingEngine(
-//                    walk, recordSource, MappingRunner, validator, assertionTests, consumer, allowInvalid, termination
-//                );
-//                engine.start();
-//            }
-//            queueFiller.start();
-//            System.out.println(Thread.currentThread().getName() + " about to consume");
-//            consumer.run();
-//        }
-//        catch (Exception e) {
-//            termination.dueToException(e);
-//            info("File processing setup problem: " + e);
-//        }
-//    }
-
-    private class QueueFiller implements Runnable {
-        final MetadataParser parser;
-        final TransferQueue<MetadataRecord> sink;
-        private final Consumer consumer;
-        private Thread thread = new Thread(this);
-
-        private QueueFiller(MetadataParser parser, TransferQueue<MetadataRecord> sink, Consumer consumer) {
-            this.parser = parser;
-            this.sink = sink;
-            this.consumer = consumer;
-        }
-
-        @Override
-        public void run() {
-            try {
-                while (termination.notYet()) {
-                    MetadataRecord metadataRecord = parser.nextRecord();
-                    while (!sink.tryTransfer(metadataRecord, 1000, TimeUnit.MILLISECONDS)) {
-                        System.out.println("retry feeding record");
-                        if (!termination.notYet()) break;
-                    }
-                }
-                System.out.println("Queue filler done");
-                consumer.poison();
+    private File createEmptyOutputDir() {
+        File sipDir = getDataSet().targetOutput().getParentFile();
+        File outputDir = new File(sipDir, "output");
+        if (!outputDir.exists()) {
+            if(!outputDir.mkdir()) {
+                throw new IllegalStateException("Unable to create directory: " + outputDir);
             }
-            catch (Exception e) {
-                termination.dueToException(e);
+        } else {
+            File[] files = Objects.requireNonNull(outputDir.listFiles());
+            for (File file : files) {
+                if (!file.delete()) throw new IllegalStateException("Unable to delete file: " + file);
             }
         }
-
-        public void start() {
-            info("Queue filler started");
-            thread.start();
-        }
-
+        return outputDir;
     }
 
     private class MappingOutput {
@@ -276,16 +221,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             this.metadataRecord = metadataRecord;
             this.mappingResult = mappingResult;
             this.exception = exception;
-        }
-
-        private MappingOutput() {
-            this.metadataRecord = null;
-            this.mappingResult = null;
-            this.exception = null;
-        }
-
-        public boolean isPoison() {
-            return metadataRecord == null;
         }
 
         public void record(ReportWriter reportWriter, XmlOutput xmlOutput) {
@@ -311,45 +246,51 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     }
 
     private class Consumer implements Runnable {
-        final BlockingQueue<MappingOutput> outputQueue = new LinkedBlockingDeque<MappingOutput>();
+        final List<MappingEngine> engines = new ArrayList<>();
+        final BlockingQueue<MappingOutput> outputQueue = new LinkedBlockingDeque<>();
         final ReportWriter reportWriter;
-        final XmlOutput xmlOutput;
+        final File outputDir;
+        final Map<String, RecDef.Namespace> namespaceMap;
         private int recordCount, validCount;
 
-        private Consumer(ReportWriter reportWriter, XmlOutput xmlOutput) {
+        private Consumer(ReportWriter reportWriter, File outputDir, Map<String, RecDef.Namespace> namespaceMap) {
             this.reportWriter = reportWriter;
-            this.xmlOutput = xmlOutput;
+            this.outputDir = outputDir;
+            this.namespaceMap = namespaceMap;
         }
 
         public void accept(MetadataRecord metadataRecord, MappingResult mappingResult, Exception exception) {
             outputQueue.add(new MappingOutput(metadataRecord, mappingResult, exception));
         }
 
-        public void poison() {
-            outputQueue.add(new MappingOutput());
+        public void poison(MetadataRecord record) {
+            outputQueue.add(new MappingOutput(record, null, null));
+        }
+
+        private boolean mappingNotDone() {
+            return !engines.stream().allMatch(engine -> engine.isDone);
         }
 
         @Override
         public void run() {
             try {
-                while (true) {
+                while (mappingNotDone() && termination.notYet()) {
                     MappingOutput mappingOutput = outputQueue.take();
-                    if (mappingOutput.isPoison()) {
-                        outputQueue.add(mappingOutput);
-                        info("Consumer stopping");
-                        break;
-                    }
                     recordCount++;
                     if (mappingOutput.exception == null) {
                         validCount++;
                     }
+
+
+                    File outputFile = new File(outputDir, mappingOutput.metadataRecord.getRecordNumber() + ".xml");
+                    XmlOutput xmlOutput = new XmlOutput(outputFile, namespaceMap);
                     mappingOutput.record(reportWriter, xmlOutput);
+                    xmlOutput.finish(false);
                 }
             }
-            catch (InterruptedException e) {
+            catch (InterruptedException | XMLStreamException | IOException e) {
                 termination.dueToException(e);
             }
-            xmlOutput.finish(termination.isIncomplete());
             if (termination.isIncomplete()) {
                 info("Abort report writer");
                 reportWriter.abort();
@@ -360,22 +301,27 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 termination.normalCompletion();
             }
         }
+
+        public void register(MappingEngine engine) {
+            engines.add(engine);
+        }
     }
 
     private class MappingEngine implements Runnable {
-        private final BlockingQueue<MetadataRecord> recordSource;
+        private final MetadataParser metadataParser;
         private final Validator validator;
         private final Consumer consumer;
         private final boolean allowInvalid;
         private final Termination termination;
-        private Thread thread;
-        private XmlSerializer serializer = new XmlSerializer();
+        public boolean isDone;
+        private final Thread thread;
+        private final XmlSerializer serializer = new XmlSerializer();
 
-        private MappingEngine(int index, BlockingQueue<MetadataRecord> recordSource,
+        private MappingEngine(int index, MetadataParser metadataParser,
                               Validator validator, Consumer consumer,
                               boolean allowInvalid, Termination termination
         ) {
-            this.recordSource = recordSource;
+            this.metadataParser = metadataParser;
             this.validator = validator;
             this.consumer = consumer;
             this.allowInvalid = allowInvalid;
@@ -390,22 +336,13 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         @Override
         public void run() {
-            MappingRunner MappingRunner = new AppMappingRunner(groovyCodeResource, recMapping, null, false);
-            List<AssertionTest> assertionTests = null;
             try {
-                assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+                MappingRunner MappingRunner = new AppMappingRunner(groovyCodeResource, recMapping, null, false);
+                List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
 
-            try {
                 while (true) {
-                    MetadataRecord record = recordSource.take();
-                    if (record.isPoison()) {
-                        recordSource.add(record);
-                        consumer.poison();
-                        return;
-                    }
+                    MetadataRecord record = metadataParser.nextRecord();
+                    if (record == null) break;
                     try {
                         Node node = MappingRunner.runMapping(record);
                         MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, MappingRunner.getRecDefTree());
@@ -459,6 +396,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             }
             catch (Exception e) {
                 termination.dueToException(e);
+            } finally {
+                isDone = true;
             }
         }
     }

@@ -34,6 +34,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static eu.delving.sip.base.HttpClientFactory.createHttpClient;
@@ -166,12 +167,6 @@ public class MappingEngineTest {
         );
     }
 
-    private InputStream readTestData(String filename) {
-        InputStream testData = getClass().getResourceAsStream("/mapped/" + filename);
-        assert (testData != null);
-        return testData;
-    }
-
     @MethodSource("testData")
     @ParameterizedTest
     public void test_file_processor(String sipFilename,
@@ -179,25 +174,27 @@ public class MappingEngineTest {
                                     String recDefFilename,
                                     String orgId,
                                     boolean enableXsdValidation) throws Exception {
+        Path testDir = new File(getClass().getResource("/mapped/").getFile()).toPath();
+
         Path workDir = HomeDirectory.WORK_DIR.toPath();
-        File sipFile = workDir.resolve(sipFilename).toFile();
-        Path mappingFile = sipFile.toPath().resolve(mappingFilename);
-        Path recDefFile = sipFile.toPath().resolve(recDefFilename);
+        Path outputSipDir = workDir.resolve(sipFilename);
+
+        File controlSipDir = testDir.resolve(sipFilename).toFile();
+        Path mappingFile = controlSipDir.toPath().resolve(mappingFilename);
+        Path recDefFile = controlSipDir.toPath().resolve(recDefFilename);
+        Path controlOutputDir = controlSipDir.toPath().resolve("output");
 
         FileProcessor.Listener listener = mock(FileProcessor.Listener.class);
         ProgressListener progressListener = mock(ProgressListener.class);
-        processSourceXML(sipFile, mappingFile, recDefFile, listener, progressListener, enableXsdValidation);
+        processSourceXML(outputSipDir.toFile(), mappingFile, recDefFile, listener, progressListener, enableXsdValidation);
 
-        String sipPrefix = sipFilename.split("__")[0];
-        String controlXMLFilename = sipPrefix + "__" + orgId + ".xml";
-        InputStream controlXMLStream = readTestData(controlXMLFilename);
-        Path outputXMLFile = workDir.resolve(sipFilename).resolve(controlXMLFilename);
-        Assert.assertTrue(Files.exists(outputXMLFile));
+        Path outputDir = outputSipDir.resolve("output");
+        Assert.assertTrue(Files.exists(outputDir));
 
-        compareXMLs(controlXMLStream, outputXMLFile);
+        compareXMLs(controlOutputDir, outputDir);
     }
 
-    private void processSourceXML(File sipFile,
+    private void processSourceXML(File outputSipDir,
                                   Path mappingFile,
                                   Path recDefFile,
                                   FileProcessor.Listener listener,
@@ -206,7 +203,7 @@ public class MappingEngineTest {
         SipModel sipModel = createSipModel(enableXsdValidation);
         RecMapping recMapping = getRecMapping(mappingFile, recDefFile);
         sipModel.getMappingModel().setRecMapping(recMapping);
-        DataSet sourceXML = new StorageImpl.DataSetImpl(sipFile, createSchemaRepository());
+        DataSet sourceXML = new StorageImpl.DataSetImpl(outputSipDir, createSchemaRepository());
         sourceXML.getDataSetFacts(); // will actually initialize data facts and prevent null pointer later on
 
         FileProcessor.UriGenerator uriGenerator = new SipModel.Generator(
@@ -233,26 +230,18 @@ public class MappingEngineTest {
         return RecMapping.read(new FileInputStream(mappingFile.toFile()), recDefTree);
     }
 
-    private void compareXMLs(InputStream controlXMLStream, Path outputXMLFile) {
-        Source expectedXml = Input.fromStream(controlXMLStream).build();
-        Source actualXml = Input.fromPath(outputXMLFile).build();
+    private void compareXMLs(Path controlOutputDir, Path outputDir) throws IOException {
         DifferenceEngine diff = new DOMDifferenceEngine();
         diff.addDifferenceListener((comparison, comparisonResult) -> Assertions.fail("found a difference: " + comparison));
-        diff.compare(expectedXml, actualXml);
-//        Diff diff = DiffBuilder
-//            .compare(expectedXml)
-//            .withTest(actualXml)
-//            .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
-//            .ignoreWhitespace()
-//            .checkForSimilar()
-//            .build();
-//
-//
-//        if (diff.hasDifferences()) {
-//            for (Difference d : diff.getDifferences()) {
-//                System.out.println(d);
-//            }
-//            Assert.fail("Differences found");
-//        }
+        int recordNumber = 0;
+        for(Path controlXMLFile : Files.list(controlOutputDir).collect(Collectors.toList())) {
+            Source expectedXml = Input.fromPath(controlXMLFile).build();
+            Source actualXml = Input.fromPath(outputDir.resolve(controlXMLFile.getFileName().toString())).build();
+            diff.compare(expectedXml, actualXml);
+            recordNumber++;
+        }
+        // Smoke test to check contents of the control output dir and actual output dir are most likely equal
+        // and one doesn't contain more files than the other
+        // Assert.assertTrue(!Files.exists(outputDir.resolve(recordNumber + ".xml")));
     }
 }

@@ -48,6 +48,7 @@ public class GroovyNode {
     private QName qName;
     private String stringName;
     private Map<String, String> attributes;
+    // TODO make sure accessors can handle its new value type
     private Object nodeValue;
     private int hashCode;
     public String text;
@@ -124,11 +125,10 @@ public class GroovyNode {
         if(nodeValue != null) {
             this.text = nodeValue.trim();
             this.hashCode = text.hashCode();
-            this.nodeValue = text;
         } else {
             this.text = "";
-            this.nodeValue = text;
         }
+        this.nodeValue = text;
     }
 
     public GroovyNode parent() {
