@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="urn:ebu:metadata-schema:ebuCore_2014" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/158">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/158">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/158">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/158">
       </edm:aggregatedCHO>
@@ -31,7 +31,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/165">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/165">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/165">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/165">
       </edm:aggregatedCHO>
@@ -62,7 +62,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/166">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/166">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/166">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/166">
       </edm:aggregatedCHO>
@@ -93,7 +93,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2217">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2217">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2217">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2217">
       </edm:aggregatedCHO>
@@ -124,7 +124,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2216">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2216">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2216">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2216">
       </edm:aggregatedCHO>
@@ -155,7 +155,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2215">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2215">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2215">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2215">
       </edm:aggregatedCHO>
@@ -186,7 +186,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2214">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2214">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2214">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2214">
       </edm:aggregatedCHO>
@@ -217,7 +217,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2213">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2213">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2213">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2213">
       </edm:aggregatedCHO>
@@ -248,7 +248,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2212">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2212">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2212">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2212">
       </edm:aggregatedCHO>
@@ -279,7 +279,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2211">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2211">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2211">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2211">
       </edm:aggregatedCHO>
@@ -310,7 +310,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/174">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/174">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/174">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/174">
       </edm:aggregatedCHO>
@@ -341,7 +341,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2210">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2210">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2210">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2210">
       </edm:aggregatedCHO>
@@ -372,7 +372,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2209">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2209">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2209">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2209">
       </edm:aggregatedCHO>
@@ -403,7 +403,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2207">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2207">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2207">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2207">
       </edm:aggregatedCHO>
@@ -434,7 +434,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2206">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2206">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2206">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2206">
       </edm:aggregatedCHO>
@@ -465,7 +465,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/179">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/179">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/179">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/179">
       </edm:aggregatedCHO>
@@ -496,7 +496,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/180">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/180">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/180">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/180">
       </edm:aggregatedCHO>
@@ -527,7 +527,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2204">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2204">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2204">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2204">
       </edm:aggregatedCHO>
@@ -558,7 +558,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/182">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/182">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/182">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/182">
       </edm:aggregatedCHO>
@@ -589,7 +589,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2203">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2203">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2203">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2203">
       </edm:aggregatedCHO>
@@ -620,7 +620,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/184">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/184">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/184">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/184">
       </edm:aggregatedCHO>
@@ -651,7 +651,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2201">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2201">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2201">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2201">
       </edm:aggregatedCHO>
@@ -682,7 +682,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2202">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2202">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2202">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2202">
       </edm:aggregatedCHO>
@@ -713,7 +713,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/985">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/985">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/985">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/985">
       </edm:aggregatedCHO>
@@ -744,7 +744,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2191">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2191">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2191">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2191">
       </edm:aggregatedCHO>
@@ -775,7 +775,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/1584">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/1584">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/1584">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/1584">
       </edm:aggregatedCHO>
@@ -807,7 +807,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/1366">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/1366">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/1366">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/1366">
       </edm:aggregatedCHO>
@@ -839,7 +839,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/1473">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/1473">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/1473">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/1473">
       </edm:aggregatedCHO>
@@ -871,7 +871,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2193">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2193">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2193">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2193">
       </edm:aggregatedCHO>
@@ -903,7 +903,7 @@
       <nave:province>nvt</nave:province>
    </nave:DcnResource>
 </rdf:Description>
-<rdf:Description rdf:about="http://localhost/resource/document/aidsmemorial_/2426">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2426">
    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2426">
       <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2426">
       </edm:aggregatedCHO>

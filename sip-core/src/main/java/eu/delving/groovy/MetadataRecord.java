@@ -87,7 +87,7 @@ public class MetadataRecord {
             return false;
         }
         else {
-            return pattern.matcher(groovyNode.text()).find();
+            return pattern.matcher(groovyNode.text).find();
         }
     }
 

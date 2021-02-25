@@ -46,6 +46,8 @@ import javax.swing.*;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactoryConfigurationException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -160,6 +162,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     @Override
     public void run() {
+        groovyCodeResource.clearMappingScripts();
         try {
             // TODO record count is never used
             MetadataParser parser = new MetadataParser(getDataSet().openSourceInputStream(), sipModel.getStatsModel().getRecordCount());
@@ -171,17 +174,15 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             QueueFiller queueFiller = new QueueFiller(parser, recordSource, consumer);
             int engineCount = Runtime.getRuntime().availableProcessors();
             info(String.format("Processing with %d engines", engineCount));
-            for (int walk = 0; walk < 1; walk++) {
+            for (int walk = 0; walk < Math.min(engineCount, 1); walk++) {
                 boolean enableXSDValidation = sipModel.getPreferences().getProperty(XSD_VALIDATION, "false").contentEquals("true");
                 Validator validator = null;
                 if (enableXSDValidation) {
                     validator = dataSet.newValidator();
                     validator.setErrorHandler(null);
                 }
-                MappingRunner MappingRunner = new AppMappingRunner(groovyCodeResource, recMapping, null, false);
-                List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
                 MappingEngine engine = new MappingEngine(
-                        walk, recordSource, MappingRunner, validator, assertionTests, consumer, allowInvalid, termination
+                        walk, recordSource, validator, consumer, allowInvalid, termination
                 );
                 engine.start();
             }
@@ -195,38 +196,39 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
     }
 
-    public void runHeadless(boolean enableXSDValidation) {
-        try {
-            MetadataParser parser = new MetadataParser(getDataSet().openSourceInputStream(), 0);
-            ReportWriter reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
-            XmlOutput xmlOutput = new XmlOutput(getDataSet().targetOutput(), recDef().getNamespaceMap());
-            // this.stats = createStats();
-            Consumer consumer = new Consumer(reportWriter, xmlOutput);
-            QueueFiller queueFiller = new QueueFiller(parser, recordSource, consumer);
-            int engineCount = Runtime.getRuntime().availableProcessors();
-            System.out.println(String.format("Processing with %d engines", engineCount));
-            for (int walk = 0; walk < engineCount; walk++) {
-                Validator validator = null;
-                if (enableXSDValidation) {
-                    validator = dataSet.newValidator();
-                    validator.setErrorHandler(null);
-                }
-                MappingRunner MappingRunner = new AppMappingRunner(groovyCodeResource, recMapping, null, false);
-                List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
-                MappingEngine engine = new MappingEngine(
-                    walk, recordSource, MappingRunner, validator, assertionTests, consumer, allowInvalid, termination
-                );
-                engine.start();
-            }
-            queueFiller.start();
-            System.out.println(Thread.currentThread().getName() + " about to consume");
-            consumer.run();
-        }
-        catch (Exception e) {
-            termination.dueToException(e);
-            info("File processing setup problem: " + e);
-        }
-    }
+//    public void runHeadless(boolean enableXSDValidation) {
+//        groovyCodeResource.clearMappingScripts();
+//        try {
+//            MetadataParser parser = new MetadataParser(getDataSet().openSourceInputStream(), 0);
+//            ReportWriter reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
+//            XmlOutput xmlOutput = new XmlOutput(getDataSet().targetOutput(), recDef().getNamespaceMap());
+//            // this.stats = createStats();
+//            Consumer consumer = new Consumer(reportWriter, xmlOutput);
+//            QueueFiller queueFiller = new QueueFiller(parser, recordSource, consumer);
+//            int engineCount = Runtime.getRuntime().availableProcessors();
+//            System.out.println(String.format("Processing with %d engines", engineCount));
+//            for (int walk = 0; walk < engineCount; walk++) {
+//                Validator validator = null;
+//                if (enableXSDValidation) {
+//                    validator = dataSet.newValidator();
+//                    validator.setErrorHandler(null);
+//                }
+//                MappingRunner MappingRunner = new AppMappingRunner(groovyCodeResource, recMapping, null, false);
+//                List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
+//                MappingEngine engine = new MappingEngine(
+//                    walk, recordSource, MappingRunner, validator, assertionTests, consumer, allowInvalid, termination
+//                );
+//                engine.start();
+//            }
+//            queueFiller.start();
+//            System.out.println(Thread.currentThread().getName() + " about to consume");
+//            consumer.run();
+//        }
+//        catch (Exception e) {
+//            termination.dueToException(e);
+//            info("File processing setup problem: " + e);
+//        }
+//    }
 
     private class QueueFiller implements Runnable {
         final MetadataParser parser;
@@ -362,23 +364,19 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     private class MappingEngine implements Runnable {
         private final BlockingQueue<MetadataRecord> recordSource;
-        private final MappingRunner MappingRunner;
         private final Validator validator;
-        private final List<AssertionTest> assertionTests;
         private final Consumer consumer;
         private final boolean allowInvalid;
         private final Termination termination;
         private Thread thread;
         private XmlSerializer serializer = new XmlSerializer();
 
-        private MappingEngine(int index, BlockingQueue<MetadataRecord> recordSource, MappingRunner MappingRunner,
-                              Validator validator, List<AssertionTest> assertionTests, Consumer consumer,
+        private MappingEngine(int index, BlockingQueue<MetadataRecord> recordSource,
+                              Validator validator, Consumer consumer,
                               boolean allowInvalid, Termination termination
         ) {
             this.recordSource = recordSource;
-            this.MappingRunner = MappingRunner;
             this.validator = validator;
-            this.assertionTests = assertionTests;
             this.consumer = consumer;
             this.allowInvalid = allowInvalid;
             this.termination = termination;
@@ -392,6 +390,14 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         @Override
         public void run() {
+            MappingRunner MappingRunner = new AppMappingRunner(groovyCodeResource, recMapping, null, false);
+            List<AssertionTest> assertionTests = null;
+            try {
+                assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
             try {
                 while (true) {
                     MetadataRecord record = recordSource.take();

@@ -20,6 +20,11 @@
  */
 
 import eu.delving.groovy.GroovyNode
+import eu.delving.groovy.PatternCache
+import groovy.transform.CompileStatic
+
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 /**
  * This category is used to give DSL features to the Groovy builder
@@ -28,7 +33,24 @@ import eu.delving.groovy.GroovyNode
  *
  */
 
+@CompileStatic
 public class MappingCategory {
+
+    static String replaceAll(String s, String regex, String replacement) {
+        return PatternCache.getPattern(regex).matcher(s).replaceAll(replacement);
+    }
+
+    static String[] split(String s, String regex) {
+        return PatternCache.getPattern(regex).split(s);
+    }
+
+    static String[] split(String s, String regex, int limit) {
+        return PatternCache.getPattern(regex).split(s, limit);
+    }
+
+    static boolean matches(String s, String regex) {
+        return PatternCache.getPattern(regex).matcher(s).matches();
+    }
 
     public static class TupleMap extends TreeMap {
         @Override
@@ -63,19 +85,19 @@ public class MappingCategory {
     }
 
     static String getAt(GroovyNode node, Object what) {
-        return node.toString()[what]
+        throw new UnsupportedOperationException();
     }
 
     static int indexOf(GroovyNode node, String string) {
-        return node.text().indexOf(string)
+        return node.text.indexOf(string)
     }
 
     static String substring(GroovyNode node, int from) {
-        return node.text().substring(from);
+        return node.text.substring(from);
     }
 
     static String substring(GroovyNode node, int from, int to) {
-        return node.text().substring(from, to);
+        return node.text.substring(from, to);
     }
 
     // concatenate lists
@@ -136,7 +158,7 @@ public class MappingCategory {
     // keepRunning a closure on each member of the list
     static List multiply(List a, Closure closure) { // operator *
         a = unwrap(a)
-        List output = new ArrayList();
+        List output = new ArrayList(a.size());
         for (Object child : a) {
             Object returnValue = closure.call(child)
             if (returnValue) {

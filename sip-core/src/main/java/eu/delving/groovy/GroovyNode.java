@@ -45,85 +45,42 @@ import java.util.*;
 public class GroovyNode {
 
     private GroovyNode parent;
-
     private QName qName;
-
     private String stringName;
-
     private Map<String, String> attributes;
-
     private Object nodeValue;
+    private int hashCode;
+    public String text;
+    public final List<GroovyNode> children = new NodeList(1);
 
     public GroovyNode(GroovyNode parent, String namespaceUri, String localName, String prefix) {
         this(parent, new QName(namespaceUri, localName, prefix == null ? "" : prefix));
     }
 
     public GroovyNode(GroovyNode parent, String name) {
-        this(parent, new QName(name), new NodeList());
+        this(parent, new QName(name), null);
     }
 
     public GroovyNode(GroovyNode parent, QName qName) {
-        this(parent, qName, new NodeList());
+        this(parent, qName, null);
     }
 
     public GroovyNode(GroovyNode parent, String name, String nodeValue) {
         this(parent, new QName(name), new TreeMap<>(), nodeValue);
     }
 
-    public GroovyNode(GroovyNode parent, QName qName, Object nodeValue) {
+    public GroovyNode(GroovyNode parent, QName qName, String nodeValue) {
         this(parent, qName, new TreeMap<>(), nodeValue);
     }
 
-    public GroovyNode(GroovyNode parent, QName qName, Map<String, String> attributes, Object nodeValue) {
+    public GroovyNode(GroovyNode parent, QName qName, Map<String, String> attributes, String nodeValue) {
         this.parent = parent;
         this.qName = qName;
         this.attributes = attributes;
-        this.nodeValue = nodeValue;
-        if (parent != null) getParentList(parent).add(this);
-    }
 
-    public String text() {
-        if (nodeValue instanceof String) {
-            return (String) nodeValue;
-        }
-        else if (nodeValue instanceof Collection) {
-            Collection coll = (Collection) nodeValue;
-            String previousText = null;
-            StringBuffer buffer = null;
-            for (Object child : coll) {
-                if (child instanceof String) {
-                    String childText = (String) child;
-                    if (previousText == null) {
-                        previousText = childText;
-                    }
-                    else {
-                        if (buffer == null) {
-                            buffer = new StringBuffer();
-                            buffer.append(previousText);
-                        }
-                        buffer.append(childText);
-                    }
-                }
-            }
-            if (buffer != null) {
-                return buffer.toString();
-            }
-            else if (previousText != null) {
-                return previousText;
-            }
-        }
-        return "";
-    }
-
-    public List children() {
-        if (nodeValue instanceof List) {
-            return (List) nodeValue;
-        }
-        else {
-            List l = new NodeList(4);
-            l.add(nodeValue);
-            return l;
-        }
+        if (parent != null)
+            parent.children.add(this);
+        setNodeValue(nodeValue);
     }
 
     public Map<String, String> attributes() {
@@ -140,35 +97,50 @@ public class GroovyNode {
     }
 
     public int size() {
-        return text().length();
+        return text.length();
     }
 
     public boolean contains(String s) {
-        return text().contains(s);
+        return text.contains(s);
     }
 
     public String[] split(String s) {
-        return text().split(s);
+        return PatternCache.getPattern(s).split(text);
     }
 
     public boolean endsWith(String s) {
-        return text().endsWith(s);
+        return text.endsWith(s);
     }
 
     public String replaceAll(String from, String to) {
-        return text().replaceAll(from, to);
+        return PatternCache.getPattern(from).matcher(text).replaceAll(to);
     }
 
     public Object getNodeValue() {
         return nodeValue;
     }
 
-    public void setNodeValue(Object nodeValue) {
-        this.nodeValue = nodeValue;
+    public void setNodeValue(String nodeValue) {
+        if(nodeValue != null) {
+            this.text = nodeValue.trim();
+            this.hashCode = text.hashCode();
+            this.nodeValue = text;
+        } else {
+            this.text = "";
+            this.nodeValue = text;
+        }
     }
 
     public GroovyNode parent() {
         return parent;
+    }
+
+    public List getChildren() {
+        return children;
+    }
+
+    public String text() {
+        return text;
     }
 
     /**
@@ -184,75 +156,49 @@ public class GroovyNode {
             if (attributeValue != null) answer.add(attributeValue);
             return answer;
         }
-        if ("*".equals(key)) return children();
+        if ("*".equals(key)) return children;
         if (key != null && key.endsWith("_")) {
-            List<Object> valueNodes = getValueNodes(key.substring(0, key.length()-1));
-            return valueNodes.isEmpty() ? "" : valueNodes.get(0);
+            GroovyNode node = getValueNodes(key.substring(0, key.length()-1));
+            return node == null ? "" : node;
         }
         return getByName(key);
     }
 
     @Override
     public boolean equals(Object other) {
-        return other != null && toString().equals(other.toString());
+        if (other == null)
+            return false;
+        if (hashCode != other.hashCode())
+            return false;
+        return text.equals(other.toString());
     }
 
     @Override
     public int hashCode() {
-        return text().hashCode();
+        return hashCode;
     }
 
     public String toString() {
-        return text();
-    }
-
-    // privates ===================================================================================
-
-    private List<Object> getParentList(GroovyNode parent) {
-        Object parentValue = parent.getNodeValue();
-        List<Object> parentList;
-        if (parentValue instanceof List) {
-            parentList = (List<Object>) parentValue;
-        }
-        else {
-            parentList = new NodeList();
-            parentList.add(parentValue);
-            parent.setNodeValue(parentList);
-        }
-        return parentList;
+        return text;
     }
 
     private List getByName(String name) {
-        List answer = new NodeList();
-        for (Object child : children()) {
-            if (child instanceof GroovyNode) {
-                GroovyNode childNode = (GroovyNode) child;
-                if (name.equals(childNode.getNodeName())) answer.add(childNode);
-            }
+        List answer = new NodeList(1);
+        for (GroovyNode child : children) {
+            if (name.equals(child.getNodeName())) answer.add(child);
         }
         return answer;
     }
 
-    private List<Object> getValueNodes(String name) {
-        List answer = new NodeList();
-        getValueNodes(name, answer);
-        return answer;
-    }
-
-    private void getValueNodes(String name, List answer) {
-        if (nodeValue instanceof List) {
-            for (Object object : ((List) nodeValue)) {
-                if (object instanceof GroovyNode) {
-                    ((GroovyNode) object).getValueNodes(name, answer);
-                }
-                else {
-                    getValueNodes(name, (List) object);
-                }
-            }
+    // TODO restore former implementation
+    private GroovyNode getValueNodes(String name) {
+        if (getNodeName().equals(name) && !text.isEmpty())
+            return this;
+        for (GroovyNode node : children) {
+            GroovyNode match = node.getValueNodes(name);
+            if (match != null) return match;
         }
-        else if (name.equals(this.getNodeName())) {
-            if (nodeValue instanceof String && !((String) nodeValue).trim().isEmpty()) answer.add(this);
-        }
+        return null;
     }
 
     protected static void setMetaClass(final MetaClass metaClass, Class nodeClass) {
