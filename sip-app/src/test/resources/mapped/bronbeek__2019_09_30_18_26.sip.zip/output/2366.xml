@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1993-04-01-7-2">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1993-04-01-7-2">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1993-04-01-7-2">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=10588">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993%5C1993_04_01-7-2.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993%5C1993_04_01-7-2.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1993-04-01-7-2">
+      <dc:description>Gardone VT met klapbajonet. kaliber 6,5 mm. Onderzoek Bas Martens &amp; Guus de Vries: OMSCHRIJVING - Wapensoort : Karabijn, repeteer - Benaming, type &amp; fabrikant : Carcano M38, Gardone, 1942, ItaliÃ« - Kaliber : 6,5 x 52,5 - Serienummer : SR 5913 - Andere belangrijke merken : Geen TOESTAND - Roestvorming ja/nee : Rond klep in kolfplaat, instabiel - Mist onderdelen : Nee - Andere beschadigingen : Gebruikssporen - Oordeel algehele toestand : Redelijk/goed BIJZONDERHEDEN - Aanwezige accessoires : Vast aan het wapen bevestigde klapbajonet - Evt. andere bijzonderheden : Geen GEBRUIKT IN INDIE : Ja - Toelichting : Tijdens W.O.II ingevoerd BEOORDELING &amp; ADVIES - Categorie : B - Advies : Exposeren DUT</dc:description>
+      <dc:identifier>1993/04/01-7-2</dc:identifier>
+      <dc:title>Repeteer karabijn Carcano Model 1938,met klapbajonet, 1942, Gardone ItaliÃ« Repeteer karabijn Carcano Model 1938,met klapbajonet, 1942, Gardone ItaliÃ«</dc:title>
+      <dc:type>karabijn</dc:type>
+      <dcterms:created>1942</dcterms:created>
+      <dcterms:extent>36 1/4 in. (92 cm)</dcterms:extent>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993%5C1993_04_01-7-2.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993%5C1993_04_01-7-2f.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993%5C1993_04_01-7-2e.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993%5C1993_04_01-7-2d.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993%5C1993_04_01-7-2c.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993%5C1993_04_01-7-2b.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993%5C1993_04_01-7-2a.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993%5C1993_04_01-7-2_006.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993%5C1993_04_01-7-2_005.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993%5C1993_04_01-7-2_004.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993%5C1993_04_01-7-2_003.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993%5C1993_04_01-7-2_002.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2f.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2e.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2d.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2c.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2b.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2a.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2_006.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2_005.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2_004.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2_003.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2_002.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2f.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2e.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2d.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2c.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2b.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2a.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2_006.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2_005.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2_004.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2_003.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1993\1993_04_01-7-2_002.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

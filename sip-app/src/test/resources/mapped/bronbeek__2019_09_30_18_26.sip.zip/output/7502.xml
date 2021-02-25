@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2010-12-02-1-41961">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2010-12-02-1-41961">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-41961">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=50403">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2494.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2494.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-41961">
+      <dc:description>Afdeling: Midden en Zuid Amerika Objectnaam: spatel Rubriek: (niet ingevoerd) Emailadres: toelichting: Roerspatel, waarvan het handvat in het midden een inkeping heeft, zodat er 2 uitstekende punten ontstaan. De randen van het handvat en overigens van de hele spatel zijn schuin schuin naar buiten afgesneden. De bovenkant is versierd met uitgesneden figuurtjes. Naar het middenstuk toe wordt de spatel smaller. Vlak boven het voorstuk zijn er 2 inkepingen. Het voorstuk heeft een ovale vorm met een spise punt. Midden op het voorstuk zijn halve-maan figuurtjes. Er is ook een duidelijke middellijn. De vlakken links en rechts zijn enigszins uitgediept tot aan de rand van de spatel. Zowel aan de voor- als achterkant zijn dezelfde figuurtjes. De roerspanen worden gebruikt om rijst en bepaald voedsel bij rituele gelegenheden te roeren. De grootte van de spatels varieert, die van de Saramaccaners neigen naar 't smalle, die van de oorstelijke bosnegers zijn wijder . (Price, 1980:99). Zie ook no. 41962 en -63. Afmetingen: Geheel: 62,8 x 6,3 x 1,8 cm Herkomst: J.L.H. Beijens Media: 2494 Publicaties over het object: Dark, Ph.J.C., 1954 Bush-negro art.. London. Putten, J.H.J., 1984 Surinaamse bosneger houtsnijwerk, Leiden, pag.29-31. Price, Richard and Sally, 1980 Afro-American Arts of the Surinam rainforest, California. pag.97-149, 188-193. Kahn, M.C. 1931 Djuka, the bush-negroes of Dutch- Guiana. New York. pag. 193-204, 205-219. Bruikleen van: Gemeente Nijmegen collectie: J.L.H. Beijens Huidige standplaats: [2494] Depot, 2, R d [2 R d] DUT</dc:description>
+      <dc:identifier>2010/12/02-1-41961</dc:identifier>
+      <dc:title>geen titel</dc:title>
+      <dc:type>spatel</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2494.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5Cbeijensready%5C2010_12_02-1-41961.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-41961.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1%5C2010_12_02-1-41961.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2494.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-41961.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-41961.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-41961.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2494.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-41961.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-41961.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-41961.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

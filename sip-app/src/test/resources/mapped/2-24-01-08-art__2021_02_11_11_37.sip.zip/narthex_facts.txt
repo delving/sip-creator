@@ -1,0 +1,10 @@
+#SIPCreator - facts
+baseUrl=https://archief.nl
+dataProvider=nationaalarchief
+language=NL
+name=2.24.01.08-art
+orgId=NL-HaNA
+provider=nationaalarchief
+rights=http://rightsstatements.org/vocab/InC/1.0/
+schemaVersions=naa_0.0.16
+spec=2-24-01-08-art

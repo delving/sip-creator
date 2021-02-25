@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2010-12-02-1-42078">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2010-12-02-1-42078">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42078">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=50520">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2611.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2611.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42078">
+      <dc:description>Afdeling: Insulair Zuidoost AziÃ« Objectnaam: sleutelhanger met sleutels Rubriek: (niet ingevoerd) Datumlabel: voor 1912 Materiaal: zilver gesmeed, verzilverd, ingekerfd Emailadres: toelichting: De koperen sleutelbos bestaat uit drie ringen van verschillende grootte; aan de grootste ring hangen zes sleutels en zes "siertangetjes". De kleinste ring (Diam 2,8; D 1,1) heeft in het midden een verdikking. Aan deze ring hangt een verzilverde, koperen schakelketting (die drie keer door de ring is gehaald) en een middelgrote ring. Deze middelgrote ring (Diam 3,0; D 0,5) en de grote ring (Diam 3,6; D 0,4) waaraan de eerstgenoemde is bevestigd, hebben beiden een hoekig gefaceteerde buitenrand. De zes sleutels (L 5,5 tot 5,7; Br 1,6 tot 1,9) hebben opengewerkte baarden en de stelen zijn net boven het midden rondom versierd met 4 Ã  5 ingekerfde lijnen. De onderkant van de ogen van de sleutels zijn net als de onderkant van de ogen van de siertangetjes versierd met een gelobde rand. De bovenkant van de steel van de siertangetjes zijn vierkant in doorsnee met op de hoeken ingekerfde driehoeken. De siertangetjes zijn in drie modellen uitgevoerd; van ieder model hangen er twee aan de sleutelbos. Een model (L 6,8; Br 1,9) loopt bovenaan lichtgebogen en loopt naar onder toe schuin uit. Het tweede model (L 6,6; Br 1,9 en L 6,5; Br 1,7) heeft een lichte ruitvorm. Het derde model (L 6,1; Br 1,9 en L 6,4; Br 1,8) loopt naar onder toe enigszins breed uit. Alledrie de tang-modellen hebben over de lengte aan de zijkanten een opening en zijn aan de onderkant dicht (ze kunnen dus niet als tangetje gebruikt worden). Een van de ogen van een siertangetje is beschadigd. Bij een van de breeduitlopende tangetjes ontbreekt aan de onderkant een stukje uit het koper. Het voorwerp heeft waarschijnlijk "Sumatra no 363" of "Sumatra no 205" als nummer van de lijst behorende bij de Beijens-collectie. Afmetingen: Geheel: 16,9 cm Herkomst: J.L.H. Beijens Media: 2611 Publicaties over het object: Mus: Wassing-Visser, R. ; titel: Sieraden en Lichaamsversiering uit IndonesiÃ« ; uitg: Delft 1984. pg 4, 6, 75 Met dank aan: Bij nummer 363 van de Sumatra-lijst behorende bij de Beijens-collectie staat de volgende tekst: Sumatra. gevonden in schuilplaats van een djahat. 9-12-1904 te Tjot-Pi. Bij nummer 205 van de Sumatra-lijst behorende bij de Beijens-collectie staat de volgende tekst: Atjeh. wordt aan een doek over de schouder gedragen. In verschillende gebieden ziet men de metalen epileertangetjes tezamen met diverse oorlepeltjes, sleutels en kalkdoosjes aan dezelfde ring hangen. Ze worden dan aan een riem gedragen .... (Wassing-Visser 1984: 4). Bruikleen van: Gemeente Nijmegen collectie: J.L.H. Beijens Huidige standplaats: [2611] Depot, LB I, 35 [LB I 35] [11-nov-2002] hoofdmateriaal: koper DUT</dc:description>
+      <dc:identifier>2010/12/02-1-42078</dc:identifier>
+      <dc:title>geen titel</dc:title>
+      <dc:type>sleutelhanger</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2611.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5Cbeijensready%5C2010_12_02-1-42078.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42078.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1%5C2010_12_02-1-42078.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2611.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42078.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42078.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42078.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2611.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42078.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42078.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42078.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

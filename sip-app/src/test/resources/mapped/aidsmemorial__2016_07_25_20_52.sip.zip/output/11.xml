@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="urn:ebu:metadata-schema:ebuCore_2014" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2210">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2210">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2210">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
+      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB012-groot-web.jpg">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB012-groot-web.jpg">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
+      </edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2210">
+      <dc:date>03-12-2010</dc:date>
+      <dc:format>380 x 380</dc:format>
+      <dc:identifier>ND12</dc:identifier>
+      <dc:subject>quiltblok 12 bevat de naamvalg voorzanger Ren? Klijn die zijn aids in de Schreeuw van de Leeuw openbaart, zijn lied Mr. Blue werd heel bekend (NV094), de naamvlag voor Paul van Ettekoven die het eerste Veilig Vrijen Festival organiseerde en zich als buddy opzettelijk liet infecteren (NV086), een naamvlag voor beeldend kunstenaar Melle Visser geboren op Schiermonnikoog (NV095) en twee naamvlaggen voor immigranten, een uit Malta (NV091 Henri Scerri) en een uit Duitsland (NV087 Gerhard Hendriok).</dc:subject>
+      <dc:subject>quiltblok 12 is gewijd aan zangers en zangeressen.</dc:subject>
+      <dcterms:spatial>Nederland 8/8, Haaglanden 1/8 (NV094), provincie Utrecht 1/8 (NV088), Limburg (NV086)</dcterms:spatial>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB012-groot-web.jpg">
+   </edm:WebResource>
+   <nave:DcnResource>
+      <nave:technique>quilting</nave:technique>
+      <nave:material>overwegend katoen met applicaties</nave:material>
+      <nave:location>NAMEN Project Nederland</nave:location>
+      <nave:province>nvt</nave:province>
+   </nave:DcnResource>
+</rdf:Description>
+</rdf:RDF>

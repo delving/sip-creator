@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1998-08-20-2-16-3">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1998-08-20-2-16-3">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1998-08-20-2-16-3">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=18266">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998%5C1998_08_20-2-16_3_a_m.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998%5C1998_08_20-2-16_3_a_m.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1998-08-20-2-16-3">
+      <dc:contributor>Dubbeld (afgebeelde persoon)</dc:contributor>
+      <dc:contributor>Hooijmaaker (afgebeelde persoon)</dc:contributor>
+      <dc:contributor>Johannes van Dijk (afgebeelde persoon)</dc:contributor>
+      <dc:description>Foto. Portret van drie soldaten : links Johannes van Dijk in Batoedjadjar, midden Hooijmaaier en rechts Dubbeld. Gedateerd 1928. Totaal 5 stuks (inv.nrs 1998/08/20-2-16/1 t/m 1998/08/20-2-16/5). DUT</dc:description>
+      <dc:identifier>1998/08/20-2-16/3</dc:identifier>
+      <dc:title>Foto portret van drie soldaten, met Johannes van Dijk Foto portret van drie soldaten, met Johannes van Dijk</dc:title>
+      <dc:type>foto</dc:type>
+      <dcterms:created>1928</dcterms:created>
+      <dcterms:medium>daglicht gelatine zilverdruk (DGZ)</dcterms:medium>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998%5C1998_08_20-2-16_3_a_m.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998%5C1998_08_20-2-16_3_v_z.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998%5C1998_08_20-2-16_3_v_m.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998%5C1998_08_20-2-16_3_a_z.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998\1998_08_20-2-16_3_a_m.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998\1998_08_20-2-16_3_v_z.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998\1998_08_20-2-16_3_v_m.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998\1998_08_20-2-16_3_a_z.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998\1998_08_20-2-16_3_a_m.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998\1998_08_20-2-16_3_v_z.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998\1998_08_20-2-16_3_v_m.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998\1998_08_20-2-16_3_a_z.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

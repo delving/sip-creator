@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1999-00-963">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1999-00-963">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1999-00-963">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=7220">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1999%5C1999_00-963_fronte.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1999%5C1999_00-963_fronte.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1999-00-963">
+      <dc:description>Koran (klein model) met Arabisch-Maleis schrift; onderdeel van een set bestaande uit een mandje met daarin een kleine koran (Catalogus 1959 inv.nr. 1227). De afmetingen van de koran zijn 5 x 3 cm. Herinventarisatie 1984: Handgeschreven gebedenboekje in Maleis-Arabisch schrift. Boekje zit in een nauwsluitend omhulsel van rotan. Toestand: rotan omhulsel gedeelten afgebroken en beschadigd, boekje vergeeld &amp; verbrokkeld &amp; aantal bladzijden voor de helft vermist, afgesneden. Compleetheid: aantal bladzijden voor de helft missend &amp; rotan omhulsel delen missend. 2003, Nancy Knaap: Op dit moment is het rotan mandje niet meer bij het boekje. Het omhulsel van het boekje is zeker niet van rotan maar van een harsmengsel. Het boekje kan, ook nu het half doorgesneden is en er delen van de verpakking missen, niet worden geopend. Het omhulsel is bedoeld om het boekje in te verbergen. DUT</dc:description>
+      <dc:identifier>1999/00-963</dc:identifier>
+      <dc:title>Gebedenboekje in Maleis-Arabisch schrift Gebedenboekje in Maleis-Arabisch schrift</dc:title>
+      <dc:type>koran</dc:type>
+      <dcterms:extent>Afmetingen: 5,5 x 5 x 1,5 cm</dcterms:extent>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1999%5C1999_00-963_fronte.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1999\1999_00-963_fronte.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1999\1999_00-963_fronte.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

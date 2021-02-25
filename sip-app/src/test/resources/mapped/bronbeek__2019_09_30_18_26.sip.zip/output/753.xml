@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1984-04-18-1-1">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1984-04-18-1-1">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1984-04-18-1-1">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=7985">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1984%5C1984_04_18-1-1-m.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1984%5C1984_04_18-1-1-m.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1984-04-18-1-1">
+      <dc:description>Document. Oorkonde. Opgeplakt op karton. Ridderdiploma uitgereikt aan Adrianus van Santen, benoemd tot Ridder 4e klasse der Militaire Willemsorde, bij Koninklijk Besluit van 30 november 1949, No.32, "Wegens het zich in de strijd onderscheiden hebben door uitstekende daden van moed, beleid en trouw in het tijdvak van Juli 1947 tot en met December 1948 door als commandant van het Ve Bataljon infanterie tegen een numerieke overmachtige vijand verscheidene acties in Midden-Java te leiden en daarbij bij herhaling onder hachelijke omstandigheden door zijn persoonlijk voorgaan, zonder op eigen levensgevaar te letten, zijn troep met een krachtige aanvalsgeest blijvend te bezielen! Door deze acties, welker conceptie getuigde van een tactisch inzicht gepaard gaande aan bijzondere stoutmoedigheid bij het aanvaarden van grote risico's, werden vele honderden tegenstanders krijgsgevangen gemaakt dan wel buiten gevecht gesteld en tenslotte de Orde en veiligheid in het hem toegewezen gebied van actie hersteld." DUT</dc:description>
+      <dc:identifier>1984/04/18-1-1</dc:identifier>
+      <dc:title>Oorkonde behorende bij RMWO 4 ten name van Adrianus van Santen Oorkonde behorende bij RMWO 4 ten name van Adrianus van Santen</dc:title>
+      <dc:type>oorkonde</dc:type>
+      <dcterms:extent>17 x 12 11/16 in. (43,2 x 32,2 cm)</dcterms:extent>
+      <dcterms:medium>papier; inkt; drukinkt</dcterms:medium>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1984%5C1984_04_18-1-1-m.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1984%5C1984_04_18-1-1-z.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1984\1984_04_18-1-1-m.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1984\1984_04_18-1-1-z.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1984\1984_04_18-1-1-m.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1984\1984_04_18-1-1-z.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

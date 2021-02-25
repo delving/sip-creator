@@ -1,0 +1,13 @@
+#SIPCreator - facts
+baseUrl=http://data.collectienederland.nl
+country=Netherlands
+dataProvider=Museum Bronbeek
+dataProviderUri=http://id.musip.nl/crm_e39/5033
+language=nl
+name=Museum Bronbeek
+orgId=dcn
+provider=Rijksdienst voor het Cultureel Erfgoed
+rights=http://creativecommons.org/publicdomain/zero/1.0/
+schemaVersions=edm_5.2.6
+spec=bronbeek
+type=IMAGE

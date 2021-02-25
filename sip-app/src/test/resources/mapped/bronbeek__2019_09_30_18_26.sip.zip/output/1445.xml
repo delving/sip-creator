@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1946-10-10-1-205">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1946-10-10-1-205">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1946-10-10-1-205">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=1999">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02051%204.cmp&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02051%204.cmp&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1946-10-10-1-205">
+      <dc:description>kling is ingekort; klingvertoont vechtbeschadigingen bij de overgang naar de angel (is niet de eerste keer getuige de inkorting). voorts staan er 3 niet te ontcijferen japanse karakters op.kling zeer goede kwaliteit (vertoont geen of nauwelijks smeedfouten. zwaard zat nog in de zogenaamde opbergschede en -greep (shira saija mounting) hireomheen zat de verplichte militaire lederen hoes en een koperen draagbeugel (slecht) met spijkers aan het hout van de schede bevestigd. greep was omwikkeld met soort perkamentachtig leer (waaronder onderlaag van pythonleer) omdat er geen oplossing bestond om traditioneel de dikke greep te omwikkelen en er de militaire fuch kashira (pommel of a sword) op aan te brengen. leer en perkament van greep verwijderd, greep opnieuw geprofileerd en passend gemaakt bij het uiterlijk van de schede, fuchi gereinigd en weer passend gemaakt (fuchi= reinforcing band around the base of a hilt), waarbij de pythonleren onderlaag is gehandhaafd. menuki's (ornaments attached to the hilt of a sword or trapped under its bindings which helped to improve the grip) welke ontbraken zijn gecopieerd van bestaande en onder een origineel zwart zijden wikkeling weer aangebracht. schede na reiniging ingevet en zuurvrij making gelijmd, geslepen en strak gemaakt, waarna een zwarte finish is aangebracht waar op traditionele manier een groen parelmoer instrooi in heeft plaats gevonden. kling: de yakiba (hardened edge of a blade) en hamon(outline shape of tempered edge of a blade) tekenen zich duidelijk af in het gunome (a hamon pattern consisting of a series of mounds that look like similarly-sized semi-circles) type (golvend). aangezien de japanse finish nof voor een belangrijk deel zichtbaar was is de kling licht gepolijst, de temperlijn weer zichtbaar genaakt, de yokote (the line running at a right angle to the cutting edge which divides the kissaki (tip of the sword, the fan-shaped part of the blade above the yokote and ko-shinogi) from the rest of the blade) weer ingeslepen, alles passend bij de toestand van het geheel. de koperen miltaire tsuba (sword guard) vloekte bij het geheel en is vervangen door een meer harmonisch exemplaar uit de collectie retsaurator (ing. G.J.F.J. Tammens) DUT</dc:description>
+      <dc:identifier>1946/10/10-1-205</dc:identifier>
+      <dc:title>Japans zwaard, Katana vroeg Shinto (17e eeuw) Japans zwaard, Katana vroeg Shinto (17e eeuw)</dc:title>
+      <dc:type>zwaard</dc:type>
+      <dcterms:created>17e eeuw</dcterms:created>
+      <dcterms:extent>L:85cm</dcterms:extent>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02051%204.cmp&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02051%203.cmp&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02051%202.cmp&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02051%201.cmp&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02051 4.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02051 3.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02051 2.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02051 1.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02051 4.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02051 3.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02051 2.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02051 1.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

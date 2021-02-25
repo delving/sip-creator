@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2010-12-02-1-42703">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2010-12-02-1-42703">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42703">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=51145">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42703.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42703.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42703">
+      <dc:description>Afdeling: Insulair Zuidoost AziÃ« Objectnaam: toiletgarnituur Rubriek: (niet ingevoerd) Datumlabel: voor 1912 Materiaal: suase, plantenvezel gesmeed Emailadres: toelichting: Het toiletgarnituur bestaat uit een ring, waaraan aan kettingen gehangen toiletstaafjes bevestigd zijn. De koperen ring (L 2,5; Br 2,1) is uitgevoerd in een druppelvorm, waarvan de uiteinden naar buiten toe in een lusvormige haak gebogen zijn. Om het smalle uiteinde van de druppelvorm zijn gedroogde plantenvezels geknoopt. Aan de beide haken hangen kleine ringetjes met stukken schakelketting eraan. Aan Ã©Ã©n haak zijn twee en aan de andere vier ringetjes gehangen. De stukken schakelketting bestaan uit langgerekte schakels van koperdraad die in het midden samengeknepen zijn. Aan de stukken ketting zijn koperen kralen geregen. EÃ©n van de stukken schakelketting aan de haak waar er maar twee aanhangen, bestaat uit slechts Ã©Ã©n schakel, de rest is vermoedelijk verloren gegaan. Aan de overige stukken schakelketting (variÃ«rend in lente van 8,5 tot 9,4 cm) hangt aan de onderzijde een ring, waaraan de volgende toiletbenodigdheden hangen: twee staafjes met een halfmaanvormig blad (L 8,1; Br 0,4 en L 7,4; Br 0,4), twee staafjes waar het blad vanaf is gebroken (L 6,7; Br 0,5 en L 8,0; Br 0,4), en een spatelvormig staafje (L 5,7; Br 0,7). De vier eerstgenoemde staafjes zijn van koper gemaakt en het bovenste deel van deze staafjes is vierkant in doorsnee en is bewerkt met ingekerfde lijnen. Het spatelvormige staafje is vermoedelijk gemaakt van suase en loopt naar onder toe enigszins breed uit. Dit staafje is op het onderste stukje na, geheel versierd met ingekerfde lijnen. Afmetingen: Geheel: 19,3 cm Herkomst: J.H.L. Beijens Media: 3236 Publicaties over het object: Mus: Wassing-Visser, R. ; titel: Sieraden en Lichaamsversiering uit IndonesiÃ« ; uitg: Delft 1984. pg 4, 6, 75 Met dank aan: Wordt vastgeknoopt aan de punt van een zakdoek, die over den linkerschouder wordt gedragen (Fischer 1916: 49). De schoonheidsidealen weerspiegelen gewoonlijk ook die lichamelijke kenmerken, waaraan de goden en de voorouders voldoen. Lichamelijke kenmerken die men verafschuwt behoren vaak tot de wereld van de kwade machten, boze geesten en dieren. In het algemeen kunnen we stellen dat gezichtbeharing in bijna geheel IndonesiÃ« als onethisch werd en wordt gezien. Men scheert zich met een bamboe mesje, of wat vaker voorkomt, men trekt de haren stuk voor stuk uit met een pincet. Soms gaat men zelfs zover, dat ook wimpers en wenkbrauwen volledig worden verwijderd (bv. bij de Apo-Kayan in Kalimantan en de Sakuddei van Siberut, Mentawai eilanden). Door dit veelvuldig epileren wordt de van nature al niet zo sterke haargroei geleidelijk aan steeds spaarzamer. Maar ook bij die Indonesische volken, die van nature gekruld of gekroesd haar hebben en waarbij van een sterkere haargroei sprake is, zal men in de regel het gezichtshaar verwijderen. In verschillende gebieden ziet men de metalen epileertangetjes tezamen met diverse oorlepeltjes, sleutels en kalkdoosjes aan dezelfde ring hangen. Ze worden dan aan een riem gedragen en zijn altijd bij de hand, om in een verloren ogenblik even wat haartjes te verwijderen. Dat men veel waarde hecht aan dergelijke schoonheidssetjes, blijkt uit het feit dat ze soms prachtig bewerkt zijn en van koper of zilver zijn vervaardigd (Wassing-Visser 1984: 4). Bruikleen van: Gemeente Nijmegen collectie: J.L.H. Beijens Huidige standplaats: [3236] Depot, LB I, 37 [LB I 37] hoofdmateriaal: koper DUT</dc:description>
+      <dc:identifier>2010/12/02-1-42703</dc:identifier>
+      <dc:title>geen titel</dc:title>
+      <dc:type>toiletgarnituur</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42703.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5Cbeijensready%5C2010_12_02-1-42703.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1%5C2010_12_02-1-42703.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42703.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42703.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42703.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42703.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42703.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42703.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

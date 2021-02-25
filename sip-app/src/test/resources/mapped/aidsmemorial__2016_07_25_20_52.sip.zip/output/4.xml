@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="urn:ebu:metadata-schema:ebuCore_2014" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/2216">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/2216">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/2216">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
+      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB05-groot-web.jpg">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB05-groot-web.jpg">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
+      </edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/2216">
+      <dc:date>04-12-2010</dc:date>
+      <dc:format>380 x 380</dc:format>
+      <dc:identifier>ND05</dc:identifier>
+      <dc:subject>quiltblok 05 bevat een van de drie naamvlaggen die Gart Zeebregts/van Gennip in zomer 1988 aan Jeannette Kok van de Belangenvereniging van Mensen met Aids BMA, de voorganganger van de Hiv Vereniging overhandigde (NV013 Afrivan Victims, gemaakt door Gart's broer Paul), een tweede naamvlag voor Martin Krijsen, bestuurslid BMA (NV014-II), een naamvlag voor een vriend in de Verenigde Staten (NV019 Kenneth Baldwin), een naamvlag voor drie vrienden waarvan een uit Uruguay (NV026 Juan Colman), een naamvlag voor een homo-activist in Apeldoorn (NV021 Hans van Rijswijk), een naamvlag voor een homo-activist en COC medewerker in Haarlem (NV017 Ben Venema), en een naamvlag voor een student beeldende kunst uit Goes (NV023).</dc:subject>
+      <dc:subject>quiltblok 05 is gewijd aan de Hiv Vereniging afdeling Noord-Holland en de provincie Zeeland.</dc:subject>
+      <dcterms:spatial>Nederland 7/8 (niet NV013), Afrika 1/8 (NV013), Verenigde Staten 1/8 (NV019), Uruguay 1/8 (NV026), Gelderland 1/8 (NV021), Haarlem 1/8 (NV017), Zeeland (N023)</dcterms:spatial>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB05-groot-web.jpg">
+   </edm:WebResource>
+   <nave:DcnResource>
+      <nave:technique>quilting</nave:technique>
+      <nave:material>overwegend katoen met applicaties</nave:material>
+      <nave:location>NAMEN Project Nederland</nave:location>
+      <nave:province>nvt</nave:province>
+   </nave:DcnResource>
+</rdf:Description>
+</rdf:RDF>

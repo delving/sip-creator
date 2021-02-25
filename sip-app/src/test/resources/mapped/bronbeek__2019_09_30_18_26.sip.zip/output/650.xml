@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1885-09-1-36">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1885-09-1-36">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1885-09-1-36">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=7059">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1885%5C1885_09-1-36-m.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1885%5C1885_09-1-36-m.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1885-09-1-36">
+      <dc:creator>F. B. Waanders F. B. Waanders (kunstenaar)</dc:creator>
+      <dc:description>Prent: J.C. Koopman, Kommandant van Z.M. Zeemagt voor Antwerpen. Naar het leven geteekend en op steen gebracht door F.B. Waanders", Ged. en uitgegeven ter Steendrij. van Steuerwald &amp; Co te Dordt. 1833." "J.C.Koopman, Geboren te Amsterdam den 24 Maart 1790. Kommandnat van Z,M, Zeemagt voor Antwerpen. Ridder van de Militaire Willems-orde 3e Klasse en Ridder van den Nederlandschen Leeuw. Gedeponneerd." Achter prent, in handschrift Ver Huell: "Mijn vader sprak dikwijls over Koopman uit de Fransche Tijd, en verhaalde hoe hij door mijn oudoom[ ] en zijn altijd even flinke uiterlijk en gedrag werd opgemerkt en bevorderd. Hij sprak dan ook altijd met enthousiasme over de[ ] Meermalen zag ik hem [ ] aan huis en op de werf te Rotterdam, o.a. bij het vervoeren van het lijk van Willem I. In den nacht, onder plegtige stilte hoewel er een menigte van menschen bij tegenwoordig was, hoorde men toen de zeer wigtige kist uit het stoomschip werd geheschen, niets door de krachtige basstem van Koopman, die de korte bevelen gaf. Dit portret is niet volkomen gelijkend, [ ]zwaarder [ ] achterhoofd, grooter mond en de neus minder vooruitstekend - de oogen [ ]helder de type van den onversaagden forsche zeeman. A.H.V." DUT</dc:description>
+      <dc:identifier>1885/09-1-36</dc:identifier>
+      <dc:title>J.C. Koopman, Kommandant van Z.M. Zeemagt voor Antwerpen J.C. Koopman, Kommandant van Z.M. Zeemagt voor Antwerpen</dc:title>
+      <dc:type>prent</dc:type>
+      <dcterms:created>1833</dcterms:created>
+      <dcterms:extent>18 7/8 x 13 1/8 in. (48 x 33,4 cm)</dcterms:extent>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1885%5C1885_09-1-36-m.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1885%5C1885_09-1-36-z.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1885\1885_09-1-36-m.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1885\1885_09-1-36-z.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1885\1885_09-1-36-m.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1885\1885_09-1-36-z.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2010-12-02-1-42050">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2010-12-02-1-42050">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42050">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=50492">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2583.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2583.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42050">
+      <dc:description>Afdeling: Noord Amerika Objectnaam: navelstrengamulet Rubriek: (niet ingevoerd) Datumlabel: voor 1912 Materiaal: glaskralen, metaal, haar, stekelvarkenpennen genaaid, geregen, gebogen Emailadres: toelichting: Het navelstrengamulet is uitgevoerd in de vorm van een schildpad. Het amulet is gemaakt van beigekleurig leer. Langs de zijranden en aan de onderkant net onder de nek van het amulet zijn stiknaden zichtbaar. De bovenkant van het lijfje en het kopje van de schildpad (L 11,4; Br 4,4; D 2,8) is bedekt met kralenwerk van glaskraaltjes volgens de lazy-stitch-methode. De basiskleur van het kralenwerk is wit. De schildpad heeft oogjes van blauwe kraaltjes. Op het lijfje zijn de kraaltjes over de lengte in zes banen aangebracht. Op sommige plaatsen zijn de banen tegen elkaar aangenaaid, maar tussen de meeste stukken is het leer zichtbaar. Op het lijfje zijn motieven van blauwe en donkerblauwe kraaltjes aangebracht. In sommige motieven zijn roze kraaltjes aangebracht. Aan beide zijden zijn de buitenste twee banen gezamenlijk halverwege met een afgestompt driehoekmotief met een smalle band erboven versierd. De binnenste banen van deze banen hebben boven en onder twee kleine kruismotieven. De middelste twee banen zijn gezamenlijk versierd met een driehoekmotief, twee ruitmotieven en een driehoekmotief. Tussen ieder van deze motieven is een smalle band aangebracht. De schildpad heeft vier pootjes (L Â± 7,0) die ieder bestaan uit vier leren veters en een staart (L 7,2) die bestaat uit zes leren veters. Het bovenste deel van de pootjes is omwikkeld met paarsgeverfde stekelvarkenpennen die aan de bovenzijde ontkleurd zijn. Bij ieder pootje is net onder de omwikkeling een van de veters afgeknipt. Het bovenste deel van de staart is omwikkeld met paars-, rood- en geelgeverfde stekelvarkenpennen die aan de bovenzijde ontkleurd zijn. Twee van de zes veters van de staart zijn net onder de omwikkeling afgeknipt. Aan iedere niet-afgeknipte veter is een jingle van donkergrijs metaal bevestigd. Uit de jingles steken, naast de uiteinden van de veters, bosjes stug, oranjegeverfd haar. Op de jingles zitten roestplekjes. Bij een van de jingles ontbreekt het oranjegeverfde haar. Een van de stukjes draad waarop glaskraaltjes geregen zijn, zit los. Van het leer aan de onderkant van de schildpad is voor een deel de bovenste laag weggesleten. Afmetingen: Geheel: 18,3 x 4,4 cm Herkomst: J.L.H. Beijens Media: 2583 Publicaties over het object: CvS Waldman, C. ; titel: Atlas of the North American Indian ; uitg: New York 1985. pg 49 Bruikleen van: Gemeente Nijmegen collectie: J.L.H. Beijens Huidige standplaats: [2583] Depot, LB IX, 31 [LB IX 31] hoofdmateriaal: leer DUT</dc:description>
+      <dc:identifier>2010/12/02-1-42050</dc:identifier>
+      <dc:title>geen titel</dc:title>
+      <dc:type>navelstrengamulet</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2583.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5Cbeijensready%5C2010_12_02-1-42050.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42050.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1%5C2010_12_02-1-42050.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2583.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42050.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42050.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42050.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2583.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42050.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42050.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42050.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>
