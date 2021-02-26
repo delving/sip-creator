@@ -242,6 +242,6 @@ public class MappingEngineTest {
         }
         // Smoke test to check contents of the control output dir and actual output dir are most likely equal
         // and one doesn't contain more files than the other
-        // Assert.assertTrue(!Files.exists(outputDir.resolve(recordNumber + ".xml")));
+         Assert.assertTrue(!Files.exists(outputDir.resolve(recordNumber + ".xml")));
     }
 }
