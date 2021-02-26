@@ -72,7 +72,7 @@ public class MetadataParser {
     }
 
     @SuppressWarnings("unchecked")
-    public synchronized MetadataRecord nextRecord() throws XMLStreamException, IOException, CancelException {
+    public MetadataRecord nextRecord() throws XMLStreamException, IOException, CancelException {
         if (isSourceExhausted) {
             return null;
         }
