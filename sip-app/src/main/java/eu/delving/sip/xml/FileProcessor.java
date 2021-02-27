@@ -313,9 +313,9 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             int validCount = 0;
             for (MappingEngine engine : engines) {
                 try {
+                    engine.thread.join();
                     recordCount += engine.recordCount;
                     validCount += engine.validCount;
-                    engine.thread.join();
                 } catch (InterruptedException e) {
                     termination.dueToException(e);
                 }
@@ -413,7 +413,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         Node node = MappingRunner.runMapping(record);
                         if (node == null) continue;
                         MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, MappingRunner.getRecDefTree());
-                        List<String> uriErrors = Collections.emptyList(); // result.getUriErrors();
+                        List<String> uriErrors = result.getUriErrors();
                         try {
                             if (!uriErrors.isEmpty()) {
                                 StringBuilder uriErrorsString = new StringBuilder();
