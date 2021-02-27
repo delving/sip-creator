@@ -164,6 +164,10 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             int engineCount = Math.max(Runtime.getRuntime().availableProcessors() - 2, 4);
             info(String.format("Processing with %d engines", engineCount));
 
+            String code = new CodeGenerator(recMapping).withEditPath(null).withTrace(false).toRecordMappingCode();
+            MappingRunner MappingRunner = new BulkMappingRunner(recMapping, code);
+            List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
+
             MetadataParserRunner metadataParserRunner = new MetadataParserRunner(parser);
             metadataParserRunner.start();
             for (int walk = 0; walk < engineCount; walk++) {
@@ -181,7 +185,9 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     termination,
                     outputDir,
                     recDef().getNamespaceMap(),
-                    reportWriter
+                    reportWriter,
+                    assertionTests,
+                    MappingRunner
                 );
                 consumer.register(engine);
                 engine.start();
@@ -345,6 +351,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         final File outputDir;
         final Map<String, RecDef.Namespace> namespaceMap;
         final  ReportWriter reportWriter;
+        final List<AssertionTest> assertionTests;
+        final MappingRunner MappingRunner;
 
         private MappingEngine(int index,
                               MetadataParserRunner metadataParserRunner,
@@ -352,7 +360,9 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                               boolean allowInvalid, Termination termination,
                               File outputDir,
                               Map<String, RecDef.Namespace> namespaceMap,
-                              ReportWriter reportWriter
+                              ReportWriter reportWriter,
+                              List<AssertionTest> assertionTests,
+                              MappingRunner MappingRunner
         ) {
             this.metadataParserRunner = metadataParserRunner;
             this.validator = validator;
@@ -361,6 +371,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             this.outputDir = outputDir;
             this.namespaceMap = namespaceMap;
             this.reportWriter = reportWriter;
+            this.assertionTests = assertionTests;
+            this.MappingRunner = MappingRunner;
             this.thread = new Thread(this);
             this.thread.setName("MappingEngine" + index);
         }
@@ -389,15 +401,9 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         @Override
         public void run() {
             try {
-                // String code = new CodeGenerator(recMapping).withEditPath(null).withTrace(false).toRecordMappingCode();
-
-                // MappingRunner MappingRunner = new BulkMappingRunner(recMapping, code);// new AppMappingRunner(groovyCodeResource, recMapping, editPath, trace);
-
-                List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
-
                 batchStartTime = System.currentTimeMillis();
                 while (termination.notYet()) {
-                    MappingRunner MappingRunner = new AppMappingRunner(groovyCodeResource, recMapping, null, false);
+
                     long start = System.currentTimeMillis();
                     MetadataRecord record = metadataParserRunner.nextRecord();
 
