@@ -1,3 +1,0 @@
-Total Records: 711615
-Valid Records: 711615
-Invalid Records: 0
