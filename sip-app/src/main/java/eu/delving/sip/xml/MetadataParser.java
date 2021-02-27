@@ -62,7 +62,6 @@ public class MetadataParser {
 
     public MetadataParser(InputStream inputStream, int recordCount) throws XMLStreamException {
         this.inputStream = inputStream;
-        System.out.println(recordCount);
         this.input = XMLToolFactory.xmlInputFactory().createXMLStreamReader("Metadata", inputStream);
     }
 
