@@ -48,13 +48,13 @@ public class MappingEngineTest {
 
     private static Stream<Arguments> testData() {
         return Stream.of(
-            Arguments.of(
-                "rijksmuseum__2021_02_15_06_51.sip.zip",
-                "mapping_edm.xml",
-                "edm_5.2.6_record-definition.xml",
-                "edm",
-                false)
-             , Arguments.of(
+//            Arguments.of(
+//                "rijksmuseum__2021_02_15_06_51.sip.zip",
+//                "mapping_edm.xml",
+//                "edm_5.2.6_record-definition.xml",
+//                "edm",
+//                false)
+              Arguments.of(
                 "aidsmemorial__2016_07_25_20_52.sip.zip",
                 "mapping_edm.xml",
                 "edm_5.2.6_record-definition.xml",
