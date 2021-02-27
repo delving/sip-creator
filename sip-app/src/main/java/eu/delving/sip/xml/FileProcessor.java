@@ -161,7 +161,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
             this.stats = createStats();
             Consumer consumer = new Consumer(reportWriter);
-            int engineCount = Math.max(Runtime.getRuntime().availableProcessors() - 2, 4);
+            int engineCount = (int) Math.round(Runtime.getRuntime().availableProcessors() * 1.1);
             info(String.format("Processing with %d engines", engineCount));
 
             String code = new CodeGenerator(recMapping).withEditPath(null).withTrace(false).toRecordMappingCode();
