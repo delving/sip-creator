@@ -114,69 +114,137 @@ public class DOMBuilder extends BuilderSupport {
         return element;
     }
 
-    @Override
-    protected Object createNode(Object name, Map attributes) {
-        Element element = (Element) createNode(name);
-        for (Object entryObject : attributes.entrySet()) {
-            Map.Entry entry = (Map.Entry) entryObject;
-            String attrName = entry.getKey().toString();
+    private class ElementFactory {
+
+        final String name;
+        final Map<String, Object> attributes;
+        final Object textContent;
+        final int elementsRequired;
+
+        private ElementFactory(String name, Map<String, Object> attributes, Object textContent) {
+            this.name = name;
+            this.attributes = resolveAttributes(attributes);
+            this.textContent = resolveValue(textContent);
+            this.elementsRequired = calcElementsRequired(attributes, textContent);
+        }
+
+        private Map<String, Object> resolveAttributes(Map<String, Object> attributes) {
+            Map<String, Object> resolvedAttributes = new HashMap<>(attributes.size());
+            for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
+                Object value = attribute.getValue();
+                resolvedAttributes.put(attribute.getKey(), resolveValue(value));
+            }
+            return resolvedAttributes;
+        }
+
+        private Object resolveValue(Object value) {
+            if (value instanceof Closure) {
+                Closure closure = (Closure) value;
+                return closure.call();
+            }
+            return value;
+        }
+
+        private int calcElementsRequired(Map<String, Object> attributes, Object content) {
+            int elementsRequired = 0;
+            if (attributes != null) {
+                for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
+                    checkAttributeName(attribute.getKey());
+                    Object attributeValue = attribute.getValue();
+
+                    if (attributeValue instanceof List) {
+                        elementsRequired = Math.max(elementsRequired, ((List<?>) attributeValue).size());
+                    } else {
+                        elementsRequired = Math.max(elementsRequired, 1);
+                    }
+                }
+            }
+
+            if (content instanceof List) {
+                elementsRequired = Math.max(elementsRequired, ((List<?>) content).size());
+            } else if (content != null) {
+                elementsRequired = Math.max(elementsRequired, 1);
+            }
+            return elementsRequired;
+        }
+
+        private void checkAttributeName(String attrName) {
             if ("xmlns".equals(attrName)) throw new RuntimeException("Can't handle xmlns attribute");
             if (attrName.startsWith("xmlns:")) throw new RuntimeException("Can't handle attribute xmlns:*");
-            if (entry.getValue() == null) throw new RuntimeException("Can't handle null attribute value");
-            String valueString;
-            if (entry.getValue() instanceof Closure) {
-                ClosureResult result = runClosure(element, (Closure) entry.getValue());
-                if (result.string != null) {
-                    valueString = result.string;
-                }
-                else if (result.list != null) {
-                    StringBuilder sb = new StringBuilder();
-                    for (Object member : result.list) sb.append(member.toString());
-                    valueString = sb.toString();
-                }
-                else {
-                    throw new RuntimeException();
-                }
-            }
-            else {
-                valueString = entry.getValue().toString();
-            }
-            TagValue tagValue = new TagValue(attrName, true);
-            element.setAttributeNS(
-                    tagValue.isNamespaceAdded() ? tagValue.uri : null,
-                    tagValue.isNamespaceAdded() ? tagValue.toString() : tagValue.localPart,
-                    valueString
-            );
         }
-        return element;
+
+        private String toString(Object o) {
+            if (o == null) return null;
+            return o.toString();
+        }
+
+        private String extractString(Object value, int index) { ;
+            if (value == null) return null;
+            if (value instanceof List) {
+                List values = (List) value;
+                if (index >= values.size()) return toString(values.get(0));
+                return toString(values.get(index));
+            }
+            return value.toString();
+        }
+
+        public List<Element> createElements() {
+            List<Element> elements = new ArrayList<>(elementsRequired);
+            for (int i = 0; i < elementsRequired; i++) {
+                Element element = (Element) createNode(name);
+                for (String attributeName : attributes.keySet()) {
+                    String attributeValue = extractString(attributes.get(attributeName), i);
+                    if (attributeValue == null) continue;
+
+                    TagValue tagValue = new TagValue(attributeName, true);
+                    element.setAttributeNS(
+                        tagValue.isNamespaceAdded() ? tagValue.uri : null,
+                        tagValue.isNamespaceAdded() ? tagValue.toString() : tagValue.localPart,
+                        attributeValue
+                    );
+                }
+
+                String text = extractString(textContent, i);
+                if(text != null) {
+                    toTextNodes(text, element);
+                }
+                elements.add(element);
+            }
+
+            return elements;
+        }
     }
 
     @Override
     protected Object createNode(Object name, Map attributes, Object value) {
-        Element element = (Element) createNode(name, attributes);
-        toTextNodes(value.toString(), element);
-        return element;
+        ElementFactory elementFactory = new ElementFactory(name.toString(), attributes, value);
+        return elementFactory.createElements();
+    }
+
+    @Override
+    protected Object createNode(Object name, Map attributes) {
+        return createNode(name, attributes, null);
     }
 
     @Override
     protected Object doInvokeMethod(String methodName, Object name, Object args) {
-        Object node;
+        List<Node> nodes;
         List list = InvokerHelper.asList(args);
         Closure closure;
         switch (list.size()) {
             case 1: { ///
                 Object object = list.get(0);
                 if (object instanceof Map) {
-                    node = createNode(name, runMapClosures((Map) object));
+                    nodes = (List<Node>)createNode(name, runMapClosures((Map) object));
                 }
                 else if (object instanceof Closure) {
-                    node = createNode(name);
+                    nodes = Arrays.asList((Node)createNode(name));
                     closure = (Closure) object;
-                    setValuesFromClosure((Node) node, closure);
+                    setValuesFromClosure(nodes, closure);
                 }
                 else {
-                    node = createNode(name, object);
-                    setParent(getCurrent(), node);
+                    nodes = (List<Node>)createNode(name, object);
+                    setParent(getCurrent(), nodes);
                 }
             }
             break;
@@ -185,24 +253,24 @@ public class DOMBuilder extends BuilderSupport {
                 Object object2 = list.get(1);
                 if (object1 instanceof Map) {
                     if (object2 instanceof Closure) {
-                        node = createNode(name, runMapClosures((Map) object1));
+                        nodes = (List<Node>)createNode(name, runMapClosures((Map) object1));
                         closure = (Closure) object2;
-                        setValuesFromClosure((Node) node, closure);
+                        setValuesFromClosure(nodes, closure);
                     }
                     else {
-                        node = createNode(name, (Map) object1, object2);
-                        setParent(getCurrent(), node);
+                        nodes = (List<Node>)createNode(name, (Map) object1, object2);
+                        setParent(getCurrent(), nodes);
                     }
                 }
                 else {
                     if (object2 instanceof Closure) {
-                        node = createNode(name, object1);
+                        nodes = (List<Node>)createNode(name, object1);
                         closure = (Closure) object2;
-                        setValuesFromClosure((Node) node, closure);
+                        setValuesFromClosure((List<Node>) nodes, closure);
                     }
                     else if (object2 instanceof Map) {
-                        node = createNode(name, (Map) object2, object1);
-                        setParent(getCurrent(), node);
+                        nodes = (List<Node>)createNode(name, (Map) object2, object1);
+                        setParent(getCurrent(), nodes);
                     }
                     else {
                         throw new MissingMethodException(name.toString(), getClass(), list.toArray(), false);
@@ -214,36 +282,41 @@ public class DOMBuilder extends BuilderSupport {
                 throw new MissingMethodException(name.toString(), getClass(), list.toArray(), false);
             }
         }
-        return node;
+        if (nodes.isEmpty()) return null;
+        if (nodes.size() == 1) return nodes.get(0);
+        return nodes;
     }
 
-    private void setValuesFromClosure(Node node, Closure closure) {
-        ClosureResult result = runClosure(node, closure);
-        if (result.string != null) {
-            toTextNodes(result.string, node);
-        }
-        if (result.list != null && !result.list.isEmpty()) {
-            toTextNodes(result.list.get(0), node);
-            Map<String, String> attributes = getAttributeMap(node);
-            for (int walk = 1; walk < result.list.size(); walk++) {
-                Node child = (Node) createNode(node.getNodeName(), attributes);
-                toTextNodes(result.list.get(walk), child);
-                makeSibling(node, child);
+    private void setValuesFromClosure(List<Node> nodes, Closure closure) {
+        for(Node node : nodes) {
+            ClosureResult result = runClosure(node, closure);
+            if (result.string != null) {
+                String text = result.string;
+                toTextNodes(result.string, node);
+            }
+            if (result.list != null && !result.list.isEmpty()) {
+                toTextNodes(result.list.get(0), node);
+                Map<String, String> attributes = getAttributeMap(node);
+                for (int walk = 1; walk < result.list.size(); walk++) {
+                    List<Node> children = (List<Node>) createNode(node.getNodeName(), attributes);
+                    for(Node child : children) {
+                        toTextNodes(result.list.get(walk), child);
+                        makeSibling(node, child);
+                    }
+                }
             }
         }
     }
 
     private Map runMapClosures(Map map) {
-        Map<String, String> out = new TreeMap<String, String>();
+        Map<String, Object> out = new TreeMap<>();
         for (Object entryObject : map.entrySet()) {
             Map.Entry entry = (Map.Entry) entryObject;
             if (entry.getValue() instanceof Closure) {
                 ClosureResult result = runClosure(null, (Closure) entry.getValue());
                 if (result.string != null) out.put(entry.getKey().toString(), result.string);
                 if (result.list != null) {
-                    StringBuilder sb = new StringBuilder();
-                    for (Object member : result.list) sb.append(member.toString());
-                    out.put(entry.getKey().toString(), sb.toString());
+                    out.put(entry.getKey().toString(), result.list);
                 }
             }
             else {

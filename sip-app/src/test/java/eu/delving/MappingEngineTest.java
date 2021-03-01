@@ -54,25 +54,25 @@ public class MappingEngineTest {
 //                "edm_5.2.6_record-definition.xml",
 //                "edm",
 //                false)
-              Arguments.of(
-                "aidsmemorial__2016_07_25_20_52.sip.zip",
-                "mapping_edm.xml",
-                "edm_5.2.6_record-definition.xml",
-                "edm",
-                false)
-            , Arguments.of(
+//,              Arguments.of(
+//                "aidsmemorial__2016_07_25_20_52.sip.zip",
+//                "mapping_edm.xml",
+//                "edm_5.2.6_record-definition.xml",
+//                "edm",
+//                false)
+             Arguments.of(
                 "2-24-01-08-art__2021_02_11_11_37.sip.zip",
-                "FF9F5FE58279B40C9CB8251F5AEF657B__mapping_naa.xml",
+                "mapping_naa.xml",
                 "naa_0.0.16_record-definition.xml",
                 "naa",
                 false)
-            , Arguments.of(
-                "bronbeek__2019_09_30_18_26.sip.zip",
-                "D8D1BA57946413A33FD02E3B61109305__mapping_edm.xml",
-                "edm_5.2.6_record-definition.xml",
-                "edm",
-                false
-            )
+//            , Arguments.of(
+//                "bronbeek__2019_09_30_18_26.sip.zip",
+//                "D8D1BA57946413A33FD02E3B61109305__mapping_edm.xml",
+//                "edm_5.2.6_record-definition.xml",
+//                "edm",
+//                false
+//            )
         );
     }
 

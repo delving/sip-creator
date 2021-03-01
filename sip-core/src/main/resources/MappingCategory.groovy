@@ -182,18 +182,26 @@ public class MappingCategory {
     // keepRunning the closure once for the concatenated values
     static List multiply(List a, String delimiter) {
         a = unwrap(a)
-        Iterator walk = a.iterator();
-        StringBuilder out = new StringBuilder()
-        GroovyNode node = null
-        while (walk.hasNext()) {
-            GroovyNode listNode = (GroovyNode)walk.next()
-            if (node == null) node = new GroovyNode(null, listNode.qName(), listNode.attributes(), '*replace*');
-            out.append(listNode.toString())
-            if (walk.hasNext()) out.append(delimiter)
+        List splitNodes = splitNodes((List<GroovyNode>) a, delimiter)
+        return splitNodes;
+    }
+
+    private static List<GroovyNode> splitNodes(List<GroovyNode> nodes, String delimiter) {
+        System.out.println("Splitting: " + nodes);
+        List<GroovyNode> splitNodes = new ArrayList<>(nodes.size());
+        for (GroovyNode node : nodes) {
+            if (node == null || node.text == null) continue
+            if (node.text.contains(delimiter)) {
+                String[] splitText = node.text.split(delimiter);
+                for (String segment : splitText) {
+                    if (segment.trim().isEmpty()) continue;
+                    splitNodes.add(new GroovyNode(node.parent(), node.qName(), node.attributes(), segment));
+                }
+            } else {
+                splitNodes.add(node);
+            }
         }
-        if (node == null) return []
-        node.setNodeValue(out.toString())
-        return [node]
+        return splitNodes;
     }
 
     // call closure for the first if there is one
