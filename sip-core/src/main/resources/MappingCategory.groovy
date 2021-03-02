@@ -23,7 +23,6 @@ import eu.delving.groovy.GroovyNode
 import eu.delving.groovy.PatternCache
 import groovy.transform.CompileStatic
 
-import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 /**
@@ -68,14 +67,20 @@ public class MappingCategory {
         }
     }
 
-    private static List unwrap(a) {
-        if (!a) return new NodeList(0);
-        if (a instanceof NodeList) return a;
-        if (a instanceof TupleList) return a
-        if (a instanceof List && ((List) a).size() == 1) return unwrap(((List) a)[0])
-        NodeList list = new NodeList();
-        list.add(a)
-        return list;
+    private static List flatten(List input, List flattenedList) {
+        for (Object item : input) {
+            if (item instanceof List) {
+                flatten((List) item, flattenedList);
+            } else {
+                flattenedList.add(item);
+            }
+        }
+    }
+
+    private static List flatten(List input) {
+        NodeList flattenedList = new NodeList(input.size());
+        flatten(input, flattenedList);
+        return flattenedList;
     }
 
     static boolean asBoolean(List list) {
@@ -103,15 +108,15 @@ public class MappingCategory {
     // concatenate lists
     static Object plus(List a, List b) { // operator +
         List both = new NodeList()
-        both.addAll(unwrap(a))
-        both.addAll(unwrap(b))
+        both.addAll(flatten(a))
+        both.addAll(flatten(b))
         return both;
     }
 
     // make maps out of the entries in two lists
     static Object or(List a, List b) { // operator |
-        a = unwrap(a)
-        b = unwrap(b)
+        a = flatten(a)
+        b = flatten(b)
         TupleList list = new TupleList()
         Iterator aa = a.iterator()
         Iterator bb = b.iterator()
@@ -157,10 +162,11 @@ public class MappingCategory {
 
     // keepRunning a closure on each member of the list
     static List multiply(List a, Closure closure) { // operator *
-        a = unwrap(a)
+        a = flatten(a)
         List output = new ArrayList(a.size());
         for (Object child : a) {
             Object returnValue = closure.call(child)
+
             if (returnValue) {
                 if (returnValue instanceof Object[]) {
                     output.addAll(returnValue)
@@ -181,21 +187,22 @@ public class MappingCategory {
 
     // keepRunning the closure once for the concatenated values
     static List multiply(List a, String delimiter) {
-        a = unwrap(a)
+        a = flatten(a)
         List splitNodes = splitNodes((List<GroovyNode>) a, delimiter)
         return splitNodes;
     }
 
     private static List<GroovyNode> splitNodes(List<GroovyNode> nodes, String delimiter) {
-        System.out.println("Splitting: " + nodes);
+        String quotedDelimiter = Pattern.quote(delimiter);
         List<GroovyNode> splitNodes = new ArrayList<>(nodes.size());
         for (GroovyNode node : nodes) {
             if (node == null || node.text == null) continue
             if (node.text.contains(delimiter)) {
-                String[] splitText = node.text.split(delimiter);
+                String[] splitText = node.text.split(quotedDelimiter);
                 for (String segment : splitText) {
                     if (segment.trim().isEmpty()) continue;
-                    splitNodes.add(new GroovyNode(node.parent(), node.qName(), node.attributes(), segment));
+                    GroovyNode splitNode = new GroovyNode(node.parent(), node.qName(), node.attributes(), segment);
+                    splitNodes.add(splitNode);
                 }
             } else {
                 splitNodes.add(node);
@@ -206,7 +213,7 @@ public class MappingCategory {
 
     // call closure for the first if there is one
     static Object power(List a, Closure closure) {  // operator **
-        a = unwrap(a)
+        a = flatten(a)
         for (Object child : a) {
             closure.call(child)
             break
@@ -216,7 +223,7 @@ public class MappingCategory {
 
     // call closure once with all of them
     static Object rightShift(List a, Closure closure) {  // operator >>
-        a = unwrap(a)
+        a = flatten(a)
         closure.call(a);
         return null
     }

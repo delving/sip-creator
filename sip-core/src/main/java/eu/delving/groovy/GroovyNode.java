@@ -242,5 +242,4 @@ public class GroovyNode {
     static {
         setMetaClass(GroovySystem.getMetaClassRegistry().getMetaClass(GroovyNode.class), GroovyNode.class);
     }
-
 }

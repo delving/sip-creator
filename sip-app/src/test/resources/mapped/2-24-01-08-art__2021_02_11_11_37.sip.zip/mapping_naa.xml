@@ -539,11 +539,10 @@
     </node-mapping>
     <node-mapping inputPath="/input/record/dcterms:hasPart.fileids" outputPath="/naa:RDF/edm:WebResource/nao:thumbnail">
       <groovy-code>
-        <string>image = _dctermshasPartfileids.split(&quot;\\|&quot;)</string>
-        <string>if (image.size() &gt; 0) {</string>
-        <string>//&quot;https://service.test.archief.nl/gaf/api/file/v1/thumb/${image.first()}&quot;.sanitizeURI()</string>
-        <string>&quot;https://images.memorix.nl/naa/thumb/1280x1280/${image.first()}.jpg&quot;</string>
-        <string>}</string>
+          <string>_record.dctermshasPartfileids * '|' * { x -></string>
+        <string>//&quot;https://service.test.archief.nl/gaf/api/file/v1/thumb/${x}&quot;.sanitizeURI()</string>
+        <string>"https://images.memorix.nl/naa/thumb/1280x1280/${x}.jpg"</string>
+<string>}</string>
       </groovy-code>
     </node-mapping>
     <node-mapping inputPath="/input" outputPath="/naa:RDF/pnv:Person/@rdf:about">
