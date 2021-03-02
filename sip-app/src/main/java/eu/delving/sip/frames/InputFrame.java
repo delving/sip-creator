@@ -176,11 +176,11 @@ public class InputFrame extends FrameBase {
             for (Map.Entry<String, String> entry : node.attributes().entrySet()) {
                 children.add(new GroovyTreeNode(this, entry.getKey(), entry.getValue()));
             }
-            if (node.getNodeValue() instanceof List) {
+            if (!node.children.isEmpty()) {
                 string = node.getNodeName();
-                toolTip = String.format("Size: %d", ((List) node.getNodeValue()).size());
+                toolTip = String.format("Size: %d", node.children.size());
             }
-            else {
+            if(node.text != null) {
                 String truncated = node.text;
                 if (truncated.contains("\n") || truncated.length() >= MAX_LENGTH) {
                     int index = truncated.indexOf('\n');
@@ -194,8 +194,8 @@ public class InputFrame extends FrameBase {
                     toolTip = truncated;
                 }
             }
-            if (this.node.getNodeValue() instanceof List) {
-                for (Object sub : ((List) this.node.getNodeValue())) {
+            if (!node.children.isEmpty()) {
+                for (Object sub : node.children) {
                     GroovyNode subnode = (GroovyNode) sub;
                     children.add(new GroovyTreeNode(this, subnode));
                 }
