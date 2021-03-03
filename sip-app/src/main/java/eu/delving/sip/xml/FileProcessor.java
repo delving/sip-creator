@@ -170,7 +170,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
             MetadataParserRunner metadataParserRunner = new MetadataParserRunner(parser);
             metadataParserRunner.start();
-            for (int walk = 0; walk < 1; walk++) {
+            for (int walk = 0; walk < engineCount; walk++) {
                 boolean enableXSDValidation = sipModel.getPreferences().getProperty(XSD_VALIDATION, "false").contentEquals("true");
                 Validator validator = null;
                 if (enableXSDValidation) {
