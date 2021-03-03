@@ -286,11 +286,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public void collectDynOpts(List<DynOpt> dynOpts) {
         if (dynOpt != null) {
-            boolean childrenPopulated = false;
-            for (RecDefNode sub : children) {
-                if (sub.populated) childrenPopulated = true;
-            }
-            if (nodeMappings.size() > 1 || childrenPopulated) dynOpts.add(dynOpt);
+            dynOpts.add(dynOpt);
         }
         for (RecDefNode sub : children) sub.collectDynOpts(dynOpts);
     }
