@@ -79,10 +79,6 @@ public class GroovyCodeResource {
         script = groovyShell.parse(code);
 
         mappingScriptsByCode.put(codeId, script);
-//        System.out.println(code);
-//        System.out.println("*****************************************************************************************");
-//        System.out.println("*****************************************************************************************");
-//        System.out.println("*****************************************************************************************");
         return script;
     }
 

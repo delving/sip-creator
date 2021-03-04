@@ -346,8 +346,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         private final XmlSerializer serializer = new XmlSerializer();
         public int recordCount;
         public int validCount;
-        private long timeSpent;
-        private long batchStartTime;
         final File outputDir;
         final Map<String, RecDef.Namespace> namespaceMap;
         final  ReportWriter reportWriter;
@@ -401,10 +399,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         @Override
         public void run() {
             try {
-                batchStartTime = System.currentTimeMillis();
                 while (termination.notYet()) {
-
-                    long start = System.currentTimeMillis();
                     MetadataRecord record = metadataParserRunner.nextRecord();
 
                     if (record == null || record.isPoison()) break;
@@ -459,15 +454,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         accept(record, null, e);
                         termination.dueToException(record, e);
                     }
-                    int batchSize = 250;
-                    if (recordCount % batchSize == 0 && recordCount != 0) {
-                        double avg = (double) timeSpent / recordCount;
-                        double curr = ((double) (System.currentTimeMillis() - batchStartTime) / batchSize);
-                        String timeSpent = "time per record: avg=" + avg + ", curr=" + curr;
-                        batchStartTime = System.currentTimeMillis();
-                        System.out.println(Thread.currentThread().getName() + ", records: " + recordCount + "; " + timeSpent);
-                    }
-                    timeSpent += System.currentTimeMillis() - start;
                 }
             }
             catch (Exception e) {

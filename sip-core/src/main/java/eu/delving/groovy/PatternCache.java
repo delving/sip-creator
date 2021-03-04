@@ -14,7 +14,6 @@ public class PatternCache {
         if (pattern == null) {
             pattern = Pattern.compile(regex);
             patternCache.put(regex, pattern);
-            System.out.println(regex);
         }
         return pattern;
     }
