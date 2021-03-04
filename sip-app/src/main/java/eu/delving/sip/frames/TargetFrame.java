@@ -338,11 +338,6 @@ public class TargetFrame extends FrameBase {
         @Override
         public void run() {
             recDefTreeNode = recDefTreeNode.createDynOptSibling(dynOpt);
-            try {
-                sipModel.getDataSetModel().getDataSet().setRecMapping(sipModel.getMappingModel().getRecMapping(), false);
-            } catch (StorageException e) {
-                throw new RuntimeException(e);
-            }
             sipModel.exec(new Swing() {
                 @Override
                 public void run() {
