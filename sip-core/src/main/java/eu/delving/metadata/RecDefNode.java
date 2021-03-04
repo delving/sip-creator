@@ -318,6 +318,15 @@ public class RecDefNode implements Comparable<RecDefNode> {
         }
     }
 
+    public void remove() {
+        if(parent != null) {
+            parent.children.remove(this);
+        }
+        for (NodeMapping nodeMapping : nodeMappings.values()) {
+            removeNodeMapping(nodeMapping.inputPath);
+        }
+    }
+
     public void notifyNodeMappingChange(NodeMapping nodeMapping, NodeMappingChange change) {
         listener.nodeMappingChanged(this, nodeMapping, change);
     }
