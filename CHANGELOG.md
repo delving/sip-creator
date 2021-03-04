@@ -9,8 +9,8 @@
 ### Added
 - You can now delete multiple local datasets at the same time after selecting them with CTRL+click
 - You can now sort local datasets by name or date
-- Splitting output will now cause the target element to be duplicated
-- You can now remove duplicated elements
+- Returning multiple values from a mapping function will now result in multiple XML elements or XML attributes
+- You can now remove duplicated elements from the target panel of the Quick Mapping panel
 
 ### Fixed
 - Duplicated elements in the target panel of the Quick Mapping panel will now be saved
