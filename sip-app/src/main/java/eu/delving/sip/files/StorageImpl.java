@@ -52,6 +52,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -177,12 +178,16 @@ public class StorageImpl implements Storage {
             }
         }
 
+        private boolean hasProcessingSucceeded() {
+            return reportConclusionFile(here, getSchemaVersion().getPrefix()).exists();
+        }
+
         private DataSetState postSourceState(File source) {
             File statistics = statsFile(here);
             if (statistics.exists() && statistics.lastModified() >= source.lastModified()) {
                 File mapping = findLatestFile(here, MAPPING, getSchemaVersion().getPrefix());
                 if (mapping.exists()) {
-                    return targetOutput().exists() ? DataSetState.PROCESSED : DataSetState.MAPPING;
+                    return hasProcessingSucceeded() ? DataSetState.PROCESSED : DataSetState.MAPPING;
                 }
                 else {
                     return DataSetState.ANALYZED_SOURCE;
