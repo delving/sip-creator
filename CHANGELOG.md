@@ -1,8 +1,9 @@
 # Changelog
 
-## v1.2.0 (2020-03-04)
+## v1.2.0 (2020-03-05)
 
-### Enhancements
+### Changed
+- Each record is now written to a separate output file during processing
 - Performance of mapping large inputs to RDF has been increased 
 - Readability of content in the Mapping Code panel has been improved
 
