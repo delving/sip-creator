@@ -7,6 +7,7 @@ import eu.delving.metadata.RecDefTree;
 import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.sip.Application;
+import eu.delving.sip.MappingCLI;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.*;
 import eu.delving.sip.model.Feedback;
@@ -48,31 +49,21 @@ public class MappingEngineTest {
 
     private static Stream<Arguments> testData() {
         return Stream.of(
-//            Arguments.of(
-//                "rijksmuseum__2021_02_15_06_51.sip.zip",
-//                "mapping_edm.xml",
-//                "edm_5.2.6_record-definition.xml",
-//                "edm",
-//                false)
-//,              Arguments.of(
-//                "aidsmemorial__2016_07_25_20_52.sip.zip",
-//                "mapping_edm.xml",
-//                "edm_5.2.6_record-definition.xml",
-//                "edm",
-//                false)
-             Arguments.of(
+            Arguments.of(
+                "source.xml.gz",
+                "aidsmemorial__2016_07_25_20_52.sip.zip",
+                "mapping_edm.xml",
+                "edm_5.2.6_record-definition.xml"),
+            Arguments.of(
+                "source.xml.gz",
                 "2-24-01-08-art__2021_02_11_11_37.sip.zip",
                 "mapping_naa.xml",
-                "naa_0.0.16_record-definition.xml",
-                "naa",
-                false)
-//            , Arguments.of(
-//                "bronbeek__2019_09_30_18_26.sip.zip",
-//                "D8D1BA57946413A33FD02E3B61109305__mapping_edm.xml",
-//                "edm_5.2.6_record-definition.xml",
-//                "edm",
-//                false
-//            )
+                "naa_0.0.16_record-definition.xml"),
+            Arguments.of(
+                "source.xml.gz",
+                "bronbeek__2019_09_30_18_26.sip.zip",
+                "D8D1BA57946413A33FD02E3B61109305__mapping_edm.xml",
+                "edm_5.2.6_record-definition.xml")
         );
     }
 
@@ -83,110 +74,25 @@ public class MappingEngineTest {
         groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
     }
 
-    private SchemaRepository createSchemaRepository() throws IOException {
-        SipProperties sipProperties = new SipProperties();
-        String serverUrl = sipProperties.getProp().getProperty(NARTHEX_URL, "http://delving.org/narthex");
-        HttpClient httpClient = createHttpClient(serverUrl).build();
-        return new SchemaRepository(new SchemaFetcher(httpClient));
-    }
-
-    private Feedback createFeedback() {
-        return new Feedback() {
-            @Override
-            public void info(String message) {
-                System.out.println("info: " + message);
-            }
-
-            @Override
-            public void alert(String message) {
-                System.err.println("alert: " + message);
-            }
-
-            @Override
-            public void alert(String message, Throwable throwable) {
-                System.err.println("alert: " + message);
-                System.err.println(throwable.getMessage());
-                throwable.printStackTrace(System.err);
-            }
-
-            @Override
-            public String ask(String question) {
-                throw new IllegalStateException();
-            }
-
-            @Override
-            public String ask(String question, String defaultValue) {
-                throw new IllegalStateException();
-            }
-
-            @Override
-            public boolean confirm(String title, String message) {
-                throw new IllegalStateException();
-            }
-
-            @Override
-            public boolean form(String title, Object... components) {
-                System.out.println("form: title=" + title + ", components=" + Arrays.toString(components));
-                return false;
-            }
-
-            @Override
-            public String getHubPassword() {
-                throw new IllegalStateException();
-            }
-
-            @Override
-            public boolean getNarthexCredentials(Map<String, String> fields) {
-                throw new IllegalStateException();
-            }
-        };
-    }
-
-    private SipModel createSipModel(boolean enableXsdValidation) throws StorageException, IOException {
-        Feedback feedback = createFeedback();
-
-        SipProperties sipProperties = new SipProperties();
-        Properties xsdValidationEnabled = new Properties(sipProperties.getProp());
-        xsdValidationEnabled.setProperty(XSD_VALIDATION, Boolean.toString(enableXsdValidation));
-        sipProperties.setProp(xsdValidationEnabled);
-
-        String serverUrl = sipProperties.getProp().getProperty(NARTHEX_URL, "http://delving.org/narthex");
-        HttpClient httpClient = createHttpClient(serverUrl).build();
-        SchemaRepository schemaRepository = new SchemaRepository(new SchemaFetcher(httpClient));
-        Application.ResolverContext context = new Application.ResolverContext();
-        Storage storage = new StorageImpl(HomeDirectory.WORK_DIR, schemaRepository, new CachedResourceResolver(context));
-        context.setStorage(storage);
-        context.setHttpClient(httpClient);
-
-        return new SipModel(
-            null,
-            storage,
-            groovyCodeResource,
-            feedback,
-            sipProperties
-        );
-    }
 
     @MethodSource("testData")
     @ParameterizedTest
-    public void test_file_processor(String sipFilename,
+    public void test_file_processor(String inputFilename,
+                                    String sipFilename,
                                     String mappingFilename,
-                                    String recDefFilename,
-                                    String orgId,
-                                    boolean enableXsdValidation) throws Exception {
+                                    String recDefFilename) throws Exception {
         Path testDir = new File(getClass().getResource("/mapped/").getFile()).toPath();
 
         Path workDir = HomeDirectory.WORK_DIR.toPath();
         Path outputSipDir = workDir.resolve(sipFilename);
 
         File controlSipDir = testDir.resolve(sipFilename).toFile();
+        Path inputFile = controlSipDir.toPath().resolve(inputFilename);
         Path mappingFile = controlSipDir.toPath().resolve(mappingFilename);
         Path recDefFile = controlSipDir.toPath().resolve(recDefFilename);
         Path controlOutputDir = controlSipDir.toPath().resolve("output");
 
-        FileProcessor.Listener listener = mock(FileProcessor.Listener.class);
-        ProgressListener progressListener = mock(ProgressListener.class);
-        processSourceXML(outputSipDir.toFile(), mappingFile, recDefFile, listener, progressListener, enableXsdValidation);
+        MappingCLI.main(new String[]{inputFile.toString(), mappingFile.toString(), recDefFile.toString(), "false", outputSipDir.toString()});
 
         Path outputDir = outputSipDir.resolve("output");
         Assert.assertTrue(Files.exists(outputDir));
@@ -194,47 +100,12 @@ public class MappingEngineTest {
         compareXMLs(controlOutputDir, outputDir);
     }
 
-    private void processSourceXML(File outputSipDir,
-                                  Path mappingFile,
-                                  Path recDefFile,
-                                  FileProcessor.Listener listener,
-                                  ProgressListener progressListener,
-                                  boolean enableXsdValidation) throws IOException, StorageException {
-        SipModel sipModel = createSipModel(enableXsdValidation);
-        RecMapping recMapping = getRecMapping(mappingFile, recDefFile);
-        sipModel.getMappingModel().setRecMapping(recMapping);
-        DataSet sourceXML = new StorageImpl.DataSetImpl(outputSipDir, createSchemaRepository());
-        sourceXML.getDataSetFacts(); // will actually initialize data facts and prevent null pointer later on
-
-        FileProcessor.UriGenerator uriGenerator = new SipModel.Generator(
-            "http://delving.org/narthex",
-            sourceXML.getSpec(),
-            sipModel.getMappingModel().getPrefix());
-
-        FileProcessor fileProcessor = new FileProcessor(
-            sipModel,
-            sourceXML,
-            recMapping,
-            false,
-            groovyCodeResource,
-            uriGenerator,
-            listener
-        );
-        fileProcessor.setProgressListener(progressListener);
-        fileProcessor.run();
-    }
-
-    private RecMapping getRecMapping(Path mappingFile, Path recFile) throws FileNotFoundException, UnsupportedEncodingException {
-        RecDef recDef = RecDef.read(new FileInputStream(recFile.toFile()));
-        RecDefTree recDefTree = RecDefTree.create(recDef);
-        return RecMapping.read(new FileInputStream(mappingFile.toFile()), recDefTree);
-    }
 
     private void compareXMLs(Path controlOutputDir, Path outputDir) throws IOException {
         DifferenceEngine diff = new DOMDifferenceEngine();
         diff.addDifferenceListener((comparison, comparisonResult) -> Assertions.fail("found a difference: " + comparison));
         int recordNumber = 0;
-        for(Path controlXMLFile : Files.list(controlOutputDir).collect(Collectors.toList())) {
+        for (Path controlXMLFile : Files.list(controlOutputDir).collect(Collectors.toList())) {
             Source expectedXml = Input.fromPath(controlXMLFile).build();
             Source actualXml = Input.fromPath(outputDir.resolve(controlXMLFile.getFileName().toString())).build();
             diff.compare(expectedXml, actualXml);
@@ -242,6 +113,6 @@ public class MappingEngineTest {
         }
         // Smoke test to check contents of the control output dir and actual output dir are most likely equal
         // and one doesn't contain more files than the other
-         Assert.assertTrue(!Files.exists(outputDir.resolve(recordNumber + ".xml")));
+        Assert.assertTrue(!Files.exists(outputDir.resolve(recordNumber + ".xml")));
     }
 }

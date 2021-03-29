@@ -53,6 +53,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static eu.delving.sip.files.Storage.XSD_VALIDATION;
+
 /**
  * This is the grand model behind the whole SIP-Creator and it holds all of the other models.  Its state
  * corresponds that of a dataset with attention set specific record mapping within, described by its prefix.
@@ -375,13 +377,14 @@ public class SipModel {
         dataSet.deleteResults();
         getMappingModel().setLocked(true);
         exec(new FileProcessor(
-                this,
-                dataSet,
-                getMappingModel().getRecMapping(),
-                allowInvalid,
-                groovyCodeResource,
-                new Generator(narthexUrl, dataSet.getSpec(), getMappingModel().getPrefix()),
-                listener
+            getFeedback(),
+            getPreferences().getProperty(XSD_VALIDATION, "false").contentEquals("true"),
+            dataSet,
+            getMappingModel().getRecMapping(),
+            allowInvalid,
+            groovyCodeResource,
+            new Generator(narthexUrl, dataSet.getSpec(), getMappingModel().getPrefix()),
+            listener
         ));
     }
 

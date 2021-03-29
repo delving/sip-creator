@@ -28,8 +28,8 @@ import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.ReportWriter;
+import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
-import eu.delving.stats.Stats;
 import org.w3c.dom.Node;
 
 import javax.swing.*;
@@ -39,10 +39,12 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static eu.delving.sip.files.Storage.XSD_VALIDATION;
 
@@ -55,7 +57,8 @@ import static eu.delving.sip.files.Storage.XSD_VALIDATION;
  */
 
 public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork {
-    private final SipModel sipModel;
+    private final Feedback feedback;
+    private final boolean enableXSDValidation;
     private final DataSet dataSet;
     private final RecMapping recMapping;
     private final GroovyCodeResource groovyCodeResource;
@@ -63,13 +66,12 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private final boolean allowInvalid;
     private final Listener listener;
     private ProgressListener progressListener;
-    private Stats stats;
     private final Termination termination = new Termination();
     private final Object lock = new Object();
 
     private void info(String message) {
-        if (sipModel != null) {
-            sipModel.getFeedback().info(message);
+        if (feedback != null) {
+            feedback.info(message);
         }
         else {
             System.out.println(message);
@@ -90,7 +92,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     }
 
     public FileProcessor(
-            SipModel sipModel,
+            Feedback feedback,
+            boolean enableXSDValidation,
             DataSet dataSet,
             RecMapping recMapping,
             boolean allowInvalid,
@@ -98,7 +101,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             UriGenerator uriGenerator,
             Listener listener
     ) {
-        this.sipModel = sipModel;
+        this.feedback = feedback;
+        this.enableXSDValidation = enableXSDValidation;
         this.dataSet = dataSet;
         this.recMapping = recMapping;
         this.allowInvalid = allowInvalid;
@@ -109,10 +113,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     public String getSpec() {
         return dataSet.getSpec();
-    }
-
-    public Stats getStats() {
-        return stats;
     }
 
     public int getFailedRecordNumber() {
@@ -153,13 +153,12 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         groovyCodeResource.clearMappingScripts();
         try {
             // TODO record count is never used
-            MetadataParser parser = new MetadataParser(getDataSet().openSourceInputStream(), sipModel.getStatsModel().getRecordCount());
+            MetadataParser parser = new MetadataParser(getDataSet().openSourceInputStream(), -1);
             parser.setProgressListener(progressListener);
             ReportWriter reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
 
             File outputDir = createEmptyOutputDir();
 
-            this.stats = createStats();
             Consumer consumer = new Consumer(reportWriter);
             int engineCount = (int) Math.round(Runtime.getRuntime().availableProcessors() * 1.1);
             info(String.format("Processing with %d engines", engineCount));
@@ -171,7 +170,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             MetadataParserRunner metadataParserRunner = new MetadataParserRunner(parser);
             metadataParserRunner.start();
             for (int walk = 0; walk < engineCount; walk++) {
-                boolean enableXSDValidation = sipModel.getPreferences().getProperty(XSD_VALIDATION, "false").contentEquals("true");
                 Validator validator = null;
                 if (enableXSDValidation) {
                     validator = dataSet.newValidator();
@@ -197,7 +195,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
         catch (Exception e) {
             termination.dueToException(e);
-            sipModel.getFeedback().alert("File processing setup problem", e);
+            feedback.alert("File processing setup problem", e);
         }
     }
 
@@ -322,11 +320,15 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             }
             if (termination.isIncomplete()) {
                 info("Abort report writer");
-                reportWriter.abort();
+                if (reportWriter != null) {
+                    reportWriter.abort();
+                }
             }
             else {
                 info(String.format("Finish report writer records=%d valid=%d", recordCount, validCount));
-                reportWriter.finish(validCount, recordCount - validCount);
+                if(reportWriter != null) {
+                    reportWriter.finish(validCount, recordCount - validCount);
+                }
                 termination.normalCompletion();
             }
         }
@@ -464,16 +466,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
     }
 
-    private Stats createStats() {
-        Stats stats = new Stats();
-        stats.freshStats();
-        stats.prefix = recMapping.getPrefix();
-        Map<String, String> facts = dataSet.getDataSetFacts();
-        stats.name = facts.get("name");
-        stats.maxUniqueValueLength = sipModel.getStatsModel().getMaxUniqueValueLength();
-        return stats;
-    }
-
     private enum NextStep {
         CONTINUE,
         INVESTIGATE,
@@ -516,8 +508,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         synchronized void dueToException(MetadataRecord failedRecord, Exception exception) {
             if (this.exception == null) { // only show one of them
-                if (sipModel != null) {
-                    sipModel.getFeedback().alert("Problem processing", exception);
+                if (feedback != null) {
+                    feedback.alert("Problem processing", exception);
                 }
                 else {
                     System.out.println("Problem processing: ");
@@ -566,7 +558,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             bg.add(continueButton);
             continueButton.setSelected(true);
             bg.add(investigateButton);
-            if (sipModel.getFeedback().form("Invalid Record! How to proceed?", continueButton, investigateButton)) {
+            if (feedback.form("Invalid Record! How to proceed?", continueButton, investigateButton)) {
                 if (investigateButton.isSelected()) {
                     return NextStep.INVESTIGATE;
                 }
