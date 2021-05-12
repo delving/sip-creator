@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1992-12-03-1">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1992-12-03-1">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1992-12-03-1">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=10421">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/cd%20000025%5C4917_e%5Cfoto_016.tif&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/cd%20000025%5C4917_e%5Cfoto_016.tif&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1992-12-03-1">
+      <dc:description>Afbeelding van luitenant-generaal in groot tenue vanaf de borsthoogte exclusief hoofddeksel, inclusief model decoraties (RMWO - Nederlandse Leeuw - Lombokkruis - EBK + 2 gespen - Legion d'Honneur - Off.kruis. met houten lijst. In redelijke staat. Het schilderij heeft last van craquelÃ© en de lijst is licht beschadigd. Inventaris 1990 : RGH : "Schilderij heeft last van craquelÃ© en lijst is licht beschadigd". Informatie van Dhr. L.M. van Kooten sept.2007: Hierbij zend ik u een kopie van het overlijdensbericht in Het Vaderland van 30 mei 1923 van mijn over-grootvader generaal G.J. van Kooten. U kunt hieruit meer gegevens over zijn loopbaan bij het K.N.I.L halen, eventueel ter aanvulling van de gegevens op het tekstbord. Zijn geboortedatum was: 23 maart 1851 te Lent, hij overleed op 29 mei 1923 te Den Haag. Op 14 december 1877 huwde hij met Wilhelmina Constance Hoffman te Soerabaja. Zijn zoon, mijn grootvader L.M. van Kooten, diende eveneens bij het K.N.I.L. als Officier Artillerie. Indien u meer bijzonderheden nodig heeft, dan zal ik u gaarne van dienst zijn. Op 23 augustus zond ik uw collega Verhoeven een email met enkele scans/fotoâs als attachment. (5 stuks). Hierop heb ik nog geen reactie ontvangen. Kan het zijn dat attachments niet door uw server worden geaccepteerd? Hierbij was o.a. een foto van zijn medailles. Als u hierop inzoomt ziet u dat de gespen zijn voor krijgsverrichtingen in Atjeh (1875-1876) en Zuid Celebes (1906). De MWO ontving hij n.a.v. de Lombok-oorlog, waar hij als majoor van de Gen. Staf in meevocht. (bij KB van 9 april 1895, No. 36). Atjeh (1875-1876) en Zuid Celebes (1906). De MWO ontving hij n.a.v. de Lombok-oorlog, waar hij als majoor van de Gen. Staf in meevocht. (bij KB van 9 april 1895, No. 36). DUT</dc:description>
+      <dc:identifier>1992/12/03-1</dc:identifier>
+      <dc:title>Schilderij van luitenant-generaal G.J. van Kooten (RMWO 4e klasse) in brede zwarte lijst Schilderij van luitenant-generaal G.J. van Kooten (RMWO 4e klasse) in brede zwar</dc:title>
+      <dc:type>schilderij</dc:type>
+      <dcterms:extent>Algemeen: 28 3/4 x 32 7/8in. (73 x 83.5cm) Algemeen (incl. lijst): 36 1/4 x 29 1/2in. (92 x 75cm)</dcterms:extent>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/cd%20000025%5C4917_e%5Cfoto_016.tif&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/fotocollectie%5Cfotos%5Caangeleverde%20fotoÂ´s2007%5Cstatieportret%20generaal.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/fotocollectie%5Cfotos%5Caangeleverde%20fotoÂ´s2007%5Clintjes.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/fotocollectie%5Cfotos%5Caangeleverde%20fotoÂ´s2007%5Chet%20vaderland-30%20mei%201923.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/fotocollectie%5Cfotos%5Caangeleverde%20fotoÂ´s2007%5Cafscheid%20generale%20staf-tekst2.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/fotocollectie%5Cfotos%5Caangeleverde%20fotoÂ´s2007%5Cafscheid%20generale%20staf.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/aangeleverde%20scans,%20fotoÂ´s%5Chet%20vaderland-30%20mei%201923.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1992%5C1992_12_03-1_is-dit-van-kooten.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/cd 000025\4917_e\foto_016.tif&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/fotocollectie\fotos\aangeleverde fotoÂ´s2007\statieportret generaal.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/fotocollectie\fotos\aangeleverde fotoÂ´s2007\lintjes.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/fotocollectie\fotos\aangeleverde fotoÂ´s2007\het vaderland-30 mei 1923.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/fotocollectie\fotos\aangeleverde fotoÂ´s2007\afscheid generale staf-tekst2.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/fotocollectie\fotos\aangeleverde fotoÂ´s2007\afscheid generale staf.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/aangeleverde scans, fotoÂ´s\het vaderland-30 mei 1923.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1992\1992_12_03-1_is-dit-van-kooten.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/cd 000025\4917_e\foto_016.tif&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/fotocollectie\fotos\aangeleverde fotoÂ´s2007\statieportret generaal.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/fotocollectie\fotos\aangeleverde fotoÂ´s2007\lintjes.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/fotocollectie\fotos\aangeleverde fotoÂ´s2007\het vaderland-30 mei 1923.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/fotocollectie\fotos\aangeleverde fotoÂ´s2007\afscheid generale staf-tekst2.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/fotocollectie\fotos\aangeleverde fotoÂ´s2007\afscheid generale staf.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/aangeleverde scans, fotoÂ´s\het vaderland-30 mei 1923.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1992\1992_12_03-1_is-dit-van-kooten.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

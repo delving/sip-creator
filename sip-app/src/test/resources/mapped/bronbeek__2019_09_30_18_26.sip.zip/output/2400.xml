@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1922-10-01-3-6">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1922-10-01-3-6">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1922-10-01-3-6">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=2018">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/jap%20zwaard.cmp&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/jap%20zwaard.cmp&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1922-10-01-3-6">
+      <dc:description>restauratie 2022-F door G.J.F.J. Tammens "Wakizashi" Op de kling welke zeer oud is, 15e eeuw bevindt zich een horimono. "Suken" De kling is gesigneerd "Norimitsu saku", vrij vertaald. Norimitsu maakte mij. Deze Norimitsu werkte met vrij grote zekerheid in het bekende zwaard centrum Bizen. De zijkanten van de kling zijn geheel vlak Hira zukuri, er is een temperlijn (Sugu ka) Een zeer interessant klein zwaardje, dat echter twee lelijke beschadigingen aan de Yaki ba heeft. In de schede bevindt zich een zogenoemde kogatana ook wel foutief kozuka genoemd (dit is alleen het greepje) Dit hulpmes evenals de hoofdkling gereinigd roestvrij gemaakt en licht opgepolijst. De schede lag totaal in twee helften en was met koperdraadjes aan elkaar gewrongen. Aangezien de originele laklaag nog voor het overgrote deel aanwezig was, is deze in stand gelaten en bijgewerkt, nadat de schede inwendig ontvet en ontzuurd en vervolgens gelijmd was. Voor op de schede is een barts zichtbaar, doordat vermoedelijk iemand er op is gaan staan en zodoende de dunne wand van de koggatana scehde heeft ingedrukt. Een onzichtbare restauratie hiervan met tevens het behoud van de fraaie oorspronkelijke lak was vrijwel ondoenlijk zodat dit helaas zo is gebleven. Het was het een of het ander en m.i. is een schede met een barst en de complete originele lak te prefereren boven een gave doch met nieuwe lak. De menukis seppa's en fuchi kishira gereinigd ontroest en weer aangebracht. De originele same, welke hier nog in redelijke staat verkeerde gereinigd en opgekleurd waarna en goudkleurige originele Japanse wikkeling is aangebracht. De tsuba welke in een zeer slechte staat verkerde en waarvan zelfs een hoek was weggeslepen is vervangen door een exacte copie zoals het origineel geweest is. Op de schede en nieuwe originele kurigata (ringknop) aangebracht aangezien deze ontbrak. (Knoopje moet er nog bij) Klad: L:90cm, greep 24cm,verlakt houten schede, gebarsten met koperdraad gerepareerd, omwikkeling schede verdwenen (met touw opnieuw omwoeld) Kling tweezijdig, ring ontbreekt DUT</dc:description>
+      <dc:identifier>1922/10/01-3-6</dc:identifier>
+      <dc:title>Japans zwaard, Wakizashi, montage Buka Zukuri Japans zwaard, Wakizashi, montage Buka Zukuri</dc:title>
+      <dc:type>zwaard</dc:type>
+      <dcterms:created>Bizen</dcterms:created>
+      <dcterms:created>15e eeuw</dcterms:created>
+      <dcterms:extent>L:68cm</dcterms:extent>
+      <dcterms:medium>metaal, hout, lakwerk</dcterms:medium>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/jap%20zwaard.cmp&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02056%205.cmp&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02056%204.cmp&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02056%203.cmp&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02056%202.cmp&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02056%201.cmp&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/jap zwaard.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02056 5.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02056 4.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02056 3.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02056 2.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02056 1.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/jap zwaard.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02056 5.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02056 4.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02056 3.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02056 2.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02056 1.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

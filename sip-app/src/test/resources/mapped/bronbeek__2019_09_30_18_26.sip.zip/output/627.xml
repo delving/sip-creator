@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1991-01-18-3-9">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1991-01-18-3-9">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1991-01-18-3-9">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=7126">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1991%5C1991_01_18-3-9_a.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1991%5C1991_01_18-3-9_a.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1991-01-18-3-9">
+      <dc:description>Dagregister 1990: POW verjaardagskaart [Tjimahi 4, ten noorden van Bandoeng, was een burgerinterneringskamp voor mannen , bron: www.blimbing.nl] KKK (Kale Koppen Kampement). Verjaardagskaart gemaakt door medegevangenen voor AN Augustijn, gevangene nummer C 100 met op de kaart kampactiviteiten, de namen van de medegevangenen en hun handtekeningen. In 6 delen gevouwen. Aan beide zijden voorzien van tekst, stempels en tekeningen. Japanse karakters voor: Soldaat, Brigadier, Sergeant Sergeant-majoor, Adjudant-onderofficier, Onderluitenant, 2e Luitenant, 1e Luitenant, Kapitein, Majoor, Luitenant-kolonel. "KKK", "een koffie", "SHAG", "10cent", "THI1942", "KKKB" "Tjimahi 1942" "Ma 'k me even ?" - "Aangenaam!" Laat het aangenaam blijven! Hierin kunt U, als U wilt, Alle namen schrijven Van hen, die U hebt gekend, In 't Kale Koppen Kampement." 35 Handtekeningen met bij enkele handtekeningen karikaturen getekend door de schrijver. Portret van een man in oranje kleuren, diverse karikaturen: "6:Augustijn ben je aan't typen?", "8: Oh mijn lieve Augustijn!", "9:Je bent een no. of je bent het niet", "10: Bij de baard van.....Augustijn!" Lijst van 35 handtekening zetters: 1. T.K.P. van Rees. 2. J.A. van Vuuren 3. T.B. Katarski 4.J.N. Peters 5. J.F. Meijer 6. H. van Beek 7. G.G. Peters 8. W. Schippers 9. J. Martijnse 10. D.P. Rempt 11. V.E. Schaefer 12. W. Bosveld 13. L. van den Berg 14. P.J. de Boer 15. J. Poot 16. H.A. Thomas 17. J.N. Anten 18. J. Anten 19. P.J. Bonjernoor 20. F. Alons 21. W.R. Belonje 22. A. Aronius 23. P.W. Albers 24. L. Adel van Neck 25. E. Algra 26. A. Admiraal 27. A.D. Arnken 28. F.L. van Aalten 29. M.J. Broekhuysen 30. L. Niardten 31. J. Aukema 32. N.J. van Adrichem Bogaerdt 33. C. Acket 34. S. SchÃ¼sler 35. G. Adams DUT</dc:description>
+      <dc:identifier>1991/01/18-3-9</dc:identifier>
+      <dc:title>Verjaardagskaart van A. N. Augustijn, Tjimahi 1942 Verjaardagskaart van A. N. Augustijn, Tjimahi 1942</dc:title>
+      <dc:type>verjaardagskaart</dc:type>
+      <dcterms:created>1942</dcterms:created>
+      <dcterms:medium>potlood, kleurpotlood en pen op papier, ingekleurd met aquarel</dcterms:medium>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1991%5C1991_01_18-3-9_a.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1991%5C1991_01_18-3-9_d.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1991%5C1991_01_18-3-9_c.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1991%5C1991_01_18-3-9_b.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1991\1991_01_18-3-9_a.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1991\1991_01_18-3-9_d.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1991\1991_01_18-3-9_c.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1991\1991_01_18-3-9_b.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1991\1991_01_18-3-9_a.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1991\1991_01_18-3-9_d.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1991\1991_01_18-3-9_c.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1991\1991_01_18-3-9_b.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

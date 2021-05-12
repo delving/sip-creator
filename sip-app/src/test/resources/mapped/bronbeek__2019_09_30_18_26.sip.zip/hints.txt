@@ -1,0 +1,6 @@
+#SIPCreator - facts
+harvestPrefix=oai_dc
+harvestUrl=http://62.221.199.184:15556/oai?
+pockets=true
+recordCount=1344
+uniqueElementPath=/pockets/pocket/@id

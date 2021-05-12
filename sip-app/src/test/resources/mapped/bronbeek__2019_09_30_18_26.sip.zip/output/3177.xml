@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1998-06-01-2-12-12">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1998-06-01-2-12-12">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1998-06-01-2-12-12">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=21946">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998%5C1998_06_01-2-12_12-recto-mb.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998%5C1998_06_01-2-12_12-recto-mb.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1998-06-01-2-12-12">
+      <dc:description>Embleem, metaal, klein, "pro patria". Metalen embleem met de afbeelding van een autoband (grijs) met twee gekruiste steeksleutels (groen). Tekst "Pro Patria". Op de steeksleutels zijn de letters V, A, A, C aangebracht. Onder de band een lint met de tekst "Pro Patria". Het embleem werd gedragen op de revers. (En op de helmhoed) In de tweede helft van 1940 bracht mevrouw Lulofs-Mehrengs te Batavia ongeveer 20 vrouwen bijeen, die in het bezit waren van een rijbewijs. Een aanvullende opleiding tot vrachtwagenchauffeur vond plaats te Tandjong Priok en reeds in oktober van genoemd jaar kwam het tot de oprichting van een reservekorps van vrachtwagenbestuursters onder de naam van Vrouwen Auto[mobiel] Corps. Er werden kakikleurige katoenen uniformen ingevoerd, bestaande uit een werktenue met blouse en lange broek en een uitgaansuniform met tuniekjasje en rok. Onder het jasje werd een witte blouse gedragen en een groene stropdas. Het Vrouwen Automobiel Corps, reeds in 1941 bestaande uit zoÂ´n vier- tot vijfhonderd leden, verrichtte materieel- en transportdiensten voor het leger. Het behoorde officieel niet tot de legerorganisatie. DUT</dc:description>
+      <dc:identifier>1998/06/01-2-12/12</dc:identifier>
+      <dc:title>Mouwembleem, "pro patria" Mouwembleem, "pro patria"</dc:title>
+      <dc:title>Embleem uitgaanstenue Vrouwen Auto Corps (VAC) Nederlandsch-IndiÃ« Embleem uitgaanstenue Vrouwen Auto Corps (VAC) Nederlandsch-IndiÃ«</dc:title>
+      <dc:type>embleem</dc:type>
+      <dcterms:created>1940-1942</dcterms:created>
+      <dcterms:medium>metaal; geemailleerd</dcterms:medium>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998%5C1998_06_01-2-12_12-recto-mb.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998%5C1998_06_01-2-12_12-verso-mb.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998%5C1998_06_01-2-12_12-recto-mb1.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998\1998_06_01-2-12_12-recto-mb.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998\1998_06_01-2-12_12-verso-mb.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998\1998_06_01-2-12_12-recto-mb1.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998\1998_06_01-2-12_12-recto-mb.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998\1998_06_01-2-12_12-verso-mb.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1998\1998_06_01-2-12_12-recto-mb1.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

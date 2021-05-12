@@ -25,7 +25,6 @@ import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.MappingResult;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.NodeMappingChange;
-import eu.delving.metadata.Operator;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.sip.base.CompileState;
@@ -80,19 +79,15 @@ public class FieldMappingFrame extends FrameBase {
     private JTextArea codeArea;
     private JTextArea docArea;
     private JTextArea outputArea;
-    private boolean operatorBoxSetting = false;
-    private JComboBox<Operator> operatorBox = new JComboBox<>(Operator.values());
     private FunctionListModel functionModel = new FunctionListModel();
     private JList functionList = new MappingFunctionJList(functionModel);
     private ContextVarListModel contextVarModel = new ContextVarListModel();
     private JList contextVarList = new ContextVarJList(contextVarModel);
-    private DictionaryPanel dictionaryPanel;
     private UndoManager undoManager = new UndoManager();
     private JTabbedPane mainTab = new JTabbedPane();
 
     public FieldMappingFrame(SipModel sipModel) {
         super(Which.FIELD_MAPPING, sipModel, "Field Mapping");
-        dictionaryPanel = new DictionaryPanel(sipModel);
         docArea = new RSyntaxTextArea(sipModel.getFieldCompileModel().getDocDocument());
         docArea.setTabSize(3);
         docArea.setLineWrap(true);
@@ -102,7 +97,6 @@ public class FieldMappingFrame extends FrameBase {
         outputArea = new RSyntaxTextArea(sipModel.getFieldCompileModel().getOutputDocument());
         outputArea.setWrapStyleWord(true);
         mainTab.addTab("Code", createCodeOutputPanel());
-        mainTab.addTab("Dictionary", dictionaryPanel);
         mainTab.addTab("Documentation", scrollVH(docArea));
         attachAccelerator(UNDO_ACTION, codeArea);
         attachAccelerator(REDO_ACTION, codeArea);
@@ -138,7 +132,6 @@ public class FieldMappingFrame extends FrameBase {
 
     private JPanel createBesideCodeOutput() {
         JPanel pp = new JPanel(new GridLayout(0, 1, 5, 5));
-        pp.add(operatorBox);
         pp.add(createActionButton(UNDO_ACTION));
         pp.add(createActionButton(REDO_ACTION));
         pp.add(new JButton(REVERT_ACTION));
@@ -188,24 +181,6 @@ public class FieldMappingFrame extends FrameBase {
                 handleEnablement();
             }
         });
-        operatorBox.addItemListener(itemEvent -> {
-            if (operatorBoxSetting) return;
-            final NodeMapping nodeMapping = sipModel.getCreateModel().getNodeMapping();
-            if (nodeMapping != null) {
-                exec(new Work() {
-                    @Override
-                    public void run() {
-                        nodeMapping.operator = (Operator) operatorBox.getSelectedItem();
-                        nodeMapping.notifyChanged(OPERATOR);
-                    }
-
-                    @Override
-                    public Job getJob() {
-                        return Job.SET_OPERATOR;
-                    }
-                });
-            }
-        });
         sipModel.getCreateModel().addListener(new CreateModel.Listener() {
             @Override
             public void transition(CreateModel createModel, CreateTransition transition) {
@@ -216,9 +191,6 @@ public class FieldMappingFrame extends FrameBase {
                     sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
                     exec(() -> {
                         setEditable(codeArea, nodeMapping.isUserCodeEditable());
-                        operatorBoxSetting = true;
-                        operatorBox.setSelectedIndex(nodeMapping.getOperator().ordinal());
-                        operatorBoxSetting = false;
                         mainTab.setSelectedIndex(nodeMapping.hasDictionary() ? 1 : 0);
                     });
                 } else {
@@ -226,9 +198,6 @@ public class FieldMappingFrame extends FrameBase {
                     sipModel.getFieldCompileModel().setNodeMapping(null);
                     exec(() -> {
                         setEditable(codeArea, false);
-                        operatorBoxSetting = true;
-                        operatorBox.setSelectedIndex(0);
-                        operatorBoxSetting = false;
                     });
                 }
             }

@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="urn:ebu:metadata-schema:ebuCore_2014" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/165">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/165">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/165">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
+      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/QB02-groot-web.jpg">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/QB02-groot-web.jpg">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
+      </edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/165">
+      <dc:date>21-11-2007</dc:date>
+      <dc:format>380 x 380</dc:format>
+      <dc:identifier>ND02</dc:identifier>
+      <dc:subject>quiltblok 02 bevat een van de naamvlaggen die Gart Zeebregts/van Gennip in zomer 1988 aan Jeannette Kok van de Belangenvereniging van Mensen met Aids BMA, de voorganger van de Hiv Vereniging overhandigde en bovendien de eerste die hij maakte (NV010 Youri Egorov, klassiek pianist, boek: In het huis van de dichter 2008), twee naamvlaggen voor de medeoprichters van de BMA (NV002 Coenrad Stegeman, NV004 Harry Hogerhrorst) en een naamvlag voor een bestuurslid van de BMA (NV001 Paul Keunen), een naamvlag voor iemand wiens moeder zich ontzetten heeft ingezet voor mensen met aids (NV009 Hendrik van der Vis, in boek Eenling is geenling 1999), en de eerste naamvlag voor een vrouw (NV008 Marieke).</dc:subject>
+      <dc:subject>quiltblok 02 is gewijd aan musici en de Hiv Vereniging Nederland.</dc:subject>
+      <dcterms:spatial>Nederland 8/8, Rusland 1/8 (NV010)</dcterms:spatial>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/QB02-groot-web.jpg">
+   </edm:WebResource>
+   <nave:DcnResource>
+      <nave:technique>quilting</nave:technique>
+      <nave:material>overwegend katoen met applicaties</nave:material>
+      <nave:location>NAMEN Project Nederland</nave:location>
+      <nave:province>nvt</nave:province>
+   </nave:DcnResource>
+</rdf:Description>
+</rdf:RDF>

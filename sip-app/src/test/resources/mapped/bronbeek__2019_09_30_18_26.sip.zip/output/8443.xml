@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2010-12-02-1-42870">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2010-12-02-1-42870">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42870">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=51312">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C3403.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C3403.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42870">
+      <dc:description>Afdeling: Insulair Zuidoost AziÃ« Objectnaam: tekst Rubriek: (niet ingevoerd) Datumlabel: voor 1912 Materiaal: ivoor, hout Emailadres: toelichting: De tekst staat op twee stroken papier ( L 20,7; Br 4,4 - L 21,2; Br 4,4) die opgerold zijn en in een ivoren koker (L 11,8; Br 2,6) opgeborgen zijn. De twee stroken papier horen vermoedelijk aan elkaar. Het papier is ingedeeld in kleine en grote vlakken waarop in zwarte inkt Arabische tekens en in rode inkt andere tekens zijn geschreven. In drie grote vlakken zijn respectievelijk een ruitvorm, een ovaalvorm, een cirkelvorm en een niet nader te omschrijven vorm getekend. Een gedeelte van de vlakken is ingekleurd met rode, gele en zwarte inkt of verf. De ivoren koker is achthoekig in doorsnee en is aan de onderkant voorzien van een bodem van een stukje hout. De bovenzijde van de koker is open. Het ivoor is gelig van kleur en heeft grijzige en bruine vlekken. In het ivoor zijn enkele kruisjes en kleine cirkelvormen ingekrast. Rond en in de opening zijn roestbruine vlekken zichtbaar. De stroken papier zijn aan de uiteinden verkreukeld. Waarschijnlijk ontbreken er nog enkele stukken papier, aangezien de patronen op de aanwezige stroken doorlopen. In het ivoor zitten enkele barsten. Afmetingen: Geheel: 11,8 x 2,6 cm Herkomst: J.L.H. Beijens Media: 3403 Bruikleen van: Gemeente Nijmegen collectie: J.L.H. Beijens Huidige standplaats: [3403] Depot, LB V, 24 [LB V 24] [14-nov-2002] hoofdmateriaal: papier DUT</dc:description>
+      <dc:identifier>2010/12/02-1-42870</dc:identifier>
+      <dc:title>geen titel</dc:title>
+      <dc:type>tekst</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C3403.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\3403.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\3403.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

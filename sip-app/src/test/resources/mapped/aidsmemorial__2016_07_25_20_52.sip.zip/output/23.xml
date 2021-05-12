@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="urn:ebu:metadata-schema:ebuCore_2014" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/aidsmemorial_edm/985">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/aidsmemorial/985">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/aidsmemorial/985">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>stichting NAMENproject Nederland</edm:dataProvider>
+      <edm:isShownBy rdf:resource="http://www.aidsmemorial.nl/var/Quilt-24_Gay_Games_98.jpg">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.aidsmemorial.nl/var/Quilt-24_Gay_Games_98.jpg">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f">
+      </edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/aidsmemorial/985">
+      <dc:date>30-11-2009</dc:date>
+      <dc:format>380 x 380</dc:format>
+      <dc:identifier>ND24</dc:identifier>
+      <dc:subject>quiltblok 24 bevat drie standaardnamvlaggen die aan het eind van de Rainbow Quilt Tour tijdens Gay Games 98 in de Vondelpark werden gelegd voor mensen die hun dierbaren wilden herdenken (NV153, NV154, NV155), een derde standaardnaamvlag werd gevormd door de vlag van Gay Games 98 (NV210), de restante oppervlakte werd gevuld met een oorspronkelijk 520 x 60 cm lang stuk stof dat tijdens de Nederlandse Tours 1999 en 2000 werd geplaatst. Deze zogenoemde 'signature quilt' werd vorm gegeven en in elkaar gezet door Tonny Biesterveld en Els Janssens, quiltverzorgsters van het NAMENproject Nederland.</dc:subject>
+      <dc:subject>quiltblok 24 is gewijd aan vriendschap door cultuur en sport.</dc:subject>
+      <dcterms:spatial>Nederland 8/8</dcterms:spatial>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.aidsmemorial.nl/var/Quilt-24_Gay_Games_98.jpg">
+   </edm:WebResource>
+   <nave:DcnResource>
+      <nave:technique>quilting, handtekeningen met filt- of balpen</nave:technique>
+      <nave:material>katoenen ondergrond, vlag uit kunststof, en applicaties</nave:material>
+      <nave:location>Pronklust</nave:location>
+      <nave:province>nvt</nave:province>
+   </nave:DcnResource>
+</rdf:Description>
+</rdf:RDF>

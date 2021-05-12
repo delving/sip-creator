@@ -58,10 +58,10 @@ public class MetadataParser {
     private Path path = Path.create();
     private MetadataRecordFactory factory = new MetadataRecordFactory(namespaces);
     private ProgressListener progressListener;
+    private boolean isSourceExhausted;
 
     public MetadataParser(InputStream inputStream, int recordCount) throws XMLStreamException {
         this.inputStream = inputStream;
-        this.recordCount = recordCount;
         this.input = XMLToolFactory.xmlInputFactory().createXMLStreamReader("Metadata", inputStream);
     }
 
@@ -71,11 +71,14 @@ public class MetadataParser {
     }
 
     @SuppressWarnings("unchecked")
-    public synchronized MetadataRecord nextRecord() throws XMLStreamException, IOException, CancelException {
-        MetadataRecord metadataRecord = MetadataRecord.poisonPill();
+    public MetadataRecord nextRecord() throws XMLStreamException, IOException, CancelException {
+        if (isSourceExhausted) {
+            return null;
+        }
+        MetadataRecord metadataRecord = null;
         GroovyNode node = null;
         StringBuilder value = new StringBuilder();
-        while (metadataRecord.isPoison()) {
+        while (metadataRecord == null) {
             switch (input.getEventType()) {
                 case XMLEvent.START_DOCUMENT:
                     break;
@@ -121,6 +124,7 @@ public class MetadataParser {
                 case XMLEvent.END_ELEMENT:
                     if (node != null) {
                         if (path.equals(RECORD_CONTAINER)) {
+                            // TODO record count is never used
                             metadataRecord = factory.fromGroovyNode(node, recordIndex++, recordCount);
                             if (progressListener != null) {
                                 progressListener.setProgress(recordIndex);
@@ -137,6 +141,7 @@ public class MetadataParser {
                     path = path.parent();
                     break;
                 case XMLEvent.END_DOCUMENT: {
+                    isSourceExhausted = true;
                     break;
                 }
             }

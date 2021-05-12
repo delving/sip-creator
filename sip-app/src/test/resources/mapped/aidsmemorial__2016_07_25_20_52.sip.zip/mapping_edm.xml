@@ -1,0 +1,138 @@
+<rec-mapping prefix="edm" schemaVersion="5.2.6" locked="true">
+  <facts>
+    <entry>
+      <string>country</string>
+      <string>Netherlands</string>
+    </entry>
+    <entry>
+      <string>schemaVersions</string>
+      <string>edm_5.2.6</string>
+    </entry>
+    <entry>
+      <string>baseUrl</string>
+      <string>http://data.collectienederland.nl</string>
+    </entry>
+    <entry>
+      <string>provider</string>
+      <string>Rijksdienst voor het Cultureel Erfgoed</string>
+    </entry>
+    <entry>
+      <string>rights</string>
+      <string>http://creativecommons.org/licenses/by/3.0/</string>
+    </entry>
+    <entry>
+      <string>name</string>
+      <string>Nederlandse AIDS Memorial Quilt</string>
+    </entry>
+    <entry>
+      <string>language</string>
+      <string>nl</string>
+    </entry>
+    <entry>
+      <string>dataProvider</string>
+      <string>stichting NAMENproject Nederland</string>
+    </entry>
+    <entry>
+      <string>type</string>
+      <string>IMAGE</string>
+    </entry>
+    <entry>
+      <string>spec</string>
+      <string>aidsmemorial</string>
+    </entry>
+    <entry>
+      <string>orgId</string>
+      <string>dcn</string>
+    </entry>
+  </facts>
+  <functions/>
+  <dyn-opts/>
+  <node-mappings>
+    <node-mapping inputPath="/input" outputPath="/edm:RDF"/>
+    <node-mapping inputPath="/input" outputPath="/edm:RDF/ore:Aggregation/@rdf:about">
+      <groovy-code>
+        <string>
+                            &quot;${baseUrl}/resource/aggregation/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/edm:RDF/ore:Aggregation/edm:aggregatedCHO/@rdf:resource">
+      <groovy-code>
+        <string>
+                                &quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/dataProvider" outputPath="/edm:RDF/ore:Aggregation/edm:dataProvider"/>
+    <node-mapping inputPath="/input/record/media/item/file/filename" outputPath="/edm:RDF/ore:Aggregation/edm:isShownBy/@rdf:resource">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.media * { _media -&gt;</string>
+        <string>_media.item * { _item -&gt;</string>
+        <string>_item.file * { _file -&gt;</string>
+        <string>if (_file.filename[0]) {</string>
+        <string>&quot;http://www.aidsmemorial.nl/var/${_file.filename[0]}&quot;.sanitizeURI()</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/media/item/file/filename" outputPath="/edm:RDF/ore:Aggregation/edm:object/@rdf:resource">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.media * { _media -&gt;</string>
+        <string>_media.item * { _item -&gt;</string>
+        <string>_item.file * { _file -&gt;</string>
+        <string>if (_file.filename[0]) {</string>
+        <string>&quot;http://www.aidsmemorial.nl/var/${_file.filename[0]}&quot;.sanitizeURI()</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/provider" outputPath="/edm:RDF/ore:Aggregation/edm:provider"/>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/ore:Aggregation/edm:rights/@rdf:resource">
+      <groovy-code>
+        <string>&apos;http://www.europeana.eu/portal/nl/rights/rr-f&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/edm:RDF/edm:ProvidedCHO/@rdf:about">
+      <groovy-code>
+        <string>
+                            &quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/media/item/creatiedatum" outputPath="/edm:RDF/edm:ProvidedCHO/dc:date"/>
+    <node-mapping inputPath="/input/record/beschrijving/geredigeerd" outputPath="/edm:RDF/edm:ProvidedCHO/dc:description"/>
+    <node-mapping inputPath="/input/record/formaat" outputPath="/edm:RDF/edm:ProvidedCHO/dc:format"/>
+    <node-mapping inputPath="/input/record/nr" outputPath="/edm:RDF/edm:ProvidedCHO/dc:identifier"/>
+    <node-mapping inputPath="/input/record/onderwerp" outputPath="/edm:RDF/edm:ProvidedCHO/dc:subject"/>
+    <node-mapping inputPath="/input/record/geografischerelatie" outputPath="/edm:RDF/edm:ProvidedCHO/dcterms:spatial"/>
+    <node-mapping inputPath="/facts/type" outputPath="/edm:RDF/edm:ProvidedCHO/edm:type"/>
+    <node-mapping inputPath="/input/record/media/item/file/filename" outputPath="/edm:RDF/edm:WebResource/@rdf:about">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.media * { _media -&gt;</string>
+        <string>_media.item * { _item -&gt;</string>
+        <string>_item.file * { _file -&gt;</string>
+        <string>_file.filename * { _filename -&gt;</string>
+        <string>&quot;http://www.aidsmemorial.nl/var/${_filename}&quot;.sanitizeURI()</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/techniek" outputPath="/edm:RDF/nave:DcnResource/nave:technique"/>
+    <node-mapping inputPath="/input/record/materiaal" outputPath="/edm:RDF/nave:DcnResource/nave:material"/>
+    <node-mapping inputPath="/input/record/standplaats" outputPath="/edm:RDF/nave:DcnResource/nave:location"/>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:DcnResource/nave:province">
+      <groovy-code>
+        <string>&apos;nvt&apos;</string>
+      </groovy-code>
+    </node-mapping>
+  </node-mappings>
+</rec-mapping>

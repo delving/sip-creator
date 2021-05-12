@@ -30,6 +30,9 @@ import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.MappingCompileModel;
 import eu.delving.sip.model.SipModel;
+import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 
 import javax.swing.*;
 import java.awt.BorderLayout;
@@ -38,6 +41,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import static eu.delving.sip.base.SwingHelper.scrollCodeVH;
 import static eu.delving.sip.base.SwingHelper.scrollVH;
 
 /**
@@ -48,10 +52,10 @@ import static eu.delving.sip.base.SwingHelper.scrollVH;
  */
 
 public class MappingCodeFrame extends FrameBase {
-    public static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 10);
+    public static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 18);
     private JTextArea listArea = new JTextArea();
-    private JTextArea recordArea = new JTextArea();
-    private JTextArea fieldArea = new JTextArea();
+    private RSyntaxTextArea recordArea = new RSyntaxTextArea(new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_GROOVY));
+    private RSyntaxTextArea fieldArea = new RSyntaxTextArea(new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_GROOVY));
     private JCheckBox docuBox = new JCheckBox("Include Documentation");
     private JCheckBox codeBox = new JCheckBox("Include Groovy Code");
     private JCheckBox traceBox = new JCheckBox("Include Line Number Traces");
@@ -78,13 +82,13 @@ public class MappingCodeFrame extends FrameBase {
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("Mapping Text", createListPanel());
         tabs.addTab("Whole Record Code", createWholeRecord());
-        tabs.addTab("Current Node Mapping Code", scrollVH(fieldArea));
+        tabs.addTab("Current Node Mapping Code", scrollCodeVH(fieldArea));
         content.add(tabs);
     }
 
     private JPanel createWholeRecord() {
         JPanel p = new JPanel(new BorderLayout(10, 10));
-        p.add(scrollVH(recordArea), BorderLayout.CENTER);
+        p.add(scrollCodeVH(recordArea), BorderLayout.CENTER);
         p.add(createCheckbox(), BorderLayout.SOUTH);
         return p;
     }
@@ -157,13 +161,7 @@ public class MappingCodeFrame extends FrameBase {
         @Override
         public void run() {
             if (code != null) {
-                StringBuilder numbered = new StringBuilder();
-                int index = 0;
-                for (String line : code.split("\n")) {
-                    numbered.append(String.format("%3d: ", ++index));
-                    numbered.append(line).append('\n');
-                }
-                textArea.setText(numbered.toString());
+                textArea.setText(code);
             }
             else {
                 textArea.setText("// No code");

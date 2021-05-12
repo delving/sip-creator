@@ -51,6 +51,7 @@ public class StatsModel {
     private FactModel hintsModel = new FactModel();
     private SourceTreeNode sourceTree = SourceTreeNode.create("Select a data set from the File menu, or download one");
     private FilterTreeModel sourceTreeModel = new FilterTreeModel(sourceTree);
+    // TODO record count is never used
     private int recordCount;
 
     public StatsModel(SipModel sipModel) {
@@ -113,6 +114,7 @@ public class StatsModel {
         return hintsModel;
     }
 
+    // TODO record count is never used
     public int getRecordCount() {
         return recordCount;
     }

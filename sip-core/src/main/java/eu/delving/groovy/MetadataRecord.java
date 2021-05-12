@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 
 public class MetadataRecord {
     private GroovyNode rootNode;
+    // TODO record count is never used
     private int recordNumber, recordCount;
 
     public static MetadataRecord create(GroovyNode rootNode, int recordNumber, int recordCount) {
@@ -71,6 +72,7 @@ public class MetadataRecord {
         return recordNumber;
     }
 
+    // TODO record count is never used
     public int getRecordCount() {
         return recordCount;
     }
@@ -85,7 +87,7 @@ public class MetadataRecord {
             return false;
         }
         else {
-            return pattern.matcher(groovyNode.text()).find();
+            return pattern.matcher(groovyNode.text).find();
         }
     }
 
