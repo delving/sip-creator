@@ -54,6 +54,7 @@ import java.util.*;
 import static eu.delving.sip.base.NetworkClient.SipEntry;
 import static eu.delving.sip.base.SwingHelper.ICON_DOWNLOAD;
 import static eu.delving.sip.files.StorageHelper.datasetNameFromSipZip;
+import static javax.swing.ListSelectionModel.*;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 
@@ -71,10 +72,9 @@ public class RemoteDataSetFrame extends FrameBase {
     private final NetworkClient networkClient;
     private final JTextField filterField = new JTextField(16);
     private final JButton workItemSortModeButton = new JButton();
-    private final JButton workItemCleanUpButton = new JButton("Delete all files");
     private NetworkClient.SipZips sipZips;
     private DownloadItem selectedDownload;
-    private WorkItem selectedWorkItem;
+    private List<WorkItem> selectedWorkItems;
     private UploadItem selectedUpload;
 
     public RemoteDataSetFrame(final SipModel sipModel, NetworkClient networkClient) {
@@ -87,7 +87,7 @@ public class RemoteDataSetFrame extends FrameBase {
         this.downloadList.setCellRenderer(DOWNLOAD_CELL_RENDERER);
         this.workItemModel = new WorkItemModel();
         this.workItemList = new JList<WorkItem>(workItemModel);
-        this.workItemList.setSelectionMode(SINGLE_SELECTION);
+        this.workItemList.setSelectionMode(MULTIPLE_INTERVAL_SELECTION);
         this.workItemList.setCellRenderer(WORK_CELL_RENDERER);
         this.workItemList.addListSelectionListener(WORK_ITEM_LISTENER);
         this.workItemList.addMouseListener(new MouseAdapter() {
@@ -134,26 +134,6 @@ public class RemoteDataSetFrame extends FrameBase {
             updateWorkItemSortModeButton();
         });
         updateWorkItemSortModeButton();
-
-        workItemCleanUpButton.addActionListener(e -> {
-            String title = "Delete all local datasets";
-            String message = "This action will delete all files in "
-                + HomeDirectory.WORK_DIR
-                + ". Do you want to continue?";
-            boolean userConfirmed = sipModel.getFeedback().confirm(title, message);
-            if (userConfirmed) {
-                try {
-                    workItemModel.deleteAllLocalDatasets();
-                } catch (IOException ex) {
-                    String feedback = "Unable to delete all local datasets."
-                        + "\nConsider manually deleting all files in the directory "
-                        + HomeDirectory.WORK_DIR
-                        + " to finish the clean up of local datasets and prevent further errors."
-                        + "\nRestart the application once you have done this.";
-                    sipModel.getFeedback().alert(feedback, ex);
-                }
-            }
-        });
     }
 
     private void updateWorkItemSortModeButton() {
@@ -193,7 +173,6 @@ public class RemoteDataSetFrame extends FrameBase {
         JPanel l = new JPanel(new FlowLayout(FlowLayout.LEFT));
         l.add(createFilterPanel());
         c.add(workItemSortModeButton);
-        c.add(workItemCleanUpButton);
         r.add(new JButton(REFRESH_ACTION));
         JPanel p = new JPanel(new GridLayout(1, 0, 10, 10));
         p.add(l);
@@ -513,42 +492,6 @@ public class RemoteDataSetFrame extends FrameBase {
             activateFilter();
             fireIntervalAdded(this, 0, getSize());
         }
-
-        public void deleteAllLocalDatasets() throws IOException {
-            Path workDir = HomeDirectory.WORK_DIR.toPath();
-            FileVisitor<Path> cleanUpVisitor =  new FileVisitor<Path>() {
-                @Override
-                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete(file);
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                    throw exc;
-                }
-
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    if(!dir.equals(workDir)) {
-                        Files.delete(dir);
-                    }
-                    return FileVisitResult.CONTINUE;
-                }
-            };
-
-            try {
-                Files.walkFileTree(workDir, cleanUpVisitor);
-            } finally {
-                downloadModel.refreshDownloads();
-                refreshWorkItems();
-            }
-        }
     }
 
     class UploadModel extends AbstractListModel<UploadItem> {
@@ -726,13 +669,13 @@ public class RemoteDataSetFrame extends FrameBase {
         }
 
         public void checkEnabled() {
-            this.setEnabled(selectedWorkItem != null);
+            this.setEnabled(selectedWorkItems != null);
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (selectedWorkItem == null) return;
-            sipModel.setDataSet(selectedWorkItem.dataset, new Swing() {
+            if (selectedWorkItems == null || selectedWorkItems.isEmpty()) return;
+            sipModel.setDataSet(selectedWorkItems.get(0).dataset, new Swing() {
                 @Override
                 public void run() {
                     setEnabled(true);
@@ -752,14 +695,16 @@ public class RemoteDataSetFrame extends FrameBase {
         }
 
         public void checkEnabled() {
-            this.setEnabled(selectedWorkItem != null);
+            this.setEnabled(selectedWorkItems != null);
         }
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (selectedWorkItem == null) return;
+            if (selectedWorkItems == null) return;
             try {
-                selectedWorkItem.dataset.remove();
+                for (WorkItem selectedWorkItem : selectedWorkItems) {
+                    selectedWorkItem.dataset.remove();
+                }
                 workItemModel.refreshWorkItems();
                 downloadModel.refreshDownloads();
             } catch (StorageException e) {
@@ -774,13 +719,16 @@ public class RemoteDataSetFrame extends FrameBase {
         @Override
         public void valueChanged(ListSelectionEvent e) {
             if (e.getValueIsAdjusting()) return;
-            int workItemIndex = workItemList.getSelectedIndex();
-            if (workItemIndex < 0) {
-                selectedWorkItem = null;
+            int[] workItemIndices = workItemList.getSelectedIndices();
+            if (workItemIndices.length == 0) {
+                selectedWorkItems = null;
                 OPEN_WORK_ITEM_ACTION.putValue(Action.NAME, "Open");
             } else {
-                selectedWorkItem = workItemModel.getElementAt(workItemIndex);
-                OPEN_WORK_ITEM_ACTION.putValue(Action.NAME, "Open " + selectedWorkItem.dataset.getSipFile().getName());
+                selectedWorkItems = new ArrayList(workItemIndices.length);
+                for(int selectedIndex : workItemIndices) {
+                    selectedWorkItems.add(workItemModel.getElementAt(selectedIndex));
+                }
+                OPEN_WORK_ITEM_ACTION.putValue(Action.NAME, "Open " + selectedWorkItems.get(0).dataset.getSipFile().getName());
             }
             OPEN_WORK_ITEM_ACTION.checkEnabled();
             DELETE_WORK_ITEM_ACTION.checkEnabled();

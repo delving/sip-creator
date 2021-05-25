@@ -40,6 +40,7 @@ import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import javax.xml.xpath.XPathExpressionException;
@@ -51,6 +52,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -74,9 +76,9 @@ import static eu.delving.sip.files.StorageHelper.*;
 
 public class StorageImpl implements Storage {
     private File home;
-    private SchemaFactory schemaFactory;
+    private static SchemaFactory schemaFactory;
     private SchemaRepository schemaRepository;
-    private LSResourceResolver resolver;
+    private static LSResourceResolver resolver;
 
     public StorageImpl(File home, SchemaRepository schemaRepository, LSResourceResolver resolver) throws StorageException {
         this.home = home;
@@ -108,7 +110,7 @@ public class StorageImpl implements Storage {
                 if (files != null) {
                     for (File file : files) if (file.isFile()) hasFiles = true;
                     if (!hasFiles) continue;
-                    DataSetImpl impl = new DataSetImpl(directory);
+                    DataSetImpl impl = new DataSetImpl(directory,  schemaRepository);
                     map.put(directory.getName(), impl);
                 }
             }
@@ -122,15 +124,17 @@ public class StorageImpl implements Storage {
         if (!directory.exists() && !directory.mkdirs()) {
             throw new StorageException(String.format("Unable to create data set directory %s", directory.getAbsolutePath()));
         }
-        return new DataSetImpl(directory);
+        return new DataSetImpl(directory, schemaRepository);
     }
 
-    public class DataSetImpl implements DataSet, Serializable {
+    public static class DataSetImpl implements DataSet, Serializable {
 
         private File here;
         private Map<String, String> dataSetFacts;
+        private final SchemaRepository schemaRepository;
 
-        public DataSetImpl(File here) {
+        public DataSetImpl(File here, SchemaRepository schemaRepository) {
+            this.schemaRepository = schemaRepository;
             this.here = here;
         }
 
@@ -174,12 +178,16 @@ public class StorageImpl implements Storage {
             }
         }
 
+        private boolean hasProcessingSucceeded() {
+            return reportConclusionFile(here, getSchemaVersion().getPrefix()).exists();
+        }
+
         private DataSetState postSourceState(File source) {
             File statistics = statsFile(here);
             if (statistics.exists() && statistics.lastModified() >= source.lastModified()) {
                 File mapping = findLatestFile(here, MAPPING, getSchemaVersion().getPrefix());
                 if (mapping.exists()) {
-                    return targetOutput().exists() ? DataSetState.PROCESSED : DataSetState.MAPPING;
+                    return hasProcessingSucceeded() ? DataSetState.PROCESSED : DataSetState.MAPPING;
                 }
                 else {
                     return DataSetState.ANALYZED_SOURCE;
@@ -530,12 +538,11 @@ public class StorageImpl implements Storage {
         }
     }
 
-    private SchemaFactory schemaFactory(String prefix) {
+    private static SchemaFactory schemaFactory(String prefix) {
         if (schemaFactory == null) {
             schemaFactory = XMLToolFactory.schemaFactory(prefix);
             if (resolver != null) schemaFactory.setResourceResolver(resolver);
         }
         return schemaFactory;
     }
-
 }

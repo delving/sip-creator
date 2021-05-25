@@ -25,14 +25,13 @@ import eu.delving.XMLToolFactory;
 import eu.delving.metadata.RecDef;
 import groovy.lang.Closure;
 import groovy.lang.GString;
-import groovy.lang.MissingMethodException;
 import groovy.util.BuilderSupport;
-import org.codehaus.groovy.runtime.InvokerHelper;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Custom node builder which executes closures if they are found as attribute values, or if
@@ -40,24 +39,26 @@ import java.util.*;
  * <p/>
  * This class is actually core to the transformation process because it gives the "Builder Pattern"
  * a very different character by executing closures for values.
- *
- *
  */
 
 public class DOMBuilder extends BuilderSupport {
     public static final String CDATA_BEFORE = "<![CDATA[";
     public static final String CDATA_AFTER = "]]>";
     private static final String SCHEMA_LOCATION_ATTR = "xsi:schemaLocation";
+    private static final String DEPTH = "depth";
     private Document document;
     private DocumentBuilder documentBuilder;
-    private Map<String, RecDef.Namespace> namespaces = new TreeMap<String, RecDef.Namespace>();
-    private RecDef recDef;
+    private Map<String, RecDef.Namespace> namespaces;
+
+    private final List<Node> allNodes = new ArrayList<>(100);
+    private int depth;
+    private final RecDef recDef;
+    private final DOMBuilder instance = this;
 
     public static DOMBuilder createFor(RecDef recDef) {
         try {
             return new DOMBuilder(recDef, XMLToolFactory.documentBuilderFactory().newDocumentBuilder());
-        }
-        catch (ParserConfigurationException e) {
+        } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
         }
     }
@@ -73,9 +74,7 @@ public class DOMBuilder extends BuilderSupport {
 
     @Override
     protected void setParent(Object parent, Object child) {
-        Node current = (Node) parent;
-        Node node = (Node) child;
-        current.appendChild(node);
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -101,253 +100,180 @@ public class DOMBuilder extends BuilderSupport {
                 document.appendChild(element);
             }
             return element;
-        }
-        else {
+        } else {
             return document.createElement(tagValue.localPart);
         }
     }
 
     @Override
     protected Object createNode(Object name, Object value) {
-        Element element = (Element) createNode(name);
-        toTextNodes(value.toString(), element);
-        return element;
+        throw new UnsupportedOperationException();
     }
 
-    @Override
-    protected Object createNode(Object name, Map attributes) {
-        Element element = (Element) createNode(name);
-        for (Object entryObject : attributes.entrySet()) {
-            Map.Entry entry = (Map.Entry) entryObject;
-            String attrName = entry.getKey().toString();
+    private class ElementFactory {
+
+        final String name;
+        final Map<String, Object> attributes;
+        final Object contents;
+        final int elementsRequired;
+
+        private ElementFactory(String name, Map<String, Object> attributes, Object contents) {
+            this.name = name;
+            this.attributes = resolveAttributes(attributes);
+            this.contents = resolveValue(contents);
+            this.elementsRequired = calcElementsRequired(this.attributes, this.contents);
+        }
+
+        private Map<String, Object> resolveAttributes(Map<String, Object> attributes) {
+            Map<String, Object> resolvedAttributes = new HashMap<>();
+            if (attributes != null) {
+                for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
+                    Object value = attribute.getValue();
+                    resolvedAttributes.put(attribute.getKey(), resolveValue(value));
+                }
+            }
+            return resolvedAttributes;
+        }
+
+        private Object resolveValue(Object value) {
+            if (value instanceof Closure) {
+                Closure closure = (Closure) value;
+                closure.setDelegate(instance);
+                return closure.call();
+            } else if (value instanceof List) {
+                List values = (List) value;
+                List resolvedValues = new ArrayList(values.size());
+                for (Object item : values) {
+                    resolvedValues.add(resolveValue(item));
+                }
+                return resolvedValues;
+            }
+            return value;
+        }
+
+        private int calcElementsRequired(Map<String, Object> attributes, Object contents) {
+            int elementsRequired = 0;
+            if (attributes != null) {
+                for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
+                    checkAttributeName(attribute.getKey());
+                    Object attributeValue = attribute.getValue();
+
+                    if (attributeValue instanceof List) {
+                        elementsRequired = Math.max(elementsRequired, ((List<?>) attributeValue).size());
+                    } else {
+                        elementsRequired = Math.max(elementsRequired, 1);
+                    }
+                }
+            }
+
+            if (contents instanceof List) {
+                List contentList = (List) contents;
+                int textContentCount = 0;
+                for(Object value : contentList) {
+                    if (!(value instanceof Node)) textContentCount++;
+                }
+                elementsRequired = Math.max(elementsRequired, textContentCount);
+            } else if (contents != null) {
+                elementsRequired = Math.max(elementsRequired, 1);
+            }
+            return Math.max(1, elementsRequired);
+        }
+
+        private void checkAttributeName(String attrName) {
             if ("xmlns".equals(attrName)) throw new RuntimeException("Can't handle xmlns attribute");
             if (attrName.startsWith("xmlns:")) throw new RuntimeException("Can't handle attribute xmlns:*");
-            if (entry.getValue() == null) throw new RuntimeException("Can't handle null attribute value");
-            String valueString;
-            if (entry.getValue() instanceof Closure) {
-                ClosureResult result = runClosure(element, (Closure) entry.getValue());
-                if (result.string != null) {
-                    valueString = result.string;
-                }
-                else if (result.list != null) {
-                    StringBuilder sb = new StringBuilder();
-                    for (Object member : result.list) sb.append(member.toString());
-                    valueString = sb.toString();
-                }
-                else {
-                    throw new RuntimeException();
-                }
-            }
-            else {
-                valueString = entry.getValue().toString();
-            }
-            TagValue tagValue = new TagValue(attrName, true);
-            element.setAttributeNS(
-                    tagValue.isNamespaceAdded() ? tagValue.uri : null,
-                    tagValue.isNamespaceAdded() ? tagValue.toString() : tagValue.localPart,
-                    valueString
-            );
         }
-        return element;
+
+        private Object extractValue(Object value, int index) {
+            if (value == null) return null;
+            if (value instanceof List) {
+                List values = (List) value;
+                if (values.isEmpty()) return null;
+                if (index >= values.size()) return values.get(0);
+                return values.get(index);
+            }
+            return value;
+        }
+
+        public List<Element> createElements() {
+            List<Element> elements = new ArrayList<>(elementsRequired);
+            for (int i = 0; i < elementsRequired; i++) {
+                Element element = (Element) createNode(name);
+                for (String attributeName : attributes.keySet()) {
+                    Object attributeValue = extractValue(attributes.get(attributeName), i);
+                    if (attributeValue == null) continue;
+
+                    TagValue tagValue = new TagValue(attributeName, true);
+                    element.setAttributeNS(
+                        tagValue.isNamespaceAdded() ? tagValue.uri : null,
+                        tagValue.isNamespaceAdded() ? tagValue.toString() : tagValue.localPart,
+                        attributeValue.toString()
+                    );
+                }
+
+                Object contentValue = extractValue(contents, i);
+//                if (contentValue instanceof Node) {
+//                    Node child = (Node) contentValue;
+//                    if(child.hasChildNodes() || child.hasAttributes() || child.getNodeValue() != null) {
+//                        element.appendChild(child);
+//                    }
+//                }
+                if(contentValue instanceof String || contentValue instanceof GString) {
+                    if(contentValue != null) {
+                        toTextNodes(contentValue.toString(), element);
+                    }
+                }
+                elements.add(element);
+            }
+
+            return elements;
+        }
     }
 
     @Override
     protected Object createNode(Object name, Map attributes, Object value) {
-        Element element = (Element) createNode(name, attributes);
-        toTextNodes(value.toString(), element);
-        return element;
+        ElementFactory elementFactory = new ElementFactory(name.toString(), attributes, value);
+        return elementFactory.createElements();
     }
 
     @Override
-    protected Object doInvokeMethod(String methodName, Object name, Object args) {
-        Object node;
-        List list = InvokerHelper.asList(args);
-        Closure closure;
-        switch (list.size()) {
-            case 1: { ///
-                Object object = list.get(0);
-                if (object instanceof Map) {
-                    node = createNode(name, runMapClosures((Map) object));
-                }
-                else if (object instanceof Closure) {
-                    node = createNode(name);
-                    closure = (Closure) object;
-                    setValuesFromClosure((Node) node, closure);
-                }
-                else {
-                    node = createNode(name, object);
-                    setParent(getCurrent(), node);
-                }
-            }
-            break;
-            case 2: {
-                Object object1 = list.get(0);
-                Object object2 = list.get(1);
-                if (object1 instanceof Map) {
-                    if (object2 instanceof Closure) {
-                        node = createNode(name, runMapClosures((Map) object1));
-                        closure = (Closure) object2;
-                        setValuesFromClosure((Node) node, closure);
-                    }
-                    else {
-                        node = createNode(name, (Map) object1, object2);
-                        setParent(getCurrent(), node);
-                    }
-                }
-                else {
-                    if (object2 instanceof Closure) {
-                        node = createNode(name, object1);
-                        closure = (Closure) object2;
-                        setValuesFromClosure((Node) node, closure);
-                    }
-                    else if (object2 instanceof Map) {
-                        node = createNode(name, (Map) object2, object1);
-                        setParent(getCurrent(), node);
-                    }
-                    else {
-                        throw new MissingMethodException(name.toString(), getClass(), list.toArray(), false);
-                    }
-                }
-            }
-            break;
-            default: {
-                throw new MissingMethodException(name.toString(), getClass(), list.toArray(), false);
-            }
-        }
-        return node;
+    protected Object createNode(Object name, Map attributes) {
+        return createNode(name, attributes, null);
     }
 
-    private void setValuesFromClosure(Node node, Closure closure) {
-        ClosureResult result = runClosure(node, closure);
-        if (result.string != null) {
-            toTextNodes(result.string, node);
+    private <T> T firstInstanceOf(Class<T> type, Object... objects) {
+        for (Object obj : objects) {
+            if (obj == null) continue;
+            if (type.isAssignableFrom(obj.getClass())) return (T) obj;
         }
-        if (result.list != null && !result.list.isEmpty()) {
-            toTextNodes(result.list.get(0), node);
-            Map<String, String> attributes = getAttributeMap(node);
-            for (int walk = 1; walk < result.list.size(); walk++) {
-                Node child = (Node) createNode(node.getNodeName(), attributes);
-                toTextNodes(result.list.get(walk), child);
-                makeSibling(node, child);
-            }
-        }
+        return null;
     }
 
-    private Map runMapClosures(Map map) {
-        Map<String, String> out = new TreeMap<String, String>();
-        for (Object entryObject : map.entrySet()) {
-            Map.Entry entry = (Map.Entry) entryObject;
-            if (entry.getValue() instanceof Closure) {
-                ClosureResult result = runClosure(null, (Closure) entry.getValue());
-                if (result.string != null) out.put(entry.getKey().toString(), result.string);
-                if (result.list != null) {
-                    StringBuilder sb = new StringBuilder();
-                    for (Object member : result.list) sb.append(member.toString());
-                    out.put(entry.getKey().toString(), sb.toString());
-                }
-            }
-            else {
-                out.put(entry.getKey().toString(), entry.getValue().toString());
-            }
-        }
-        return out;
-    }
+    @Override
+    protected Object doInvokeMethod(String methodName, Object name, Object argsObj) {
+        Object[] args = (Object[]) argsObj;
+        Closure contentClosure = firstInstanceOf(Closure.class, args);
 
-    private ClosureResult runClosure(Node node, Closure closure) {
-        ClosureResult cr = new ClosureResult();
-        Object result;
-        if (node != null) {
-            Object oldCurrent = getCurrent();
-            setCurrent(node);
-            if (oldCurrent != null) setParent(oldCurrent, node);
-            setClosureDelegate(closure, node);
-            result = closure.call();
-            setCurrent(oldCurrent);
-        }
-        else {
-            result = closure.call();
-        }
-        if (result instanceof String) {
-            cr.string = (String) result;
-        }
-        else if (result instanceof GString) {
-            cr.string = result.toString();
-        }
-        else if (result instanceof List) {
-            cr.list = unpack((List) result);
-        }
-        else if (result instanceof Object[]) {
-            cr.list = unpack(Arrays.asList((Object[]) result));
-        }
-        if (cr.string != null && cr.string.trim().isEmpty()) cr.string = null;
-        if (cr.list != null) {
-            Iterator<String> walk = cr.list.iterator();
-            while (walk.hasNext()) {
-                String member = walk.next();
-                if (member.trim().isEmpty()) walk.remove();
-            }
-            if (cr.list.isEmpty()) cr.list = null;
-        }
-        return cr;
-    }
+        depth++;
+        Map<String, Object> attributes = firstInstanceOf(Map.class, args);
+        List<Node> nodes = (List<Node>) createNode(methodName, attributes, contentClosure);
+        for (Node node : nodes) node.setUserData(DEPTH, depth, null);
+        allNodes.addAll(nodes);
+        depth--;
 
-    private List<String> unpack(List list) {
-        List<String> result = new ArrayList<String>();
-        unpack(list, result);
-        return result.isEmpty() ? null : result;
-    }
-
-    private void unpack(List from, List<String> to) {
-        for (Object member : from) {
-            if (member instanceof List) {
-                unpack((List) member, to);
-            }
-            else if (member instanceof Object[]) {
-                unpack(Arrays.asList((Object[]) member), to);
-            }
-            else if (member instanceof String) {
-                to.add((String) member);
-            }
-            else if (!(member instanceof Node)) {
-                to.add(member.toString());
-            }
-            else {
-                throw new RuntimeException("unpack: " + member.getClass());
+        if (depth == 0) {
+            Collections.reverse(allNodes);
+            Map<Integer, Node> parentNodes = new HashMap<>();
+            for(Node next : allNodes) {
+                int nodeDepth = (int) next.getUserData(DEPTH);
+                parentNodes.put(nodeDepth, next);
+                Node parentNode = parentNodes.get(nodeDepth - 1);
+                if (parentNode != null) parentNode.appendChild(next);
             }
         }
-    }
 
-    private static class ClosureResult {
-        public String string;
-        public List<String> list;
-
-        public String toString() {
-            if (string != null) {
-                return String.format("String(%s)", string);
-            }
-            else if (list != null) {
-                return String.format("List(%s)", list);
-            }
-            else {
-                return "Empty";
-            }
-        }
-    }
-
-    private void makeSibling(Node node, Node sibling) {
-        Node parent = node.getParentNode();
-        if (parent == null) throw new RuntimeException("Node has no parent: " + node);
-        parent.appendChild(sibling);
-    }
-
-    private Map<String, String> getAttributeMap(Node node) {
-        Map<String, String> attributes = new TreeMap<String, String>();
-        NamedNodeMap nodeAttributes = node.getAttributes();
-        for (int a = 0; a < nodeAttributes.getLength(); a++) {
-            Attr attr = (Attr) nodeAttributes.item(a);
-            attributes.put(attr.getName(), attr.getValue());
-        }
-        return attributes;
+        if (nodes.size() == 1) return nodes.get(0);
+        return nodes;
     }
 
     private void toTextNodes(String text, Node parent) {
@@ -360,8 +286,7 @@ public class DOMBuilder extends BuilderSupport {
             if (before > 0) {
                 parent.appendChild(document.createTextNode(text.substring(0, before)));
                 text = text.substring(before);
-            }
-            else { // starts with CDATA
+            } else { // starts with CDATA
                 text = text.substring(CDATA_BEFORE.length());
                 int after = text.indexOf(CDATA_AFTER);
                 if (after < 0) throw new RuntimeException("No CDATA terminator");
@@ -388,8 +313,7 @@ public class DOMBuilder extends BuilderSupport {
                 }
                 this.uri = namespace.uri;
                 this.localPart = name.substring(colon + 1);
-            }
-            else {
+            } else {
                 this.prefix = null;
                 this.uri = null;
                 this.localPart = name;
@@ -401,8 +325,7 @@ public class DOMBuilder extends BuilderSupport {
             if (prefix != null && !prefix.equals(recDef.prefix)) return true;
             if (attribute) {
                 return recDef.attributeFormDefaultQualified;
-            }
-            else {
+            } else {
                 return recDef.elementFormDefaultQualified;
             }
         }

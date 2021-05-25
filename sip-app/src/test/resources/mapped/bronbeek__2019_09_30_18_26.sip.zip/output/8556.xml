@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2010-12-02-1-42903">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2010-12-02-1-42903">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42903">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=51345">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42903.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42903.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42903">
+      <dc:description>Afdeling: Insulair Zuidoost AziÃ« Objectnaam: doos Rubriek: (niet ingevoerd) Datumlabel: voor 1912 Materiaal: gegoten, ingekerfd Emailadres: toelichting: Het doosje is van geelkoper gegoten en is gemaakt in de vorm van een trapezium met aan de bovenzijde (=langste zijde) een lichte uitholing. Het doosje heeft aan de bovenkant een klein, scharnierend dekseltje, verder is de bovenkant dicht. Het doosje is versierd met ingekerfde en ingegoten motieven. De lengte-zijvlakken zijn versierd met blokpatronen met vijf stippen erin, hierboven en hieronder golfmotieven en langs drie zijden een halvecirkelmotieven. Op Ã©Ã©n van de breedte-zijvlakken is langs de omtrek een rij gebogen streepjes en langs drie zijden een rechte lijn ingekerfd. in het midden van dit vlak is een rnkmotief ingekerfd. Op het andere breedte-zijvlak zijn op de hoeken twee gestyleerde mensenhoofden (voorouderfiguren?) aangebracht. De ruimte tussen de hoofden is versierd met ingekerfde lijn- en cirkelmotieven. Net onder de bovenrand is een ronde opening in het koper gemaakt. EÃ©n van de helften van de bovenkant van de doos is langs de rand versierd met ingekerfde, gebogen lijnen en streepjes, hiertussen zijn twee rijen met rankmotieven, een rij met dubbelspiralen en een rij in kabelmotieven ingekerfd. In de andere helft zit een opening (L 4,2; Br 3,2) waar het deksel in zit. De rand boven de mensenhoofden is versierd met ingekerfde kruis-, cirkel-, streep- en halgebogen lijnmotieven. Het deksel (L 4,1; Br 3,00 heeft een ronde knop met een stompe punt. Aan de binnenkant van het deksel is een oog bevestigd dat precies achter de opening in het breedte-zijvlak zit. Het deksel is versierd met gladde randen en kabelranden in lijn- cirkel- en spiraalmotieven. In de bodem van de doos zitten enkele gaatjes. Het doosje is in Nederland gelakt om aantasting van het koper tegen te gaan. Hierdoor is met name het deksel donker van kleur geworden. Afmetingen: Geheel: 11,2 x 5,1 x 5,2 cm Herkomst: J.L.H. Beijens Media: 3436 Publicaties over het object: Mus: Barbier, J.P. ; titel: Les coffres sculptÃ©s des Toba-Batak^GenÃ¨ve 1985. Met dank aan: De doos is uitgevoerd in de vorm van een gebeeldhouwde kist van de Toba-Batak (zie Barbier 1985). Bruikleen van: Gemeente Nijmegen collectie: J.L.H. Beijens Huidige standplaats: [3436] Depot, LB IV, 10 [LB IV 10] [14-nov-2002] hoofdmateriaal: koper DUT</dc:description>
+      <dc:identifier>2010/12/02-1-42903</dc:identifier>
+      <dc:title>geen titel</dc:title>
+      <dc:type>doos</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42903.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5Cbeijensready%5C2010_12_02-1-42903.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1%5C2010_12_02-1-42903.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42903.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42903.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42903.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42903.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42903.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42903.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

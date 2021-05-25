@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1971-05-27-1">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1971-05-27-1">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1971-05-27-1">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=6161">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971%5C1971_05_27-1.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971%5C1971_05_27-1.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1971-05-27-1">
+      <dc:description>Officierssabel Infanterie Model 1854 L&amp;V: Infanteriesabel. Stootijzer: koper (messing). Schede: Staal (vernikkeld) Kling: staal. Gevest: hout. Compleet (dragon mist?) In goede toestand: decoratie stootijzer versleten. Gevest: zilverdraad ontbreekt. Tekst: kling, gegraveerd: "W.J. van Heynsbergen Den Haag" Tekst: kling, geperst: ijzerhouwer. Schede heeft twee draagringen. L: 97,5cm, stootplaat: 10,5cm, schede: 3cm. M.van Laar (19-03-2001): Gevest -Materiaal: messing -Greep: hoorn: 13 ribben -Stootplaat: gebogen met voorbeugel -Pareerstang: achter neerwaarts gebogen -Bijzonderheden: pareerstang en voorbeugel versiert met gegraveerde bloem- en bladmotieven -Montage: geschroefd d.m.v. afschroefbare klingknop -Inscripties: binnenzijde klingknop: "14"; onderzijde stootplaat: "14" Kling -Materiaal: staal -Vorm: gebogen -Leverancier: W.J. van Heijnsbergen-Haag -Techniek: ijzerhouwer -Boog (pijl): 31 mm -Inscripties: W.J. van Heijnsbergen-Haag, ijzerhouwer -Geul: 544 mm -Vorm angel: gebogen -Inscripties angel: "14" en "CWO" -Snede: buitenbocht eenzijdig geslepen Schede -Materiaal: metaal: verzilverd -Draagring: twee -Sleepplaat: ijzer -Dekplaat (tromp): ontbreekt Beschadigingen -Ontbrekende onderdelen: tromp-schede en schroefjes; draadwinding greep; stootleertje (houtjes binnenzijde schede) -Deuken: schede pareerstang geknakt; gravering grotendeels weggepoetst -Roestvorming: schede en gevest gelakt: kling licht geroest en ingevet Bronvermelding: J.P. Puype: blz 84, nr 130-132 DUT</dc:description>
+      <dc:identifier>1971/05/27-1</dc:identifier>
+      <dc:title>Officierssabel Infanterie Model 1854 Officierssabel Infanterie Model 1854</dc:title>
+      <dc:title>Officierssabel M.1852 Infanterie Officierssabel M.1852 Infanterie</dc:title>
+      <dc:title>Infanterie Officierssabel M.1852 (vÃ³Ã³r 1880) Infanterie Officierssabel M.1852 (vÃ³Ã³r 1880)</dc:title>
+      <dc:type>sabel</dc:type>
+      <dcterms:extent>Totale lengte 96,6 cm Lengte zonder schede 92,9 cm Lengte kling 87,4 cm, breedte kling 3,19 cm, dikte 0,66 cm Lengte schede 82 cm</dcterms:extent>
+      <dcterms:medium>Messing, hoorn, staal, metaal (verzilverd), ijzer</dcterms:medium>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971%5C1971_05_27-1.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971%5C1971_05_27-1_007.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971%5C1971_05_27-1_006.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971%5C1971_05_27-1_005.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971%5C1971_05_27-1_004.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971%5C1971_05_27-1_003.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971%5C1971_05_27-1_002.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971\1971_05_27-1.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971\1971_05_27-1_007.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971\1971_05_27-1_006.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971\1971_05_27-1_005.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971\1971_05_27-1_004.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971\1971_05_27-1_003.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971\1971_05_27-1_002.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971\1971_05_27-1.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971\1971_05_27-1_007.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971\1971_05_27-1_006.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971\1971_05_27-1_005.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971\1971_05_27-1_004.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971\1971_05_27-1_003.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1971\1971_05_27-1_002.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

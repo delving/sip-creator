@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2000-11-06-1-15">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2000-11-06-1-15">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2000-11-06-1-15">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=20358">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2000%5C2000_11_06-1-15_a_m.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2000%5C2000_11_06-1-15_a_m.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2000-11-06-1-15">
+      <dc:description>Sabel in schede. Officierssabel Model 1852. Totale lengte: 97cm. Lengte sabel: 93cm. Schede met 2 ringen. bronskleurig. Schroefjes aan onderzijde en bovenzijde insteek ontbreken. Schede op diverse plaatsen gescheurd. Metaalwindsels greep los. M.van Laar (15-03-2001): Gevest -Materiaal: messing -Greep: hoorn; draadwing ontbreekt gedeeltelijk; 16 ribben -Stootplaat: licht gebogen met voorbeugel en hor.stootplaat voorzien van gegraveerd bloem- en bladmotief -Pareerstang: achterzijde neerwaarts gebogen en -Bijzonderheden: onderdelen voorzien van gegraveerd bloem- en bladmotief -Montage: geschroefd d.m.v. afschroefbare klingknop Kling -Materiaal: staal -Vorm: gebogen -Fabrikant: F. HÃ¶rster-Solingen -Techniek: Eisenhou...... (= Eisenhouer) -Boog (pijl): 28 mm -Inscripties: Eisenhouer + F. HÃ¶rse.. (rest doorgekrast).Soli...(rest doorgekrast) -Geul: 594 mm -Breedte: 293 mm -Dikte (hiel): 77mm -Vorm angel: gebogen -Snede: buitenbocht, eenzijdig geslepen Schede -Materiaal: metaal: verzilverd -Draagring: -> Ã©Ã©n; een ontbreekt -Sleepplaat: metaal- ijzer afgesleten -Dekplaat (tromp): aanwezig doch gesoldeerd i.p.v. geschroefd, boutjes weg Bijzonderheden -Dragon: geen Beschadigingen -Ontbrekende onderdelen: deel winding + greep; 1 draagring; schede gescheurd -Deuken: schede -Roestvorming: kling sterk geroest (punt); angel geroest Reparaties -Prioriteit: ja Bronvermelding: Puijpe: blz 84, nr 130-132 DUT</dc:description>
+      <dc:identifier>2000/11/06-1-15</dc:identifier>
+      <dc:title>Officierssabel Model 1852 Officierssabel Model 1852</dc:title>
+      <dc:type>sabel</dc:type>
+      <dcterms:extent>38 3/16 in. (97 cm) Totale lengte: 972 mm Lengte zonder schede: 930 mm Lengte kling: 778 mm Lengte schede: 825 mm</dcterms:extent>
+      <dcterms:medium>Messing, staal, hoorn, metaal verzilverd, metaal ijzer</dcterms:medium>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2000%5C2000_11_06-1-15_a_m.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2000%5C2000_11_06-1-15_z.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2000%5C2000_11_06-1-15_m.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2000%5C2000_11_06-1-15_a_z.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2000\2000_11_06-1-15_a_m.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2000\2000_11_06-1-15_z.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2000\2000_11_06-1-15_m.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2000\2000_11_06-1-15_a_z.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2000\2000_11_06-1-15_a_m.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2000\2000_11_06-1-15_z.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2000\2000_11_06-1-15_m.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2000\2000_11_06-1-15_a_z.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2005-04-18-5-1">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2005-04-18-5-1">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2005-04-18-5-1">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=33972">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2005%5C2005_04_18-5-1%5C2005_04_18-5-1.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2005%5C2005_04_18-5-1%5C2005_04_18-5-1.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2005-04-18-5-1">
+      <dc:description>Documenten met betrekking tot J.H. Voges Foto, Portret van 1e Luitenant J.H. Voges in Ceremonieel tenue, borststuk Oorkonde Eervolle Vermelding, Buitenzorg 1 juli 1907, met handtekening J. van Heutsz. Uitloting Nationale Militie, Arnhem, 19 november 1907. Oorkonde Bronzen Medaille voor Trouwen Dienst, Batavia 15 oktober 1908. Oorkonde gesp EBK Zuid Celebes 1905-1908, Batavia 30 november 1910, getekend door van Daalen. Oorkonde gesp EBK Atjeh 1906-1910, Batavia 27 juli 1912, getekend door van Daalen. Oorkonde Zilveren medaille Trouwen Dienst, Batavia 12 december 1914, getekend door Michielsen. Beschikking benoeming tot Onderluitenant Infanterie, Batavia 25 november 1915. Oorkonde Zilveren gesp voor Trouwen Dienst voor 36 jaren dienst, Bandoeng 8 maart 1921. Tevredenheidsbetuiging Commando Detachement te Paloe, Makassar 11 april 1921. Beschikking Eervol ontslag, Bandoeng 22 mei 1923. Uittreksel benoeming tot reserve 2e Luitenant, Batavia, 30 mei 1923. Beschikking uitbetaling pensioen, Bandoeng 16 juli 1923. Uittreksel bevordering tot reserve 1e Luitenant, Batavia 2 september 1927. Uittreksel Eervol ontslag reserve 1e Luitenant, Tjipanas, 17 september 1927. Oorkonde gesp Atjeh 1911-1914. Bandoeng, augustus 1930, getekend door Cramer. Legitimatiebewijs Onderluitenant, 18 juni 1935. Uitbetalingsboekje pensioen, 18 februari 1942. Beschikking in werkelijke dienststelling als beheerder kampement XIXste Bataljon en 2 Mar. II te Malang per 8 december 1941. Bandoeng 17 januari 1942 (29 januari 1942). Beschikking opname in subsistentenkader Batavia, Batavia 23 oktober 1946. Uittreksel eervol ontslag uit militaire dienst, Batavia 8 mei 1947. Uittreksel toekenning voorlopig pensioen geldmiddelen Nederlnadsch IndiÃ«, Batavia 12 juni 1947. Uittreksel Stamboek tot 30 april 1947. Uittreksel Stamboek tot 1927 in hoesje Oorkonde ereteken voor Orde en Vrede, 12 februari 1949. Oorkonde Insigne Koninklijk Nederlands Indonesisch Leger, Batavia 25 juli 1950. Toekenning van uitbetaling pensioen door Republik Indonesia in Nederland. Den Haag 28 augustus 1950. Brief met bevestiging van uitreiking verloren gegane onderscheidingstekens. Den Haag 13 september 1951. DUT</dc:description>
+      <dc:identifier>2005/04/18-5-1</dc:identifier>
+      <dc:title>Documenten met betrekking tot J.H. Voges Documenten met betrekking tot J.H. Voges</dc:title>
+      <dc:type>documenten</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2005%5C2005_04_18-5-1%5C2005_04_18-5-1.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2005%5C2005_04_18-5-1%5C2005_04_18-5-1%5C2005_04_18-5-1.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2005\2005_04_18-5-1\2005_04_18-5-1.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2005\2005_04_18-5-1\2005_04_18-5-1\2005_04_18-5-1.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2005\2005_04_18-5-1\2005_04_18-5-1.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2005\2005_04_18-5-1\2005_04_18-5-1\2005_04_18-5-1.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

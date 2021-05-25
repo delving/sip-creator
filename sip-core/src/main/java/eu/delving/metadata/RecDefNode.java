@@ -290,7 +290,7 @@ public class RecDefNode implements Comparable<RecDefNode> {
             for (RecDefNode sub : children) {
                 if (sub.populated) childrenPopulated = true;
             }
-            if (nodeMappings.size() > 1 || childrenPopulated) dynOpts.add(dynOpt);
+            if (nodeMappings.size() >= 1 || childrenPopulated) dynOpts.add(dynOpt);
         }
         for (RecDefNode sub : children) sub.collectDynOpts(dynOpts);
     }
@@ -318,6 +318,15 @@ public class RecDefNode implements Comparable<RecDefNode> {
         }
     }
 
+    public void remove() {
+        if(parent != null) {
+            parent.children.remove(this);
+        }
+        for (NodeMapping nodeMapping : nodeMappings.values()) {
+            removeNodeMapping(nodeMapping.inputPath);
+        }
+    }
+
     public void notifyNodeMappingChange(NodeMapping nodeMapping, NodeMappingChange change) {
         listener.nodeMappingChanged(this, nodeMapping, change);
     }
@@ -335,7 +344,6 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public boolean hasActiveAttributes() {
-        if (dynOpt != null) return true;
         for (RecDefNode sub : children) {
             if (sub.isAttr() && (!sub.nodeMappings.isEmpty() || sub.isChildOpt())) return true;
         }

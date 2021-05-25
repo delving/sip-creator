@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1873-07-2-1">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1873-07-2-1">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1873-07-2-1">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=2509">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1873%5C1873_07-2-1.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1873%5C1873_07-2-1.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1873-07-2-1">
+      <dc:description>Rode vlag met Arabische letters, kogelgaten en bloedvlekken. Een vlag; Met Arabische letters, kogelgaten en bloedvlekken. In het begin van 1840 werden de bentings, door de Atjehers in het gezicht van onzen post te Baros, Sum.-Westkust opgericht, stormenderhand genomen onder bevel van den kolonel Michiels. Bij dien stormloop was de luitenant Bischof de eerste op de borstwering; hij haalde de Atjeehsche vlag naar omlaag en ontving daarbij elf klewanghouwen, waaraan hij eenige dagen later, den 3den Mei te Tapanoli, overleed, nadat hij tot kapitein was bevorderd." Het bloed op de vlag is dat van den luitenant Bischof, die zich gewond in deze vlag heeft gewikkeld. De vlag bestaat uit drie ruw aan elkaar genaaide roode banen katoen, te zamen lang 2,70, breed 1,35 Nederl. el, waarop, even zoo, gehecht zijn twee wit katoenen volle maanschijven, en twee Klewangs van dezelfde stof, door bijschriften, in fraaie Arabische letterfiguren opgeluisterd, terwijl, te midden in, aan de buitenzijde, zich een Vierkant vertoont van honderd ruiten, met soortgelijke karakters gevuld, en door een letterrand omgeven. De inhoud van een en ander, op verzoek van Dr. Wap, welwillend door den Heer Dr. A.W.T. Juynboll, te Delft, ontcijferd, luidt als volgt: Op de Maanschijf, aan de binnenzijde der vlag: Allah zal u op den rechten weg geleiden. Hij is de verhoorder en alwetende. - Deze spreuk is opgenomen uit den Koran: SÃ»ra II: 131. - Op het zwaard (Dsu'l-fakar), aan de binnenzijde der Vlag: In den naam van Allah, den ontfermer, den barmhartige. - De zegevierende leeuw van Allah is Ali-ibn-abi-Talib. (Een neven-profeet der niet-orthodoxe (kettersche) Mahomedanen.) - Allah verheerlijkt zijn aangezicht. - Gij, Ali, predik Hem dan ter eere, die wonderen verricht, en Gij zult Hem vinden te uwer hulpe in alle bezwaren; zorg en smart zullen opgeheven worden, Mahomed, door uw Profeetschap, en, door uw toevoorzicht. - Er is geen Edele dan Ali, geen Zwaard dan het zijne: Dsu'l-fakar. - Hij is het beste van des Ontfermers schepselen, de grootste der geloovigen; maar Hij, Allah, is de Allerhoogste, de Gewichtige: Hij-allÃ©Ã©n bestaat, en buiten Hem is er geen God. Op de Maanschijf, aam de naar den vijand gekeerde buitenzijde der Vlag: De vloot vare uit en ankere in Allah's Naam, want Hij, mijn Heer, is waarlijk vergevensgezind en barmhartig. - Allah zal helpen; de overwinning is nabij! Verkondig dit den geloovigen. - Deze spreuken zijn genomen uit den Koran: SÃ»ra XI; 43, en SÃ»ra LXI; 13. - Op het gevest van het Zwaard, aan de buitenzijde der Vlag: Dit Vierkant is geplaatst op de Banier van Al-Iskander. (De Opperbevelhebber der legermacht.) Aan de buitenzijde der Vlag vertoont zich, namelijk, een door een randschrift omgeven en in honderd vakjes verdeeld Vierkant, zijnde een Talisman of Tooverteeken, wat men den vijand voorhoudt, om hem daarmeÃª op de vlucht te jagen, door het gezicht van de tienmalen herhaalde tien Namen van Allah, op tien lijnen geschreven, van de rechter- naar de linkerhand, te weten: Standhoudende; Nabijzijnde; Aannemer van het berouw. Op de punt van het Zwaard, aan de buitenzijde der Vlag: Er is geen God dan Allah. Rond het Vierkant, aan de buitenzijde der Vlag: O Machtige, verdelg mijn vijand, Holland, wegens zijn list. Alvermogende, vernietig den logenaar en grootspreker, Holland. DUT</dc:description>
+      <dc:identifier>1873/07-2-1</dc:identifier>
+      <dc:title>Atjehse vlag, veroverd in 1840 bij Baros Atjehse vlag, veroverd in 1840 bij Baros</dc:title>
+      <dc:type>vlag</dc:type>
+      <dcterms:created>Baros</dcterms:created>
+      <dcterms:created>1840</dcterms:created>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1873%5C1873_07-2-1.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1873\1873_07-2-1.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1873\1873_07-2-1.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

@@ -40,7 +40,7 @@ public class BulkMappingRunner extends AbstractMappingRunner {
             recMapping.getRecDefTree().getRecDef(), metadataRecord.getRootNode(),
             recMapping.getRecDefTree().getRecDef().valueOptLookup);
         try {
-            Node result = (Node) compiledScript.eval(bindings);
+            Object result =  compiledScript.eval(bindings);
             return Utils.stripEmptyElements(result);
         } catch (ScriptException e) {
             throw new RuntimeException(e);

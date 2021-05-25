@@ -80,6 +80,7 @@ public class MappingResult {
     public List<String> getUriErrors() throws XPathExpressionException {
         List<String> errors = new ArrayList<String>();
         for (Map.Entry<String, XPathExpression> entry : recDefTree.getUriCheckPaths().entrySet()) {
+            // TODO causes the largest spikes in memory usage by a large margin even after the set of URI checks was significantly. See #38738404363a326970f52626ae6ac61deaebe2ec
             NodeList nodeList = (NodeList) entry.getValue().evaluate(root, XPathConstants.NODESET);
             for (int walk = 0; walk < nodeList.getLength(); walk++) {
                 Node node = nodeList.item(walk);

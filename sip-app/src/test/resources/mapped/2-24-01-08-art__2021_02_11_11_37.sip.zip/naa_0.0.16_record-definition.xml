@@ -1,0 +1,2856 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record-definition prefix="naa" version="0.0.1" flat="false">
+	<namespaces>
+		<namespace prefix="bf" uri="http://id.loc.gov/ontologies/bibframe/"/>
+		<namespace prefix="cs" uri="http://www.kulttuurisampo.fi/ebkr/"/>
+		<namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/"/>
+		<namespace prefix="geo" uri="http://www.opengis.net/ont/geosparql#"/>
+		<namespace prefix="hg" uri="http://rdf.histograph.io/"/>
+		<namespace prefix="sd" uri="http://www.w3.org/ns/sparql-service-description#"/>
+		<namespace prefix="vs" uri="http://www.w3.org/2003/06/sw-vocab-status/ns#"/>
+		<namespace prefix="dbo" uri="http://dbpedia.org/ontology/"/>
+		<namespace prefix="edm" uri="http://www.europeana.eu/schemas/edm/"/>
+		<namespace prefix="naa" uri="https://archief.nl/def/"/>
+		<namespace prefix="nao" uri="https://archief.nl/def/ontologie/"/>
+		<namespace prefix="nav" uri="https://archief.nl/def/vocabulaire/"/>
+		<namespace prefix="pnv" uri="https://w3id.org/pnv#"/>
+		<namespace prefix="ore" uri="http://www.openarchives.org/ore/terms/"/>
+		<namespace prefix="org" uri="http://www.w3.org/ns/org#"/>
+		<namespace prefix="owl" uri="http://www.w3.org/2002/07/owl#"/>
+		<namespace prefix="rdf" uri="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+		<namespace prefix="sem" uri="http://semanticweb.cs.vu.nl/2009/11/sem/"/>
+		<namespace prefix="xml" uri="http://www.w3.org/XML/1998/namespace"/>
+		<namespace prefix="xsd" uri="http://www.w3.org/2001/XMLSchema#"/>
+		<namespace prefix="dcat" uri="https://www.w3.org/TR/vocab-dcat-2/"/>
+		<namespace prefix="foaf" uri="http://xmlns.com/foaf/0.1/"/>
+		<namespace prefix="iiif" uri="http://iiif.io/api/image/2#"/>
+		<namespace prefix="prov" uri="http://www.w3.org/ns/prov#"/>
+		<namespace prefix="rdfs" uri="http://www.w3.org/2000/01/rdf-schema#"/>
+		<namespace prefix="skos" uri="http://www.w3.org/2004/02/skos/core#"/>
+		<namespace prefix="svcs" uri="http://rdfs.org/sioc/services#"/>
+		<namespace prefix="void" uri="http://rdfs.org/ns/void#"/>
+		<namespace prefix="vcard" uri="http://www.w3.org/2006/vcard/ns#"/>
+		<namespace prefix="frbroo" uri="http://iflastandards.info/ns/fr/frbr/frbroo/"/>
+		<namespace prefix="premis" uri="http://www.loc.gov/premis/rdf/v3/"/>
+		<namespace prefix="schema" uri="http://schema.org/"/>
+		<namespace prefix="dcterms" uri="http://purl.org/dc/terms/"/>
+		<namespace prefix="eac-cpf" uri="http://www3.iath.virginia.edu/eac/cpf/"/>
+		<namespace prefix="ebucore" uri="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#"/>
+		<namespace prefix="cidoc-crm" uri="http://www.cidoc-crm.org/cidoc-crm/"/>
+		<namespace prefix="frbr_core" uri="http://purl.org/vocab/frbr/core#"/>
+		<namespace prefix="odrl" uri="http://www.w3.org/ns/odrl/2/"/>
+		<namespace prefix="adms" uri="http://www.w3.org/ns/adms#"/>
+		<namespace prefix="ov" uri="http://open.vocab.org/terms/"/>
+		<namespace prefix="agrl" uri="http://d-nb.info/standards/elementset/agrelon#"/>
+	</namespaces>
+	<functions>
+		<mapping-function name="createOreAggregationUri">
+			<sample-input>
+				<string>00001</string>
+			</sample-input>
+			<groovy-code>
+				<string>"${baseUrl}/resource/aggregation/${spec}/${_uniqueIdentifier.sanitizeURI()}"</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="createEDMAgentUri">
+			<groovy-code>
+				<string>StringBuilder out = new StringBuilder()</string>
+				<string>for (char c : it.toString().chars) {</string>
+				<string>switch (c) {</string>
+				<string>case ' ':</string>
+				<string>out.append('%20')</string>
+				<string>break;</string>
+				<string>case '[':</string>
+				<string>out.append('%5B')</string>
+				<string>break;</string>
+				<string>case ']':</string>
+				<string>out.append('%5D')</string>
+				<string>break;</string>
+				<string>case '\\':</string>
+				<string>out.append('%5C')</string>
+				<string>break;</string>
+				<string>default:</string>
+				<string>out.append(c);</string>
+				<string>}</string>
+				<string>}</string>
+				<string>identifier = out.toString()</string>
+				<string>"${baseUrl}/resource/agent/${spec}/${identifier}"</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="createEDMPlaceUri">
+			<groovy-code>
+				<string>StringBuilder out = new StringBuilder()</string>
+				<string>for (char c : it.toString().chars) {</string>
+				<string>switch (c) {</string>
+				<string>case ' ':</string>
+				<string>out.append('%20')</string>
+				<string>break;</string>
+				<string>case '[':</string>
+				<string>out.append('%5B')</string>
+				<string>break;</string>
+				<string>case ']':</string>
+				<string>out.append('%5D')</string>
+				<string>break;</string>
+				<string>case '\\':</string>
+				<string>out.append('%5C')</string>
+				<string>break;</string>
+				<string>default:</string>
+				<string>out.append(c);</string>
+				<string>}</string>
+				<string>}</string>
+				<string>identifier = out.toString()</string>
+				<string>"${baseUrl}/resource/place/${spec}/${identifier}"</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="lowercase">
+			<sample-input>
+				<string>Bla bla</string>
+				<string>BLA bla bla</string>
+			</sample-input>
+			<groovy-code>
+				<string>"${it.toString().toLowerCase()}"</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="reverseNames">
+			<sample-input>
+				<string>Sjoerd Siebinga</string>
+				<string>Siebinga, Sjoerd</string>
+				<string>Siebinga, Sjoerd Michiel</string>
+			</sample-input>
+			<groovy-code>
+				<string>kwrd = "${it}".replaceAll('[^|,-_a-zA-Z0-9]','')</string>
+				<string>parts = kwrd.toString().split(",")</string>
+				<string>if (parts.length &gt; 1) {</string>
+				<string>"${parts[1].trim()} ${parts[0]}"</string>
+				<string>}</string>
+				<string>else {</string>
+				<string>"${it}"</string>
+				<string>}</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="smallThumbnail">
+			<groovy-code>
+				<string>"http://media.delving.org/thumbnail/${spec}/${it.replaceAll('^.*[\\/|\\\\]','').replaceAll('(?i)\\.jpg|\\.jpeg|\\.tif|\\.tiff|\\.png|\\.gif', '')}/180"</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="createNTURI">
+			<sample-input>
+				<string>lkjljk</string>
+			</sample-input>
+			<groovy-code>
+				<string>def utmOut = false</string>
+				<string>String string = it.toString()</string>
+				<string>if (string == '') {</string>
+				<string>""</string>
+				<string>}</string>
+				<string>else {</string>
+				<string>"nt00001"</string>
+				<string>}</string>
+			</groovy-code>
+		</mapping-function>
+		<!-- 27 oktober 2020 - urilify archiefLink -->
+		<mapping-function name="NA_archiefLink">
+			<sample-input>
+				<string>NL-HaNA/3.03.01.01/4271////01</string>
+				<string>NL-HaNA/1.08.11/7318// fol. CCCXVIII//</string>
+				<string>NL-HaNA/1.08.11/7318// fol. XCII vo//</string>
+			</sample-input>
+			<groovy-code>
+				<string>"${it}".replaceAll('[ /]','_')</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="NA_createNARefByUri">
+			<groovy-code>
+				<string>StringBuilder out = new StringBuilder()</string>
+				<string>for (char c : it.toString().chars) {</string>
+				<string>switch (c) {</string>
+				<string>case ' ':</string>
+				<string>out.append('%20')</string>
+				<string>break;</string>
+				<string>case '[':</string>
+				<string>out.append('%5B')</string>
+				<string>break;</string>
+				<string>case ']':</string>
+				<string>out.append('%5D')</string>
+				<string>break;</string>
+				<string>case '\\':</string>
+				<string>out.append('%5C')</string>
+				<string>break;</string>
+				<string>default:</string>
+				<string>out.append(c);</string>
+				<string>}</string>
+				<string>}</string>
+				<string>identifier = out.toString()</string>
+				<string>code = "${spec}"</string>
+				<string>it = code.substring(0,7)</string>
+				<string>"${baseUrl}/naderetoegang/doc/${it}/${identifier}"</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="NA_giveNTCODE">
+			<groovy-code>
+				<string>code = "${spec}"</string>
+				<string>it = code.substring(0,7)</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="NA_urilify">
+			<sample-input>
+				<string>kkjhdf lkjj(d)f[l]k.kj'fHaneGra%af</string>
+			</sample-input>
+			<groovy-code>
+				<string>StringBuilder out = new StringBuilder()</string>
+				<string>for (char c : it.toString().chars) {</string>
+				<string>switch (c) {</string>
+				<string>case ' ':</string>
+				<string>out.append('_')</string>
+				<string>break;</string>
+				<string>case '.':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case ']':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case '\\':</string>
+				<string>out.append('_')</string>
+				<string>break;</string>
+				<string>case '(':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case ']':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case '[':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case ')':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case '\'':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case '%':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<!--Toevoeging GK 20181018: komma , hekje # en & eruit gestript-->
+				<string>case ',':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case '#':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case '&amp;':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<!-- replace {} -->
+				<string>case '{':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case '}':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<!-- replace > character -->
+				<string>case '>':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<!-- replace special characters -->
+				<!-- Àà · Áá · Ââ · Ää · Ãã · Āā · Ąą · Ăă · Ǎǎ  -->
+				<string>case 'À':</string>
+				<string>out.append('A')</string>
+				<string>break;</string>
+				<string>case 'à':</string>
+				<string>out.append('a')</string>
+				<string>break;</string>
+				<string>case 'Â':</string>
+				<string>out.append('A')</string>
+				<string>break;</string>
+				<string>case 'á':</string>
+				<string>out.append('a')</string>
+				<string>break;</string>
+				<string>case 'Ã':</string>
+				<string>out.append('A')</string>
+				<string>break;</string>
+				<string>case 'â':</string>
+				<string>out.append('a')</string>
+				<string>break;</string>
+				<string>case 'Ā':</string>
+				<string>out.append('A')</string>
+				<string>break;</string>
+				<string>case 'ä':</string>
+				<string>out.append('a')</string>
+				<string>break;</string>
+				<string>case 'Ą':</string>
+				<string>out.append('A')</string>
+				<string>break;</string>
+				<string>case 'ą':</string>
+				<string>out.append('a')</string>
+				<string>break;</string>
+				<string>case 'ã':</string>
+				<string>out.append('a')</string>
+				<string>break;</string>
+				<string>case 'Ă':</string>
+				<string>out.append('A')</string>
+				<string>break;</string>
+				<string>case 'ă':</string>
+				<string>out.append('a')</string>
+				<string>break;</string>
+				<string>case 'Ǎ':</string>
+				<string>out.append('A')</string>
+				<string>break;</string>
+				<string>case 'ǎ':</string>
+				<string>out.append('a')</string>
+				<string>break;</string>
+				<!-- Çç · Ĉĉ · Čč · Ćć  -->
+				<string>case 'Ç':</string>
+				<string>out.append('C')</string>
+				<string>break;</string>
+				<string>case 'ç':</string>
+				<string>out.append('c')</string>
+				<string>break;</string>
+				<string>case 'Ĉ':</string>
+				<string>out.append('C')</string>
+				<string>break;</string>
+				<string>case 'ĉ':</string>
+				<string>out.append('c')</string>
+				<string>break;</string>
+				<string>case 'Č':</string>
+				<string>out.append('C')</string>
+				<string>break;</string>
+				<string>case 'č':</string>
+				<string>out.append('c')</string>
+				<string>break;</string>
+				<string>case 'Ć':</string>
+				<string>out.append('C')</string>
+				<string>break;</string>
+				<string>case 'ć':</string>
+				<string>out.append('c')</string>
+				<string>break;</string>
+				<!-- Đđ · Ďď  -->
+				<string>case 'Đ':</string>
+				<string>out.append('D')</string>
+				<string>break;</string>
+				<string>case 'đ':</string>
+				<string>out.append('d')</string>
+				<string>break;</string>
+				<string>case 'Ď':</string>
+				<string>out.append('D')</string>
+				<string>break;</string>
+				<string>case 'ď':</string>
+				<string>out.append('d')</string>
+				<string>break;</string>
+				<!-- Èè · Éé · Êê · Ëë · Ęę · Ēē · Ĕĕ · Ėė · Ěě	 -->
+				<string>case 'È':</string>
+				<string>out.append('E')</string>
+				<string>break;</string>
+				<string>case 'è':</string>
+				<string>out.append('e')</string>
+				<string>break;</string>
+				<string>case 'É':</string>
+				<string>out.append('E')</string>
+				<string>break;</string>
+				<string>case 'é':</string>
+				<string>out.append('e')</string>
+				<string>break;</string>
+				<string>case 'Ê':</string>
+				<string>out.append('E')</string>
+				<string>break;</string>
+				<string>case 'ê':</string>
+				<string>out.append('e')</string>
+				<string>break;</string>
+				<string>case 'Ë':</string>
+				<string>out.append('E')</string>
+				<string>break;</string>
+				<string>case 'ë':</string>
+				<string>out.append('e')</string>
+				<string>break;</string>
+				<string>case 'Ę':</string>
+				<string>out.append('E')</string>
+				<string>break;</string>
+				<string>case 'ę':</string>
+				<string>out.append('e')</string>
+				<string>break;</string>
+				<string>case 'Ē':</string>
+				<string>out.append('E')</string>
+				<string>break;</string>
+				<string>case 'ē':</string>
+				<string>out.append('e')</string>
+				<string>break;</string>
+				<string>case 'Ė':</string>
+				<string>out.append('E')</string>
+				<string>break;</string>
+				<string>case 'ė':</string>
+				<string>out.append('e')</string>
+				<string>break;</string>
+				<string>case 'Ě':</string>
+				<string>out.append('E')</string>
+				<string>break;</string>
+				<string>case 'ě':</string>
+				<string>out.append('e')</string>
+				<string>break;</string>
+				<!--  Ĝĝ · Ğğ · Ġġ · Ģģ · Ǧǧ -->
+				<string>case 'Ĝ':</string>
+				<string>out.append('G')</string>
+				<string>break;</string>
+				<string>case 'ĝ':</string>
+				<string>out.append('g')</string>
+				<string>break;</string>
+				<string>case 'Ğ':</string>
+				<string>out.append('G')</string>
+				<string>break;</string>
+				<string>case 'ğ':</string>
+				<string>out.append('g')</string>
+				<string>break;</string>
+				<string>case 'Ġ':</string>
+				<string>out.append('G')</string>
+				<string>break;</string>
+				<string>case 'ġ':</string>
+				<string>out.append('g')</string>
+				<string>break;</string>
+				<string>case 'Ģ':</string>
+				<string>out.append('G')</string>
+				<string>break;</string>
+				<string>case 'ģ':</string>
+				<string>out.append('g')</string>
+				<string>break;</string>
+				<string>case 'Ǧ':</string>
+				<string>out.append('G')</string>
+				<string>break;</string>
+				<string>case 'ǧ':</string>
+				<string>out.append('g')</string>
+				<string>break;</string>
+				<!-- Ĥĥ · Ħħ -->
+				<string>case 'Ĥ':</string>
+				<string>out.append('H')</string>
+				<string>break;</string>
+				<string>case 'ĥ':</string>
+				<string>out.append('h')</string>
+				<string>break;</string>
+				<string>case 'Ħ':</string>
+				<string>out.append('H')</string>
+				<string>break;</string>
+				<string>case 'ħ':</string>
+				<string>out.append('h')</string>
+				<string>break;</string>
+				<!-- Ìì · Íí · Îî · Ïï · Įį · İı · Ĩĩ · Īī · Ĭĭ -->
+				<string>case 'Ì':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'ì':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<string>case 'Í':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'í':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<string>case 'Î':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'î':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<string>case 'Ï':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'ï':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<string>case 'Į':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'į':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<string>case 'İ':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'ı':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<string>case 'Ĩ':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'ĩ':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<string>case 'Ī':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'ī':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<string>case 'Ĭ':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'ĭ':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<!-- Ĵĵ -->
+				<string>case 'Ĵ':</string>
+				<string>out.append('J')</string>
+				<string>break;</string>
+				<string>case 'ĵ':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<!-- Ķķ · Ǩǩ -->
+				<string>case 'Ķ':</string>
+				<string>out.append('K')</string>
+				<string>break;</string>
+				<string>case 'ķ':</string>
+				<string>out.append('k')</string>
+				<string>break;</string>
+				<string>case 'Ǩ':</string>
+				<string>out.append('K')</string>
+				<string>break;</string>
+				<string>case 'ǩ':</string>
+				<string>out.append('k')</string>
+				<string>break;</string>
+				<!-- Ĺĺ · Ļļ · Ľľ · Ŀŀ · Łł -->
+				<string>case 'Ĺ':</string>
+				<string>out.append('L')</string>
+				<string>break;</string>
+				<string>case 'ĺ':</string>
+				<string>out.append('l')</string>
+				<string>break;</string>
+				<string>case 'Ļ':</string>
+				<string>out.append('L')</string>
+				<string>break;</string>
+				<string>case 'ļ':</string>
+				<string>out.append('l')</string>
+				<string>break;</string>
+				<string>case 'Ľ':</string>
+				<string>out.append('L')</string>
+				<string>break;</string>
+				<string>case 'ľ':</string>
+				<string>out.append('l')</string>
+				<string>break;</string>
+				<string>case 'Ŀ':</string>
+				<string>out.append('L')</string>
+				<string>break;</string>
+				<string>case 'ŀ':</string>
+				<string>out.append('l')</string>
+				<string>break;</string>
+				<string>case 'Ł':</string>
+				<string>out.append('L')</string>
+				<string>break;</string>
+				<string>case 'ł':</string>
+				<string>out.append('l')</string>
+				<string>break;</string>
+				<!-- Ńń · Ņņ · Ññ · Ňň · Ṅṅ -->
+				<string>case 'Ń':</string>
+				<string>out.append('N')</string>
+				<string>break;</string>
+				<string>case 'ń':</string>
+				<string>out.append('n')</string>
+				<string>break;</string>
+				<string>case 'Ņ':</string>
+				<string>out.append('N')</string>
+				<string>break;</string>
+				<string>case 'ņ':</string>
+				<string>out.append('n')</string>
+				<string>break;</string>
+				<string>case 'Ñ':</string>
+				<string>out.append('N')</string>
+				<string>break;</string>
+				<string>case 'ñ':</string>
+				<string>out.append('n')</string>
+				<string>break;</string>
+				<string>case 'Ň':</string>
+				<string>out.append('N')</string>
+				<string>break;</string>
+				<string>case 'ň':</string>
+				<string>out.append('n')</string>
+				<string>break;</string>
+				<string>case 'Ṅ':</string>
+				<string>out.append('N')</string>
+				<string>break;</string>
+				<string>case 'ṅ':</string>
+				<string>out.append('n')</string>
+				<string>break;</string>
+				<!--  Òò · Óó · Ôô · Öö · Õõ · Őő · Ǫǫ · Ōō · Ŏŏ · Ơơ -->
+				<string>case 'Ò':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ò':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Ó':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ó':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Ô':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ô':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Ö':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ö':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Õ':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'õ':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Ő':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ő':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Ǫ':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ǫ':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Ō':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ō':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Ŏ':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ŏ':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Ơ':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ơ':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<!-- Ŕŕ · Ŗŗ · Řř -->
+				<string>case 'Ŕ':</string>
+				<string>out.append('R')</string>
+				<string>break;</string>
+				<string>case 'ŕ':</string>
+				<string>out.append('r')</string>
+				<string>break;</string>
+				<string>case 'Ŗ':</string>
+				<string>out.append('R')</string>
+				<string>break;</string>
+				<string>case 'ŗ':</string>
+				<string>out.append('r')</string>
+				<string>break;</string>
+				<string>case 'Ř':</string>
+				<string>out.append('R')</string>
+				<string>break;</string>
+				<string>case 'ř':</string>
+				<string>out.append('r')</string>
+				<string>break;</string>
+				<!-- Śś · Ŝŝ · Şş · Șș · Šš · ẞß · Þþ -->
+				<string>case 'Ś':</string>
+				<string>out.append('S')</string>
+				<string>break;</string>
+				<string>case 'ś':</string>
+				<string>out.append('s')</string>
+				<string>break;</string>
+				<string>case 'Ŝ':</string>
+				<string>out.append('S')</string>
+				<string>break;</string>
+				<string>case 'ŝ':</string>
+				<string>out.append('s')</string>
+				<string>break;</string>
+				<string>case 'Ş':</string>
+				<string>out.append('S')</string>
+				<string>break;</string>
+				<string>case 'ş':</string>
+				<string>out.append('s')</string>
+				<string>break;</string>
+				<string>case 'Ș':</string>
+				<string>out.append('S')</string>
+				<string>break;</string>
+				<string>case 'ș':</string>
+				<string>out.append('s')</string>
+				<string>break;</string>
+				<string>case 'Š':</string>
+				<string>out.append('S')</string>
+				<string>break;</string>
+				<string>case 'š':</string>
+				<string>out.append('s')</string>
+				<string>break;</string>
+				<string>case 'ẞ':</string>
+				<string>out.append('S')</string>
+				<string>break;</string>
+				<string>case 'ß':</string>
+				<string>out.append('s')</string>
+				<string>break;</string>
+				<string>case 'Þ':</string>
+				<string>out.append('S')</string>
+				<string>break;</string>
+				<string>case 'þ':</string>
+				<string>out.append('s')</string>
+				<string>break;</string>
+				<!-- Ťť · Ŧŧ · Ţţ · Țț  -->
+				<string>case 'Ť':</string>
+				<string>out.append('T')</string>
+				<string>break;</string>
+				<string>case 'ť':</string>
+				<string>out.append('t')</string>
+				<string>break;</string>
+				<string>case 'Ŧ':</string>
+				<string>out.append('T')</string>
+				<string>break;</string>
+				<string>case 'ŧ':</string>
+				<string>out.append('t')</string>
+				<string>break;</string>
+				<string>case 'Ţ':</string>
+				<string>out.append('T')</string>
+				<string>break;</string>
+				<string>case 'ţ':</string>
+				<string>out.append('t')</string>
+				<string>break;</string>
+				<string>case 'Ț':</string>
+				<string>out.append('T')</string>
+				<string>break;</string>
+				<string>case 'ț':</string>
+				<string>out.append('t')</string>
+				<string>break;</string>
+				<!-- Ùù · Úú · Ûû · Üü · Ũũ · Ūū · Ŭŭ · Ųų · Ůů · Űű · Ưư -->
+				<string>case 'Ù':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ù':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ú':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ú':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Û':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'û':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ü':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ü':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ũ':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ũ':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ū':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ū':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ŭ':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ŭ':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ų':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ų':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ů':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ů':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ű':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ű':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ư':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ư':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<!-- Ŵŵ -->
+				<string>case 'Ŵ':</string>
+				<string>out.append('W')</string>
+				<string>break;</string>
+				<string>case 'ŵ':</string>
+				<string>out.append('w')</string>
+				<string>break;</string>
+				<!-- Ýý · Ŷŷ · Ÿÿ -->
+				<string>case 'Ý':</string>
+				<string>out.append('Y')</string>
+				<string>break;</string>
+				<string>case 'ý':</string>
+				<string>out.append('y')</string>
+				<string>break;</string>
+				<string>case 'Ŷ':</string>
+				<string>out.append('Y')</string>
+				<string>break;</string>
+				<string>case 'ŷ':</string>
+				<string>out.append('y')</string>
+				<string>break;</string>
+				<string>case 'Ÿ':</string>
+				<string>out.append('Y')</string>
+				<string>break;</string>
+				<string>case 'ÿ':</string>
+				<string>out.append('y')</string>
+				<string>break;</string>
+				<!-- Źź · Žž · Żż -->
+				<string>case 'Ź':</string>
+				<string>out.append('Z')</string>
+				<string>break;</string>
+				<string>case 'ź':</string>
+				<string>out.append('z')</string>
+				<string>break;</string>
+				<string>case 'Ž':</string>
+				<string>out.append('Z')</string>
+				<string>break;</string>
+				<string>case 'ž':</string>
+				<string>out.append('z')</string>
+				<string>break;</string>
+				<string>case 'Ż':</string>
+				<string>out.append('Z')</string>
+				<string>break;</string>
+				<string>case 'ż':</string>
+				<string>out.append('z')</string>
+				<string>break;</string>
+				<!-- end replace special characters -->
+				<string>default:</string>
+				<string>out.append(c);</string>
+				<string>}</string>
+				<string>}</string>
+				<string>identifier = out.toString().toLowerCase().replaceAll('[^-_a-zA-Z0-9]','')</string>
+				<string>"${identifier}"</string>
+			</groovy-code>
+		</mapping-function>
+		<!-- 20181018 GK Functie toegevoegd om namen te urlifyen zonder dat ze naar kleine letters worden gezet -->
+		<mapping-function name="NA_urilifyNames">
+			<sample-input>
+				<string>kkjhdf lkjj(d)f[l]k.kj'fHaneGra%af</string>
+			</sample-input>
+			<groovy-code>
+				<string>StringBuilder out = new StringBuilder()</string>
+				<string>for (char c : it.toString().chars) {</string>
+				<string>switch (c) {</string>
+				<string>case ' ':</string>
+				<string>out.append('_')</string>
+				<string>break;</string>
+				<string>case '.':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case '{':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case '}':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case '\\':</string>
+				<string>out.append('_')</string>
+				<string>break;</string>
+				<string>case '(':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case ']':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case '[':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case ')':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case '\'':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case '%':</string>
+				<string>out.append('')</string>
+				<!--Toevoeging GK 20181018: komma , hekje # en & eruit gestript-->
+				<string>case ',':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case '#':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case '&amp;':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<!-- replace {} -->
+				<string>case '{':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<string>case '}':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<!-- replace > character -->
+				<string>case '>':</string>
+				<string>out.append('')</string>
+				<string>break;</string>
+				<!-- replace special characters -->
+				<!-- replace special characters -->
+				<!-- Àà · Áá · Ââ · Ää · Ãã · Āā · Ąą · Ăă · Ǎǎ  -->
+				<string>case 'À':</string>
+				<string>out.append('A')</string>
+				<string>break;</string>
+				<string>case 'à':</string>
+				<string>out.append('a')</string>
+				<string>break;</string>
+				<string>case 'Â':</string>
+				<string>out.append('A')</string>
+				<string>break;</string>
+				<string>case 'á':</string>
+				<string>out.append('a')</string>
+				<string>break;</string>
+				<string>case 'Ã':</string>
+				<string>out.append('A')</string>
+				<string>break;</string>
+				<string>case 'â':</string>
+				<string>out.append('a')</string>
+				<string>break;</string>
+				<string>case 'Ā':</string>
+				<string>out.append('A')</string>
+				<string>break;</string>
+				<string>case 'ä':</string>
+				<string>out.append('a')</string>
+				<string>break;</string>
+				<string>case 'Ą':</string>
+				<string>out.append('A')</string>
+				<string>break;</string>
+				<string>case 'ą':</string>
+				<string>out.append('a')</string>
+				<string>break;</string>
+				<string>case 'ã':</string>
+				<string>out.append('a')</string>
+				<string>break;</string>
+				<string>case 'Ă':</string>
+				<string>out.append('A')</string>
+				<string>break;</string>
+				<string>case 'ă':</string>
+				<string>out.append('a')</string>
+				<string>break;</string>
+				<string>case 'Ǎ':</string>
+				<string>out.append('A')</string>
+				<string>break;</string>
+				<string>case 'ǎ':</string>
+				<string>out.append('a')</string>
+				<string>break;</string>
+				<!-- Çç · Ĉĉ · Čč · Ćć  -->
+				<string>case 'Ç':</string>
+				<string>out.append('C')</string>
+				<string>break;</string>
+				<string>case 'ç':</string>
+				<string>out.append('c')</string>
+				<string>break;</string>
+				<string>case 'Ĉ':</string>
+				<string>out.append('C')</string>
+				<string>break;</string>
+				<string>case 'ĉ':</string>
+				<string>out.append('c')</string>
+				<string>break;</string>
+				<string>case 'Č':</string>
+				<string>out.append('C')</string>
+				<string>break;</string>
+				<string>case 'č':</string>
+				<string>out.append('c')</string>
+				<string>break;</string>
+				<string>case 'Ć':</string>
+				<string>out.append('C')</string>
+				<string>break;</string>
+				<string>case 'ć':</string>
+				<string>out.append('c')</string>
+				<string>break;</string>
+				<!-- Đđ · Ďď  -->
+				<string>case 'Đ':</string>
+				<string>out.append('D')</string>
+				<string>break;</string>
+				<string>case 'đ':</string>
+				<string>out.append('d')</string>
+				<string>break;</string>
+				<string>case 'Ď':</string>
+				<string>out.append('D')</string>
+				<string>break;</string>
+				<string>case 'ď':</string>
+				<string>out.append('d')</string>
+				<string>break;</string>
+				<!-- Èè · Éé · Êê · Ëë · Ęę · Ēē · Ĕĕ · Ėė · Ěě	 -->
+				<string>case 'È':</string>
+				<string>out.append('E')</string>
+				<string>break;</string>
+				<string>case 'è':</string>
+				<string>out.append('e')</string>
+				<string>break;</string>
+				<string>case 'É':</string>
+				<string>out.append('E')</string>
+				<string>break;</string>
+				<string>case 'é':</string>
+				<string>out.append('e')</string>
+				<string>break;</string>
+				<string>case 'Ê':</string>
+				<string>out.append('E')</string>
+				<string>break;</string>
+				<string>case 'ê':</string>
+				<string>out.append('e')</string>
+				<string>break;</string>
+				<string>case 'Ë':</string>
+				<string>out.append('E')</string>
+				<string>break;</string>
+				<string>case 'ë':</string>
+				<string>out.append('e')</string>
+				<string>break;</string>
+				<string>case 'Ę':</string>
+				<string>out.append('E')</string>
+				<string>break;</string>
+				<string>case 'ę':</string>
+				<string>out.append('e')</string>
+				<string>break;</string>
+				<string>case 'Ē':</string>
+				<string>out.append('E')</string>
+				<string>break;</string>
+				<string>case 'ē':</string>
+				<string>out.append('e')</string>
+				<string>break;</string>
+				<string>case 'Ė':</string>
+				<string>out.append('E')</string>
+				<string>break;</string>
+				<string>case 'ė':</string>
+				<string>out.append('e')</string>
+				<string>break;</string>
+				<string>case 'Ě':</string>
+				<string>out.append('E')</string>
+				<string>break;</string>
+				<string>case 'ě':</string>
+				<string>out.append('e')</string>
+				<string>break;</string>
+				<!--  Ĝĝ · Ğğ · Ġġ · Ģģ · Ǧǧ -->
+				<string>case 'Ĝ':</string>
+				<string>out.append('G')</string>
+				<string>break;</string>
+				<string>case 'ĝ':</string>
+				<string>out.append('g')</string>
+				<string>break;</string>
+				<string>case 'Ğ':</string>
+				<string>out.append('G')</string>
+				<string>break;</string>
+				<string>case 'ğ':</string>
+				<string>out.append('g')</string>
+				<string>break;</string>
+				<string>case 'Ġ':</string>
+				<string>out.append('G')</string>
+				<string>break;</string>
+				<string>case 'ġ':</string>
+				<string>out.append('g')</string>
+				<string>break;</string>
+				<string>case 'Ģ':</string>
+				<string>out.append('G')</string>
+				<string>break;</string>
+				<string>case 'ģ':</string>
+				<string>out.append('g')</string>
+				<string>break;</string>
+				<string>case 'Ǧ':</string>
+				<string>out.append('G')</string>
+				<string>break;</string>
+				<string>case 'ǧ':</string>
+				<string>out.append('g')</string>
+				<string>break;</string>
+				<!-- Ĥĥ · Ħħ -->
+				<string>case 'Ĥ':</string>
+				<string>out.append('H')</string>
+				<string>break;</string>
+				<string>case 'ĥ':</string>
+				<string>out.append('h')</string>
+				<string>break;</string>
+				<string>case 'Ħ':</string>
+				<string>out.append('H')</string>
+				<string>break;</string>
+				<string>case 'ħ':</string>
+				<string>out.append('h')</string>
+				<string>break;</string>
+				<!-- Ìì · Íí · Îî · Ïï · Įį · İı · Ĩĩ · Īī · Ĭĭ -->
+				<string>case 'Ì':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'ì':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<string>case 'Í':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'í':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<string>case 'Î':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'î':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<string>case 'Ï':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'ï':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<string>case 'Į':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'į':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<string>case 'İ':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'ı':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<string>case 'Ĩ':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'ĩ':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<string>case 'Ī':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'ī':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<string>case 'Ĭ':</string>
+				<string>out.append('I')</string>
+				<string>break;</string>
+				<string>case 'ĭ':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<!-- Ĵĵ -->
+				<string>case 'Ĵ':</string>
+				<string>out.append('J')</string>
+				<string>break;</string>
+				<string>case 'ĵ':</string>
+				<string>out.append('i')</string>
+				<string>break;</string>
+				<!-- Ķķ · Ǩǩ -->
+				<string>case 'Ķ':</string>
+				<string>out.append('K')</string>
+				<string>break;</string>
+				<string>case 'ķ':</string>
+				<string>out.append('k')</string>
+				<string>break;</string>
+				<string>case 'Ǩ':</string>
+				<string>out.append('K')</string>
+				<string>break;</string>
+				<string>case 'ǩ':</string>
+				<string>out.append('k')</string>
+				<string>break;</string>
+				<!-- Ĺĺ · Ļļ · Ľľ · Ŀŀ · Łł -->
+				<string>case 'Ĺ':</string>
+				<string>out.append('L')</string>
+				<string>break;</string>
+				<string>case 'ĺ':</string>
+				<string>out.append('l')</string>
+				<string>break;</string>
+				<string>case 'Ļ':</string>
+				<string>out.append('L')</string>
+				<string>break;</string>
+				<string>case 'ļ':</string>
+				<string>out.append('l')</string>
+				<string>break;</string>
+				<string>case 'Ľ':</string>
+				<string>out.append('L')</string>
+				<string>break;</string>
+				<string>case 'ľ':</string>
+				<string>out.append('l')</string>
+				<string>break;</string>
+				<string>case 'Ŀ':</string>
+				<string>out.append('L')</string>
+				<string>break;</string>
+				<string>case 'ŀ':</string>
+				<string>out.append('l')</string>
+				<string>break;</string>
+				<string>case 'Ł':</string>
+				<string>out.append('L')</string>
+				<string>break;</string>
+				<string>case 'ł':</string>
+				<string>out.append('l')</string>
+				<string>break;</string>
+				<!-- Ńń · Ņņ · Ññ · Ňň · Ṅṅ -->
+				<string>case 'Ń':</string>
+				<string>out.append('N')</string>
+				<string>break;</string>
+				<string>case 'ń':</string>
+				<string>out.append('n')</string>
+				<string>break;</string>
+				<string>case 'Ņ':</string>
+				<string>out.append('N')</string>
+				<string>break;</string>
+				<string>case 'ņ':</string>
+				<string>out.append('n')</string>
+				<string>break;</string>
+				<string>case 'Ñ':</string>
+				<string>out.append('N')</string>
+				<string>break;</string>
+				<string>case 'ñ':</string>
+				<string>out.append('n')</string>
+				<string>break;</string>
+				<string>case 'Ň':</string>
+				<string>out.append('N')</string>
+				<string>break;</string>
+				<string>case 'ň':</string>
+				<string>out.append('n')</string>
+				<string>break;</string>
+				<string>case 'Ṅ':</string>
+				<string>out.append('N')</string>
+				<string>break;</string>
+				<string>case 'ṅ':</string>
+				<string>out.append('n')</string>
+				<string>break;</string>
+				<!--  Òò · Óó · Ôô · Öö · Õõ · Őő · Ǫǫ · Ōō · Ŏŏ · Ơơ -->
+				<string>case 'Ò':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ò':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Ó':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ó':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Ô':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ô':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Ö':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ö':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Õ':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'õ':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Ő':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ő':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Ǫ':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ǫ':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Ō':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ō':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Ŏ':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ŏ':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<string>case 'Ơ':</string>
+				<string>out.append('O')</string>
+				<string>break;</string>
+				<string>case 'ơ':</string>
+				<string>out.append('o')</string>
+				<string>break;</string>
+				<!-- Ŕŕ · Ŗŗ · Řř -->
+				<string>case 'Ŕ':</string>
+				<string>out.append('R')</string>
+				<string>break;</string>
+				<string>case 'ŕ':</string>
+				<string>out.append('r')</string>
+				<string>break;</string>
+				<string>case 'Ŗ':</string>
+				<string>out.append('R')</string>
+				<string>break;</string>
+				<string>case 'ŗ':</string>
+				<string>out.append('r')</string>
+				<string>break;</string>
+				<string>case 'Ř':</string>
+				<string>out.append('R')</string>
+				<string>break;</string>
+				<string>case 'ř':</string>
+				<string>out.append('r')</string>
+				<string>break;</string>
+				<!-- Śś · Ŝŝ · Şş · Șș · Šš · ẞß · Þþ -->
+				<string>case 'Ś':</string>
+				<string>out.append('S')</string>
+				<string>break;</string>
+				<string>case 'ś':</string>
+				<string>out.append('s')</string>
+				<string>break;</string>
+				<string>case 'Ŝ':</string>
+				<string>out.append('S')</string>
+				<string>break;</string>
+				<string>case 'ŝ':</string>
+				<string>out.append('s')</string>
+				<string>break;</string>
+				<string>case 'Ş':</string>
+				<string>out.append('S')</string>
+				<string>break;</string>
+				<string>case 'ş':</string>
+				<string>out.append('s')</string>
+				<string>break;</string>
+				<string>case 'Ș':</string>
+				<string>out.append('S')</string>
+				<string>break;</string>
+				<string>case 'ș':</string>
+				<string>out.append('s')</string>
+				<string>break;</string>
+				<string>case 'Š':</string>
+				<string>out.append('S')</string>
+				<string>break;</string>
+				<string>case 'š':</string>
+				<string>out.append('s')</string>
+				<string>break;</string>
+				<string>case 'ẞ':</string>
+				<string>out.append('S')</string>
+				<string>break;</string>
+				<string>case 'ß':</string>
+				<string>out.append('s')</string>
+				<string>break;</string>
+				<string>case 'Þ':</string>
+				<string>out.append('S')</string>
+				<string>break;</string>
+				<string>case 'þ':</string>
+				<string>out.append('s')</string>
+				<string>break;</string>
+				<!-- Ťť · Ŧŧ · Ţţ · Țț  -->
+				<string>case 'Ť':</string>
+				<string>out.append('T')</string>
+				<string>break;</string>
+				<string>case 'ť':</string>
+				<string>out.append('t')</string>
+				<string>break;</string>
+				<string>case 'Ŧ':</string>
+				<string>out.append('T')</string>
+				<string>break;</string>
+				<string>case 'ŧ':</string>
+				<string>out.append('t')</string>
+				<string>break;</string>
+				<string>case 'Ţ':</string>
+				<string>out.append('T')</string>
+				<string>break;</string>
+				<string>case 'ţ':</string>
+				<string>out.append('t')</string>
+				<string>break;</string>
+				<string>case 'Ț':</string>
+				<string>out.append('T')</string>
+				<string>break;</string>
+				<string>case 'ț':</string>
+				<string>out.append('t')</string>
+				<string>break;</string>
+				<!-- Ùù · Úú · Ûû · Üü · Ũũ · Ūū · Ŭŭ · Ųų · Ůů · Űű · Ưư -->
+				<string>case 'Ù':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ù':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ú':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ú':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Û':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'û':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ü':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ü':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ũ':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ũ':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ū':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ū':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ŭ':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ŭ':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ų':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ų':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ů':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ů':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ű':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ű':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<string>case 'Ư':</string>
+				<string>out.append('U')</string>
+				<string>break;</string>
+				<string>case 'ư':</string>
+				<string>out.append('u')</string>
+				<string>break;</string>
+				<!-- Ŵŵ -->
+				<string>case 'Ŵ':</string>
+				<string>out.append('W')</string>
+				<string>break;</string>
+				<string>case 'ŵ':</string>
+				<string>out.append('w')</string>
+				<string>break;</string>
+				<!-- Ýý · Ŷŷ · Ÿÿ -->
+				<string>case 'Ý':</string>
+				<string>out.append('Y')</string>
+				<string>break;</string>
+				<string>case 'ý':</string>
+				<string>out.append('y')</string>
+				<string>break;</string>
+				<string>case 'Ŷ':</string>
+				<string>out.append('Y')</string>
+				<string>break;</string>
+				<string>case 'ŷ':</string>
+				<string>out.append('y')</string>
+				<string>break;</string>
+				<string>case 'Ÿ':</string>
+				<string>out.append('Y')</string>
+				<string>break;</string>
+				<string>case 'ÿ':</string>
+				<string>out.append('y')</string>
+				<string>break;</string>
+				<!-- Źź · Žž · Żż -->
+				<string>case 'Ź':</string>
+				<string>out.append('Z')</string>
+				<string>break;</string>
+				<string>case 'ź':</string>
+				<string>out.append('z')</string>
+				<string>break;</string>
+				<string>case 'Ž':</string>
+				<string>out.append('Z')</string>
+				<string>break;</string>
+				<string>case 'ž':</string>
+				<string>out.append('z')</string>
+				<string>break;</string>
+				<string>case 'Ż':</string>
+				<string>out.append('Z')</string>
+				<string>break;</string>
+				<string>case 'ż':</string>
+				<string>out.append('z')</string>
+				<string>break;</string>
+				<!-- end replace special characters -->
+				<string>default:</string>
+				<string>out.append(c);</string>
+				<string>}</string>
+				<string>}</string>
+				<string>identifier = out.toString().replaceAll('[^-_a-zA-Z0-9]','')</string>
+				<string>"${identifier}"</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="NA_trefwoorden">
+			<sample-input>
+				<string>De Katholieke Vrouw
+|De Nieuwe Eeuw
+|De Tijd
+|Gelderlander
+|Helmer J.W.
+|Kallen A. van der
+|Laudy Alphons
+|Nieuwenhuis W.
+|Pol Max van
+|Steenhoff-Smulders Albertine
+|Tijd</string>
+			</sample-input>
+			<groovy-code>
+				<string>kwrd = "${it}".replaceAll('[^ |,-_a-zA-Z0-9]','').capitalize()</string>
+				<string>parts = kwrd.toString().split(",")</string>
+				<string>if (parts.length > 1) {</string>
+				<string>"${parts[1].trim()} ${parts[0]}"</string>
+				<string>}</string>
+				<string>else {</string>
+				<string>"${it}"</string>
+				<string>}</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="NA_splitgeo_about">
+			<sample-input>
+				<string>Tutucorin</string>
+				<string>- - - - -</string>
+				<string>Jaffanapatnam</string>
+				<string>- - - - -</string>
+				<string>Tutucorin|Jaffanapatnam</string>
+				<string>- - - - -</string>
+				<string>Tutucorin|Jaffanapatnam|Macao|Engelsen</string>
+			</sample-input>
+			<groovy-code>
+				<string>kwrd = "${it.toLowerCase()}"</string>
+				<string>parts = kwrd.toString().split("\\|")</string>
+				<string>if (parts.length > 1) {</string>
+				<string>"${parts[0].trim()}"</string>
+				<string>}</string>
+				<string>else {</string>
+				<string>"${kwrd}"</string>
+				<string>}</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="NA_splitgeo_label">
+			<sample-input>
+				<string>Tutucorin</string>
+				<string>- - - - -</string>
+				<string>Jaffanapatnam</string>
+				<string>- - - - -</string>
+				<string>Tutucorin|Jaffanapatnam</string>
+				<string>- - - - -</string>
+				<string>Tutucorin|Jaffanapatnam|Macao|Engelsen</string>
+			</sample-input>
+			<groovy-code>
+				<string>kwrd = "${it}"</string>
+				<string>parts = kwrd.toString().split("\\|")</string>
+				<string>if (parts.length > 1) {</string>
+				<string>"${parts[0].trim()}"</string>
+				<string>}</string>
+				<string>else {</string>
+				<string>"${it}"</string>
+				<string>}</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="NA_genereerDataSetUrl">
+			<groovy-code>
+				<string>code = "${spec}"</string>
+				<string>it = "${baseUrl}/doc/Dataset-" + code.substring(0,7)</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="hyphenateGUID">
+			<sample-input>
+				<string>64ca27d182201d1ce0530518a8c06b96</string>
+			</sample-input>
+			<groovy-code>
+				<string>&quot;${it}&quot;.toLowerCase().replaceAll(&apos;^([0-9a-f]{8})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{12})&apos;, &apos;$1-$2-$3-$4-$5&apos;)</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="test">
+			<sample-input>
+				<string>64AC27d182201d1ce0530518a8c06b96</string>
+			</sample-input>
+			<groovy-code>
+				<string>&quot;${it}&quot;.toLowerCase().replaceAll(&apos;^([0-9a-f]{8})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{12})&apos;, &apos;$1-$2-$3-$4-$5&apos;)</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="NA_lowercase_spec">
+			<groovy-code>
+				<string>StringBuilder out = new StringBuilder()</string>
+				<string>for (char c : it.toString().chars) {</string>
+				<string>switch (c) {</string>
+				<string>case '-':</string>
+				<string>out.append('.')</string>
+				<string>break;</string>
+				<string>default:</string>
+				<string>out.append(c);</string>
+				<string>}</string>
+				<string>}</string>
+				<string>identifier = out.toString()</string>
+				<string>"${spec}".toLowerCase().replaceAll('-','.')</string>
+			</groovy-code>
+		</mapping-function>
+		<mapping-function name="NA_uppercase_spec">
+			<groovy-code>
+				<string>StringBuilder out = new StringBuilder()</string>
+				<string>for (char c : it.toString().chars) {</string>
+				<string>switch (c) {</string>
+				<string>case '-':</string>
+				<string>out.append('.')</string>
+				<string>break;</string>
+				<string>default:</string>
+				<string>out.append(c);</string>
+				<string>}</string>
+				<string>}</string>
+				<string>identifier = out.toString()</string>
+				<string>"${spec}".toUpperCase().replaceAll('-','.')</string>
+			</groovy-code>
+		</mapping-function>
+	</functions>
+	<attrs>
+		<attr tag="rdf:about" uriCheck="true"/>
+		<attr tag="rdf:resource"/>
+		<attr tag="rdf:datatype"/>
+		<attr tag="rdf:type"/>
+		<attr tag="rdf:parseType"/>
+		<attr tag="xml:lang"/>
+	</attrs>
+	<!-- START - root -->
+	<root tag="naa:RDF">
+		<node-mapping inputPath="/input"/>
+		<!-- start ore:Aggregation - -->
+		<elem tag="ore:Aggregation">
+			<!-- 15-09-2019 - automatische mapping: geldig voor zowel Beeldbank en Nadere toegangen -->
+			<!-- Record 0 bevat ook de eventuele TENANT switch i.g.v. RHC's gebruik gaan maken van de HUB -->
+			<!-- Dit was nog i.o.v. Gijsbert Kruithof, maar moet nog worden verfijnt en vastgelegd in de architectuur  -->
+			<attr tag="rdf:about" uriCheck="true">
+				<node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/ore:Aggregation/@rdf:about">
+					<groovy-code>
+						<string>/* tenant switch */</string>
+						<string>if (&quot;${orgId}&quot; == &quot;NL-HaNA&quot;) {</string>
+						<string>&quot;${baseUrl}&quot;</string>
+						<string>} else {</string>
+						<string>baseUrl = &quot;https://${orgId}.archief.nl&quot;</string>
+						<string>}</string>
+						<string>/* Groep soort Beeldbank of Nadere toegang */</string>
+						<string>if (_input.dcsubjectsoort_ == &quot;Beeldbank&quot; ) {</string>
+						<string>&quot;${baseUrl}/doc/PhotoCollection:&quot; + NA_lowercase_spec()</string>
+						<string>} else if (_input.dcsubjectsoort_ == &quot;Nadere toegangen&quot;) {</string>
+						<string>&quot;${baseUrl}/doc/&quot; + NA_lowercase_spec()</string>
+						<string>}</string>
+					</groovy-code>
+				</node-mapping>
+			</attr>
+			<!-- 20181001 GK gebruiken van ore:aggregation voor fotocollectie als geheel -->
+			<!-- 15-09-2019 - automatische mapping: geldig voor zowel Beeldbank en Nadere toegangen -->
+			<elem tag="nao:isAggregatietype">
+				<attr tag="rdf:resource" uriCheck="true">
+					<node-mapping inputPath="/input" outputPath="/naa:RDF/ore:Aggregation/nao:isAggregatietype/@rdf:resource">
+						<groovy-code>
+							<string>if (_input.dcsubjectsoort_ == &quot;Beeldbank&quot; ) {</string>
+							<string>&quot;${baseUrl}/def/Fotocollectie&quot;</string>
+							<string>} else if (_input.dcsubjectsoort_ == &quot;Nadere toegangen&quot; ) {</string>
+							<string>&quot;${baseUrl}/def/Index&quot;</string>
+							<string>}</string>
+						</groovy-code>
+					</node-mapping>
+				</attr>
+				<attr tag="xml:lang"/>
+			</elem>
+			<!-- 15-09-2019 - automatische mapping: geldig voor zowel Beeldbank en Nadere toegangen -->
+			<!-- Switch xml:lang teruggeplaatst in element -->
+			<elem tag="rdfs:label" attrs="xml:lang">
+				<node-mapping inputPath="/input" outputPath="/naa:RDF/ore:Aggregation/rdfs:label">
+					<groovy-code>
+						<string>if (_input.dcsubjectsoort_ == &quot;Beeldbank&quot;) {</string>
+						<string>&quot;Fotocollectie ${_input.dcsubjectabbreviation_}&quot;</string>
+						<string>} else if (_input.dcsubjectsoort_ == &quot;Nadere toegangen&quot;) {</string>
+						<string>&quot;${_input.dcsubjectabbreviation_} (Nadere Toegang)&quot;</string>
+						<string>}</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<elem tag="skos:prefLabel" attrs="xml:lang">
+				<node-mapping inputPath="/input" outputPath="/naa:RDF/ore:Aggregation/skos:prefLabel">
+					<groovy-code>
+						<string>if (_input.dcsubjectsoort_ == &quot;Beeldbank&quot;) {</string>
+						<string>&quot;${_input.dcsubjectabbreviation_}&quot;</string>
+						<string>} else if (_input.dcsubjectsoort_ == &quot;Nadere toegangen&quot;) {</string>
+						<string>&quot;${_input.dcsubjectabbreviation_}&quot;</string>
+						<string>}</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<!-- 20181005 GK. Toegevoegd dcat dataset properties -->
+			<elem tag="skos:altLabel" attrs="xml:lang"/>
+			<!-- Titel van de collectie -->
+			<elem tag="dc:title" attrs="xml:lang"/>
+			<!-- 20181005 GK. Toegevoegd dcat dataset properties -->
+			<elem tag="dcterms:description" attrs="rdf:resource,xml:lang"/>
+			<!-- MAIS toegangscode / nummer archiefinventaris / toegangsnummer-->
+			<elem tag="nao:inventarisnummer" attrs="xml:lang"/>
+			<!-- guid MAIS -->
+			<elem tag="nao:uuid">
+				<node-mapping inputPath="/input/@id" outputPath="/naa:RDF/ore:Aggregation/nao:uuid">
+					<groovy-code>
+						<string>if (_input.dcsubjectsoort_)</string>
+						<string>&quot;${_id}&quot;</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<elem tag="nao:toegangsnummer"/>
+			<elem tag="nao:ntCode">
+				<node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/ore:Aggregation/nao:ntCode">
+					<groovy-code>
+						<string>if (_input.dcsubjectsoort_)</string>
+						<string>&quot;${_input.dcidentifiercode_}&quot;</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<elem tag="dc:identifier" attrs="xml:lang">
+				<node-mapping inputPath="/input/@id" outputPath="/naa:RDF/ore:Aggregation/dc:identifier">
+					<groovy-code>
+						<string>if (_input.dcsubjectsoort_)</string>
+						<string>&quot;${_id}&quot;</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<!-- Mais Handle  -->
+			<elem tag="edm:isShownAt" attrs="rdf:resource"/>
+			<!-- The primary topic of this aggregation, record or document. -->
+			<elem tag="foaf:primaryTopic" attrs="rdf:resource"/>
+			<!-- Verwijzing naar genest object (onderdeel van deze aggregatie) -->
+			<elem tag="ore:aggregates" attrs="rdf:resource"/>
+			<!-- Wanneer de aggregatie gemaakt is -->
+			<elem tag="dcterms:issued" attrs="xml:lang, rdf:datatype"/>
+			<elem tag="dcterms:relation" attrs="rdf:resource,xml:lang"/>
+			<!-- MAIS Wijzigingsdatum -->
+			<elem tag="dcterms:modified" attrs="rdf:resource,xml:lang,rdf:datatype"/>
+			<!-- 20181005 GK. Toegevoegd dcat dataset properties -->
+			<elem tag="dcat:keyword" attrs="rdf:resource,xml:lang"/>
+			<elem tag="dcat:landingPage" attrs="rdf:resource,xml:lang"/>
+			<elem tag="dc:creator" attrs="rdf:resource,xml:lang"/>
+			<elem tag="dcterms:creator" attrs="rdf:resource,xml:lang,rdf:datatype"/>
+			<elem tag="dc:date" attrs="rdf:resource,xml:lang"/>
+			<elem tag="dc:language"/>
+			<elem tag="dc:publisher" attrs="rdf:resource,xml:lang"/>
+			<elem tag="dcterms:publisher" attrs="rdf:resource,xml:lang,rdf:datatype">
+				<node-mapping inputPath="/facts/dataProvider" outputPath="/naa:RDF/ore:Aggregation/dcterms:publisher">
+					<groovy-code>
+						<string>if (_input.dcsubjectsoort_)</string>
+						<string>&quot;${_facts.dataProvider_}&quot;</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<!-- Dc:terms Spatial kan gebruikt worden voor lokatie. GK 20200501-->
+			<elem tag="dcterms:spatial" attrs="rdf:resource"/>
+			<elem tag="dc:coverage" attrs="xml:lang"/>
+			<elem tag="edm:begin" attrs="xml:lang"/>
+			<!-- MAIS Einddatum (bijvoorbeeld 0000-00-00) -->
+			<elem tag="edm:end" attrs="xml:lang"/>
+			<!-- Toegevoegd 20181001 GK gebruiken van ore:aggregation voor fotocollectie als geheel -->
+		</elem>
+		<!-- end - ore:Aggregation -->
+		<!-- start elem - RecordAggregation -->
+		<elem tag="nao:Recordaggregatie">
+			<attr tag="rdf:about" uriCheck="true">
+				<!-- Record 0 alleen PhotoCollection en daarboven PhotoRecord -->
+				<node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Recordaggregatie/@rdf:about">
+					<groovy-code>
+						<string>if ((_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot; )) {</string>
+						<string>&quot;${baseUrl}/doc/fotorecord/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+						<string>} else if ((_input.dcsubjectrecordsoort_ == &quot;NTRecord&quot; )) {</string>
+						<string>&quot;${baseUrl}/doc/indexrecord/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+						<string>}</string>
+					</groovy-code>
+				</node-mapping>
+			</attr>
+			<elem tag="nao:aet" attrs="xml:lang">
+				<node-mapping inputPath="/input" outputPath="/naa:RDF/ore:Aggregation/nao:aet">
+					<groovy-code>
+						<string>_input.record * { _record -></string>
+						<string> _record.dcsubjectaet * { _dcsubjectaet -></string>
+						<string>  "${_dcsubjectaet}"</string>
+						<string>}</string>
+						<string>}</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<!-- Additioneel type dd 6-7-2018  -->
+			<elem tag="rdf:type" attrs="rdf:resource"/>
+			<!-- Indien mogelijk een label toewijzen -->
+			<elem tag="rdfs:label" attrs="xml:lang">
+				<!-- 16-09-2019 - automatische mapping: hier worden de waardes per archiefeenheidssoort ingegeven -->
+				<node-mapping inputPath="/input/record" outputPath="/naa:RDF/nao:Recordaggregatie/rdfs:label">
+					<groovy-code>
+						<string>if (_input.dcsubjectrecordsoort_)</string>
+						<string>if (_input.dcsubjectaet_ == &quot;dossier&quot;) {</string>
+						<string>&quot;Archivalreference ${_input.dcidentifierregistratienummer_} Collectie Binnenlandse Strijdkrachten&quot;</string>
+						<string>} else if (_input.dcsubjectaet_) {</string>
+						<string>&quot;Record over ${_input.dcsubjectaet_}&quot;</string>
+						<string>}</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<elem tag="skos:prefLabel" attrs="xml:lang">
+				<node-mapping inputPath="/input/record" outputPath="/naa:RDF/nao:Recordaggregatie/skos:prefLabel">
+					<groovy-code>
+						<string>if (_input.dcsubjectrecordsoort_)</string>
+						<string>if (_input.dcsubjectaet_ == &quot;dossier&quot;) {</string>
+						<string>&quot;Archivalreference ${_input.dcidentifierregistratienummer_} Collectie Binnenlandse Strijdkrachten&quot;</string>
+						<string>} else {</string>
+						<string>&quot;Record over ${_input.dcsubjectaet_}&quot;</string>
+						<string>}</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<elem tag="dc:identifier" attrs="xml:lang">
+				<node-mapping inputPath="/input/@id" outputPath="/naa:RDF/nao:Recordaggregatie/dc:identifier">
+					<groovy-code>
+						<string>if (_input.dcsubjectrecordsoort_)</string>
+						<string>&quot;${_id}&quot;</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<!-- Mais Handle  -->
+			<elem tag="edm:isShownAt">
+				<attr tag="rdf:resource" uriCheck="true">
+					<node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Recordaggregatie/edm:isShownAt/@rdf:resource">
+						<groovy-code>
+							<string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot;)</string>
+							<string>&quot;${_input.dctermshasParthandle_}&quot;</string>
+							<string>else if (_input.dcsubjectrecordsoort_ == &quot;NTRecord&quot;)</string>
+							<string>&quot;http://hdl.handle.net/10648/${_uniqueIdentifier}&quot;</string>
+						</groovy-code>
+					</node-mapping>
+				</attr>
+			</elem>
+			<!-- The primary topic of this aggregation, record or document. -->
+			<elem tag="foaf:primaryTopic" attrs="rdf:resource"/>
+			<!-- MAIS Webdisplay verwijzing naar het GAF zichtexemplaar-->
+			<elem tag="edm:isShownBy">
+				<attr tag="rdf:resource" uriCheck="true">
+					<node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Recordaggregatie/edm:isShownBy/@rdf:resource">
+						<groovy-code>
+							<string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot;)</string>
+							<string>&quot;https://service.archief.nl/gaf/image-service/${hyphenateGUID(_uniqueIdentifier)}&quot;.sanitizeURI()</string>
+						</groovy-code>
+					</node-mapping>
+				</attr>
+			</elem>
+			<!-- MAIS Webdisplay -->
+			<elem tag="edm:landingPage" attrs="rdf:resource"/>
+			<!-- Verwijzing naar hoger aggregatie niveau  -->
+			<elem tag="ore:isAggregatedBy">
+				<attr tag="rdf:resource" uriCheck="true">
+					<node-mapping inputPath="/input/record" outputPath="/naa:RDF/nao:Recordaggregatie/ore:isAggregatedBy/@rdf:resource">
+						<groovy-code>
+							<string>if (_input.dcsubjectrecordsoort_)</string>
+							<string>_input.record * { _record -&gt;</string>
+							<string>&quot;${baseUrl}/doc/&quot; + NA_lowercase_spec()</string>
+							<string>}</string>
+						</groovy-code>
+					</node-mapping>
+				</attr>
+			</elem>
+			<!-- Verwijzing naar genest object (onderdeel van deze aggregatie) -->
+			<elem tag="ore:aggregates" attrs="rdf:resource"/>
+			<!-- Maker van de aggregatie / record  -->
+			<elem tag="dcterms:creator" attrs="rdf:resource"/>
+			<!-- Wat voor soort (type) aggregatie het is. Bij voorkeur gecontrolleerde termen gebruiken bv. <http://archief.nl/def/TypePhotoAggregation> -->
+			<elem tag="dcterms:type" attrs="rdf:resource,xml:lang"/>
+			<elem tag="nao:isAggregatietype">
+				<attr tag="rdf:resource" uriCheck="true">
+					<node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Recordaggregatie/nao:isAggregatietype/@rdf:resource">
+						<groovy-code>
+							<string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot;) {</string>
+							<string>&quot;${baseUrl}/def/FotoRecord&quot;</string>
+							<string>} else if (_input.dcsubjectrecordsoort_ == &quot;NTRecord&quot;) {</string>
+							<string>&quot;${baseUrl}/def/IndexRecord&quot;</string>
+							<string>}</string>
+						</groovy-code>
+					</node-mapping>
+				</attr>
+				<attr tag="xml:lang"/>
+			</elem>
+			<!-- Wanneer de aggregatie gemaakt is -->
+			<elem tag="dcterms:created" attrs="xml:lang, rdf:datatype"/>
+			<!-- MAIS Wijzigingsdatum -->
+			<elem tag="dcterms:modified" attrs="rdf:resource,xml:lang,rdf:datatype"/>
+		</elem>
+		<!-- end elem - RecordAggregation -->
+		<!-- start elem - Archiefeenheid -->
+		<!-- Fysieke objecten of entiteiten. Gebruik "id" als onderdeel van de URI. -->
+		<!-- Een foto, persoon of echte plaats zijn entiteiten. Zie ook Niet-informatie-objecten. -->
+		<!-- Hiervoor wordt de GUID van MAIS gebruikt -->
+		<!-- vanaf record 1 en hoger -->
+		<elem tag="nao:Archiefeenheid" attrs="rdf:about">
+			<!-- Additioneel type dd 6-7-2018  -->
+			<elem tag="rdf:type">
+				<attr tag="rdf:resource" uriCheck="true">
+					<node-mapping inputPath="/input/record" outputPath="/naa:RDF/nao:Archiefeenheid/rdf:type/@rdf:resource">
+						<groovy-code>
+							<string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot;)</string>
+							<string>_input.record * { _record -&gt;</string>
+							<string>&quot;http://www.w3.org/ns/odrl/2/Asset&quot;</string>
+							<string>}</string>
+						</groovy-code>
+					</node-mapping>
+				</attr>
+			</elem>
+			<!-- Indien mogelijk een label toewijzen -->
+			<elem tag="rdfs:label" attrs="xml:lang"/>
+			<elem tag="skos:prefLabel" attrs="xml:lang"/>
+			<elem tag="skos:altLabel" attrs="xml:lang"/>
+			<!-- Wat voor soort type entiteit het is. Bij voorkeur gecontrolleerde termen gebruiken bv. <http://archief.nl/def/Foto/  -->
+			<elem tag="nao:Archiefeenheidstype" attrs="rdf:resource,xml:lang">
+				<node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Archiefeenheid/nao:Archiefeenheidstype/@rdf:resource">
+					<groovy-code>
+						<string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot;)</string>
+						<string>&quot;${baseUrl}/def/Foto&quot;</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<elem tag="foaf:isPrimaryTopicOf" attrs="rdf:resource"/>
+			<!-- MAIS toegangscode / nummer archiefinventaris / toegangsnummer-->
+			<elem tag="nao:inventarisnummer" attrs="xml:lang"/>
+			<!-- MAIS bestanddeelnummer -->
+			<elem tag="nao:dossiernummer" attrs="xml:lang"/>
+			<!-- guid MAIS -->
+			<elem tag="dc:identifier" attrs="xml:lang"/>
+			<elem tag="dc:date" attrs="xml:lang,rdf:datatype"/>
+			<!-- start nesting - dcterms:relation -->
+			<elem tag="dcterms:date" attrs="xml:lang, rdf:datatype"/>
+			<!-- MAIS Afmeting | MAIS Vorm (bijvoorbeeld 13 x 18 cm) -->
+			<elem tag="dc:format" attrs="xml:lang"/>
+			<!-- "MAIS Materiaal (bijvoorbeeld Foto zwart/wit)" -->
+			<elem tag="dc:type" attrs="xml:lang"/>
+			<!--20190412 FN Toegevoegd tbv. Het materiaaltype (bijv. foto zwart/wit) kan dmv een skos:Concept worden opgebouwd. -->
+			<elem tag="nao:isMateriaaltype" attrs="rdf:resource"/>
+			<!-- GK 20181101 voor verwijzing naar archiefstuk. Toegevoegd in recorddef 0.08 -->
+			<elem tag="nao:archiefLink" attrs="xml:lang">
+				<node-mapping inputPath="/input/record/dc:subject.bronverwijzing" outputPath="/naa:RDF/nao:Archiefeenheid/nao:archiefLink">
+					<groovy-code>
+						<string>if (_input.dcsubjectrecordsoort_) {</string>
+						<string>if (_dcsubjectbronverwijzing){</string>
+						<string>&quot;${_dcsubjectbronverwijzing}&quot;</string>
+						<string>}</string>
+						<string>}</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+		</elem>
+		<!-- end elem - Archiefeenheid -->
+		<!-- start elem - Archiefbeschrijving -->
+		<elem tag="nao:Archiefbeschrijving">
+			<attr tag="rdf:about" uriCheck="true">
+				<node-mapping inputPath="/input/@id" outputPath="/naa:RDF/nao:Archiefbeschrijving/@rdf:about">
+					<groovy-code>
+						<string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot;) {</string>
+						<string>&quot;${baseUrl}/doc/beschrijving/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+						<string>} else if (_input.dcsubjectrecordsoort_ == &quot;NTRecord&quot;) {</string>
+						<string>if (_input.dcsubjectrecordsoort_) {</string>
+						<string>&quot;${baseUrl}/doc/beschrijving/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+						<string>}</string>
+						<string>}</string>
+					</groovy-code>
+				</node-mapping>
+			</attr>
+			<!-- Additioneel type dd 6-7-2018  -->
+			<elem tag="rdf:type" attrs="rdf:resource"/>
+			<!-- Indien mogelijk een label toewijzen -->
+			<elem tag="rdfs:label" attrs="xml:lang">
+				<node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Archiefbeschrijving/rdfs:label">
+					<groovy-code>
+						<string>if (_input.dcsubjectrecordsoort_)</string>
+						<string>&quot;Beschrijving van ${_uniqueIdentifier}&quot;</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<elem tag="skos:prefLabel" attrs="xml:lang">
+				<node-mapping inputPath="/input" outputPath="/naa:RDF/nao:Archiefbeschrijving/skos:prefLabel">
+					<groovy-code>
+						<string>if (_input.dcsubjectrecordsoort_)</string>
+						<string>&quot;Beschrijving van ${_uniqueIdentifier}&quot;</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<elem tag="skos:altLabel" attrs="xml:lang"/>
+			<elem tag="dc:description" attrs="xml:lang"/>
+			<!-- Wordt gebruikt voor het samenstellen van de handle -->
+			<elem tag="nao:persistentIdentifier" attrs="rdf:resource,xml:lang"/>
+			<!-- Verwijzing vanuit foto naar zichtexemplaar-->
+			<elem tag="edm:hasView" attrs="rdf:resource"/>
+			<!-- GK 20181023 The subject is a document that, to any extent, describes the object tbv. rechtzaken i.h.b. nt00306 -->
+			<elem tag="ov:describes" attrs="rdf:resource,xml:lang"/>
+			<!-- MAIS Beschrijving (bijvoorbeeld Troonswisseling 30 april : bijeenkomst voor de abdicatie het Paleis op de Dam ; overzicht) -->
+			<elem tag="dc:description" attrs="xml:lang"/>
+			<!-- Extra beschrijving indien beschikbaar -->
+			<elem tag="nao:toelichting" attrs="xml:lang"/>
+			<!-- MAIS Trefwoorden: algemeen -->
+			<elem tag="dc:subject" attrs="xml:lang"/>
+			<!-- Verwijzingen naar thesauri of anderszijds vastgestelde gestructureerde data op basis van trefwoorden uit Mais -->
+			<!-- MAIS Relaties:thesaurusterm algemeen. Als object van dcterms:subject, bijvoorbeeld de GTAA thesaurusterm "Oorlogen" <http://data.beeldengeluid.nl/gtaa/216561>.  -->
+			<elem tag="dcterms:subject" attrs="rdf:resource"/>
+			<!-- MAIS Relaties:geografische term. Als object van dcterms:subject of als verwijzing in hg:PlaceInTime met rdfs:seeAlso <http://data.beeldengeluid.nl/gtaa/xxxx> -->
+			<elem tag="foaf:primaryTopic" attrs="rdf:resource"/>
+			<!-- The primary topic of this aggregation, record or document. -->
+			<elem tag="foaf:isPrimaryTopicOf" attrs="rdf:resource"/>
+			<!-- Coverage kan gebruikt worden voor tijd en lokatie. Als het lokatie is: MAIS Lokatie in Beschrijven (bijvoorbeeld Frankrijk). Als het tijd is: MAIS Datering geschat-->
+			<elem tag="dc:coverage" attrs="xml:lang"/>
+			<!-- Dc:terms Spatial kan gebruikt worden voor lokatie. GK 20180928-->
+			<elem tag="dcterms:spatial" attrs="rdf:resource"/>
+			<!-- MAIS Verwijzing -->
+			<elem tag="dc:relation" attrs="xml:lang"/>
+			<elem tag="dcterms:relation" attrs="rdf:resource"/>
+			<elem tag="dc:date" attrs="xml:lang"/>
+			<!-- start nesting - dcterms:relation -->
+			<elem tag="dcterms:date" attrs="xml:lang, rdf:datatype"/>
+			<!-- MAIS Fotograaf | Memorix Vervaardiger | MAIS Auteur (bijvoorbeeld Onbekend / Publiek Domein) -->
+			<elem tag="dc:creator" attrs="rdf:resource,xml:lang"/>
+			<!-- MAIS Vervaardiger -->
+			<elem tag="dcterms:creator" attrs="rdf:resource,xml:lang"/>
+			<!-- MAIS Aanmaakdatum -->
+			<elem tag="dcterms:created" attrs="rdf:datatype,xml:lang"/>
+			<!-- MAIS Informatie aanbieder beschrijving -->
+			<elem tag="dc:publisher" attrs="xml:lang"/>
+			<!-- MAIS Informatie aanbieder beschrijving. Verwijzing naar de organisatie die verantwoordelijk is voor het publiceren. Gebruik bij voorkeur een gecontrolleerde term bv. <http://archief.nl/NL-HaNA/organisatie/id/NationaalArchief> -->
+			<elem tag="dcterms:publisher" attrs="rdf:resource,xml:lang"/>
+			<!-- MAIS Licentie methode -->
+			<elem tag="dc:license" attrs="xml:lang"/>
+			<!-- MAIS Licentie methode gecontrolleerde verwijzing beschikbaar (URI) -->
+			<elem tag="dcterms:license" attrs="rdf:resource,xml:lang"/>
+			<elem tag="rdfs:comment" attrs="xml:lang"/>
+			<!-- Tijdsaanduiding aangepast in combinatie met type 6-7-2018-->
+			<!-- MAIS Begindatum (bijvoorbeeld 0000-00-00) -->
+			<elem tag="edm:begin" attrs="xml:lang"/>
+			<!-- MAIS Einddatum (bijvoorbeeld 0000-00-00) -->
+			<elem tag="edm:end" attrs="xml:lang"/>
+			<!-- GK 20180928 - MAIS Datumaanduiding ("ca", "tussen", "voor", etc) -->
+			<elem tag="nav:datumVoorzetsel" attrs="xml:lang"/>
+			<!-- end Tijdsaanduiding -->
+			<!-- MAIS Schaal -->
+			<elem tag="bf:scale" attrs="xml:lang"/>
+			<!-- Toegangsrecht volgens Open Digital Rights Language -->
+			<elem tag="odrl:hasPolicy" attrs="rdf:resource"/>
+			<!-- Eventuele Opmerkingen -->
+			<elem tag="skos:note" attrs="xml:lang"/>
+		</elem>
+		<!-- end elem - Archiefbeschrijving -->
+		<!-- start elem - WebResource -->
+		<elem tag="edm:WebResource" attrs="rdf:about">
+			<!-- 20190412 FN Toegevoegd zodat de odrl:Asset kan worden meegegeven -->
+			<elem tag="rdf:type" attrs="rdf:resource"/>
+			<elem tag="dc:identifier" attrs="xml:lang"/>
+			<!-- 20181005 GK toegevoegd voor bestandsnaam. Is: dcterms_hasPart_media -->
+			<elem tag="ebucore:filename" attrs="xml:lang"/>
+			<!-- Indien mogelijk een label toewijzen -->
+			<elem tag="rdfs:label" attrs="xml:lang"/>
+			<!-- 20190412 FN Toegevoegd -->
+			<elem tag="skos:prefLabel" attrs="xml:lang"/>
+			<!-- Vervaardiger van digitaal object. Volgens EDM: For the creator of the web resource. -->
+			<!-- If possible supply the identifier of the creator from an authority source. Repeat for multiple creators.  -->
+			<elem tag="dc:creator" attrs="xml:lang"/>
+			<!-- Beschrijving van digitaal object. Volgens EDM: Use for an account or description of this digital representation -->
+			<elem tag="dc:description" attrs="xml:lang"/>
+			<!-- Metadata over formaat / specificatie (MAM). Bijvoorbeeld: image/jpeg -->
+			<elem tag="dc:format" attrs="xml:lang"/>
+			<!-- Volgens EDM: A related resource from which the Web resource is derived in whole or in part. -->
+			<elem tag="dc:source" attrs="xml:lang"/>
+			<!-- Volgens EDM:The nature or genre of the digital representation. Ideally the term(s) will be taken from a controlled vocabulary. -->
+			<elem tag="dc:type" attrs="xml:lang"/>
+			<!-- Zie dc:type maar dan een gecontrolleerde term zoals nao:TypeDigitalVideo -->
+			<elem tag="dcterms:type" attrs="xml:lang"/>
+			<!-- Volgens EDM: An established standard to which the web resource conforms. Bijvoorbeeld W3C of IIIF -->
+			<elem tag="dcterms:conformsTo" attrs="xml:lang"/>
+			<!-- Verwijzing naar de IIIF functies van de GAF-server. Link naar API -->
+			<elem tag="svcs:has_service" attrs="rdf:resource,xml:lang"/>
+			<!-- FN 20190711 Toegevoegd om de manifest file automatisch te genereren tbv het correct tonen van de foto in de UniversalViewer.
+			Tevens is deze ook toegevoegd om de foto-keten R1 sluitend te maken. -->
+			<elem tag="nao:rechtenset" attrs="xml:lang"/>
+			<elem tag="nao:parent-uuid" attrs="xml:lang"/>
+			<elem tag="nao:file-uuid" attrs="xml:lang"/>
+			<elem tag="nao:beeldtype" attrs="xml:lang"/>
+			<elem tag="nao:toegang" attrs="xml:lang"/>
+			<elem tag="nao:thumbnail" attrs="xml:lang"/>
+			<elem tag="nao:handle-uuid" attrs="xml:lang"/>
+			<elem tag="nao:manifest" attrs="xml:lang"/>
+			<elem tag="nao:manifests" attrs="xml:lang"/>
+			<elem tag="nao:bestanddeelnummer" attrs="xml:lang"/>
+			<elem tag="nao:openbaarheid" attrs="xml:lang"/>
+			<elem tag="nao:du-uuid" attrs="xml:lang"/>
+			<elem tag="nao:tenant" attrs="xml:lang"/>
+			<elem tag="nao:inventarisnummer" attrs="xml:lang"/>
+			<elem tag="nao:volgorde" attrs="xml:lang"/>
+			<elem tag="nao:bestandsnaam" attrs="xml:lang"/>
+			<!-- Einde toevoeging van elemten tbv manifest file -->
+		</elem>
+		<!-- end elem - WebResource -->
+		<!-- start Person zonder nesting -->
+		<elem tag="pnv:Person" attrs="rdf:about">
+			<!-- Als identifier bij voorkeur een guid uit het collectiebeheersysteem -->
+			<elem tag="dc:identifier" attrs="rdf:resource,xml:lang"/>
+			<!-- Fragment identifier is alleen uniek binnen context van een toegang of NT, bijvoorbeeld een prs_id. Buiten de context (zoals de bijbehorende aggregatie) zal deze referentie sleutel niet uniek zijn, maar binnen de context, of scope - wel. -->
+			<elem tag="nao:fragmentIdentifier" attrs="xml:lang"/>
+			<!-- Indien mogelijk een label toewijzen -->
+			<elem tag="rdfs:label" attrs="xml:lang"/>
+			<elem tag="skos:prefLabel" attrs="xml:lang"/>
+			<elem tag="skos:altLabel" attrs="xml:lang"/>
+			<!-- MAIS Trefwoorden: namen. Indien dit veld aanwezig is kan een naa:PersonEntity gemodelleerd worden -->
+			<elem tag="rdfs:seeAlso" attrs="rdf:about"/>
+			<!-- Linken naar een andere persoon als deze dezelfde is -->
+			<elem tag="owl:sameAs" attrs="rdf:resource"/>
+			<!-- Iets wat deze persoon gemaakt heeft -->
+			<elem tag="foaf:made" attrs="rdf:resource"/>
+			<!-- Toegevoegd om link te leggen naar beschrijvingd -->
+			<elem tag="foaf:isPrimaryTopicOf" attrs="rdf:resource"/>
+			<!-- Toegevoegd om een rol aan te geven zoals een beroep, status of familielid -->
+			<elem tag="ebucore:hasRole" attrs="rdf:resource"/>
+			<elem tag="nav:heeftBeroep" attrs="rdf:resource"/>
+			<!-- Extra toegevoegd, geen mapping regels vanuit MAIS -->
+			<elem tag="dc:description" attrs="rdf:resource,xml:lang"/>
+			<elem tag="skos:note" attrs="xml:lang"/>
+			<elem tag="nav:heeftGeslacht" attrs="rdf:resource,xml:lang"/>
+			<elem tag="nav:heeftReligie" attrs="rdf:resource,xml:lang"/>
+			<elem tag="schema:birthDate" attrs="rdf:resource,xml:lang,rdf:datatype"/>
+			<elem tag="schema:birthPlace" attrs="rdf:resource,xml:lang"/>
+			<elem tag="schema:deathDate" attrs="rdf:resource,xml:lang,rdf:datatype"/>
+			<elem tag="schema:deathPlace" attrs="rdf:resource,xml:lang"/>
+			<elem tag="nav:doopdatum" attrs="xml:lang"/>
+			<elem tag="nav:leeftijd" attrs="xml:lang"/>
+			<!-- Einde extra toegevoegd -->
+			<elem tag="pnv:hasName" attrs="rdf:about,rdf:parseType">
+				<elem tag="pnv:PersonName" attrs="rdf:about,rdf:parseType">
+					<elem tag="skos:definition" attrs="xml:lang"/>
+					<elem tag="rdfs:label" attrs="xml:lang"/>
+					<elem tag="pnv:nameSpecification" attrs="rdf:resource,xml:lang"/>
+					<elem tag="pnv:initials" attrs="xml:lang"/>
+					<elem tag="pnv:prefix" attrs="xml:lang"/>
+					<elem tag="pnv:givenName" attrs="xml:lang"/>
+					<elem tag="pnv:givenNameSuffix" attrs="xml:lang"/>
+					<elem tag="pnv:firstName" attrs="xml:lang"/>
+					<elem tag="pnv:patronym" attrs="xml:lang"/>
+					<elem tag="pnv:infixTitle" attrs="xml:lang"/>
+					<elem tag="pnv:surnamePrefix" attrs="xml:lang"/>
+					<elem tag="pnv:baseSurname" attrs="xml:lang"/>
+					<elem tag="pnv:infix" attrs="xml:lang"/>
+					<elem tag="pnv:surname" attrs="xml:lang"/>
+					<elem tag="pnv:trailingPatronym" attrs="xml:lang"/>
+					<elem tag="pnv:suffix" attrs="xml:lang"/>
+					<elem tag="pnv:honorificSuffix" attrs="xml:lang"/>
+					<elem tag="pnv:disambiguatingDescription" attrs="xml:lang"/>
+					<elem tag="pnv:literalName" attrs="xml:lang"/>
+				</elem>
+			</elem>
+			<elem tag="nav:heeftVerblijfplaats" attrs="rdf:resource,xml:lang"/>
+			<elem tag="nav:wasEigendomVan" attrs="rdf:resource,xml:lang"/>
+			<!-- 20190125 FN This property associates the people, things or information resources with an event at which they were present -->
+			<elem tag="edm:wasPresentAt" attrs="rdf:resource"/>
+			<!-- 20190125 FN edm:hasMet relates a resource with the objects or phenomena that have happened to or have happened together with the resource under consideration. We can abstractly think of history and the present as a series of “meetings” between people and other things in space-time. Therefore we name this relationship as the things the object “has met” in the course of its existence. These meetings are events in the proper sense, in which other people and things participate in any role. -->
+			<elem tag="edm:hasMet" attrs="rdf:resource"/>
+			<!-- FN 20191018 extra mogelijkheid om persoonrelaties te definieren -->
+			<elem tag="agrl:hasSpouse" attrs="rdf:resource"/>
+			<elem tag="agrl:hasFianceeFiance" attrs="rdf:resource"/>
+			<elem tag="agrl:hasParent" attrs="rdf:resource"/>
+			<elem tag="agrl:hasChild" attrs="rdf:resource"/>
+			<elem tag="schema:memberOf" attrs="rdf:resource"/>
+			<!-- FN 2020-07-02 Diverse termen tbv de Suriname NT's -->
+			<elem tag="nav:heeftContract" attrs="rdf:resource,xml:lang"/>
+			<elem tag="nav:hercontract" attrs="xml:lang"/>
+			<elem tag="nav:contractnummer"/>
+			<elem tag="nav:monsternummer"/>
+			<elem tag="nav:nummerVrijeArbeider"/>
+		</elem>
+		<!-- end - Person -->
+		<!-- start TimeSpan zonder nesting-->
+		<!-- aanpassing - 16-09-2019 - automatische mapping: geldig voor zowel Beeldbank en Nadere toegangen -->
+		<elem tag="edm:TimeSpan" attrs="rdf:about">
+			<elem tag="rdfs:label" attrs="xml:lang"/>
+			<elem tag="skos:prefLabel" attrs="xml:lang"/>
+			<elem tag="skos:altLabel" attrs="xml:lang"/>
+			<!-- MAIS Datering geschat -->
+			<elem tag="dc:coverage" attrs="xml:lang"/>
+			<!-- MAIS datumaanduiding (bijvoorbeeld Circa) -->
+			<elem tag="dc:description" attrs="xml:lang"/>
+			<!-- MAIS Begindatum (bijvoorbeeld 0000-00-00) -->
+			<elem tag="edm:begin" attrs="xml:lang"/>
+			<!-- MAIS Einddatum (bijvoorbeeld 0000-00-00) -->
+			<elem tag="edm:end" attrs="xml:lang"/>
+		</elem>
+		<!-- end TimeSpan zonder nesting -->
+		<!-- 20181105 GK toegevoegd n.a.v. NT00306 voor instanties zoals Hoge Raad -->
+		<elem tag="org:FormalOrganization" attrs="rdf:about">
+			<elem tag="dc:identifier" attrs="xml:lang"/>
+			<elem tag="rdfs:label" attrs="xml:lang"/>
+			<elem tag="skos:prefLabel" attrs="xml:lang"/>
+			<elem tag="skos:altLabel" attrs="xml:lang"/>
+			<elem tag="skos:note" attrs="xml:lang"/>
+			<elem tag="dc:description" attrs="xml:lang"/>
+			<elem tag="vcard:hasUrl" attrs="rdf:resource,xml:lang"/>
+			<elem tag="vcard:hasEmail" attrs="rdf:resource,xml:lang"/>
+		</elem>
+		<!-- start PlaceInTime -->
+		<elem tag="hg:PlaceInTime" attrs="rdf:about">
+			<!-- GK 20180928 Toegevoegd type -->
+			<elem tag="dcterms:type" attrs="rdf:resource,xml:lang"/>
+			<elem tag="rdfs:label" attrs="xml:lang"/>
+			<elem tag="skos:prefLabel" attrs="xml:lang"/>
+			<elem tag="skos:altLabel" attrs="xml:lang"/>
+			<elem tag="sem:hasEarliestBeginTimeStamp" attrs="xml:lang"/>
+			<elem tag="sem:hasLatestBeginTimeStamp" attrs="xml:lang"/>
+			<elem tag="sem:hasEarliestEndTimeStamp" attrs="xml:lang"/>
+			<elem tag="sem:hasLatestEndTimeStamp" attrs="xml:lang"/>
+			<elem tag="owl:sameAs" attrs="rdf:resource"/>
+			<elem tag="schema:name" attrs="rdf:resource"/>
+			<elem tag="geo:hasGeometry" attrs="rdf:resource"/>
+			<elem tag="hg:sameHgConcept" attrs="rdf:resource"/>
+			<elem tag="hg:containsHgConcept" attrs="rdf:resource"/>
+			<elem tag="hg:withinHgConcept" attrs="rdf:resource"/>
+			<elem tag="hg:intersectsHgConcept" attrs="rdf:resource"/>
+			<elem tag="hg:absorbed" attrs="rdf:resource"/>
+			<elem tag="hg:absorbedBy" attrs="rdf:resource"/>
+			<elem tag="hg:originated" attrs="rdf:resource"/>
+			<elem tag="hg:originatedFrom" attrs="rdf:resource"/>
+			<elem tag="hg:contains" attrs="rdf:resource"/>
+			<elem tag="hg:liesIn" attrs="rdf:resource"/>
+		</elem>
+		<!-- end PlaceInTime -->
+		<!-- start elem - Policy -->
+		<elem tag="odrl:Policy">
+			<attr tag="rdf:about" uriCheck="true">
+				<node-mapping inputPath="/input" outputPath="/naa:RDF/odrl:Policy/@rdf:about">
+					<groovy-code>
+						<string>if (_input.dcsubjectrecordsoort_ == &quot;TypePhotoRecord&quot;) {</string>
+						<string>&quot;${baseUrl}/def/Policy/&quot;  + NA_urilify(_input.dctermsrights_);</string>
+						<string>}</string>
+					</groovy-code>
+				</node-mapping>
+			</attr>
+			<elem tag="dc:type" attrs="xml:lang"/>
+			<elem tag="odrl:permission" attrs="rdf:resource,xml:lang"/>
+			<elem tag="rdfs:label" attrs="xml:lang"/>
+			<elem tag="foaf:primaryTopic" attrs="rdf:resource,xml:lang"/>
+			<elem tag="dc:rights" attrs="xml:lang"/>
+			<elem tag="dcterms:rightsHolder" attrs="rdf:resource, xml:lang"/>
+		</elem>
+		<!-- end Policy -->
+		<!-- start elem - Het WAT: SKOS GK Toegevoegd 20180928-->
+		<elem tag="skos:Concept" attrs="rdf:about">
+			<elem tag="rdfs:label" attrs="xml:lang"/>
+			<elem tag="skos:prefLabel" attrs="xml:lang"/>
+			<elem tag="skos:altLabel" attrs="xml:lang"/>
+			<elem tag="skos:inScheme" attrs="rdf:resource,xml:lang"/>
+			<!-- Linken naar andere concept dat hetzelfde is -->
+			<elem tag="owl:sameAs" attrs="rdf:resource"/>
+			<!-- Linken naar een concept dat er op lijkt -->
+			<elem tag="rdfs:seeAlso" attrs="rdf:about"/>
+		</elem>
+		<!-- end elem - Dataset -->
+		<elem tag="nav:Contract" attrs="rdf:about">
+			<elem tag="rdfs:label" attrs="xml:lang"/>
+			<elem tag="skos:prefLabel" attrs="xml:lang"/>
+			<elem tag="skos:altLabel" attrs="xml:lang"/>
+			<elem tag="edm:begin" attrs="xml:lang"/>
+			<elem tag="edm:end" attrs="xml:lang"/>
+		</elem>
+		<elem tag="nav:Reis" attrs="rdf:about">
+			<elem tag="rdfs:label" attrs="xml:lang"/>
+			<elem tag="skos:prefLabel" attrs="xml:lang"/>
+			<elem tag="skos:altLabel" attrs="xml:lang"/>
+			<elem tag="nav:datumVanAankomst" attrs="rdf:resource"/>
+			<elem tag="nav:datumVanVertrek" attrs="rdf:resource"/>
+			<elem tag="nav:heeftPlaatsVanAankomst" attrs="rdf:resource"/>
+			<elem tag="nav:heeftPlaatsVanVertrek" attrs="rdf:resource"/>
+			<elem tag="nav:heefLading" attrs="rdf:resource"/>
+			<elem tag="nav:heefSchip" attrs="rdf:resource"/>
+			<elem tag="edm:wasPresentAt" attrs="rdf:resource"/>
+		</elem>
+		<elem tag="edm:Event" attrs="rdf:about">
+			<elem tag="rdfs:label" attrs="xml:lang"/>
+			<elem tag="skos:prefLabel" attrs="xml:lang"/>
+			<elem tag="skos:altLabel" attrs="xml:lang"/>
+			<elem tag="dc:date" attrs="xml:lang,rdf:datatype"/>
+			<elem tag="dcterms:date" attrs="xml:lang, rdf:datatype"/>
+			<elem tag="edm:happendAt" attrs="rdf:resource"/>
+			<elem tag="edm:occuredAt" attrs="rdf:resource"/>
+			<elem tag="edm:wasPresentAt" attrs="rdf:resource"/>
+		</elem>
+		<!-- end edm:Event zonder nesting -->
+		<!-- 20190412 FN nav:Agent tbv van de vervaardiger van een foto. Dit kan bijv. een persoon of een organisatie zijn. Vanuit Archiefbeschrijving->dct:creator kan worden gelinked naar de nav:Agent -->
+		<elem tag="nav:Agent" attrs="rdf:about">
+			<!-- Indien mogelijk een label toewijzen -->
+			<elem tag="rdfs:label" attrs="xml:lang"/>
+			<elem tag="skos:prefLabel" attrs="xml:lang"/>
+		</elem>
+		<!-- end nav:Agent zonder nesting -->
+		<!-- NDE Register -->
+		<elem tag="schema:Organization">		
+			<attr tag="rdf:about" uriCheck="true">
+				<node-mapping inputPath="/input" outputPath="/naa:RDF/schema:Organization/@rdf:about">
+					<groovy-code>
+						<string>if(_input.dcsubjectsoort_)</string>
+						<string>&quot;${baseUrl}/id/nationaal_archief&quot;</string>
+					</groovy-code>
+				</node-mapping>
+			</attr>
+			<elem tag="schema:name" attrs="xml:lang">
+				<node-mapping inputPath="/input" outputPath="/naa:RDF/schema:Organization/schema:name">
+					<groovy-code>
+						<string>if(_input.dcsubjectsoort_)</string>
+						<string>&quot;Nationaal Archief&quot;</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<elem tag="schema:url" attrs="rdf:resource,xml:lang">
+				<node-mapping inputPath="/input" outputPath="/naa:RDF/schema:Organization/schema:url">
+					<groovy-code>
+						<string>if(_input.dcsubjectsoort_)</string>
+						<string>&quot;https://www.nationaalarchief.nl/&quot;</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<elem tag="schema:sameAs" attrs="rdf:resource,xml:lang">
+				<node-mapping inputPath="/input" outputPath="/naa:RDF/schema:Organization/schema:sameAs">
+					<groovy-code>
+						<string>if(_input.dcsubjectsoort_)</string>
+						<string>&quot;https://ror.org/0546dmt59&quot;</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+		</elem>
+		<elem tag="schema:DataCatalog">
+			<attr tag="rdf:about" uriCheck="true">
+				<node-mapping inputPath="/input" outputPath="/naa:RDF/schema:DataCatalog/@rdf:about">
+					<groovy-code>
+						<string>if(_input.dcsubjectsoort_)</string>
+						<string>&apos;https://archief.nl/doc/LinkedOpenDataNationaalArchief&apos;</string>
+					</groovy-code>
+				</node-mapping>
+			</attr>
+			<elem tag="schema:name">
+				<node-mapping inputPath="/input" outputPath="/naa:RDF/schema:DataCatalog/schema:name">
+					<groovy-code>
+						<string>if(_input.dcsubjectsoort_)</string>
+						<string>&apos;Linked Open Data Nationaal Archief&apos;</string>
+					</groovy-code>
+				</node-mapping>
+				<attr tag="xml:lang">
+					<node-mapping inputPath="/facts/language" outputPath="/naa:RDF/schema:DataCatalog/schema:name/@xml:lang">
+						<groovy-code>
+							<string>_facts.language * { _language -&gt;</string>
+							<string>if(_input.dcsubjectsoort_)</string>
+							<string>&quot;${_language}&quot;.toLowerCase()</string>
+							<string>}</string>
+						</groovy-code>
+					</node-mapping>
+				</attr>
+			</elem>
+			<elem tag="schema:description">
+				<node-mapping inputPath="/input" outputPath="/naa:RDF/schema:DataCatalog/schema:description">
+					<groovy-code>
+						<string>if(_input.dcsubjectsoort_)</string>
+						<string>&apos;Deze DataCatalog is een verzameling van metadata-sets mbt de Linked Open Data van het Nationaal Archief&apos;</string>
+					</groovy-code>
+				</node-mapping>
+				<attr tag="xml:lang">
+					<node-mapping inputPath="/facts/language" outputPath="/naa:RDF/schema:DataCatalog/schema:description/@xml:lang">
+						<groovy-code>
+							<string>_facts.language * { _language -&gt;</string>
+							<string>if(_input.dcsubjectsoort_)</string>
+							<string>&quot;${_language}&quot;.toLowerCase()</string>
+							<string>}</string>
+						</groovy-code>
+					</node-mapping>
+				</attr>
+			</elem>
+			<elem tag="schema:publisher" attrs="xml:lang">
+				<attr tag="rdf:resource" uriCheck="true">
+					<node-mapping inputPath="/input" outputPath="/naa:RDF/schema:DataCatalog/schema:publisher/@rdf:resource">
+						<groovy-code>
+							<string>if(_input.dcsubjectsoort_)</string>
+							<string>&quot;${baseUrl}/id/nationaal_archief&quot;</string>
+						</groovy-code>
+					</node-mapping>
+				</attr>
+			</elem>
+			<elem tag="schema:dataset">
+				<attr tag="rdf:resource" uriCheck="true">
+					<node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/schema:DataCatalog/schema:dataset/@rdf:resource">
+						<groovy-code>
+							<string>if(_input.dcsubjectsoort_)</string>
+							<string>_input.record * { _record -&gt;</string>
+							<string>_record.dcdescriptiondataset * { _dcdescriptiondataset -&gt;</string>
+							<string>_dcdescriptiondataset.dcidentifiercode * { _dcidentifiercode -&gt;</string>
+							<string>&quot;${baseUrl}/id/dataset/${_dcidentifiercode}&quot;</string>
+							<string>}</string>
+							<string>}</string>
+							<string>}</string>
+						</groovy-code>
+					</node-mapping>
+				</attr>
+			</elem>
+		</elem>
+		<elem tag="schema:Dataset">
+			<attr tag="rdf:about" uriCheck="true">
+				<node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/schema:Dataset/@rdf:about">
+					<groovy-code>
+						<string>if(_input.dcsubjectsoort_)</string>
+						<string>_input.record * { _record -&gt;</string>
+						<string>_record.dcdescriptiondataset * { _dcdescriptiondataset -&gt;</string>
+						<string>_dcdescriptiondataset.dcidentifiercode * { _dcidentifiercode -&gt;</string>
+						<string>&quot;${baseUrl}/id/dataset/${_dcidentifiercode}&quot;</string>
+						<string>}</string>
+						<string>}</string>
+						<string>}</string>
+					</groovy-code>
+				</node-mapping>
+			</attr>
+			<elem tag="schema:identifier" attrs="xml:lang">
+				<node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/schema:Dataset/schema:identifier">
+					<groovy-code>
+						<string>if(_input.dcsubjectsoort_)</string>
+						<string>&quot;${_dcidentifiercode}&quot;</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<elem tag="schema:name" attrs="xml:lang">
+				<node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/schema:Dataset/schema:name">
+					<groovy-code>
+						<string>if(_input.dcsubjectsoort_)</string>
+						<string>&quot;${_dcidentifiercode}&quot;</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<elem tag="schema:description" attrs="xml:lang">
+				<node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/schema:Dataset/schema:description">
+					<groovy-code>
+						<string>if(_input.dcsubjectsoort_)</string>
+						<string>&quot;Dataset: ${_dcidentifiercode}&quot;</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<elem tag="schema:creator" attrs="rdf:resource,xml:lang"/>
+			<elem tag="schema:license" attrs="xml:lang"/>
+			<elem tag="schema:distribution" attrs="xml:lang">
+				<attr tag="rdf:resource" uriCheck="true">
+					<node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/schema:Dataset/schema:distribution/@rdf:resource">
+						<groovy-code>
+							<string>_input.record * { _record -&gt;</string>
+							<string>_record.dcdescriptiondataset * { _dcdescriptiondataset -&gt;</string>
+							<string>_dcdescriptiondataset.dcidentifiercode * { _dcidentifiercode -&gt;</string>
+							<string>&quot;${baseUrl}/id/datadownload/${_dcidentifiercode}_rdf&quot;</string>
+							<string>}</string>
+							<string>}</string>
+							<string>}</string>
+						</groovy-code>
+					</node-mapping>
+				</attr>
+			</elem>
+			<elem tag="schema:publisher" attrs="xml:lang">
+				<attr tag="rdf:resource" uriCheck="true">
+					<node-mapping inputPath="/input" outputPath="/naa:RDF/schema:Dataset/schema:publisher/@rdf:resource">
+						<groovy-code>
+							<string>if(_input.dcsubjectsoort_)</string>
+							<string>&apos;https://archief.nl/id/nationaal_archief&apos;</string>
+						</groovy-code>
+					</node-mapping>
+				</attr>
+			</elem>
+			<!-- deze moeten link naar schema:DataDownload -->
+			<elem tag="schema:dateCreated" attrs="xml:lang"/>
+			<elem tag="schema:datePublished" attrs="xml:lang"/>
+			<elem tag="schema:dateModified" attrs="xml:lang"/>
+			<elem tag="schema:version" attrs="xml:lang"/>
+			<elem tag="schema:mainEntityOfPage" attrs="xml:lang"/>
+			<elem tag="schema:inLanguage" attrs="xml:lang"/>
+			<elem tag="schema:isBasedOnUrl" attrs="rdf:resource,xml:lang"/>
+			<elem tag="schema:citation" attrs="xml:lang"/>
+			<elem tag="schema:genre" attrs="xml:lang"/>
+			<elem tag="schema:keywords" attrs="xml:lang"/>
+			<elem tag="schema:spatialCoverage" attrs="xml:lang"/>
+			<elem tag="schema:temporalCoverage" attrs="xml:lang"/>
+			<elem tag="schema:includedInDataCatalog" attrs="xml:lang">
+				<attr tag="rdf:resource" uriCheck="true">
+					<node-mapping inputPath="/input" outputPath="/naa:RDF/schema:Dataset/schema:includedInDataCatalog/@rdf:resource">
+						<groovy-code>
+							<string>if(_input.dcsubjectsoort_)</string>
+							<string>&apos;https://archief.nl/doc/LinkedOpenDataNationaalArchief&apos;</string>
+						</groovy-code>
+					</node-mapping>
+				</attr>
+			</elem>
+		</elem>
+		<!-- velden conform standaard van 20 oktober 2020 -->
+		<elem tag="schema:DataDownload">
+			<attr tag="rdf:about" uriCheck="true">
+				<node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/schema:DataDownload/@rdf:about">
+					<groovy-code>
+						<string>_input.record * { _record -&gt;</string>
+						<string>_record.dcdescriptiondataset * { _dcdescriptiondataset -&gt;</string>
+						<string>_dcdescriptiondataset.dcidentifiercode * { _dcidentifiercode -&gt;</string>
+						<string>&quot;${baseUrl}/id/datadownload/${_dcidentifiercode}_rdf&quot;</string>
+						<string>}</string>
+						<string>}</string>
+						<string>}</string>
+					</groovy-code>
+				</node-mapping>
+			</attr>
+			<elem tag="schema:name">
+				<node-mapping inputPath="/input/record/dc:description.dataset/dc:identifier.code" outputPath="/naa:RDF/schema:DataDownload/schema:name">
+					<groovy-code>
+						<string>if (_input.dcsubjectsoort_)</string>
+						<string>&quot;${_dcidentifiercode} (RDF)&quot;</string>
+					</groovy-code>
+				</node-mapping>
+				<attr tag="xml:lang">
+					<node-mapping inputPath="/facts/language" outputPath="/naa:RDF/schema:DataDownload/schema:name/@xml:lang">
+						<groovy-code>
+							<string>_facts.language * { _language -&gt;</string>
+							<string>&quot;${_language}&quot;.toLowerCase()</string>
+							<string>}</string>
+						</groovy-code>
+					</node-mapping>
+				</attr>
+			</elem>
+			<elem tag="schema:description" attrs="xml:lang"/>
+			<elem tag="schema:encodingFormat" attrs="rdf:resource,xml:lang">
+				<node-mapping inputPath="/input" outputPath="/naa:RDF/schema:DataDownload/schema:encodingFormat">
+					<groovy-code>
+						<string>if(_input.dcsubjectsoort_)</string>
+						<string>&apos;application/rdf+xml&apos;</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<elem tag="schema:contentURL" attrs="rdf:resource,xml:lang"/>
+			<elem tag="schema:datePublished" attrs="xml:lang"/>
+			<elem tag="schema:dateModified" attrs="xml:lang">
+				<node-mapping inputPath="/input/record/dc:description.dataset/dc:subject.wijzigingsdatum" outputPath="/naa:RDF/schema:DataDownload/schema:dateModified">
+					<groovy-code>
+						<string>if (_input.dcsubjectsoort_)</string>
+						<string>&quot;${_dcsubjectwijzigingsdatum}&quot;</string>
+					</groovy-code>
+				</node-mapping>
+			</elem>
+			<elem tag="schema:inLanguage" attrs="xml:lang"/>
+			<elem tag="schema:license" attrs="rdf:resource,xml:lang"/>
+			<elem tag="schema:contentSize" attrs="xml:lang"/>
+		</elem>
+	</root>
+	<!-- END - root -->
+	<field-markers/>
+	<opts/>
+	<docs>
+		<!-- start Tekst en uitleg - HaNA_Aggregation -->
+		<doc path="/naa:RDF/ore:Aggregation">
+			<para name="Label">ore:Aggregation</para>
+			<para name="Definition">ore:Aggregation komt mogelijk te vervallen en wordt niet in de nieuwe record definitions niet meer gebruikt. RecordAggregation is het startpunt van de mapping en hard aan Pockets gekoppeld.</para>
+		</doc>
+		<!-- Start van de tekst en uitleg per onderdeel -->
+		<!-- Start tekst en uitleg - HaNA_Aggregation -->
+		<doc path="/naa:RDF/nao:Recordaggregatie">
+			<para name="Label">RecordAggregation</para>
+			<para name="Definition">Ter vervanging van ore:Aggregation. Dit is de start van de record definitie/mapping en hard aan Pockets gekoppeld.</para>
+		</doc>
+		<doc path="/naa:RDF/nao:Recordaggregatie/dc:identifier">
+			<para name="Label">MAIS hier komt de MAIS GUID - dc:identifier.guid</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Recordaggregatie/edm:isShownAt">
+			<para name="Label">Hier komt de Handle vanuit MAIS - dcterms:hasPart.handle</para>
+			<para name="Note">Dit is een link naar de foto/ het beeldmateriaal</para>
+		</doc>
+		<doc path="/naa:RDF/nao:Recordaggregatie/foaf:primaryTopic">
+			<para name="Label">Het primaire onderwerp van deze aggregatie, record of document.</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Recordaggregatie/edm:isShownBy">
+			<para name="Label"> nog in te vullen </para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Recordaggregatie/edm:landingPage">
+			<para name="Label">MAIS geeft hier een 1 of 0 maar dt zou een URL of URI moeten zijn - dcterms:hasPart.webdisplay</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Recordaggregatie/ore:isAggregatedBy">
+			<para name="Label">Verwijzing naar hoger aggregatie niveau</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Recordaggregatie/ore:aggregates">
+			<para name="Label">Verwijzing naar genest object (onderdeel van deze aggregatie)</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Recordaggregatie/dcterms:creator">
+			<para name="Label">Maker van de aggregatie / record</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Recordaggregatie/dcterms:type">
+			<para name="Label">Wat voor soort (type) aggregatie het is. Bij voorkeur gecontrolleerde termen gebruiken bv.</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Recordaggregatie/dcterms:created">
+			<para name="Label">Wanneer de aggregatie gemaakt is</para>
+			<para name="Note"/>
+		</doc>
+		<!-- Einde tekst en uitleg - HaNA_Aggregation -->
+		<!-- Start tekst en uitleg - Archiefeenheid -->
+		<doc path="/naa:RDF/nao:Archiefeenheid">
+			<para name="Label">Archiefeenheid</para>
+			<para name="Definition">Nog in te vullen</para>
+			<para name="Verplichting en voorkomen">Is het veld verplicht en hoeveel mag hij voorkomen.</para>
+			<para name="Voorbeeld">Voorbeeld nog in te vullen</para>
+		</doc>
+		<doc path="/naa:RDF/nao:Archiefeenheid/rdfs:label">
+			<para name="Label">Indien mogelijk een Label toevoegen</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Archiefeenheid/skos:prefLabel">
+			<para name="Label">Indien mogelijk een Label toevoegen</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Archiefeenheid/skos:altLabel">
+			<para name="Label">Indien mogelijk een Label toevoegen</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Archiefeenheid/nao:Archiefeenheidstype">
+			<para name="Label">Wat voor soort type entiteit het is. Bij voorkeur gecontrolleerde termen gebruiken zie onderliggend niveau @rdf:resource</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Archiefeenheid/nao:Archiefeenheidstype/@rdf:resource">
+			<para name="Label">Wat voor soort type entiteit het is. Bij voorkeur gecontrolleerde termen gebruiken bv. rijksarchief.nl/def/Foto in geval van een foto</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Archiefeenheid/nao:inventarisnummer">
+			<para name="Label">MAIS toegangscode / nummer archiefinventaris / toegangsnummer</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Archiefeenheid/nao:dossiernummer">
+			<para name="Label">MAIS bestanddeelnummer</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Archiefeenheid/dc:identifier">
+			<para name="Label">guid MAIS - dc:identifier.guid</para>
+			<para name="Note"/>
+		</doc>
+		<!-- Start tekst en uitleg - Archiefbeschrijving -->
+		<doc path="/naa:RDF/nao:Archiefbeschrijving">
+			<para name="Label">Archiefbeschrijving</para>
+			<para name="Definition">Nog aan te vullen</para>
+			<para name="Verplichting en voorkomen">Is het veld verplicht en hoeveel mag hij voorkomen.</para>
+			<para name="Voorbeeld">Voorbeeld nog in te vullen</para>
+		</doc>
+		<doc path="/naa:RDF/nao:Archiefbeschrijving/rdfs:label">
+			<para name="Label">Indien mogelijk een label toewijzen</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Archiefbeschrijving/skos:prefLabel">
+			<para name="Label">Indien mogelijk een label toewijzen</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/nao:Archiefbeschrijving/skos:altLabel">
+			<para name="Label">Indien mogelijk een label toewijzen</para>
+			<para name="Note"/>
+		</doc>
+		<!-- Einde tekst en uitleg - Archiefbeschrijving -->
+		<!-- Start tekst en uitleg - WebResource -->
+		<doc path="/naa:RDF/edm:WebResource">
+			<para name="Label">WebResource</para>
+			<para name="Definition">Nog aan te vullen</para>
+			<para name="Verplichting en voorkomen">Is het veld verplicht en hoeveel mag hij voorkomen.</para>
+			<para name="Voorbeeld">Voorbeeld nog in te vullen</para>
+		</doc>
+		<doc path="/naa:RDF/edm:WebResource/rdfs:label">
+			<para name="Label">Indien mogelijk een label toewijzen</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/edm:WebResource/dc:creator">
+			<para name="Label">Vervaardiger van digitaal object. Volgens EDM: For the creator of the web resource.</para>
+			<para name="Note">Geef indien mogelijk de ID van de maker op vanuit een bron van autoriteit. Herhaal dit voor meerdere vervaardigers.</para>
+		</doc>
+		<doc path="/naa:RDF/edm:WebResource/dc:description">
+			<para name="Label">Beschrijving van digitaal object. Volgens EDM: Gebruik voor een account of beschrijving van deze digitale weergave</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/edm:WebResource/dc:format">
+			<para name="Label">Metadata over formaat / specificatie (MAM). Bijvoorbeeld: image/jpeg</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/edm:WebResource/dc:source">
+			<para name="Label">Volgens EDM: Een verwante bron waaruit de webresource geheel of gedeeltelijk is afgeleid.</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/edm:WebResource/dc:type">
+			<para name="Label">Volgens EDM: De aard of het genre van de digitale representatie. Idealiter zal/zullen de term(en) worden afgeleid uit een gecontroleerde vocabulaire.</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/edm:WebResource/dcterms:type">
+			<para name="Label">Zie dc:type maar dan een gecontrolleerde term zoals nao:TypeDigitalVideo</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/edm:WebResource/dcterms:conformsTo">
+			<para name="Label">Volgens EDM: Een gevestigde standaard waaraan de webresource voldoet. Bijvoorbeeld W3C of IIIF</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/edm:WebResource/svcs:has_service">
+			<para name="Label">Verwijzing naar de IIIF functies van de GAF-server. Link naar API</para>
+			<para name="Note"/>
+		</doc>
+		<!-- Einde tekst en uitleg - WebResource -->
+		<!-- Start tekst en uitleg - PersonEntity -->
+		<doc path="/naa:RDF/pnv:Person">
+			<para name="Label">Person</para>
+			<para name="Definition">Nog aan te vullen</para>
+			<para name="Verplichting en voorkomen">Is het veld verplicht en hoeveel mag hij voorkomen.</para>
+			<para name="Voorbeeld">Voorbeeld nog in te vullen</para>
+		</doc>
+		<doc path="/naa:RDF/pnv:Person/rdfs:label">
+			<para name="Label">Indien mogelijk een label toewijzen</para>
+			<para name="Note"/>
+		</doc>
+		<!-- Einde tekst en uitleg - PersonEntity -->
+		<!-- Start tekst en uitleg - TimeSpan -->
+		<doc path="/naa:RDF/edm:TimeSpan">
+			<para name="Label">Catalog</para>
+			<para name="Definition">Nog aan te vullen</para>
+			<para name="Verplichting en voorkomen">Is het veld verplicht en hoeveel mag hij voorkomen.</para>
+			<para name="Voorbeeld">Voorbeeld nog in te vullen</para>
+		</doc>
+		<doc path="/naa:RDF/edm:TimeSpan/rdfs:label">
+			<para name="Label">Indien mogelijk een label toewijzen</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/edm:TimeSpan/skos:prefLabel">
+			<para name="Label">Indien mogelijk een label toewijzen</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/edm:TimeSpan/skos:altLabel">
+			<para name="Label">Indien mogelijk een label toewijzen</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/edm:TimeSpan/dc:coverage">
+			<para name="Label">MAIS Datering geschat</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/edm:TimeSpan/dc:description">
+			<para name="Label">MAIS datumaanduiding (bijvoorbeeld Circa)</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/edm:TimeSpan/edm:begin">
+			<para name="Label">MAIS Begindatum (bijvoorbeeld 0000-00-00)</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/edm:TimeSpan/edm:end">
+			<para name="Label">MAIS Einddatum (bijvoorbeeld 0000-00-00)</para>
+			<para name="Note"/>
+		</doc>
+		<!-- Einde tekst en uitleg - TimeSpan -->
+		<!-- Start tekst en uitleg - PlaceInTime -->
+		<doc path="/naa:RDF/hg:PlaceInTime">
+			<para name="Label">Catalog</para>
+			<para name="Definition">Nog aan te vullen</para>
+			<para name="Verplichting en voorkomen">Is het veld verplicht en hoeveel mag hij voorkomen.</para>
+			<para name="Voorbeeld">Voorbeeld nog in te vullen</para>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/rdfs:label">
+			<para name="Label">Indien mogelijk een label toewijzen</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/skos:prefLabel">
+			<para name="Label">Indien mogelijk een label toewijzen</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/skos:altLabel">
+			<para name="Label">Indien mogelijk een label toewijzen</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/sem:hasEarliestBeginTimeStamp">
+			<para name="Label">Indien mogelijk een label toewijzen</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/sem:hasLatestBeginTimeStamp">
+			<para name="Label">Indien mogelijk een label toewijzen</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/sem:hasEarliestEndTimeStamp">
+			<para name="Label">Indien mogelijk een label toewijzen</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/sem:hasLatestEndTimeStamp">
+			<para name="Label">Indien mogelijk een label toewijzen</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/owl:sameAs">
+			<para name="Label">Linken naar externe plek als deze dezelfde is, bv BAG: http://bag.basisregistraties.overheid.nl/bag/id/pand/0363100012172975</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/schema:name">
+			<para name="Label">Linken naar externe plek als deze dezelfde is, bv BAG: http://bag.basisregistraties.overheid.nl/bag/id/pand/0363100012172975</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/geo:hasGeometry">
+			<para name="Label">Linken naar externe plek als deze dezelfde is, bv BAG: http://bag.basisregistraties.overheid.nl/bag/id/pand/0363100012172975</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/hg:sameHgConcept">
+			<para name="Label">Linken naar externe plek als deze dezelfde is, bv BAG: http://bag.basisregistraties.overheid.nl/bag/id/pand/0363100012172975</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/hg:containsHgConcept">
+			<para name="Label">Linken naar externe plek als deze dezelfde is, bv BAG: http://bag.basisregistraties.overheid.nl/bag/id/pand/0363100012172975</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/hg:withinHgConcept">
+			<para name="Label">Linken naar externe plek als deze dezelfde is, bv BAG: http://bag.basisregistraties.overheid.nl/bag/id/pand/0363100012172975</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/hg:intersectsHgConcept">
+			<para name="Label">Linken naar externe plek als deze dezelfde is, bv BAG: http://bag.basisregistraties.overheid.nl/bag/id/pand/0363100012172975</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/hg:absorbed">
+			<para name="Label">Linken naar externe plek als deze dezelfde is, bv BAG: http://bag.basisregistraties.overheid.nl/bag/id/pand/0363100012172975</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/hg:absorbedBy">
+			<para name="Label">Linken naar externe plek als deze dezelfde is, bv BAG: http://bag.basisregistraties.overheid.nl/bag/id/pand/0363100012172975</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/hg:originated">
+			<para name="Label">Linken naar externe plek als deze dezelfde is, bv BAG: http://bag.basisregistraties.overheid.nl/bag/id/pand/0363100012172975</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/hg:originatedFrom">
+			<para name="Label">Linken naar externe plek als deze dezelfde is, bv BAG: http://bag.basisregistraties.overheid.nl/bag/id/pand/0363100012172975</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/hg:contains">
+			<para name="Label">Linken naar externe plek als deze dezelfde is, bv BAG: http://bag.basisregistraties.overheid.nl/bag/id/pand/0363100012172975</para>
+			<para name="Note"/>
+		</doc>
+		<doc path="/naa:RDF/hg:PlaceInTime/hg:liesIn">
+			<para name="Label">Linken naar externe plek als deze dezelfde is, bv BAG: http://bag.basisregistraties.overheid.nl/bag/id/pand/0363100012172975</para>
+			<para name="Note"/>
+		</doc>
+		<!-- Onderstaande laat ik als voorbeeld in de record definition staan -->
+		<!--
+		  <doc path="/naa:RDF/naa:Persoon/wie:hasName">
+			<para name="Label">Heeft naam</para>
+			<para name="Note">Heeft naam</para>
+		  </doc>
+		  <doc path="/naa:RDF/naa:ntRecord/wie:Person/wie:hasName/wie:HistoricalName">
+			<para name="Label">Historische naam</para>
+			<para name="Note">Historische naam</para>
+		  </doc>
+		  <doc path="/naa:RDF/naa:ntRecord/wie:Person/wie:hasName/wie:HistoricalName/wie:fullname">
+			<para name="URI">http://www.biographynet.nl/schema/fPerson/fullname</para>
+			<para name="Label">Volledige naam</para>
+			<para name="Definition">Volledige naam</para>
+			<para name="Obligation and Occurrence">Niet verplicht</para>
+			<para name="Example">For example Jan Pieterszoon Coen</para>
+			<para name="Comment">Volledige naam kan gebruikt worden voor het tonen. Soms is uit de bron alleen de volledige naam bekend en was het niet doenlijk om de naam te splitsen in de verschillende onderdelen zoals voornaam, intrapositie, achternaam enz.</para>
+			<para name="Note"><![CDATA[De volledige naam van een persoon - als die bekend is]]>            </para>
+			<para name="Value type">literal</para>
+			<para name="Cardinality">0….1</para>
+		  </doc>
+  -->
+	</docs>
+	<!-- Revisie - 17 mei 2018 - NT/Beeld switch aangepast -->
+	<!-- Revisie - 07 juni 2018 - diverse wijigingen bijv uitbreiding ordl -->
+	<!-- Revisie - 08 juni 2018 - diverse wijigingen en nieuwe mapping -->
+</record-definition>

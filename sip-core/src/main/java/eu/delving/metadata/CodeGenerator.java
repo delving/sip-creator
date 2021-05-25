@@ -107,7 +107,7 @@ public class CodeGenerator {
         recDefTree.getNodeMappings().forEach(this::toLookupCode);
         codeOut.line("// DSL Category wraps Builder call:");
         codeOut.line("boolean _absent_ = true");
-        codeOut.line("org.w3c.dom.Node outputNode");
+        codeOut.line("def outputNode");
         codeOut.line_("use (MappingCategory) {");
         codeOut.line_("WORLD.input * { _input ->");
         codeOut.line("_uniqueIdentifier = _input['@id'][0].toString()");

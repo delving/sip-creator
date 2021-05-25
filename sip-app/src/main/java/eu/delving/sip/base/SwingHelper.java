@@ -24,6 +24,9 @@ package eu.delving.sip.base;
 import eu.delving.metadata.*;
 import eu.delving.sip.model.SourceTreeNode;
 import eu.delving.stats.Stats;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rtextarea.RTextArea;
+import org.fife.ui.rtextarea.RTextScrollPane;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
@@ -98,6 +101,14 @@ public class SwingHelper {
         component.setOpaque(!selected);
         component.setForeground(selected ? color : NORMAL_FG);
         component.setBackground(selected ? NORMAL_BG : color);
+    }
+
+    public static JComponent scrollCodeVH(RSyntaxTextArea content) {
+        RTextScrollPane scroll = new RTextScrollPane(content);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scroll.setLineNumbersEnabled(true);
+        return scroll;
     }
 
     public static JComponent scrollVH(JComponent content) {

@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1950-01-01-1">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1950-01-01-1">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1950-01-01-1">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=2023">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%201.cmp&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%201.cmp&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1950-01-01-1">
+      <dc:description>Kling stamt uit de Koto-periode, afkomstig van een gevangen genomen Japanse officier bij Soerabaja,1945. klad: L:90cm, greep: 28cm, houten schede met leer bekleed; 1 ring, greep omwikkeld, kling 2 zijdig, scherp beschadigd (bramen) Restauratie 2010 door G.J.F.J. Tammens korte katana De kling is zeer oud 15e eeuw of iets jonger doch zeer beslist stammend uit de Koto-periode (voor 1600) De kling heeft een speciaal gehard snijgedeelte wat aan de rest (hoofdbestanddeel) is aangebracht (geweld). Dit harde gedeelte is partieel los gaan zitten van de kling en is zelfs hier en daar verdwenen. Dit zijn met vrij grote zekerheid gevechtsbeschadigingen. Hoe interessant ook maakt dit de kling vrijwel waardeloos, zodat plaatselijk materiaal inlassen, gevolgd door het gehele slijp &amp; polijstprogramma weinig zinvol is. De habaki ontbreekt. Uitwendig is het zwaard in de originele staat terug gebracht. De schede is van zijn kapotte leren hoes ontdaan van binnen zuur en vetvrij gemaakt, daarna gelijmd en geslepen, waarna een rood met goud instrooi finish is aangebracht in 32 laklagen. Het oppervlak moet min of meer het effect gaan vertonen dat we het beste populair "sinasappelschiloppervlak" kunnen noemen. Dit ontstaat echter na zeer lange tijd (kan wel ee jaar duren) door verharding van bepaalde onderlagen. Voorzichtge behandeling is voorlopig gewenst. De tsuba en menukis gereinigd, tsuba strak gemaakt en origineel gefinished. De kashira, bovenste greep knop, was door opensplijting na doorgeroest te zijn niet meer te gebruiken. Er is nu een originele Japanse hoornen kashira op aangebracht. De same welke nog partieel aanwezig was viel bij de reiniging in stukjes en brokjes uiteen zodat de greep bedekt is met stukjes pythonhuid. Originele Japanse zijden wikkeling is op de greep aangebracht. Het houten gedeelte van de greep is geheel door nieuwe vervangen, aangezien het oude grotendeels door boktorren was geconsumeerd. Tsuba lijt niet oud, beslist niet stammend uit de Koto-periode. DUT</dc:description>
+      <dc:identifier>1950/01/01-1</dc:identifier>
+      <dc:title>Japans zwaard, korte Katana (Chisa Katana) Japans zwaard, korte Katana (Chisa Katana)</dc:title>
+      <dc:type>zwaard</dc:type>
+      <dcterms:created>voor 1600</dcterms:created>
+      <dcterms:extent>L: 91cm</dcterms:extent>
+      <dcterms:medium>metaal, hout, lakwerk</dcterms:medium>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%201.cmp&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/jap%20zwaard.cmp&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%202.cmp&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010 1.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/jap zwaard.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010 2.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010 1.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/jap zwaard.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010 2.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

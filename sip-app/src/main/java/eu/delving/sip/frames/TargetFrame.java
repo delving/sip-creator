@@ -32,8 +32,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.tree.*;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -53,6 +52,8 @@ import static eu.delving.sip.base.SwingHelper.scrollVH;
  */
 
 public class TargetFrame extends FrameBase {
+    private final static String CREATE_DUPLICATE_ELEMENT = "Create duplicate element";
+    private final static String REMOVE_DUPLICATE_ELEMENT = "Remove duplicate element";
     public static final FilterNode EMPTY_NODE = FilterNode.createMessageNode("No record definition");
     private JTree recDefTree;
     private JTextField filterField = new JTextField();
@@ -173,10 +174,13 @@ public class TargetFrame extends FrameBase {
                 if (!node.getRecDefNode().isDuplicatePossible()) return;
                 Rectangle rect = recDefTree.getUI().getPathBounds(recDefTree, path);
                 if (rect != null && rect.contains(e.getX(), e.getY())) {
-                    JPopupMenu menu = new JPopupMenu();
-                    menu.add(new DuplicateElementAction());
-                    // todo: when there is a ROOT opt list, show the values to choose from (as well), and then set the value?
-                    menu.show(recDefTree, rect.x + rect.width, rect.y + rect.height / 2);
+                    DuplicateElementAction duplicateElementAction = new DuplicateElementAction(recDefTree);
+                    if(duplicateElementAction.isValid()) {
+                        JPopupMenu menu = new JPopupMenu();
+                        menu.add(duplicateElementAction);
+                        // todo: when there is a ROOT opt list, show the values to choose from (as well), and then set the value?
+                        menu.show(recDefTree, rect.x + rect.width, rect.y + rect.height / 2);
+                    }
                 }
             }
         });
@@ -299,21 +303,44 @@ public class TargetFrame extends FrameBase {
 
     }
 
+    private RecDefTreeNode getRecDefTreeNode(JTree recDefTree) {
+        TreePath path = recDefTree.getSelectionPath();
+        if (path != null && path.getLastPathComponent() instanceof RecDefTreeNode) {
+            return (RecDefTreeNode) path.getLastPathComponent();
+        }
+        return null;
+    }
+
+    private String createDuplicateActionName(JTree recDefTree) {
+        RecDefTreeNode recDefTreeNode = getRecDefTreeNode(recDefTree);
+        if (recDefTreeNode != null) {
+            RecDefNode recDefNode = recDefTreeNode.getRecDefNode();
+            if (recDefNode.getDynOpt() != null) {
+                return REMOVE_DUPLICATE_ELEMENT;
+            } else if(recDefNode.isDuplicatePossible()) {
+                return CREATE_DUPLICATE_ELEMENT;
+            }
+        }
+        return null;
+    }
+
     private class DuplicateElementAction extends AbstractAction implements Work {
 
+        private final TreePath path;
+        private final String name;
         private RecDefTreeNode recDefTreeNode;
         private DynOpt dynOpt;
 
-        private DuplicateElementAction() {
-            super("Create duplicate element");
+        private DuplicateElementAction(JTree recDefTree) {
+            super(createDuplicateActionName(recDefTree));
+            path = recDefTree.getSelectionPath();
+            name = createDuplicateActionName(recDefTree);
+            recDefTreeNode = getRecDefTreeNode(recDefTree);
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            TreePath path = recDefTree.getSelectionPath();
-            if (path == null) return;
-            if (path.getLastPathComponent() instanceof RecDefTreeNode) {
-                recDefTreeNode = (RecDefTreeNode) path.getLastPathComponent();
+            if (CREATE_DUPLICATE_ELEMENT.equals(name)) {
                 if (!recDefTreeNode.getRecDefNode().isDuplicatePossible()) return;
                 String answer = sipModel.getFeedback().ask("Please enter a discriminator for the new element");
                 if (answer == null) return;
@@ -331,6 +358,10 @@ public class TargetFrame extends FrameBase {
                 dynOpt.path = recDefTreeNode.getRecDefPath().getTagPath();
                 dynOpt.value = answer;
                 exec(this);
+            } else if(REMOVE_DUPLICATE_ELEMENT.equals(name)) {
+                recDefTreeNode.getRecDefNode().remove();
+                RecDefTreeModel treeModel = (RecDefTreeModel) recDefTree.getModel();
+                treeModel.removeNode((FilterNode) path.getLastPathComponent());
             }
         }
 
@@ -349,6 +380,10 @@ public class TargetFrame extends FrameBase {
         @Override
         public Job getJob() {
             return Job.DUPLICATE_ELEMENT;
+        }
+
+        public boolean isValid() {
+            return name != null;
         }
     }
 

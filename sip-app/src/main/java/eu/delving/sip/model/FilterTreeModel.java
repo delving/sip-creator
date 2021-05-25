@@ -47,6 +47,22 @@ public class FilterTreeModel implements TreeModel {
         root.setFilterModel(this);
     }
 
+    public void removeNode(FilterNode filterNode) {
+        removeNodeFrom(filterNode, root);
+        refreshTree();
+    }
+
+    private boolean removeNodeFrom(FilterNode filterNode, FilterNode ancestor) {
+        for (FilterNode child : ancestor.getChildren()) {
+            if (child.equals(filterNode)) {
+                ancestor.getChildren().remove(filterNode);
+                return true;
+            }
+            removeNodeFrom(filterNode, child);
+        }
+        return false;
+    }
+
     public void setFilter(String patternString) {
         this.patternString = patternString;
         refresh();

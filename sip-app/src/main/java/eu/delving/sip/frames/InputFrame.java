@@ -176,26 +176,26 @@ public class InputFrame extends FrameBase {
             for (Map.Entry<String, String> entry : node.attributes().entrySet()) {
                 children.add(new GroovyTreeNode(this, entry.getKey(), entry.getValue()));
             }
-            if (node.getNodeValue() instanceof List) {
+            if (!node.children.isEmpty()) {
                 string = node.getNodeName();
-                toolTip = String.format("Size: %d", ((List) node.getNodeValue()).size());
+                toolTip = String.format("Size: %d", node.children.size());
             }
-            else {
-                String truncated = node.text();
+            if(node.text != null) {
+                String truncated = node.text;
                 if (truncated.contains("\n") || truncated.length() >= MAX_LENGTH) {
                     int index = truncated.indexOf('\n');
                     if (index > 0) truncated = truncated.substring(0, index);
                     if (truncated.length() >= MAX_LENGTH) truncated = truncated.substring(0, MAX_LENGTH);
                     string = String.format("<html><b>%s</b> = %s ...</html>", node.getNodeName(), truncated);
-                    toolTip = tameTooltipText(node.text());
+                    toolTip = tameTooltipText(node.text);
                 }
                 else {
                     string = String.format("<html><b>%s</b> = %s</html>", node.getNodeName(), truncated);
                     toolTip = truncated;
                 }
             }
-            if (this.node.getNodeValue() instanceof List) {
-                for (Object sub : ((List) this.node.getNodeValue())) {
+            if (!node.children.isEmpty()) {
+                for (Object sub : node.children) {
                     GroovyNode subnode = (GroovyNode) sub;
                     children.add(new GroovyTreeNode(this, subnode));
                 }

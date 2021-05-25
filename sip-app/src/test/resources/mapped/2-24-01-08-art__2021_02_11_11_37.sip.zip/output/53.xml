@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:premis="http://www.loc.gov/premis/rdf/v3/" xmlns:schema="http://schema.org/" xmlns:bf="http://id.loc.gov/ontologies/bibframe/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:iiif="http://iiif.io/api/image/2#" xmlns:agrl="http://d-nb.info/standards/elementset/agrelon#" xmlns:naa="https://archief.nl/def/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:geo="http://www.opengis.net/ont/geosparql#" xmlns:sd="http://www.w3.org/ns/sparql-service-description#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:cidoc-crm="http://www.cidoc-crm.org/cidoc-crm/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:sem="http://semanticweb.cs.vu.nl/2009/11/sem/" xmlns:dcat="https://www.w3.org/TR/vocab-dcat-2/" xmlns:nao="https://archief.nl/def/ontologie/" xmlns:prov="http://www.w3.org/ns/prov#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:nav="https://archief.nl/def/vocabulaire/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:void="http://rdfs.org/ns/void#" xmlns:adms="http://www.w3.org/ns/adms#" xmlns:org="http://www.w3.org/ns/org#" xmlns:svcs="http://rdfs.org/sioc/services#" xmlns:ov="http://open.vocab.org/terms/" xmlns:vcard="http://www.w3.org/2006/vcard/ns#" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:cs="http://www.kulttuurisampo.fi/ebkr/" xmlns:dbo="http://dbpedia.org/ontology/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:eac-cpf="http://www3.iath.virginia.edu/eac/cpf/" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:pnv="https://w3id.org/pnv#" xmlns:frbr_core="http://purl.org/vocab/frbr/core#" xmlns:odrl="http://www.w3.org/ns/odrl/2/" xmlns:vs="http://www.w3.org/2003/06/sw-vocab-status/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:hg="http://rdf.histograph.io/" xmlns:frbroo="http://iflastandards.info/ns/fr/frbr/frbroo/" xmlns:cc="http://creativecommons.org/ns#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/AD8C0CCAD0B4102DBCF8003048976D84">
+   <nao:Recordaggregatie rdf:about="https://archief.nl/doc/fotorecord/AD8C0CCAD0B4102DBCF8003048976D84">
+      <nao:aet>foto</nao:aet>
+      <rdfs:label>Record over foto</rdfs:label>
+      <skos:prefLabel>Record over foto</skos:prefLabel>
+      <dc:identifier>AD8C0CCAD0B4102DBCF8003048976D84</dc:identifier>
+      <edm:isShownAt rdf:resource="http://hdl.handle.net/10648/ad8c0cca-d0b4-102d-bcf8-003048976d84">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="https://service.archief.nl/gaf/image-service/ad8c0cca-d0b4-102d-bcf8-003048976d84">
+      </edm:isShownBy>
+      <ore:isAggregatedBy rdf:resource="https://archief.nl/doc/2.24.01.08.art">
+      </ore:isAggregatedBy>
+      <ore:aggregates rdf:resource="https://archief.nl/doc/beschrijving/AD8C0CCAD0B4102DBCF8003048976D84">
+      </ore:aggregates>
+      <nao:isAggregatietype rdf:resource="https://archief.nl/def/FotoRecord">
+      </nao:isAggregatietype>
+   </nao:Recordaggregatie>
+   <nao:Archiefeenheid rdf:about="https://archief.nl/doc/foto/AD8C0CCAD0B4102DBCF8003048976D84">
+      <rdf:type rdf:resource="http://www.w3.org/ns/odrl/2/Asset">
+      </rdf:type>
+      <rdfs:label>Archiefeenheid van AD8C0CCAD0B4102DBCF8003048976D84</rdfs:label>
+      <skos:prefLabel>Archiefeenheid van AD8C0CCAD0B4102DBCF8003048976D84</skos:prefLabel>
+      <nao:Archiefeenheidstype>https://archief.nl/def/Foto</nao:Archiefeenheidstype>
+      <nao:dossiernummer>254-7056</nao:dossiernummer>
+      <dc:identifier>4b0b5edb-91da-47ef-b476-46023d2d8699</dc:identifier>
+      <dc:format>4 x 5 inch</dc:format>
+      <nao:isMateriaaltype rdf:resource="https://archief.nl/id/concept/a727a445-22d5-4f2a-94c2-6749ea4baca0">
+      </nao:isMateriaaltype>
+      <nao:archiefLink>340837|NL-HaNA_2.24.01.08_0_254-7056</nao:archiefLink>
+   </nao:Archiefeenheid>
+   <nao:Archiefbeschrijving rdf:about="https://archief.nl/doc/beschrijving/AD8C0CCAD0B4102DBCF8003048976D84">
+      <rdfs:label>Beschrijving van AD8C0CCAD0B4102DBCF8003048976D84</rdfs:label>
+      <skos:prefLabel>Beschrijving van AD8C0CCAD0B4102DBCF8003048976D84</skos:prefLabel>
+      <dc:description>Salon met tapijt van Sjah van Perzie</dc:description>
+      <ov:describes>Drakenstein</ov:describes>
+      <dc:subject>paleizen</dc:subject>
+      <dcterms:subject rdf:resource="https://archief.nl/doc/Fotocollectie/fotocollectie_anefo">
+      </dcterms:subject>
+      <foaf:primaryTopic rdf:resource="https://archief.nl/doc/foto/AD8C0CCAD0B4102DBCF8003048976D84">
+      </foaf:primaryTopic>
+      <odrl:hasPolicy rdf:resource="https://archief.nl/def/Policy/set_b_rechtenvrij__publiek_domein">
+      </odrl:hasPolicy>
+   </nao:Archiefbeschrijving>
+   <odrl:Policy rdf:about="https://archief.nl/def/Policy/set_b_rechtenvrij__publiek_domein">
+      <rdfs:label>Set B: Rechtenvrij / Publiek Domein</rdfs:label>
+   </odrl:Policy>
+   <skos:Concept rdf:about="https://archief.nl/doc/Fotocollectie/fotocollectie_anefo">
+      <rdfs:label>Fotocollectie Anefo</rdfs:label>
+      <skos:prefLabel>Fotocollectie Anefo</skos:prefLabel>
+   </skos:Concept>
+   <nav:Agent rdf:about="https://archief.nl/NL-HaNA/id/vervaardiger/">
+   </nav:Agent>
+</rdf:Description>
+</rdf:RDF>

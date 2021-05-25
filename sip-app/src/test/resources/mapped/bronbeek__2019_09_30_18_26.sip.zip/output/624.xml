@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1973-10-01-1-1-2">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1973-10-01-1-1-2">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1973-10-01-1-1-2">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=6904">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1973%5C1973_10_01-1-1_2.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1973%5C1973_10_01-1-1_2.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1973-10-01-1-1-2">
+      <dc:description>Gereedschap: Op houten steel gemonteerd reservoir om te batikken. (Canting) Nowhere in the world has the batik technique been so highly developed as on Java. Batik is a resist dye technique in which sections of a cloth surface are covered in wax so that it does not absorb the dye. This canting, a small, light, drawing instrument, was developed on Java to apply the wax to the cloth surface. Canting vary in the number of spouts they have. More spouts means that the batiker can draw more than one line at a time. Canting also vary in the width of the spouts.The smallest spout openings are a fraction of a centimetre. The wider ones function like wide brushes to cover a broad surface with wax. This canting, or wax pen has two small spouts. The copper reservoir in the pen-like instrument holds the wax. The batiker holds the handle in the right hand, dips the reservoir in a molten wax mixture, and then applies the wax to the cloth through the spout(s). The technique requires considerable skill. For example, the spout of the canting may not touch the cloth, because this will result in an ugly blob of wax on the fabric. The temperature of the wax determines how quickly the wax will flow. The wax solution in the pan is very carefully composed so that the wax has the correct fluidity, and the temperature under the pan must also be kept constant. In addition, the cloth to be batiked must be treated with a finishing layer so that the wax does not penetrate the fibres. Working with the canting in Java is womenÂ´s work. She sits on a low bench beside a charcoal fire on which the pan of wax is heated. The cloth is hung over a rack, fastened at the top and weighted at the bottom. The batiker holds her left hand behind the section of cloth where she will apply the resist solution. She holds the canting in her right hand, and from time to time blows on the spout to remove the wax that has coagulated in it. Using the pen, she draws wax lines or dots on the cloth. The canting functions as a kind of pen, and cloth that has been decorated with this batik process is called Â´tulisÂ´, the same word as for writing. Batik tulis, or hand-drawn batik, contrasts with batik cap, in which the wax has been applied (by men) using a stamp. S. Niessen 08/2005 DUT</dc:description>
+      <dc:identifier>1973/10/01-1-1/2</dc:identifier>
+      <dc:title>A wax pen used in the batik process. A wax pen used in the batik process.</dc:title>
+      <dc:title>Op houten steel gemonteerd reservoir om te batikken Op houten steel gemonteerd reservoir om te batikken</dc:title>
+      <dc:type>batik gereedschap</dc:type>
+      <dcterms:extent>Algemeen: 4 1/2 x 13/16 x 1 3/16in. (11,5 x 2 x 3cm)</dcterms:extent>
+      <dcterms:medium>A small vessel of thin copper with a spout, set in a wooden handle. Reed and bamboo are commonly used for the handle. This copper reservoir has two small spouts.</dcterms:medium>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1973%5C1973_10_01-1-1_2.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1973%5C1973_10_01-1-1_2_002.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1973\1973_10_01-1-1_2.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1973\1973_10_01-1-1_2_002.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1973\1973_10_01-1-1_2.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1973\1973_10_01-1-1_2_002.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

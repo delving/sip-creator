@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2010-12-02-1-42891">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2010-12-02-1-42891">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42891">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=51333">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42891.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42891.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42891">
+      <dc:description>Afdeling: Insulair Zuidoost AziÃ« Objectnaam: zwaard &amp; schede Titel: mandau Rubriek: (niet ingevoerd) Datumlabel: voor 1900 Materiaal: ijzer, hout, hoorn Emailadres: toelichting: Lemmet. Licht gekromd. Aan weerszijden van de kling drie bloedgleuven; twee lange en een korte. Brede rug, op tweederde versmallend tot snijvlak. Greep: zwart hoorn. Tweedelig. Achthoekig, een beetje afgehoekt. Bovenop de karakteristieke vleugelmoer. Stootplaat, handbeugel met steelring van ijzer. Steelring achthoekig, ajour bewerkt. Aan de rugzijde buigt de stootplaat in een haak/hoek/pegel naar beneden. De greep heeft een rozet en is met metalen nagels ingelegd. De schede: hout rood gelakt. Tien metalen banden houden de schede bijeen. Ogen voor draagband of koord aan de eerste en vierde band. Mondstuk ontbreekt, de zilveren schoen is gedeeltelijk ajour bewerkt met symmetrische figuren. Heeft bovendien een uitstekende rand, "op de wijze der sleepsabels ". Afmetingen: Geheel: 77 x 3,7 cm Herkomst: J.L.H. Beijens Media: 3424 Publicaties over het object: Juynbol Catalogus Borneo II 187 716/12-13. het nummer 716 verwijst naar het inventarisnummer zoals dat verleend werd aan de collectie Christan. 2) Perelaer, etnografische beschrijvingen der Dayaks; " het (de mandau) is oneindig meer doelmatig dan de klewang der Maleiers of de kromme sabel der Nagarezen". (65). Schmelts, Hein A.R. Ethno. von Borneop 232 e.v. Met dank aan: Vermoedelijk sier- of statiewapen, weinig doelmatig. De vorm de greep met stootplaat enz. Waarschijnlijk imitatie van, dan wel geÃ¯nspireerd door Europese wapens. Uit beschrijvingen van Juynbol is niet moeilijk op te maken dat onderhavige zwaarden afkomstig zijn uit Zuidoost Kalimantan, Negara. Dit wordt versterkt door de omschrijving zoals die te vinden is op de zo genaamde naamlijst van voorwerpen en ethnografica uit de collectie Beijens, bewerkt door H.G. Wijdeveld. Bovendien is bekend dat Negara een gerenommeerde streek was met betrekking tot ijzerbewerking en smederij. Bruikleen van: Gemeente Nijmegen collectie: J.L.H. Beijens Huidige standplaats: [3424] Depot, 16, L d [16 L d] [08-jun-2007] hoofdmateriaal: ijzer DUT</dc:description>
+      <dc:identifier>2010/12/02-1-42891</dc:identifier>
+      <dc:title>geen titel</dc:title>
+      <dc:type>zwaard</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42891.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5Cbeijensready%5C2010_12_02-1-42891.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1%5C2010_12_02-1-42891.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42891.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42891.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42891.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42891.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42891.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42891.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

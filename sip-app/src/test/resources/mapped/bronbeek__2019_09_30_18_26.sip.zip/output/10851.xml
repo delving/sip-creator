@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1950-1-22">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1950-1-22">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1950-1-22">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=6485">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2034b.cmp&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2034b.cmp&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1950-1-22">
+      <dc:description>Licht machinegeweer, Taisho 11 (1922) (1944) p.194: "Model 11 (1922) 6.5-mm light machine gun. 1) General description. This is a gas operated, air-cooled, machine gun with hopper feed which holds 6-5 round clips of ammunition (fig.178). positive identification can be made from the following markings which appear on the top of the receiver [ ] and read "11th year model". It is equipped with a blade front-sight and a V notched rear leaf-sight sliding on a ramp. There is no windage or drift adjustment. The safety lever (see fig. 178) is turned down to a vertical position to make the weapon safe. 2)Characteristics. Caliber: 6.5-mm (0.256inch) Hopper capacity: 6-5 round clips. Weight: 22 1/2 pounds. Muzzle velocity: 2,440 feet per second. Sight graduations: 300-1500 meters Cyclic rate of fire: 550 rounds per minute. 3) Ammunition. Clips of 5 rounds standard or reduced charge 6.5-mm ball rifle ammunition are used. (1995) p.138: "The Japanese Army was equipped with a large number of light machine guns. The LMG played a very important role in infantry combat. Each platoon consisted of three rifle squads, one LMG squad and one portable mortar squad. Without the LMG and portable mortar, the inafntry could not operate fully. p.140: "The hopper could easily be separated from the gun but when changing the barrel, the action needed to be removed first. Six clips with five rounds of ammunition each for a total of thirty rounds could be placed in the hopper." Onderzoek Bas Martens&amp;Guus de Vries REGISTRATIE - Inventarisnummer : 2034-C (ex RvH) - Locatie : Wapenkluis OMSCHRIJVING - Wapensoort : Mitrailleur - Benaming, type &amp; fabrikant : Type 11, Nambu, Nagoya Arsenal, Japan - Kaliber : 6,5 x 51 mmSR - Serienummer : 27143 - Andere belangrijke merken : Geen TOESTAND - Roestvorming ja/nee : Nee - Mist onderdelen : Diverse onderdelen voedingsmechanisme - Andere beschadigingen : Tekst op bovenkant deksel weggeslepen - Oordeel algehele toestand : Redelijk BIJZONDERHEDEN - Aanwezige accessoires : Geen - Evt. andere bijzonderheden : Oorlogsbuit 1950 GEBRUIKT IN INDIE : Ja - Toelichting : Wapen van een KNIL tegenstander BRONNEN/LITERATUUR - T. Nakata &amp; T.B. Nelson, Imperial Japanese Army and Navy Uniforms &amp; Equipments (Alexandria 1997,4) BEOORDELING &amp; ADVIES - Categorie : B - Advies : Exposeren DUT</dc:description>
+      <dc:identifier>1950-1-22</dc:identifier>
+      <dc:title>Model 11 (1922) 6.5-mm light machine gun Model 11 (1922) 6.5-mm light machine gun</dc:title>
+      <dc:type>machinegeweer</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2034b.cmp&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2034b.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2034b.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>
