@@ -158,7 +158,7 @@ public class GroovyNode {
         }
         if ("*".equals(key)) return children;
         if (key != null && key.endsWith("_")) {
-            GroovyNode node = getValueNodes(key.substring(0, key.length()-1));
+            GroovyNode node = findFirstMatch(key.substring(0, key.length()-1));
             return node == null ? "" : node;
         }
         return getByName(key);
@@ -190,15 +190,37 @@ public class GroovyNode {
         return answer;
     }
 
-    // TODO restore former implementation
-    private GroovyNode getValueNodes(String name) {
+    private GroovyNode findFirstMatch(String name) {
         if (getNodeName().equals(name) && !text.isEmpty())
             return this;
         for (GroovyNode node : children) {
-            GroovyNode match = node.getValueNodes(name);
+            GroovyNode match = node.findFirstMatch(name);
             if (match != null) return match;
         }
         return null;
+    }
+
+    // Used by scripts
+    public List<Object> getValueNodes(String name) {
+        List answer = new NodeList();
+        getValueNodes(name, answer);
+        return answer;
+    }
+
+    private void getValueNodes(String name, List answer) {
+        if (nodeValue instanceof List) {
+            for (Object object : ((List) nodeValue)) {
+                if (object instanceof GroovyNode) {
+                    ((GroovyNode) object).getValueNodes(name, answer);
+                }
+                else {
+                    getValueNodes(name, (List) object);
+                }
+            }
+        }
+        else if (name.equals(this.getNodeName())) {
+            if (nodeValue instanceof String && !((String) nodeValue).trim().isEmpty()) answer.add(this);
+        }
     }
 
     protected static void setMetaClass(final MetaClass metaClass, Class nodeClass) {
