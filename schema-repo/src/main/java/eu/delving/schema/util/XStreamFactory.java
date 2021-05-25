@@ -42,10 +42,10 @@ import java.util.Collection;
 public class XStreamFactory {
     public static XStream getSchemasStream() {
         XStream xstream = new XStream(new PureJavaReflectionProvider());
+        // See http://x-stream.github.io/security.html#example
         XStream.setupDefaultSecurity(xstream);
         xstream.setMode(XStream.NO_REFERENCES);
 
-        xstream.addPermission(NoTypePermission.NONE);
         xstream.addPermission(NullPermission.NULL);
         xstream.addPermission(PrimitiveTypePermission.PRIMITIVES);
 

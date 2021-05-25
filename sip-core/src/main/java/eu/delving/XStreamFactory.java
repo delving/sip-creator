@@ -25,10 +25,10 @@ public class XStreamFactory {
     }
 
     public static XStream asSecureXStream(XStream stream) {
-        XStream.setupDefaultSecurity(stream);
         stream.setMode(XStream.NO_REFERENCES);
 
-        stream.addPermission(NoTypePermission.NONE);
+        // See http://x-stream.github.io/security.html#example
+        XStream.setupDefaultSecurity(stream);
         stream.addPermission(NullPermission.NULL);
         stream.addPermission(PrimitiveTypePermission.PRIMITIVES);
 
