@@ -48,8 +48,7 @@ public class MappingModel implements RecDefNodeListener {
     private RecDefTreeNode recDefTreeRoot;
     private NodeMappingListModel nodeMappingListModel = new NodeMappingListModel();
 
-    @VisibleForTesting
-    MappingModel() {
+    public MappingModel() {
     }
 
     public MappingModel(SipModel sipModel) {

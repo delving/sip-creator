@@ -307,6 +307,7 @@ public class MappingCompileModel {
 
         @Override
         public void run() {
+            groovyCodeResource.clearMappingScripts();
             if (metadataRecord == null) return;
             compiling = true;
             try {
@@ -328,7 +329,7 @@ public class MappingCompileModel {
                             List<String> uriErrors = result.getUriErrors();
                             if (!uriErrors.isEmpty()) {
                                 StringBuilder out = new StringBuilder();
-                                for (String uriError : result.getUriErrors()) {
+                                for (String uriError : uriErrors) {
                                     out.append(uriError).append("\n");
                                 }
                                 compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
@@ -357,6 +358,7 @@ public class MappingCompileModel {
                         List<String> rdfErrors = result.getRDFErrors();
                         if (!rdfErrors.isEmpty()) {
                             StringBuilder out = new StringBuilder();
+                            // TODO we can probably reuse uriErrors instead of doing result.getUriErrors()
                             for (String rdfError : result.getRDFErrors()) {
                                 out.append(rdfError).append("\n");
                             }
@@ -365,7 +367,7 @@ public class MappingCompileModel {
                         }
                         else if (!uriErrors.isEmpty()) {
                             StringBuilder out = new StringBuilder();
-                            for (String uriError : result.getUriErrors()) {
+                            for (String uriError : uriErrors) {
                                 out.append(uriError).append("\n");
                             }
                             compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());

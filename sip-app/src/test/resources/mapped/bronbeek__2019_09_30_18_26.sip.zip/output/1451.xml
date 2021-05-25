@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1946-10-10-1-206">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1946-10-10-1-206">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1946-10-10-1-206">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=2001">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02052%202.cmp&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02052%202.cmp&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1946-10-10-1-206">
+      <dc:description>Klad: L:90cm, greep 23cm, verlakt houten schede, ring binnenzijde, greep omwoeld, binnenzijde greep koperen motief in haut relief Restauratierapport Tachi door Ing. G.J.F. Tammens datering: Koto-periode (1600) Kling: Tijdens de restauratie bleek na het schoonmaken en partieel ontroesten van de angel, dit exemplaar een originele Tachi te zijn. Zeer zeldzaam, in aanmerking nemende dat ongeveer 1/1000 van de Japanse klingen "tachiblades" zijn. Dit zwaard is in Japan ongeveer 25cm ingekort waarschijnlijk 18?e eeuw. Aangezien de angel sterk is bijgeslepen is de inscriptie verloren gegaan, op enige half weggeslepen restanten na. De zijde, waarop de inscripties staan, geeft echter de indicatie, dat we met een tachi te doen hebben en wel een zeer vroege. De kling is na vele malen slijpen en polijsten, zogenaamd "doodgeslepen", wat wil zeggen dat de typische karakters van de kling als hamon en yakiba niet meer duidelijk zichtbaar zijn, omdat er te veel materiaal is weggenomen. De kling is nu licht gepolijst, na ontroesting en antiroest geprepareerd. De yokabe is opnieuw ingeslepen. Greep: Totaal gerestaureerd, pasklaar gemaakt op de angel, onderlaag opgekleurd, nieuwe wikkeling aangebarcht, passende Fuchi-kashira aangebracht, copieÃ«n menuki's gemaakt en onder de wikkeling geplaatst. Tsuba: Ontroest, strak gemaakt en origineel gekleurd passend in het geheel. Habaki: Ontroest en weer passend gemaakt. Schede: Partieel gespleten, ontzuurd en ontvet van binnen. Het geheel gelijmd, strak gemaakt en de bestaande laklaag totaal bijgewerkt. Tot slot het geheel met een beschermende laag afgedekt. DUT</dc:description>
+      <dc:identifier>1946/10/10-1-206</dc:identifier>
+      <dc:title>Japans zwaard, "Tachi", Koto-periode (voor 1600) Japans zwaard, "Tachi", Koto-periode (voor 1600)</dc:title>
+      <dc:type>zwaard</dc:type>
+      <dcterms:created>voor 1600</dcterms:created>
+      <dcterms:extent>L:92cm Lengte lemmet: 63cm dikte lemmet: 6.3mm kromming lemmet: 15.9mm Lengte tang: 19.8cm</dcterms:extent>
+      <dcterms:medium>metaal, hout, lakwerk</dcterms:medium>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02052%202.cmp&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/jap%20zwaard.cmp&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02052%203.cmp&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02052%201.cmp&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02052 2.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/jap zwaard.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02052 3.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02052 1.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02052 2.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/jap zwaard.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02052 3.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02052 1.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

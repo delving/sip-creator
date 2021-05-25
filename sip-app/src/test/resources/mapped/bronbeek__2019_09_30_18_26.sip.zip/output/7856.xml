@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2010-12-02-1-42330">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2010-12-02-1-42330">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42330">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=50772">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2863.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2863.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42330">
+      <dc:description>Afdeling: Insulair Zuidoost AziÃ« Objectnaam: sirihdoos Rubriek: (niet ingevoerd) Datumlabel: voor 1912 Materiaal: goud, zilver gedreven, gesmeed, ingekerfd, verguld Emailadres: toelichting: Het doosje is gemaakt van gedreven zilver en is gemaakt in een zandlopervorm. Het doosje bestaat uit twee op elkaar passende, afgetopte kegelvormige helften, die met elkaar verbonden zijn door middel van een ketting. De doos is versierd met ingedreven en ingekerfde motieven. De zijrand van de doos is licht in facetten gedreven en is versierd met ingekerfde bloem- en golflijnmotieven die in een punt uitlopen. De bovenkant van de bovenste helft (H 3,6; Diam 6,7) loopt enigszins bol en is versierd met ingedreven motieven: een cirkelmotief met vierkante punten en met hierbinnen een versiering van ranken met vergulde (?) bloem- en bladmotieven en in het midden een hoog, verguld (?) achtbladig bloemmotief. De onderkant van de onderste helft (H 3,6; Diam 6,7) is versierd met twee concentrische cirkels. Om de buitenste cirkel is een rand van halve cirkeltjes ingekerfd. De ruimte binnen de concentrische cirkels is opgevuld met Arabische tekens (betekenis vooralsnog onbekend) en het getal 1906 (jaartal?). In beide helften is net onder/boven de rand een kleine opening gemaakt, waar een oogje van zilverdraad doorheen is gehaald. Aan beide oogjes hangt een ring waaraan een spiraalvorm die zes kleinere ringen vormt, is bevestigd. Aan iedere kleinere "ring" hangt een stukje schakelketting (L 5,5). De andere uiteinden van de stukjes schakelketting zijn eveneens aan een spiraalvorm gehangen. Deze twee spiraalvormen hangen aan een ring met ingekerfde streepjes. De binnekant van de doos is gedeeltelijk licht zalmroze van kleur. In de doos zitten op verschillende plaatsen groene vlekken. Op met name de bovenkant van de doos zit veel donkere aanslag. In het doosje zit een labeltje met hierop het volgende nummer van de lijst behorende bij de Beijens-colectie: Sumatra no 365. Afmetingen: Geheel: 6,6 x 6,7 cm Herkomst: J.L.H. Beijens Media: 2863 Met dank aan: Bij nummer 365 van de Sumatra-lijst behorende bij de Beijens-collectie staat de volgende tekst: sirihstel, Djambi zilver Bruikleen van: Gemeente Nijmegen collectie: J.L.H. Beijens Huidige standplaats: [2863] Depot, LB IV, 10 [LB IV 10] [14-nov-2002] hoofdmateriaal: zilver DUT</dc:description>
+      <dc:identifier>2010/12/02-1-42330</dc:identifier>
+      <dc:title>geen titel</dc:title>
+      <dc:type>sirihdoos</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2863.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5Cbeijensready%5C2010_12_02-1-42330.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42330.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1%5C2010_12_02-1-42330.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2863.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42330.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42330.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42330.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2863.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42330.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42330.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42330.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

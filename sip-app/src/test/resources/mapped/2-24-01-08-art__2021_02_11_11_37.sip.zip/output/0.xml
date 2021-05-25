@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:premis="http://www.loc.gov/premis/rdf/v3/" xmlns:schema="http://schema.org/" xmlns:bf="http://id.loc.gov/ontologies/bibframe/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:iiif="http://iiif.io/api/image/2#" xmlns:agrl="http://d-nb.info/standards/elementset/agrelon#" xmlns:naa="https://archief.nl/def/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:geo="http://www.opengis.net/ont/geosparql#" xmlns:sd="http://www.w3.org/ns/sparql-service-description#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:cidoc-crm="http://www.cidoc-crm.org/cidoc-crm/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:sem="http://semanticweb.cs.vu.nl/2009/11/sem/" xmlns:dcat="https://www.w3.org/TR/vocab-dcat-2/" xmlns:nao="https://archief.nl/def/ontologie/" xmlns:prov="http://www.w3.org/ns/prov#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:nav="https://archief.nl/def/vocabulaire/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:void="http://rdfs.org/ns/void#" xmlns:adms="http://www.w3.org/ns/adms#" xmlns:org="http://www.w3.org/ns/org#" xmlns:svcs="http://rdfs.org/sioc/services#" xmlns:ov="http://open.vocab.org/terms/" xmlns:vcard="http://www.w3.org/2006/vcard/ns#" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:cs="http://www.kulttuurisampo.fi/ebkr/" xmlns:dbo="http://dbpedia.org/ontology/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:eac-cpf="http://www3.iath.virginia.edu/eac/cpf/" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:pnv="https://w3id.org/pnv#" xmlns:frbr_core="http://purl.org/vocab/frbr/core#" xmlns:odrl="http://www.w3.org/ns/odrl/2/" xmlns:vs="http://www.w3.org/2003/06/sw-vocab-status/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:hg="http://rdf.histograph.io/" xmlns:frbroo="http://iflastandards.info/ns/fr/frbr/frbroo/" xmlns:cc="http://creativecommons.org/ns#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/2-24-01-08-art_naa/7EA6F4CC20191D7FE05309F0900A4002">
+   <ore:Aggregation rdf:about="https://archief.nl/doc/Fotocollectie/2.24.01.08.art">
+      <nao:isAggregatietype rdf:resource="https://archief.nl/def/Fotocollectie">
+      </nao:isAggregatietype>
+      <rdfs:label xml:lang="nl">Fotocollectie</rdfs:label>
+      <skos:prefLabel xml:lang="nl">
+      </skos:prefLabel>
+      <nao:uuid>7EA6F4CC20191D7FE05309F0900A4002</nao:uuid>
+      <nao:ntCode>2.24.01.08</nao:ntCode>
+      <dc:identifier>7EA6F4CC20191D7FE05309F0900A4002</dc:identifier>
+      <dcterms:creator rdf:resource="https://archief.nl/id/organisatie/nationaalarchief">
+      </dcterms:creator>
+      <dc:language>NL</dc:language>
+      <dcterms:publisher xml:lang="nl">nationaalarchief</dcterms:publisher>
+   </ore:Aggregation>
+   <schema:Organization rdf:about="https://archief.nl/id/nationaal_archief">
+      <schema:name>Nationaal Archief</schema:name>
+      <schema:url>https://www.nationaalarchief.nl/</schema:url>
+      <schema:sameAs>https://ror.org/0546dmt59</schema:sameAs>
+   </schema:Organization>
+   <schema:DataCatalog rdf:about="https://archief.nl/doc/LinkedOpenDataNationaalArchief">
+      <schema:name xml:lang="nl">Linked Open Data Nationaal Archief</schema:name>
+      <schema:description xml:lang="nl">Deze DataCatalog is een verzameling van metadata-sets mbt de Linked Open Data van het Nationaal Archief</schema:description>
+      <schema:publisher rdf:resource="https://archief.nl/id/nationaal_archief">
+      </schema:publisher>
+      <schema:dataset rdf:resource="https://archief.nl/id/dataset/2.24.01.08">
+      </schema:dataset>
+   </schema:DataCatalog>
+   <schema:Dataset rdf:about="https://archief.nl/id/dataset/2.24.01.08">
+      <schema:identifier>2.24.01.08</schema:identifier>
+      <schema:name>2.24.01.08</schema:name>
+      <schema:description>Dataset: 2.24.01.08</schema:description>
+      <schema:distribution rdf:resource="https://archief.nl/id/datadownload/2.24.01.08_rdf">
+      </schema:distribution>
+      <schema:publisher rdf:resource="https://archief.nl/id/nationaal_archief">
+      </schema:publisher>
+      <schema:includedInDataCatalog rdf:resource="https://archief.nl/doc/LinkedOpenDataNationaalArchief">
+      </schema:includedInDataCatalog>
+   </schema:Dataset>
+   <schema:DataDownload rdf:about="https://archief.nl/id/datadownload/2.24.01.08_rdf">
+      <schema:name xml:lang="nl">2.24.01.08 (RDF)</schema:name>
+      <schema:encodingFormat>application/rdf+xml</schema:encodingFormat>
+   </schema:DataDownload>
+</rdf:Description>
+</rdf:RDF>

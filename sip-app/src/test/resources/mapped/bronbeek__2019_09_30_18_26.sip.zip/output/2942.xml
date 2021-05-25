@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1998-00-547">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1998-00-547">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1998-00-547">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=2027">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02109%203.cmp&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02109%203.cmp&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1998-00-547">
+      <dc:creator>Aoki Terunoshin Motonaga Aoki Terunoshin Motonaga (vervaardiger)</dc:creator>
+      <dc:description>land en volkenkunde:"lemmet draak figuur ingegraveerd stootplaat met goud verfraait handvat stenen ingelegd met paars draad samengebonden schede zwart gelakt met insecten motieven van verguld materiaal beugel aan de schede met goud versierd." 2000/01/22 Beschreven door Han Bing Siong Wakizashi Gesigneerd: Aoki Terunoshin, Motonaga, Bunsei Kunen, Aki Kichi Jitsu Afmetingen: Lengte 34,2cm Sugata: Hira tsukuri, ihore mune, sori Kitae: In de huidige conditie niet vast te stellen. Hamon: Notare ni gunome ha, yakidashi. Boshi: Sugu ko maru kaeri nagashi Horimono: Aan omote zijde: tamaoi nobori ryu no niku bori; aan ura zijde: koshi hi no chu ni suken no uki bori to tsume. Nakago: Ubu, saki kuri jiri, yasuri me arai higaki, maru mune (yasuri me higaki mo), 1 mekugi ana, aan sashi omote de signatuur, aan ura de datering: 1826. Deze smid is Aoki Kibee, een smid van chu jo saku (bovenlaag van de middelmaat) klasse. Van oorsprong van de provincie Settsu, ging hij in de leer bij verschillende smeden: bij de 6de generatie HOKI NO KAMI NOBUTAKA in de provincie Owari, waarbij de 8ste generatie NOBUTAKA met zijn begeleiding werd belast, bij OZAKI SUKETAKA in de provincie Settsu, en bij de beroemde OKU YAMATO NO KAMI MOTOHIRA in de provincie Satsuma (zie beschrijving N.012). Het was in 1803 dat hij bij de laatst genoemde smid in de leer ging, en van wiens naam hij het karakter MOTO voor zijn eigen naam gebruikte. Voordien droeg hij achtereenvolgens de naam NOBUNAO, ontleend aan de naam van de andere leermeester, NOBUTAKA, en de naam MOTOTOSHI toen hij SUKETAKA's leerling werd. YOSHIKAWA KENTARO Sensei is van oordeel dat door de opleiding door MOTOHIRA MOTONAGA in de provincie Owari gedurende de Shinshinto periode de leiding gevende zwaardsmid werd. De literatuur vermeldt dat MOTONAGA bedreven was in het maken van horimono. Interessant is dat de signatuur, die FUJISHIRO YOSHIO sensei toont als die van de hier beschreven smid, door TOKUNO KAZUO sensei wordt beschouwd als de signatuur van de 2e generatie AOKI TERUNOSHIN MOTONAGA. Echter vermeldt TOKUNO sensei zelf dat de 1ste generatie werkzaam was tussen Tenmei 2 (1782) en Tempo 12 (1841). Ook naar zijn zienswijze is dus de hier beschreven smid de 1ste generatie. Heisei 12-1-22. Montering: Kojiri is gesigneerd: Ikkosai Atsuoki, van de Otsuki school in Kyoto, 19e eeuw. DUT</dc:description>
+      <dc:identifier>1998/00-547</dc:identifier>
+      <dc:title>Wakizashi, Japan Wakizashi, Japan</dc:title>
+      <dc:type>zwaard</dc:type>
+      <dcterms:created>1826</dcterms:created>
+      <dcterms:extent>13 7/16 in. (34,2 cm)</dcterms:extent>
+      <dcterms:medium>metaal, hout, textiel,lakwerk</dcterms:medium>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02109%203.cmp&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02109.cmp&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02109%202.cmp&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02109 3.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02109.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02109 2.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02109 3.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02109.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/02109 2.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

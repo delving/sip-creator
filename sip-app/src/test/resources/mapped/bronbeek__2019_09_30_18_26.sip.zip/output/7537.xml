@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2010-12-02-1-42052">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2010-12-02-1-42052">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42052">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=50494">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2585.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2585.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42052">
+      <dc:description>Afdeling: Noord Amerika Objectnaam: model kano Rubriek: (niet ingevoerd) Datumlabel: voor 1912 Materiaal: hout, twijgen/wortels, veren genaaid, gesneden, getekend Emailadres: toelichting: De model kano is gemaakt van een stuk beige-gelig berkenbast. Het middelste deel van de kano is vrij plat en de uiteinden lopen omhoog. De voor- en achterzijde van de kano zijn afgerond. Het stuk berkenbast is aan de voor- en achterkant ingesneden, vervolgens zijn de twee delen aan zowel de voor- en achterkant tegen elkaar gedrukt en met bruine twijgen of wortels aan elkaar vastgemaakt. Aan beide zijkanten van de kano is met bruine twijgen of wortels langs de bovenrand aan de binnenkant een houten latje bevestigd. Op twee plaatsen is een dwarsplankje in de kano bevestigd. Middenop beide plankjes is een houten spiesje vastgezet. Op ieder spiesje is een licht- tot middenbruin houten, zittende, stilistische mensfiguur geplaatst. De grootste mensfiguur (L 14,0; Br 4,0) heeft de armen voor de borst gevouwen en lijkt een lang gewaad aan te hebben, waar alleen de benen onderuit steken. Het kleine mensfiguur (L 10,3; Br 3,1) heeft de handen op de knieÃ«n gelegd. Bij beide mensfiguren lijkt het alsof de voeten af zijn gesneden. Beide mensfiguren hebben een spits gelaat, waarop de mond en de neus uitgesneden zijn en waarop de ogen en de wenkbrauwen met potlood zijn aangegeven. Bovenop het hoofd van beide mensfiguren is een plukje wit-grijze veertjes aangebracht. Bij de kano hoort een lichtbruine houten peddel (L 19,9; Br 1,5) die enigszins gebogen loopt en een recht blad heeft. Van de peddel ontbreekt aan het uiteinde een stukje van de steel en een stukje aan de onderkant van het peddelblad. Aan de binnenkant zitten verschillende bruine vlekjes op de berkenbast. In de kano ligt een label met hierop de volgende tekst: "West IndiÃ«, CaraÃ¯be negers" geschreven. Deze plaatsing is onjuist. De kano staat op een zwart geverfd houten standaardje. Afmetingen: Geheel: 46,9 x 10,7 cm Herkomst: J.L.H. Beijens Media: 2585 Publicaties over het object: CvS Waldman, C. ; titel: Atlas of the North American Indian ; uitg: New York 1985. pg 55 Bruikleen van: Gemeente Nijmegen collectie: J.L.H. Beijens Huidige standplaats: [2585] Kelder, kast 1/2 [kelder kast 1/2] hoofdmateriaal: berkenbast DUT</dc:description>
+      <dc:identifier>2010/12/02-1-42052</dc:identifier>
+      <dc:title>geen titel</dc:title>
+      <dc:type>modelkano</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2585.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5Cbeijensready%5C2010_12_02-1-42052.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42052.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1%5C2010_12_02-1-42052.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2585.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42052.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42052.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42052.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2585.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42052.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42052.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42052.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

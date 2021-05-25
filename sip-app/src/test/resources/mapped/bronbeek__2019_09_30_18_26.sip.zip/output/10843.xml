@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1950-1-3">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1950-1-3">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1950-1-3">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=6449">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2023c.cmp&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2023c.cmp&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1950-1-3">
+      <dc:description>Karabijn:geweer kort model 99, 1939; P.190: Model 99 (1939) 7.7-mm rifle. 1). General description. The Japanese are replacing their 6.5-mm weapons with this shorter, heavier caliber weapon (fig. 173). This rifle is an improved version of model 38 (1905) Arisaka rifle. The rifle has a blade front sight and a leaf rear sight graduated from 300 to 1500 meters. Modifications, other than the larger caliber which also help to identify this peice, are as follows: Monopod under fore end; anti-aircraft sight arms attached to rear sight leaf; magazine floor plate hinged to forward part of trigger guard; sling swivels attached to side instead of under part of rifle. The markings [ ] on the top of the receiver read "Model 99". Reports have been received that a short model (38 inches overall) is being issued to service troops. 2) Characteristics. Caliber: 7.7-mm (0.303 inch) Lenght overall: 44 inches. (without bayonet) Muzzle velocity: 2300 feet per second. Weight: 8.8 pounds. 3) Ammunition. This is supplied in 5 round clps, 3 clips to a package. It is a rimless type supplied in ball, tracer, and armor piercing varieties, and has standard markings. This ammunition can be used in the 7.7-mm model 92 (1932) machine gun, but the model 92 ammunition is semirimmed and cannot be used in the rifle. p. 78: "The quality of the M-99 rifle was maintained through 1940 and 1941 at almost same level as the late T-38. The Army could not be equiped with the M-99 at the start of the Pacific war." p.79: "Model 99 (139( (early type) with bayonet and ammunition. After the M-99 appeared, the M-30 bayonet was modified to have a straight guard and blue blade. The ammunition for the M-99, 7.7-mm, is far bigger than for the M-38, 6.5-mm, but the size of the cartridge rim is almost same. Total production for the early type was one million. p.80: "Model 99 (199) Short Rifles, Early Type. The early type was manufactured until the summer of 1943. It had a mono pod, antiaircraft sight and full size cleaning rod. The finish of the Kokura is considered to be better than that of the Nagoya. Total production for the M-99 was 2,360,443 in five years; 38,271 long rifles and 2,322,192 short rifles." p.84: "Model 99(1939), Transition Type. These two were manufactured at the same place and during almost the same period. The one above has no mum or grooves on safety. From late 1943 to early 1944, wood still proved to be of better quality and 520,000 of thes transition types were built. p.86: "Late production type. Production of the late type began after the summer of 1944. It was not equipped with a cleaning rod and an adjustable rear sight and cover on the front barrel. The butt end was made of wood. Most of the wood for the stocks was from Taiwan as well as China and painted a reddish color. The bayonet has no arsenal stamp but only the Matsushita mark. The scabbard is made of the same kind of wood as the stock. The ammunition cartridges were made of soft iron due to the shortage of brass. Total production of the late type was approximately 840,000. p.88: "There was much confusion in later production. There was no design policy for production beginning, probably, in late 1944. Manufacturers made adjustments in the quality of the rifles according to the availability of materials." DUT</dc:description>
+      <dc:identifier>1950-1-3</dc:identifier>
+      <dc:title>Karabijn Model 99 Karabijn Model 99</dc:title>
+      <dc:type>karabijn</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2023c.cmp&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1950%5C1950_1-3z.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1950%5C1950_1-3m.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2023c.cmp&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1950\1950_1-3z.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1950\1950_1-3m.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2023c.cmp&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1950\1950_1-3z.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1950\1950_1-3m.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

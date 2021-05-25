@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/1875-04-1-2">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/1875-04-1-2">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/1875-04-1-2">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=91">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1875%5C1875_04-1-2_1.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1875%5C1875_04-1-2_1.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/1875-04-1-2">
+      <dc:description>Koperen kanon met krans van gouden eikenloof (inv.nr. 1881/08/12-1) Een koperen kanon lang 6 Meter, waarop een krans van gouden eikenloof; Door den Sultan van Turkije in een der jaren 1631-1636 geschonken aan den Sultan van Atjeh. Aan dit stuk werden de menschen die geroofd waren met kettingen bevestigd, om op de Atjehse slavenmarkt te worden tentoongesteld en verkocht. De inscriptie in Arabische karakters 3e regel van onder luidt: Z.M. Ibn Schah Ã¢lan trill allÃ¢h, en betekent: "zoon van den Koning der Wereld, de schaduw Gods op de wereld." Daarna volgt de naam die schijnt te zijn Pulbil ibn Torka. De krans (inv.nr. 1605) daarop, vervaardigd in de fabriek van Van Kempen te Voorschoten, is omslingerd van een zilver lint, waarop de namen Palembang, Bali, Banka, Java-oorlog, Pamangkat, Borneo, Boni, Celebes, Molukkos, Lampongs, Timor, Bandjermasin, Sumatra, Montrado, Bondjol, Atjeh; op den krans rustten alle decoratiÃ«n die hier te lande door den krijgsman konden of nog kunnen verworven worden als: de Militaire W.O., het Officierskruis, de Java-medaille, de Eikenkroon, de Dienstmedaille, de Atjeh-medaille, het Kruis voor belangrijke krijgsverrichtingen, de Medaille voor moed en trouw in Ned. IndiÃ«, de Citadel-medaille, de Ned. Leeuw, het Metalen kruis en het Zilveren kruis, allen gedekt door de Koninklijke Kroon, terwijl op het door dezen krans omgeven gladde bronzen middenvak te lezen staat: "Geschenk van Z.M. Koning Willem III ter vereering van allen die hun leven voor Koning en Vaderland veil hadden in onze overzeesche bezittingen en ter herinnering aan den onbezweken, volhardenden moed onzer zoo dappere land- en zeemacht te Atjeh 1875"; terwijl onder aan den rand te lezen is: "Koninklijke goedkeuring bij kabinets-rescript van 16 September 1875, No. 36." Deze krans werd door Zijne Majesteit bij Hoogstdeszelfs bezoek aan Bronbeek op den 12den Augustus 1881, eigenhandig op het kanon geplaatst. Staat bekend als Peperstuk of `Radja BeudÃ©`. DUT</dc:description>
+      <dc:identifier>1875/04-1-2</dc:identifier>
+      <dc:title>"Peperstuk" of "Radja BeudÃ©" "Peperstuk" of "Radja BeudÃ©"</dc:title>
+      <dc:type>kanon</dc:type>
+      <dcterms:created>1631-1636</dcterms:created>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1875%5C1875_04-1-2_1.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1875%5C1875_04-1-2_2.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1875\1875_04-1-2_1.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1875\1875_04-1-2_2.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1875\1875_04-1-2_1.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/1875\1875_04-1-2_2.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

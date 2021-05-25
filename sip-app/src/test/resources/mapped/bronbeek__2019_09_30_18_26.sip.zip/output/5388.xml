@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2002-01-22-1-4">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2002-01-22-1-4">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2002-01-22-1-4">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=31857">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2002%5C2002_01_22-1-4_001.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2002%5C2002_01_22-1-4_001.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2002-01-22-1-4">
+      <dc:description>Typoscript brieftelegram betreffende overgave en overname van personen (19 april 1949) Typoscript brieftelegram betr. beeÃ¯ndiging dienstverbanden KNIL (9 november 1949) Typoscript betr. Richtlijnen inz. repatriÃ«ring (12 november 1949) Afschrift brieftelegram betr. beeÃ¯ndiging dienstverbanden KNIL (15 november 1949) Typoscript betr. opberging internationaal pokkencertificaat (31 december 1949) Typoscript mutaties (13 januari 1950) Vervallen Typoscript mutatievoering bij voorwaardelijke overgang naar strijdkrachten van de R.I.S. (14 januari 1950) Typoscript brieftelegram stopzetting overgang KL en KNIL personeel naar KM (19 januari 1950) Typoscript brieftelegram betreffende onbekendheid richtlijnen Letter A [21 januari 1950] Afschrift brieftelegram betr. te verwachten voorwaarden van dienstneming bij RIS (26 januari 1950) Typoscript betr. enquetering militair personeel niet behorende tot de K.L., incl. bijlagen en modellen (8 februari 1950) Afschrift brieftelegram betr. opzending militairen naar Nederland (10 februari 1950) Typoscript betr. opzending naar Nederland gezinsleden (13 februari 1950) Typoscript betr. verlofbezoldiging (17 februari 1950) [z.o.z. afschrift uittreksel Register der Besluiten d.d. 23 november 1949] Afschrift brieftelegram betr. verloven (21 februari 1950) Afschrift brieftelegram betr. reorganisatie KNIL (22 februari 1950) Afschrift brieftelegram reorganisatie KNIL inz. afvloeiing (24 februari 1950) Typoscript Indiening mutaties bij voorwaardelijke -en definitieve overgang naar de weermacht van de R.I.S. (24 februari 1950) Typoscript afvloeiing in IndonesiÃ« (28 februari 1950) Typoscript definitieve overgang naar de weermacht van de R.I.S. (13 maart 1950) Typoscript afvloeiing in Nederland (20 maart 1950) [2x] Brieftelegram betr. vooruitzending gezinnen KNIL-militairen (22 maart 1950) Typoscript betr. bijlage Richtlijnen letter E. , personeelsadvies Landstrijdkrachten onder Nederlands bevel m.b.t. onderdelen overgedragen aan R.I.S.(23 maart 1950) Afschrift brieftelegram betr. voorkoming vertraging paspoortuitgifte (25 maart 1950) Afschrift brieftelegram problematiek afvloeiing Ambonese militairen (28 maart 1950) Afschrift brieftelegram betr. KNIL enquetering (28 maart 1950) Afschrift brieftelegram betr.nalatigheid melding vermissingen of deserties (13 maart 1950) Typoscript brigadeorder diverse mededelingen (30 maart 1950) Afschrift brieftelegram betr. wijziging enquete-uitspraken (1 april 1950) Afschrift brieftelegram betr. overgang Europese militairen in vaste dienst bij het KNIL (4 april 1950) DUT</dc:description>
+      <dc:identifier>2002/01/22-1-4</dc:identifier>
+      <dc:title>Documenten betreffende reorganisatie, repatriÃ«ring, afvloeiing K.N.I.L. militairen Documenten betreffende reorganisatie, repatriÃ«ring, afvloeiing K.N.I.L. militair</dc:title>
+      <dc:type>document</dc:type>
+      <dcterms:created>1949-1950</dcterms:created>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2002%5C2002_01_22-1-4_001.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2002\2002_01_22-1-4_001.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2002\2002_01_22-1-4_001.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

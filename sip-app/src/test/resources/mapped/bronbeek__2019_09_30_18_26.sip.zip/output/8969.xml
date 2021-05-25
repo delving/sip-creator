@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2010-12-02-1-43212">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2010-12-02-1-43212">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-43212">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=51654">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-43212.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-43212.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-43212">
+      <dc:description>Kris met schede Afdeling: Insulair Zuidoost AziÃ« Objectnaam: kris &amp; schede Titel: keris Rubriek: (niet ingevoerd) Datumlabel: [Begin 18e eeuw] Materiaal: metaal, hout; gesmeed, gesneden toelichting: Kris met rechte kling, type dapoer bener. De naam van deze kris luidt tilampetak (ook wel tilamoepih of tilapoeth). Voorzien van tikel alis en pedjettan, voorts zonder enig versierend onderdeel. De kling is fraai gedamasceerd met een dubbel pamormotief te weten oentoe walang (de tanden van een walang of sprinkhaan) dit zijn de kartelrandjes lopende aan de zijkant van de kling en lintang kekoemoes (staartster) . De mendak is van geelkoper en identiek aan die van nr. 43063. De ukiran is van roodbruin hout, de boengkoel is onversierd, daarboven is de greep voorzien van lofwerk en reliÃ«f in de vorm van raksasa. Het geheel loopt naar boven knopvormig. De raksasa heeft op het hoofd een diadeem, voorts een halssieraad, vier strengen haren op de rug, ogen mond en neus zijn goed zichtbaar. Over de borst gevouwen armen. De oren en rug zijn rijk geornamenteerd met arabesken en komma-vormige krullen. Het geheel is minder gestyleerd dan de greep van nr. 43098. De schede bestaat uit twee onderdelen: de warongka heeft een tussenvorm de zgn. tanggal of batjihan en is gemaakt van lichtbruin hout. De gandar is voorzien van eenn koperkleurige overschede of pendoq, die geheel dicht is en onversierd. Deze draagt de naam pendoq boenton. Lemmet: L 37,7 Br 7,5 D 1,1. Mendak: H 1 Diam 2,2. Ukiran: L 9,8 Br 3,3 D 3,7. Schede: L 41,5 Br 15 D 2,6. Gandar: L 33,4 Br 3,7 D 2,1. Warongka: L 15 Br 2,6 D 7. Afmetingen: Geheel: 49,9 x 15 x 3,3 cm Herkomst: J.L.H. Beijens Media: 3745 Publicaties over het object: Literatuur: zie nr. 41899 en nr. 43058. Bruikleen van: Gemeente Nijmegen collectie: J.L.H. Beijens Huidige standplaats: [3745] Depot, 24, R c [24 R c] [22-nov-2002] hoofdmateriaal: metaal DUT</dc:description>
+      <dc:identifier>2010/12/02-1-43212</dc:identifier>
+      <dc:title>Kris in schede Kris in schede</dc:title>
+      <dc:type>kris</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-43212.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5Cbeijensready%5C2010_12_02-1-43212.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-43212.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-43212.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-43212.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-43212.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2006-00-13-41">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2006-00-13-41">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2006-00-13-41">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=48549">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_00-13_41-2.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_00-13_41-2.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2006-00-13-41">
+      <dc:description>Documenten van mevrouw G.P. van de Pol-Canters. Pamflet: Voice of Indonesia [5 eisen Indonesische volk aan de Britten] Pamflet: Proclamatie aan alle krijgsgevangenen en geinterneerden op Java (getekend door Vice president Raad NEI Spit, Kol. Vooren; mevr. Tjarda van Starkenborch-Marburg)augustus/sept. 1945 Telegram 1942/10/19 Brief aan mevrouw J. van Mastwijk-Boyer, 1945/09/03. Briefkaart aan mevr. D. Canters, 1943/04/10. Bon inleveren (?) Radio met Japanse stempel. Document: aanwijzing voor het betrekken van een woning in een der beschermde wijken, Batavia 1942/10/22. [mevr. D. Canters; mevr. M.J.C. Martens- van der Spek] Typoscript: Augustus 1945 (enkele regels) Zakje voor medicijnen gemaakt van een Japans notitievel: 1945/10/25. 4 enveloppen, zonder brieven. (ontbreken) Document: "Tanda anggota" Document: "Kartu keterangan" 1947/10/01. Documenten betreffende Herdenking Den Haag 1970. Documenten betreffende Stichting Nederlandse Slachtoffers Japanse Vrouwenkampen. Knickerbocker Weekly: december 3, 1945. Nummer 41, volume 5. knipsel uit Vrij Nederland, 12 januari 1946, pg. 779-780. Knipsels column B. Lulofs, De Telegraaf, met betrekking tot Nederlands Indie, uitkering aan Indische emigranten. Tijdschriftknipsel naar aanleiding van boek van Nevil Shute, A Town like Alice. Elseviers Weekblad, 1961/05/01: "De prijs van de vrijheid", J.A. Vermeulen. Krantenknipsel 1965/08/07: "Twintig jaar geleden uit hel van jappenkamp bevrijd..." Dagboeknotities van een kind. NRC, 1965/05/01: "Twee dagen in Kampong Makassar toen de oorlog ten einde liep. Honger", Bep Vuyk. Wij van Overzee, orgaan van de Bond van ex-gevangenen van overzee. 1970 (4). Idem, 1970(5). Oost en West, officieel orgaan der Koninklijke Vereeniging "Oost en West", 1946(3) DUT</dc:description>
+      <dc:identifier>2006/00-13/41</dc:identifier>
+      <dc:title>Documenten van mevrouw G.P. van de Pol-Canters Documenten van mevrouw G.P. van de Pol-Canters</dc:title>
+      <dc:type>document</dc:type>
+      <dcterms:created>1942-1970</dcterms:created>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_00-13_41-2.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_00-13_41_004_verso.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_00-13_41_004_recto.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_00-13_41_003.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_00-13_41_002.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006%5C2006_00-13_41_001.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_00-13_41-2.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_00-13_41_004_verso.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_00-13_41_004_recto.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_00-13_41_003.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_00-13_41_002.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_00-13_41_001.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_00-13_41-2.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_00-13_41_004_verso.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_00-13_41_004_recto.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_00-13_41_003.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_00-13_41_002.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2006\2006_00-13_41_001.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

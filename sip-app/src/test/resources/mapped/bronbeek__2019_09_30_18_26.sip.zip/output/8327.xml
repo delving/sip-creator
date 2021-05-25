@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2010-12-02-1-42701">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2010-12-02-1-42701">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42701">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=51143">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42701.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42701.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42701">
+      <dc:description>Afdeling: Insulair Zuidoost AziÃ« Objectnaam: oorsieraad Rubriek: (niet ingevoerd) Datumlabel: voor 1912 Materiaal: bamboe, hout, draad, edelstenen, stenen gesmeed, ajour-bewerkt, gegranuleerd, ingekerfd, roodgebeitst Emailadres: toelichting: Het gouden oorsieraad bestaat uit een lange, smalle, holle cilinder (H 4,6; Diam 1,8) met op de bovenkant een ronde plaat met een versiering in reliÃ«f. Deze ronde plaat heeft langs de zijrand een rand van halve cirkels, waarop granules zijn aangebracht. Op deze plaat is een platte ring bevestigd, waarop in reliÃ«f een bloemmotief is aangebracht. Het hart van het bloemmotief bestaat uit een donkerblauwe edelsteen (? ) in een gouden zetting. Dit bloemenhart is op een plaatje met zeven plaatjes vastgezet, waarop granules zijn aangebracht. Rondom dit plaatje bevinden zich zeven puntige bladeren die gemaakt zijn van een opstaand randje goud. In het midden van ieder blad is over de lengte een nerf van gouddraad aangebracht. Vier van de bladeren zijn opgevuld met rode draad en drie met steentjes. Tussen de bladeren zijn kleine, zesbladige bloemmotieven met een hart van een kleine, ronde, in goud gezette, bruine of lichtblauwe edelsteen (?) op een ondergrond van in cirkels gebogen gouddraad aangebracht. Rond deze bloemmotieven en langs de buitenrand van de bladeren zijn granules opgezet. De cilinder is voor het grootste deel versierd met verschillende bloemmotieven in ajourwerk. Deze bloemmotieven zijn versierd met ingekerfde streepjes. In de cilinder is een koker van donkerbruin hout geplaats. In deze koker is een stuk bamboe gezet. De onderkant van de cilinder is versierd met zes stukjes gouddraad met omgekrulde uiteinden aan elkaar bevestigd. Op ieder bevestigingspunt is een driehoekig plaatje versierd met granules aangebracht. Het oorsieraad vertoont sporen van roodbeitsen. De ronde plaat is een beetje gebogen. Afmetingen: Geheel: 5,7 x 2,8 cm Herkomst: J.L.H. Beijens Media: 3234 Bruikleen van: Gemeente Nijmegen collectie: J.L.H. Beijens Huidige standplaats: [3234] Depot, LB V, 23 [LB V 23] hoofdmateriaal: goud DUT</dc:description>
+      <dc:identifier>2010/12/02-1-42701</dc:identifier>
+      <dc:title>geen titel</dc:title>
+      <dc:type>oorsieraad</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42701.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5Cbeijensready%5C2010_12_02-1-42701.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1%5C2010_12_02-1-42701.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42701.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42701.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42701.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42701.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42701.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42701.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2010-12-02-1-42647">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2010-12-02-1-42647">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42647">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=51089">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42647.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42647.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2010-12-02-1-42647">
+      <dc:description>Afdeling: Insulair Zuidoost AziÃ« Objectnaam: medicijnkoker Rubriek: (niet ingevoerd) Materiaal: hout, touw, metaal gesneden, gepolijst Emailadres: toelichting: De koker is gemaakt van donkerbruin gepolijst hoorn. Het onderste deel van de koker is recht en loopt naar onder toe een beetje breder uit. Op dit deel zijn verschillende banen met motieven uitgesneden. De gebruikte motieven zijn: rechte banen, zigzaglijnen, spiraal- en krulmotieven. In enkele motieven zijn gaatjes gemaakt. Het bovenste deel van de koker is karafvormig en heeft enkele bollingen. De vorm van de karaf loopt over in de stop. De karafvorm bestaat van onder naar boven uit de volgende elementen: een bolvorm met twee platte oren, de bovenzijde van deze bolvorm loopt eerst smaller toe en vervolgens breder als een soort mond uit, hierop is eenzelfde, iets kleinere bolvorm geplaatst. Op de mond van deze laatste bolvorm staat een recht bandje. Op dit bandje sluit het stopje aan. Het stopje sluit over een smalopstaand randje van de karafvorm. Het stopje bestaat uit twee op elkaar geplaatste ovalen "mond"-vormen. De bovenste mondvorm loopt enigszins bol en heeft in het midden over de breedte een verhoging. In de onderste mondvorm van het stopje zijn aan twee zijkanten gaatjes in het hoorn gemaakt. Door beide gaatjes is een ovale ring van donkergekleurd metaal gehaald. In de platte oren van de onderste bolvorm zijn ook gaatjes gemaakt. Aan de ene kant is een donkergekleurde metalen ring door de gaatjes gehaald en aan de andere kant een stuk touw, waarin aan de onderkant een knoop is gemaakt. Het andere uiteinde van het stuk touw is door een van de ringen van het stopje gehaald en is vervolgens aan een ander stuk touw geknoopt. Dit stuk touw is door de metalen ring aan het stopje gehaald en vervolgens aan de ring van de bolvorm geknoopt. De onderkant van de koker bestaat uit een schijfje hoorn en is versierd met een uitgesneden concentrische lijn en een ruitvorm met hollopende zijkanten en een open cirkelvorm in het midden. Aan de medicijnkoker hangt eeb labeltje met hierop het volgende nummer van de lijst behorende bij de Beijens-collectie: Sumatra no 580. Afmetingen: Geheel: 10,4 x 2,8 cm Herkomst: J.L.H. Beijens Media: 3180 Publicaties over het object: Mus: LoebÃ¨r, J.A. ; titel: Been-, hoorn- en schildpadbewerking en het vlechtwerk in Nederlandsch-IndiÃ«, GeÃ¯llustreerde beschrijvingen van Indische Kunstnijverheid No. VII ; uitg: Amsterdam 1916. pg 12-13, 29; plaat VII Met dank aan: Het voorwerp is een medicijnkoker en geen, zoals in de Beijenslijst bij Sumatra no 580 staat, een stempeltje. De bodem is op 19-07- 1984 van het Museum voor Volkenkunde uit Rotterdam ontvangen. Bruikleen van: Gemeente Nijmegen collectie: J.L.H. Beijens Huidige standplaats: [3180] Depot, LB IV, 4 [LB IV 4] [14-nov-2002] hoofdmateriaal: hoorn DUT</dc:description>
+      <dc:identifier>2010/12/02-1-42647</dc:identifier>
+      <dc:title>geen titel</dc:title>
+      <dc:type>medicijnkoker</dc:type>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1-42647.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5Cbeijensready%5C2010_12_02-1-42647.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010%5C2010_12_02-1%5C2010_12_02-1-42647.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42647.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42647.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42647.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1-42647.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\beijensready\2010_12_02-1-42647.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2010\2010_12_02-1\2010_12_02-1-42647.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

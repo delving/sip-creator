@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:cc="https://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dbpedia-owl="http://dbpedia.org/ontology/" xmlns:dbprop="http://dbpedia.org/property/" xsi:schemaLocation="">
+<rdf:Description rdf:about="http://delving.org/resource/document/bronbeek_edm/2001-00-6">
+   <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/bronbeek/2001-00-6">
+      <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/bronbeek/2001-00-6">
+      </edm:aggregatedCHO>
+      <edm:dataProvider>Museum Bronbeek</edm:dataProvider>
+      <edm:isShownAt rdf:resource="http://www.museumbronbeek.nl/default.aspx#id=21755">
+      </edm:isShownAt>
+      <edm:isShownBy rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2001%5C2001_00-6-m.jpg&amp;width=800&amp;height=800">
+      </edm:isShownBy>
+      <edm:object rdf:resource="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2001%5C2001_00-6-m.jpg&amp;width=800&amp;height=800">
+      </edm:object>
+      <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+      <edm:rights>http://creativecommons.org/publicdomain/zero/1.0/</edm:rights>
+   </ore:Aggregation>
+   <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/bronbeek/2001-00-6">
+      <dc:description>Document. Diploma. Ridderdiploma uitgereikt aan Johannes Adrianus de Jong, benoemd tot Ridder 4e klasse der Militaire Willemsorde bij Koninklijk Besluit van 7 October 1947 No.16 (Posthuum). Mutatie: "Het zich in de strijd door het bedrijven van uitstekende daden van moed, beleid en trouw onderscheiden door: op of omstreeks 21 Maart 1942 nadat het leger in Nederlandsch IndiÃ« reeds had gecapituleerd, als commandant van het Detachement Kolonedale (Celebes), na van zijn commandant de opdracht tot capituleren aan de Japanners te hebben ontvangen, te weigeren de wapenen van zijn troepen over te dragen en zelfs zich meester te maken van de bewapening van ongeveer zestig man, welke reeds door een andere officier te Poso (Celebes) was ingeleverd; nadat de Europese gezinnen van Midden Celebes te Poso voor internering naar Menado waren verscheept, te besluiten met zijn troep de strijd in het Poso gebied tot het uiterste voort te zetten niettegenstaande hij wist, dat dit onder uiterst moeilijke omstandigheden zou moeten geschieden en voor hem , indien hij zou worden gevangen genomen, de doodstraf zou betekenen; gedurende April tot en met Juli 1942 de strijd tegen de overmachtige vijand aan te binden en deze bij herhaling ernstige verliezen toe te brengen, zoodat deze, drie- tot vierhonderd man sterke vijandelijke afdeling, was gedwongen versterkingen uit Makassar te ontbieden; na in het begin van Augustus 1942 door uitputting in handen van de vijand te zijn gevallen, zich tijdens zijn gevangenschap en bij zijn executie onverschrokken te gedragen. Afgegeven te 's Gravenhage 2 Februari 1960." DUT</dc:description>
+      <dc:identifier>2001/00-6</dc:identifier>
+      <dc:title>Ridderdiploma MWO-4 Ridderdiploma MWO-4</dc:title>
+      <dc:type>document</dc:type>
+      <dcterms:created>1942-1960</dcterms:created>
+      <dcterms:extent>17 5/16 x 12 11/16 in. (44 x 32,3 cm)</dcterms:extent>
+      <edm:type>IMAGE</edm:type>
+   </edm:ProvidedCHO>
+   <edm:WebResource rdf:about="http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2001%5C2001_00-6-m.jpg&amp;width=800&amp;height=800http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2001%5C2001_00-6-z.jpg&amp;width=800&amp;height=800">
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2001\2001_00-6-m.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbSmall>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2001\2001_00-6-z.jpg&amp;width=800&amp;height=800</nave:thumbSmall>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2001\2001_00-6-m.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+      <nave:thumbLarge>http://www.museumbronbeek.nl/imageproxy.aspx?server=10.0.10.14&amp;port=9888&amp;filename=images/2001\2001_00-6-z.jpg&amp;width=800&amp;height=800</nave:thumbLarge>
+   </edm:WebResource>
+   <nave:DelvingResource>
+      <nave:featured>false</nave:featured>
+      <nave:allowDeepZoom>true</nave:allowDeepZoom>
+      <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+      <nave:allowSourceDownload>false</nave:allowSourceDownload>
+      <nave:public>true</nave:public>
+   </nave:DelvingResource>
+</rdf:Description>
+</rdf:RDF>

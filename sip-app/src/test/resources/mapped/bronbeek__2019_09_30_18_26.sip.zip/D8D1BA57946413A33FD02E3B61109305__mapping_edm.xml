@@ -1,0 +1,167 @@
+<rec-mapping prefix="edm" schemaVersion="5.2.6" locked="true">
+  <facts>
+    <entry>
+      <string>country</string>
+      <string>Netherlands</string>
+    </entry>
+    <entry>
+      <string>schemaVersions</string>
+      <string>edm_5.2.6</string>
+    </entry>
+    <entry>
+      <string>baseUrl</string>
+      <string>http://data.collectienederland.nl</string>
+    </entry>
+    <entry>
+      <string>provider</string>
+      <string>Rijksdienst voor het Cultureel Erfgoed</string>
+    </entry>
+    <entry>
+      <string>dataProviderUri</string>
+      <string>http://id.musip.nl/crm_e39/5033</string>
+    </entry>
+    <entry>
+      <string>rights</string>
+      <string>http://creativecommons.org/publicdomain/zero/1.0/</string>
+    </entry>
+    <entry>
+      <string>name</string>
+      <string>Museum Bronbeek</string>
+    </entry>
+    <entry>
+      <string>language</string>
+      <string>nl</string>
+    </entry>
+    <entry>
+      <string>dataProvider</string>
+      <string>Museum Bronbeek</string>
+    </entry>
+    <entry>
+      <string>type</string>
+      <string>IMAGE</string>
+    </entry>
+    <entry>
+      <string>orgId</string>
+      <string>dcn</string>
+    </entry>
+    <entry>
+      <string>spec</string>
+      <string>bronbeek</string>
+    </entry>
+  </facts>
+  <functions/>
+  <dyn-opts/>
+  <node-mappings>
+    <node-mapping inputPath="/input" outputPath="/edm:RDF"/>
+    <node-mapping inputPath="/input" outputPath="/edm:RDF/ore:Aggregation/@rdf:about">
+      <groovy-code>
+        <string>
+                            &quot;${baseUrl}/resource/aggregation/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/edm:RDF/ore:Aggregation/edm:aggregatedCHO/@rdf:resource">
+      <groovy-code>
+        <string>
+                                &quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/dataProvider" outputPath="/edm:RDF/ore:Aggregation/edm:dataProvider"/>
+    <node-mapping inputPath="/input/record/metadata/isShownAt" outputPath="/edm:RDF/ore:Aggregation/edm:isShownAt/@rdf:resource">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.metadata * { _metadata -&gt;</string>
+        <string>if (_metadata.isShownAt[0]) {</string>
+        <string>&quot;http://${_metadata.isShownAt[0]}&quot;.sanitizeURI()</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/isShownBy" outputPath="/edm:RDF/ore:Aggregation/edm:isShownBy/@rdf:resource" operator="FIRST">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.metadata * { _metadata -&gt;</string>
+        <string>if (_metadata.isShownBy[0]) {</string>
+        <string>&quot;${_metadata.isShownBy[0]}&quot;.sanitizeURI()</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/isShownBy" outputPath="/edm:RDF/ore:Aggregation/edm:object/@rdf:resource" operator="FIRST">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.metadata * { _metadata -&gt;</string>
+        <string>if (_metadata.isShownBy[0]) {</string>
+        <string>&quot;${_metadata.isShownBy[0]}&quot;.sanitizeURI()</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/provider" outputPath="/edm:RDF/ore:Aggregation/edm:provider"/>
+    <node-mapping inputPath="/facts/rights" outputPath="/edm:RDF/ore:Aggregation/edm:rights"/>
+    <node-mapping inputPath="/input" outputPath="/edm:RDF/edm:ProvidedCHO/@rdf:about">
+      <groovy-code>
+        <string>
+                            &quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/dc:contributor" outputPath="/edm:RDF/edm:ProvidedCHO/dc:contributor"/>
+    <node-mapping inputPath="/input/record/metadata/dc:creator" outputPath="/edm:RDF/edm:ProvidedCHO/dc:creator"/>
+    <node-mapping inputPath="/input/record/metadata/dc:description" outputPath="/edm:RDF/edm:ProvidedCHO/dc:description"/>
+    <node-mapping inputPath="/input/record/metadata/dc:identifier" outputPath="/edm:RDF/edm:ProvidedCHO/dc:identifier"/>
+    <node-mapping inputPath="/input/record/metadata/dc:publisher" outputPath="/edm:RDF/edm:ProvidedCHO/dc:publisher"/>
+    <node-mapping inputPath="/input/record/metadata/dc:title" outputPath="/edm:RDF/edm:ProvidedCHO/dc:title">
+      <groovy-code>
+        <string>if (_absent_) {</string>
+        <string>&apos;geen titel&apos;</string>
+        <string>}</string>
+        <string>&quot;${_dctitle}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/dc:subject" outputPath="/edm:RDF/edm:ProvidedCHO/dc:type"/>
+    <node-mapping inputPath="/input/record/metadata/dc:coverage" outputPath="/edm:RDF/edm:ProvidedCHO/dcterms:created"/>
+    <node-mapping inputPath="/input/record/metadata/dc:format" outputPath="/edm:RDF/edm:ProvidedCHO/dcterms:extent"/>
+    <node-mapping inputPath="/input/record/metadata/icn_material" outputPath="/edm:RDF/edm:ProvidedCHO/dcterms:medium"/>
+    <node-mapping inputPath="/facts/type" outputPath="/edm:RDF/edm:ProvidedCHO/edm:type"/>
+    <node-mapping inputPath="/input/record/metadata/isShownBy" outputPath="/edm:RDF/edm:WebResource/@rdf:about">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>_record.metadata * { _metadata -&gt;</string>
+        <string>_metadata.isShownBy * { _isShownBy -&gt;</string>
+        <string>&quot;${_isShownBy}&quot;.sanitizeURI()</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/isShownBy" outputPath="/edm:RDF/edm:WebResource/nave:thumbSmall"/>
+    <node-mapping inputPath="/input/record/metadata/isShownBy" outputPath="/edm:RDF/edm:WebResource/nave:thumbLarge"/>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:DelvingResource/nave:featured">
+      <groovy-code>
+        <string>&apos;false&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:DelvingResource/nave:allowDeepZoom">
+      <groovy-code>
+        <string>&apos;true&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:DelvingResource/nave:allowLinkedOpenData">
+      <groovy-code>
+        <string>&apos;true&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:DelvingResource/nave:allowSourceDownload">
+      <groovy-code>
+        <string>&apos;false&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:DelvingResource/nave:public">
+      <groovy-code>
+        <string>&apos;true&apos;</string>
+      </groovy-code>
+    </node-mapping>
+  </node-mappings>
+</rec-mapping>
