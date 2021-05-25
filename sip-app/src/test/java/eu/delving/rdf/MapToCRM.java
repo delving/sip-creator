@@ -28,6 +28,7 @@ import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider
 import com.thoughtworks.xstream.io.naming.NoNameCoder;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 import eu.delving.XMLToolFactory;
+import eu.delving.XStreamFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.namespace.NamespaceContext;
@@ -52,8 +53,7 @@ public class MapToCRM {
     }
 
     private static XStream stream() {
-        XStream xstream = new XStream(new PureJavaReflectionProvider(), new XppDriver(new NoNameCoder()));
-        xstream.setMode(XStream.NO_REFERENCES);
+        XStream xstream = XStreamFactory.asSecureXStream(new XStream(new PureJavaReflectionProvider(), new XppDriver(new NoNameCoder())));
         xstream.processAnnotations(Mappings.class);
         return xstream;
     }

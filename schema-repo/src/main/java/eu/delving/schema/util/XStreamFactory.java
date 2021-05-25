@@ -23,7 +23,15 @@ package eu.delving.schema.util;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import com.thoughtworks.xstream.security.NoTypePermission;
+import com.thoughtworks.xstream.security.NullPermission;
+import com.thoughtworks.xstream.security.PrimitiveTypePermission;
+import eu.delving.schema.xml.Schema;
+import eu.delving.schema.xml.SchemaFile;
 import eu.delving.schema.xml.Schemas;
+import eu.delving.schema.xml.Version;
+
+import java.util.Collection;
 
 /**
  * Produce an xstream for the repo
@@ -34,7 +42,20 @@ import eu.delving.schema.xml.Schemas;
 public class XStreamFactory {
     public static XStream getSchemasStream() {
         XStream xstream = new XStream(new PureJavaReflectionProvider());
+        XStream.setupDefaultSecurity(xstream);
         xstream.setMode(XStream.NO_REFERENCES);
+
+        xstream.addPermission(NoTypePermission.NONE);
+        xstream.addPermission(NullPermission.NULL);
+        xstream.addPermission(PrimitiveTypePermission.PRIMITIVES);
+
+        xstream.allowTypeHierarchy(Schemas.class);
+        xstream.allowTypeHierarchy(Schema.class);
+        xstream.allowTypeHierarchy(Version.class);
+        xstream.allowTypeHierarchy(SchemaFile.class);
+        xstream.allowTypeHierarchy(String.class);
+        xstream.allowTypeHierarchy(Collection.class);
+
         xstream.processAnnotations(Schemas.class);
         return xstream;
     }

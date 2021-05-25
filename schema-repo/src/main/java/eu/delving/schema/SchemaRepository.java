@@ -58,21 +58,6 @@ public class SchemaRepository {
         }
     }
 
-    public void prefetchAllSchemas() throws IOException {
-        for (Schema schema : schemas.schemas) {
-            for (Version version : schema.versions) {
-                for (SchemaFile file : version.files) {
-                    SchemaType type = SchemaType.forFile(file.name);
-                    if (type != null) getSchema(new SchemaVersion(schema.prefix, version.number), type);
-                }
-            }
-        }
-    }
-
-    public List<Schema> getSchemas() {
-        return schemas.schemas;
-    }
-
     public SchemaResponse getSchema(SchemaVersion schemaVersion, SchemaType schemaType) throws IOException {
         String hash = null;
         for (Schema schema : schemas.schemas) {
