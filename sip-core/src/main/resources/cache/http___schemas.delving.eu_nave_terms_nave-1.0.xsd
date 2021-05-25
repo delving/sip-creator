@@ -1,0 +1,418 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://schemas.delving.eu/nave/terms/"
+           targetNamespace="http://schemas.delving.eu/nave/terms/"
+           xmlns:ore="http://www.openarchives.org/ore/terms/"
+           xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+           xmlns:nave="http://schemas.delving.eu/nave/terms/"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+    <!--xs:import namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	       schemaLocation="http://www.europeana.eu/schemas/edm/RDF.xsd"/>-->
+    <!--<xs:import namespace="http://www.openarchives.org/ore/terms/"-->
+               <!--schemaLocation="http://schemas.delving.eu/xsd/external/ORE.xsd"/>-->
+    <!--<xs:import namespace="http://www.openarchives.org/ore/terms/"-->
+               <!--schemaLocation="http://www.europeana.eu/schemas/edm/ORE.xsd"/>-->
+
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace"
+               schemaLocation="http://www.w3.org/2001/03/xml.xsd"/>
+
+    <xs:element name="aboutPerson" type="xs:string"/>
+    <xs:element name="agentType" type="xs:string"/>
+    <xs:element name="allowDeepZoom" type="xs:boolean"/>
+    <xs:element name="allowLinkedOpenData" type="xs:boolean"/>
+    <xs:element name="allowSourceDownload" type="xs:boolean"/>
+    <xs:element name="allowPublicWebView" type="xs:boolean"/>
+    <xs:element name="acceptedStateCharges" type="xs:string"/>
+    <xs:element name="acceptedStateChargesReason" type="xs:string"/>
+    <xs:element name="acquiredWithHelpFrom" type="xs:string"/>
+    <xs:element name="acquisitionMeans" type="xs:string"/>
+    <xs:element name="acquisitionYear" type="xs:string"/>
+    <xs:element name="address" type="xs:string"/>
+    <xs:element name="category" type="xs:string"/>
+    <xs:element name="archiveNr" type="xs:string"/>
+    <xs:element name="bibliography" type="xs:string"/>
+    <xs:element name="cemetary" type="xs:string"/>
+    <xs:element name="citName" type="xs:string"/>
+    <xs:element name="citOldId" type="xs:string"/>
+    <xs:element name="city" type="xs:string"/>
+    <xs:element name="classification" type="xs:string"/>
+    <xs:element name="collection" type="xs:string"/>
+    <xs:element name="collectionName" type="xs:string"/>
+    <xs:element name="collectionPart" type="xs:string"/>
+    <xs:element name="subcollectionPart" type="xs:string"/>
+    <xs:element name="collectionTitle" type="xs:string"/>
+    <xs:element name="collectionType" type="xs:string"/>
+    <xs:element name="color" type="xs:string"/>
+    <xs:element name="colorHex" type="xs:string"/>
+    <xs:element name="condition" type="xs:string"/>
+    <xs:element name="conditionNote" type="xs:string"/>
+    <xs:element name="copyright" type="xs:string"/>
+    <xs:element name="copyrightNote" type="xs:string"/>
+    <xs:element name="contentProvider" type="xs:string"/>
+    <xs:element name="continent" type="xs:string"/>
+    <xs:element name="country" type="xs:string"/>
+    <xs:element name="county" type="xs:string"/>
+    <xs:element name="countyNr" type="xs:string"/>
+    <xs:element name="creditLine" type="xs:string"/>
+    <xs:element name="creatorBirthYear" type="xs:string"/>
+    <xs:element name="creatorDeathYear" type="xs:string"/>
+    <xs:element name="creatorRole" type="xs:string"/>
+    <xs:element name="creatorUri" type="xs:anyURI"/>
+    <xs:element name="creatorYearOfBirth" type="xs:string"/>
+    <xs:element name="creatorYearOfDeath" type="xs:string"/>
+    <xs:element name="currentLocation" type="xs:string"/>
+    <xs:element name="date" type="xs:string"/>
+    <xs:element name="dateNote" type="xs:string"/>
+    <xs:element name="dateOfBurial" type="xs:string"/>
+    <xs:element name="day" type="xs:string"/>
+    <xs:element name="deepZoomUrl" type="xs:anyURI"/>
+    <xs:element name="design" type="xs:string"/>
+    <xs:element name="digitised" type="xs:string"/>
+    <xs:element name="dimension" type="xs:string"/>
+    <xs:element name="dimensionNote" type="xs:string"/>
+    <xs:element name="documentationAuthor" type="xs:string"/>
+    <xs:element name="documentationLeadword" type="xs:string"/>
+    <xs:element name="documentationPageReference" type="xs:string"/>
+    <xs:element name="documentationTitle" type="xs:string"/>
+    <xs:element name="documentationPlaceOfPublication" type="xs:string"/>
+    <xs:element name="documentationYearOfPublication" type="xs:string"/>
+    <xs:element name="documentationObjectNumber" type="xs:string"/>
+    <xs:element name="edition" type="xs:string"/>
+    <xs:element name="estateName" type="xs:string"/>
+    <xs:element name="estateNr" type="xs:string"/>
+    <xs:element name="event" type="xs:string"/>
+    <xs:element name="exhibition" type="xs:string"/>
+    <xs:element name="exhibitionDateStart" type="xs:string"/>
+    <xs:element name="exhibitionDateEnd" type="xs:string"/>
+    <xs:element name="exhibitionTitle" type="xs:string"/>
+    <xs:element name="exhibitionOrganiser" type="xs:string"/>
+    <xs:element name="expulsionMeans" type="xs:string"/>
+    <xs:element name="expulsionYear" type="xs:string"/>
+    <xs:element name="featured" type="xs:string"/>
+    <xs:element name="firstName" type="xs:string"/>
+    <xs:element name="formatted" type="xs:string"/>
+    <xs:element name="fullText" type="xs:string"/>
+    <xs:element name="fullTextObjectUrl" type="xs:anyURI"/>
+    <xs:element name="geojson" type="xs:string"/>
+    <xs:element name="geoHash" type="xs:string"/>
+    <xs:element name="iconography" type="xs:string"/>
+    <xs:element name="illustrations" type="xs:string"/>
+    <xs:element name="imageUri" type="xs:anyURI"/>
+    <xs:element name="imageUrl" type="xs:string"/>
+    <xs:element name="inventoryNr" type="xs:string"/>
+    <xs:element name="isbn" type="xs:string"/>
+    <xs:element name="issn" type="xs:string"/>
+    <xs:element name="issue" type="xs:string"/>
+    <xs:element name="issueNr" type="xs:string"/>
+    <xs:element name="introduction" type="xs:string"/>
+    <xs:element name="leadWord" type="xs:string"/>
+    <xs:element name="language" type="xs:string"/>
+    <xs:element name="latLong" type="xs:string"/>
+    <xs:element name="linkedObjectNumber" type="xs:string"/>
+    <xs:element name="legalStatus" type="xs:string"/>
+    <xs:element name="location" type="xs:string"/>
+    <xs:element name="material" type="xs:string"/>
+    <xs:element name="month" type="xs:string"/>
+    <xs:element name="municipality" type="xs:string"/>
+    <xs:element name="municipalityNr" type="xs:string"/>
+    <xs:element name="namedPlace" type="xs:string"/>
+    <xs:element name="notes" type="xs:string"/>
+    <xs:element name="objectNumber" type="xs:string"/>
+    <xs:element name="objectSoort" type="xs:string"/>
+    <xs:element name="objectType" type="xs:string"/>
+    <xs:element name="objectName" type="xs:string"/>
+    <xs:element name="originalSourceName" type="xs:string"/>
+    <xs:element name="originalSourcePath" type="xs:string"/>
+    <xs:element name="pageEnd" type="xs:string"/>
+    <xs:element name="pageStart" type="xs:string"/>
+    <xs:element name="pages" type="xs:string"/>
+    <xs:element name="person" type="xs:string"/>
+    <xs:element name="physicalDetails" type="xs:string"/>
+    <xs:element name="physicalState" type="xs:string"/>
+    <xs:element name="place" type="xs:string"/>
+    <xs:element name="placeOfBurial" type="xs:string"/>
+    <xs:element name="polygon_latLong" type="xs:string"/>
+    <xs:element name="polygon_utm" type="xs:string"/>
+    <xs:element name="postalCode" type="xs:string"/>
+    <xs:element name="productionDateNotes" type="xs:string"/>
+    <xs:element name="productionEnd" type="xs:string"/>
+    <xs:element name="productionPeriod" type="xs:string"/>
+    <xs:element name="productionStart" type="xs:string"/>
+    <xs:element name="productionPlace" type="xs:string"/>
+    <xs:element name="propertyName" type="xs:string"/>
+    <xs:element name="propertyNr" type="xs:string"/>
+    <xs:element name="province" type="xs:string"/>
+    <xs:element name="public" type="xs:string"/>
+    <xs:element name="purchasePrice" type="xs:string"/>
+    <xs:element name="reasonListed" type="xs:string"/>
+    <xs:element name="yearListed" type="xs:string"/>
+    <xs:element name="recordSyncURI" type="xs:anyURI"/>
+    <xs:element name="region" type="xs:string"/>
+    <xs:element name="religion" type="xs:string"/>
+    <xs:element name="relationNote" type="xs:string"/>
+    <xs:element name="rijksCollection" type="xs:string"/>
+    <xs:element name="resourceSortOrder" type="xs:string"/>
+    <xs:element name="schoolStyle" type="xs:string"/>
+    <xs:element name="seriesNumber" type="xs:string"/>
+    <xs:element name="seriesTitle" type="xs:string"/>
+    <xs:element name="shelfMark" type="xs:string"/>
+    <xs:element name="soundUri" type="xs:anyURI"/>
+    <xs:element name="source" type="xs:string"/>
+    <xs:element name="sourceTitle" type="xs:string"/>
+    <xs:element name="sourceTitleArticleLeadword" type="xs:string"/>
+    <xs:element name="street" type="xs:string"/>
+    <xs:element name="streetNr" type="xs:string"/>
+    <xs:element name="subjectDepicted" type="xs:string"/>
+    <xs:element name="surname" type="xs:string"/>
+    <xs:element name="surnamePrefix" type="xs:string"/>
+    <xs:element name="technique" type="xs:string"/>
+    <xs:element name="textUri" type="xs:anyURI"/>
+    <xs:element name="theme" type="xs:string"/>
+    <xs:element name="thumbLarge" type="xs:string"/>
+    <xs:element name="thumbMedium" type="xs:string"/>
+    <xs:element name="thumbSmall" type="xs:string"/>
+    <xs:element name="thumbnail" type="xs:anyURI"/>
+    <xs:element name="type" type="xs:string"/>
+    <xs:element name="uri" type="xs:anyURI"/>
+    <xs:element name="utm" type="xs:string"/>
+    <xs:element name="videoUri" type="xs:anyURI"/>
+    <xs:element name="vindplaats" type="xs:string"/>
+    <xs:element name="volume" type="xs:string"/>
+    <xs:element name="year" type="xs:string"/>
+    <xs:element name="excludedFromEuropeana" type="xs:boolean"/>
+
+
+    <xs:element name="BrabantCloudResource">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:documentation>ResourceType that contain the brabantcloud specific elements.</xs:documentation>
+            </xs:annotation>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:choice>
+                    <xs:element ref="citName" minOccurs="0" maxOccurs="1"/>
+                    <xs:element ref="citOldId" minOccurs="0" maxOccurs="1"/>
+                    <!-- change to minOccurs 1-->
+                    <xs:element ref="collection" minOccurs="0" maxOccurs="1"/>
+                    <xs:element ref="collectionPart" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="color" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="colorHex" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="creatorBirthYear" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="creatorDeathYear" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="creatorRole" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="date" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="design" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="dimension" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="event" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="exhibition" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="formatted" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="location" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="material" minOccurs="0" maxOccurs="unbounded"/>
+                    <!-- change to minOccurs 1-->
+                    <xs:element ref="objectNumber" minOccurs="0" maxOccurs="1"/>
+                    <xs:element ref="objectSoort" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="pageEnd" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="pageStart" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="pages" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="person" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="place" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="productionEnd" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="productionPeriod" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="productionStart" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="region" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="subjectDepicted" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="technique" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="theme" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="thumbLarge" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="thumbSmall" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="vindplaats" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="year" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="subcollectionPart" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="productionDateNotes" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="schoolStyle" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="creditLine" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="leadWord" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="shelfMark" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="issue" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="edition" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="illustrations" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="day" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="month" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="seriesNumber" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="seriesTitle" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="sourceTitle" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="sourceTitleArticleLeadword" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Exhibition">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:documentation>DelvingType contains Delving elements.</xs:documentation>
+            </xs:annotation>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:choice>
+                    <xs:element ref="exhibitionTitle" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="exhibitionOrganiser" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="exhibitionDateStart" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="exhibitionDateEnd" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Documentation">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:documentation>DelvingType contains Delving elements.</xs:documentation>
+            </xs:annotation>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:choice>
+                    <xs:element ref="documentationAuthor" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="documentationPageReference" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="documentationTitle" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="documentationLeadword" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="documentationPlaceOfPublication" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="documentationYearOfPublication" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="documentationObjectNumber" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="DelvingResource">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:documentation>DelvingType contains Delving elements.</xs:documentation>
+            </xs:annotation>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:choice>
+                    <xs:element ref="excludedFromEuropeana" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="deepZoomUrl" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="fullText" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="fullTextObjectUrl" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="imageUrl" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="thumbnail" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="year" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="objectNumber" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="objectType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="collection" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="collectionPart" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="collectionType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="dimension" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="technique" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="material" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="featured" minOccurs="1" maxOccurs="1"/>
+                    <xs:element ref="allowDeepZoom" minOccurs="1" maxOccurs="1"/>
+                    <xs:element ref="allowLinkedOpenData" minOccurs="1" maxOccurs="1"/>
+                    <xs:element ref="allowSourceDownload" minOccurs="1" maxOccurs="1"/>
+                    <xs:element ref="public" minOccurs="1" maxOccurs="1"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="DcnResource">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:documentation>ResourceType contains Dimcon elements.</xs:documentation>
+            </xs:annotation>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:choice>
+                    <xs:element ref="collectionPart" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="collectionType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="creatorRole" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="creatorYearOfBirth" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="creatorYearOfDeath" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="location" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="material" minOccurs="0" maxOccurs="unbounded"/>
+                    <!-- change to minOccurs 1-->
+                    <xs:element ref="province" minOccurs="0" maxOccurs="1"/>
+                    <xs:element ref="technique" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Museometrie">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:documentation>ResourceType contains Museometrie elements.</xs:documentation>
+            </xs:annotation>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:choice>
+                    <xs:element ref="acquiredWithHelpFrom" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="acquisitionMeans" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="acquisitionYear" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="currentLocation" minOccurs="0" maxOccurs="1"/>
+                    <xs:element ref="physicalState" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="purchasePrice" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="NorvegianaResource">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:documentation>ResourceType contains Museometrie elements.</xs:documentation>
+            </xs:annotation>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:choice>
+                    <xs:element ref="aboutPerson" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="address" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="category" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="classification" minOccurs="0" maxOccurs="unbounded"/>
+                    <!-- change to minOccurs 1-->
+                    <xs:element ref="collectionType" minOccurs="0" maxOccurs="unbounded"/>
+                    <!-- change to minOccurs 1-->
+                    <xs:element ref="contentProvider" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="country" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="county" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="countyNr" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="creatorUri" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="digitised" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="estateName" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="estateNr" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="imageUri" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="introduction" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="latLong" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="municipality" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="municipalityNr" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="namedPlace" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="polygon_latLong" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="polygon_utm" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="propertyName" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="propertyNr" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="soundUri" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="textUri" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="type" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="utm" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="videoUri" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="RijksCollection">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:documentation>ResourceType contains RijksCollection elements.</xs:documentation>
+            </xs:annotation>
+                <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:choice>
+                        <xs:element ref="acceptedStateCharges" minOccurs="0" maxOccurs="1"/>
+                        <xs:element ref="acceptedStateChargesReason" minOccurs="0" maxOccurs="unbounded"/>
+                        <xs:element ref="expulsionMeans" minOccurs="0" maxOccurs="1"/>
+                        <xs:element ref="expulsionYear" minOccurs="0" maxOccurs="1"/>
+                        <xs:element ref="legalStatus" minOccurs="0" maxOccurs="1"/>
+                        <xs:element ref="rijksCollection" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:choice>
+                </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

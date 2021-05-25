@@ -69,13 +69,28 @@ public class CachedResourceResolver implements LSResourceResolver {
     public LSInput resolveResource(String type, final String namespaceUri, final String publicId, final String systemId, final String baseUri) {
         File resourceFile = context.file(systemId);
         if (!resourceFile.exists()) {
+            String internalLocation = "/cache/" + systemId.replaceAll("[/:]", "_");
+            InputStream cachedIn = getClass().getResourceAsStream(internalLocation);
+
             try {
-                String schemaText = fetchResource(systemId, baseUri);
+                String schemaText;
+                if (cachedIn != null) {
+                    StringBuilder schemaTextBuilder = new StringBuilder();
+                    try(BufferedReader reader = new BufferedReader(new InputStreamReader(cachedIn))) {
+                        String line;
+                        while((line = reader.readLine()) != null) {
+                            schemaTextBuilder.append(line);
+                            schemaTextBuilder.append('\n');
+                        }
+                        schemaText = schemaTextBuilder.toString();
+                    }
+                } else {
+                    schemaText = fetchResource(systemId, baseUri);
+                }
                 FileOutputStream fileOutputStream = new FileOutputStream(resourceFile);
                 IOUtils.write(schemaText, fileOutputStream, "UTF-8");
                 IOUtils.closeQuietly(fileOutputStream);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException("Unable to fetch and store resource: " + resourceFile, e);
             }
         }

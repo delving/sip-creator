@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<frame-arrangements>
+    <arrangement view="DATA_SETS">
+        <frame where="0011" which="DATA_SET"/>
+    </arrangement>
+    <arrangement view="QUICK_MAPPING">
+        <frame where="0013" which="SOURCE"/>
+        <frame where="1012" which="CREATE"/>
+        <frame where="1211" which="REC_MAPPING"/>
+        <frame where="2013" which="TARGET"/>
+    </arrangement>
+    <arrangement view="BIG_PICTURE">
+        <frame where="0011" which="INPUT"/>
+        <frame where="1011" which="OUTPUT"/>
+    </arrangement>
+    <arrangement view="CODE_TWEAKING">
+        <frame where="0011" which="REC_MAPPING"/>
+        <frame where="1031" which="FIELD_MAPPING"/>
+        <frame where="4011" which="INPUT"/>
+    </arrangement>
+    <arrangement view="DEEP_DELVING">
+        <frame where="0011" which="FIELD_MAPPING"/>
+    </arrangement>
+    <arrangement view="DECADENT_DISPLAY">
+        <frame where="0024" which="SOURCE"/>
+        <frame where="2013" which="CREATE"/>
+        <frame where="3023" which="TARGET"/>
+        <frame where="5024" which="INPUT"/>
+        <frame where="2335" which="FIELD_MAPPING"/>
+        <frame where="5424" which="OUTPUT"/>
+        <frame where="0424" which="REC_MAPPING"/>
+    </arrangement>
+    <arrangement view="FUNCTIONS">
+        <frame where="0011" which="FUNCTIONS"/>
+    </arrangement>
+    <arrangement view="MAPPING_CODE">
+        <frame where="0011" which="MAPPING_CODE"/>
+    </arrangement>
+    <arrangement view="STATISTICS">
+        <frame where="0011" which="STATISTICS"/>
+    </arrangement>
+    <arrangement view="REPORT">
+        <frame where="0011" which="REPORT"/>
+    </arrangement>
+    <arrangement view="LOG">
+        <frame where="0011" which="LOG"/>
+    </arrangement>
+
+</frame-arrangements>
