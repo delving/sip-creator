@@ -262,7 +262,13 @@ public class DOMBuilder extends BuilderSupport {
                 int nodeDepth = (int) next.getUserData(DEPTH);
                 parentNodes.put(nodeDepth, next);
                 Node parentNode = parentNodes.get(nodeDepth - 1);
-                if (parentNode != null) parentNode.appendChild(next);
+                if (parentNode != null) {
+                    if (parentNode.hasChildNodes()) {
+                        parentNode.insertBefore(next, parentNode.getFirstChild());
+                    } else {
+                        parentNode.appendChild(next);
+                    }
+                }
             }
         }
 
