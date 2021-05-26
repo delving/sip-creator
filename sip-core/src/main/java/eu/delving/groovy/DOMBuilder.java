@@ -212,12 +212,6 @@ public class DOMBuilder extends BuilderSupport {
                 }
 
                 Object contentValue = extractValue(contents, i);
-//                if (contentValue instanceof Node) {
-//                    Node child = (Node) contentValue;
-//                    if(child.hasChildNodes() || child.hasAttributes() || child.getNodeValue() != null) {
-//                        element.appendChild(child);
-//                    }
-//                }
                 if(contentValue instanceof String || contentValue instanceof GString) {
                     if(contentValue != null) {
                         toTextNodes(contentValue.toString(), element);
