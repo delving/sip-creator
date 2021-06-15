@@ -212,12 +212,6 @@ public class DOMBuilder extends BuilderSupport {
                 }
 
                 Object contentValue = extractValue(contents, i);
-//                if (contentValue instanceof Node) {
-//                    Node child = (Node) contentValue;
-//                    if(child.hasChildNodes() || child.hasAttributes() || child.getNodeValue() != null) {
-//                        element.appendChild(child);
-//                    }
-//                }
                 if(contentValue instanceof String || contentValue instanceof GString) {
                     if(contentValue != null) {
                         toTextNodes(contentValue.toString(), element);
@@ -268,7 +262,13 @@ public class DOMBuilder extends BuilderSupport {
                 int nodeDepth = (int) next.getUserData(DEPTH);
                 parentNodes.put(nodeDepth, next);
                 Node parentNode = parentNodes.get(nodeDepth - 1);
-                if (parentNode != null) parentNode.appendChild(next);
+                if (parentNode != null) {
+                    if (parentNode.hasChildNodes()) {
+                        parentNode.insertBefore(next, parentNode.getFirstChild());
+                    } else {
+                        parentNode.appendChild(next);
+                    }
+                }
             }
         }
 

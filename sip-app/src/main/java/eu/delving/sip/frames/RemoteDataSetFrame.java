@@ -492,6 +492,11 @@ public class RemoteDataSetFrame extends FrameBase {
             activateFilter();
             fireIntervalAdded(this, 0, getSize());
         }
+
+        public void removeWorkItem(WorkItem selectedWorkItem) {
+            workItems.remove(selectedWorkItem);
+            activateFilter();
+        }
     }
 
     class UploadModel extends AbstractListModel<UploadItem> {
@@ -704,7 +709,10 @@ public class RemoteDataSetFrame extends FrameBase {
             try {
                 for (WorkItem selectedWorkItem : selectedWorkItems) {
                     selectedWorkItem.dataset.remove();
+                    workItemModel.removeWorkItem(selectedWorkItem);
                 }
+
+                workItemList.clearSelection();
                 workItemModel.refreshWorkItems();
                 downloadModel.refreshDownloads();
             } catch (StorageException e) {
