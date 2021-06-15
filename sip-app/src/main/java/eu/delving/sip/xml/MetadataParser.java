@@ -162,4 +162,8 @@ public class MetadataParser {
             e.printStackTrace(); // should never happen
         }
     }
+
+    public void setNotExhausted() {
+        isSourceExhausted = false;
+    }
 }
