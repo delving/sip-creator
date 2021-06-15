@@ -84,7 +84,12 @@ public class CodeGenerator {
         codeOut.line("Object _facts = WORLD._facts");
         codeOut.line("Object _optLookup = WORLD._optLookup");
         for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
-            codeOut.line(String.format("String %s = '''%s'''", entry.getKey(), entry.getValue()));
+            String value = entry.getValue();
+            if (value != null) {
+                value = value.replace("'", "");
+                value = value.replace("\"", "");
+            }
+            codeOut.line(String.format("String %s = '''%s'''", entry.getKey(), value));
         }
         codeOut.line("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'");
         codeOut.line("// Functions from Mapping:");

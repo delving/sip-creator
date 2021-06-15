@@ -60,7 +60,12 @@ public class GroovyCodeResource {
     public Script createFunctionScript(MappingFunction function, Map<String,String> facts, String editedCode) {
         StringBuilder scriptCode = new StringBuilder();
         for (Map.Entry<String,String> entry : facts.entrySet()) {
-            scriptCode.append(String.format("String %s = '''%s'''%n", entry.getKey(), entry.getValue()));
+            String value = entry.getValue();
+            if (value != null) {
+                value = value.replace("'", "");
+                value = value.replace("\"", "");
+            }
+            scriptCode.append(String.format("String %s = '''%s'''%n", entry.getKey(), value));
         }
         scriptCode.append(String.format("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'%n"));
         scriptCode.append(function.toCode(editedCode));
