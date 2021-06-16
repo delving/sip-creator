@@ -46,7 +46,8 @@
         <repository>
             <id>mygrid-repository</id>
             <name>myGrid Respository</name>
-            <url>http://www.mygrid.org.uk/maven/repository</url>
+            <url>https://repository.mygrid.org.uk/artifactory/mygrid-all/</url>
+            <!-- <url>http://www.mygrid.org.uk/maven/repository</url> -->
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
