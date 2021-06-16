@@ -87,7 +87,6 @@ public class CodeGenerator {
             String value = entry.getValue();
             if (value != null) {
                 value = value.replace("'", "\'");
-                value = value.replace("\"", "\\\"");
             }
             codeOut.line(String.format("String %s = '''%s'''", entry.getKey(), value));
         }

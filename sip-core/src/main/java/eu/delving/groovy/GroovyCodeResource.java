@@ -63,7 +63,6 @@ public class GroovyCodeResource {
             String value = entry.getValue();
             if (value != null) {
                 value = value.replace("'", "\'");
-                value = value.replace("\"", "\\\"");
             }
             scriptCode.append(String.format("String %s = '''%s'''%n", entry.getKey(), value));
         }
