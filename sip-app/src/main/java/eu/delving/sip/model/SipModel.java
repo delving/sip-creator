@@ -443,8 +443,9 @@ public class SipModel {
                 if (parser == null) {
                     parser = new MetadataParser(dataSetModel.getDataSet().openSourceInputStream(), statsModel.getRecordCount());
                 }
+                parser.setNotExhausted();
                 parser.setProgressListener(progressListener);
-                for (MetadataRecord metadataRecord = parser.nextRecord(); !metadataRecord.isPoison(); metadataRecord = parser.nextRecord()) {
+                for (MetadataRecord metadataRecord = parser.nextRecord(); metadataRecord != null && !metadataRecord.isPoison(); metadataRecord = parser.nextRecord()) {
                     if (scanPredicate == null || scanPredicate.accept(metadataRecord)) {
                         for (ParseListener parseListener : parseListeners) {
                             parseListener.updatedRecord(metadataRecord);

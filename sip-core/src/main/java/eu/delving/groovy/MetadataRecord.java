@@ -78,17 +78,15 @@ public class MetadataRecord {
     }
 
     private boolean checkFor(GroovyNode groovyNode, Pattern pattern) {
-        if (groovyNode.getNodeValue() instanceof List) {
-            List list = (List) groovyNode.getNodeValue();
-            for (Object member : list) {
-                GroovyNode childNode = (GroovyNode) member;
-                if (checkFor(childNode, pattern)) return true;
+        if (groovyNode.text != null && pattern.matcher(groovyNode.text).find()) {
+            return true;
+        }
+        for (GroovyNode child : groovyNode.children) {
+            if (checkFor(child, pattern)) {
+                return true;
             }
-            return false;
         }
-        else {
-            return pattern.matcher(groovyNode.text).find();
-        }
+        return false;
     }
 
     public String toString() {
