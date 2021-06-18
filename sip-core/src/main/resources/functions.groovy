@@ -25,8 +25,7 @@ String calculateAge(String birthDate, String deathDate) { // #def
 
     if (parsedBirthDate.after(parsedDeathDate)) {
         throw new IllegalArgumentException("birth date " + birthDate + " is more recent than death date " + deathDate)
-        return ""
-    }
+R    }
     def ageInMilliseconds = parsedDeathDate.getTime() - parsedBirthDate.getTime();
 
     Calendar calendar = Calendar.getInstance()
