@@ -1,5 +1,5 @@
 @groovy.transform.CompileStatic
-String calculateAge(String birthDate, String deathDate) { // #def
+String calculateAge(String birthDate, String deathDate, boolean automaticDateReordering = false) { // #def
     def dateFormatter = new java.text.SimpleDateFormat("yyyy-MM-dd")
     if (birthDate == null
         || deathDate == null
@@ -15,7 +15,7 @@ String calculateAge(String birthDate, String deathDate) { // #def
     try {
         parsedBirthDate = dateFormatter.parse(birthDate);
     } catch (java.text.ParseException e) {
-        throw new IllegalArgumentException($/unable to parse birth date/$, e)
+        throw new IllegalArgumentException("unable to parse birth date", e)
     }
     try {
         parsedDeathDate = dateFormatter.parse(deathDate);
@@ -24,8 +24,15 @@ String calculateAge(String birthDate, String deathDate) { // #def
     }
 
     if (parsedBirthDate.after(parsedDeathDate)) {
-        throw new IllegalArgumentException("birth date " + birthDate + " is more recent than death date " + deathDate)
-R    }
+        if (!automaticDateReordering) {
+            throw new IllegalArgumentException("birth date " + birthDate + " is more recent than death date " + deathDate)
+        } else {
+            def birth = parsedBirthDate
+            def death = parsedDeathDate
+            parsedDeathDate = birth
+            parsedBirthDate = death
+        }
+    }
     def ageInMilliseconds = parsedDeathDate.getTime() - parsedBirthDate.getTime();
 
     Calendar calendar = Calendar.getInstance()
@@ -34,8 +41,8 @@ R    }
 }
 
 @groovy.transform.CompileStatic
-String calculateAgeRange(String birthDate, String deathDate) { // #def
-    def age = calculateAge(birthDate, deathDate)
+String calculateAgeRange(String birthDate, String deathDate, boolean automaticDateReordering = false) { // #def
+    def age = calculateAge(birthDate, deathDate, automaticDateReordering)
     if(age == "") {
         return ""
     }

@@ -10,7 +10,7 @@
 ### Added
 
 - Added support for adding ``__cache__`` from the jar when network is not available [[GH-508]](https://github.com/delving/sip-creator/pull/508)
-- Support for calculating the age of a person. [[GH-508]](https://github.com/delving/sip-creator/pull/508)
+- Support for calculating the age of a person. [[GH-509]](https://github.com/delving/sip-creator/pull/509)
 
 ### Fixed
 
