@@ -1,9 +1,8 @@
-
 # Changelog
 
 ## unreleased
 
-- history of changes: see https://github.com/delving/sip-creator/compare/v0.2.1...master
+- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.1...master
 
 ## v1.2.1 (2020-07-22)
 
@@ -18,7 +17,7 @@
 - Disable warnings for Xstream at startup for Sip-App [[GH-508]](https://github.com/delving/sip-creator/pull/508)
 - Upgrade depandabot alerts
 
-- history of changes: see https://github.com/delving/sip-creator/compare/v0.2.0...v0.2.1
+- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.0...sip-creator-v1.2.1
 
 ## v1.2.0 (2020-03-05)
 
