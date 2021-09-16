@@ -419,6 +419,9 @@ public class RecDef {
     public static class Elem implements Cloneable {
 
         @XStreamAsAttribute
+        public String label;
+
+        @XStreamAsAttribute
         public Tag tag;
 
         @XStreamAsAttribute

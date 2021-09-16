@@ -1,11 +1,14 @@
-
 # Changelog
 
 ## unreleased
 
-- history of changes: see https://github.com/delving/sip-creator/compare/v0.2.1...master
+- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.2...master
 
 ## v1.2.2 (2021-09-16)
+
+### Added 
+
+- Added display option for rec-def labels  [[GH-512]](https://github.com/delving/sip-creator/pull/512)
 
 ### Fixed
 
@@ -24,7 +27,7 @@
 - Disable warnings for Xstream at startup for Sip-App [[GH-508]](https://github.com/delving/sip-creator/pull/508)
 - Upgrade depandabot alerts
 
-- history of changes: see https://github.com/delving/sip-creator/compare/v0.2.0...v0.2.1
+- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.0...sip-creator-v1.2.1
 
 ## v1.2.0 (2021-03-05)
 

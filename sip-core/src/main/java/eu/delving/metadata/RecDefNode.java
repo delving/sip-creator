@@ -352,6 +352,10 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public String toString() {
         String name = isAttr() ? attr.tag.toString(defaultPrefix) : elem.tag.toString(defaultPrefix);
+        if (elem != null && elem.label != null) {
+            name = String.format("%s (%s)", elem.label, name);
+        }
+
         if (dynOpt != null) {
             name += String.format("[%s]", dynOpt);
         }
