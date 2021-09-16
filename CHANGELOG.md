@@ -7,6 +7,10 @@
 
 ## v1.2.2 (2021-09-16)
 
+### Added
+
+- Display labels from record definition in target panel
+
 ### Fixed
 
 - Catch and report any instances of the DiscardRecordException instead of failing the validation [[GH-511]](https://github.com/delving/sip-creator/pull/511)
