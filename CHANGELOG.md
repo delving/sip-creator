@@ -2,9 +2,13 @@
 
 ## unreleased
 
-- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.1...master
+- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.2...master
 
 ## v1.2.2 (2021-09-16)
+
+### Added 
+
+- Added display option for rec-def labels  [[GH-512]](https://github.com/delving/sip-creator/pull/512)
 
 ### Fixed
 
