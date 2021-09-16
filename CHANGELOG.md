@@ -5,7 +5,13 @@
 
 - history of changes: see https://github.com/delving/sip-creator/compare/v0.2.1...master
 
-## v1.2.1 (2020-07-22)
+## v1.2.2 (2021-09-16)
+
+### Fixed
+
+- Catch and report any instances of the DiscardRecordException instead of failing the validation [[GH-511]](https://github.com/delving/sip-creator/pull/511)
+
+## v1.2.1 (2021-07-22)
 
 ### Added
 
@@ -20,7 +26,7 @@
 
 - history of changes: see https://github.com/delving/sip-creator/compare/v0.2.0...v0.2.1
 
-## v1.2.0 (2020-03-05)
+## v1.2.0 (2021-03-05)
 
 ### Changed
 - Each record is now written to a separate output file during processing

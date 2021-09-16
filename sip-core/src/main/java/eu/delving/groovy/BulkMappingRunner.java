@@ -34,18 +34,20 @@ public class BulkMappingRunner extends AbstractMappingRunner {
     }
 
     @Override
-    public Node runMapping(final MetadataRecord metadataRecord) throws MappingException {
+    public Node runMapping(final MetadataRecord metadataRecord) {
         LOG.trace("Running mapping for record {}", metadataRecord);
         SimpleBindings bindings = Utils.bindingsFor(recMapping.getFacts(),
             recMapping.getRecDefTree().getRecDef(), metadataRecord.getRootNode(),
             recMapping.getRecDefTree().getRecDef().valueOptLookup);
         try {
-            Object result =  compiledScript.eval(bindings);
+            Object result = compiledScript.eval(bindings);
             return Utils.stripEmptyElements(result);
         } catch (ScriptException e) {
+            if (e.getCause() instanceof DiscardRecordException) {
+                throw (DiscardRecordException) e.getCause();
+            }
             throw new RuntimeException(e);
         }
-
     }
 
 }
