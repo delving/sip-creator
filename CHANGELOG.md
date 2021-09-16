@@ -9,7 +9,7 @@
 
 ### Added
 
-- Display labels from record definition in target panel
+- Display labels from record definition in target panel [[GH-511]](https://github.com/delving/sip-creator/pull/511)
 
 ### Fixed
 
