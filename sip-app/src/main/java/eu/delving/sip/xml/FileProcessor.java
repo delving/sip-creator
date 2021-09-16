@@ -407,7 +407,13 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     if (record == null || record.isPoison()) break;
 
                     try {
-                        Node node = MappingRunner.runMapping(record);
+                        Node node = null;
+                        try {
+                            node = MappingRunner.runMapping(record);
+                        } catch (DiscardRecordException e) {
+                            reportWriter.discarded(record, e.toString());
+                        }
+
                         if (node == null) continue;
                         MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, MappingRunner.getRecDefTree());
                         List<String> uriErrors = result.getUriErrors();
