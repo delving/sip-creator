@@ -208,18 +208,12 @@ public class GroovyNode {
     }
 
     private void getValueNodes(String name, List answer) {
-        if (nodeValue instanceof List) {
-            for (Object object : ((List) nodeValue)) {
-                if (object instanceof GroovyNode) {
-                    ((GroovyNode) object).getValueNodes(name, answer);
-                }
-                else {
-                    getValueNodes(name, (List) object);
-                }
-            }
+        if (name.equals(this.getNodeName())) {
+            if (text != null && !text.isEmpty()) answer.add(this);
         }
-        else if (name.equals(this.getNodeName())) {
-            if (nodeValue instanceof String && !((String) nodeValue).trim().isEmpty()) answer.add(this);
+
+        for (GroovyNode child : children) {
+            child.getValueNodes(name, answer);
         }
     }
 
