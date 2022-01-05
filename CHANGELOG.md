@@ -1,6 +1,14 @@
 # Changelog
 
 ## unreleased
+ 
+- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.3...master
+
+## v1.2.3 (2022-01-05)
+
+### Added
+
+- Add support for NANT record-definition [[GH-514]](https://github.com/delving/sip-creator/pull/514)
 
 ### Fixed
 
