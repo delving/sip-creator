@@ -2,6 +2,10 @@
 
 ## unreleased
 
+### Fixed
+
+- Escape single quotes and restore former getValueNodes behavior [[GH-513]](https://github.com/delving/sip-creator/pull/513)
+
 - history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.2...master
 
 ## v1.2.2 (2021-09-16)
