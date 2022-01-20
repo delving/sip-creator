@@ -30,11 +30,11 @@
     <artifactId>sip-app</artifactId>
     <packaging>jar</packaging>
     <name>SIP-App</name>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-creator</artifactId>
-        <version>1.2.4</version>
+        <version>1.2.3</version>
     </parent>
 
     <build>
