@@ -104,10 +104,13 @@ public class Application {
     private ExpertMenu expertMenu;
     private CreateSipZipAction createSipZipAction;
     private UnlockMappingAction unlockMappingAction;
-    private SipProperties sipProperties;
+    private final static SipProperties sipProperties = new SipProperties();
+
+    public static boolean canWritePocketFiles() {
+        return "true".equals(sipProperties.getProp().getProperty("writePocketFiles"));
+    }
 
     private Application(final File storageDir) throws StorageException {
-        sipProperties = new SipProperties();
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         desktop = new JDesktopPane();
         desktop.setMinimumSize(new Dimension(800, 600));

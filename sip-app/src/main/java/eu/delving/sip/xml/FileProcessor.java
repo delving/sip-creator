@@ -23,6 +23,7 @@ package eu.delving.sip.xml;
 
 import eu.delving.groovy.*;
 import eu.delving.metadata.*;
+import eu.delving.sip.Application;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
@@ -389,10 +390,12 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     validCount++;
                 }
 
-                File outputFile = new File(outputDir, mappingOutput.metadataRecord.getRecordNumber() + ".xml");
-                XmlOutput xmlOutput = new XmlOutput(outputFile, namespaceMap);
-                mappingOutput.record(reportWriter, xmlOutput);
-                xmlOutput.finish(false);
+                if(Application.canWritePocketFiles()) {
+                    File outputFile = new File(outputDir, mappingOutput.metadataRecord.getRecordNumber() + ".xml");
+                    XmlOutput xmlOutput = new XmlOutput(outputFile, namespaceMap);
+                    mappingOutput.record(reportWriter, xmlOutput);
+                    xmlOutput.finish(false);
+                }
             } catch (XMLStreamException | IOException e) {
                 termination.dueToException(e);
             }
