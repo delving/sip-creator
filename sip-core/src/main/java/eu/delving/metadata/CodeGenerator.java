@@ -76,7 +76,7 @@ public class CodeGenerator {
         for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
             String value = entry.getValue();
             if (value != null) {
-                value = value.replace("'", "\'");
+                value = value.replace("'", "\\'");
             }
             codeOut.line(String.format("String %s = '''%s'''", entry.getKey(), value));
         }
