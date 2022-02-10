@@ -2,7 +2,15 @@
 
 ## unreleased
  
-- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.3...master
+- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.5...master
+
+## v1.2.5 (2022-02-10)
+
+### Fixed
+ 
+-  Escape single quotes in facts [d38e7ea](https://github.com/delving/hub3/commit/d38e7ea00484010aa62e609b22adc0757023fb24)
+
+- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.4...v1.2.5
 
 ## v1.2.4 (2022-01-20)
 
