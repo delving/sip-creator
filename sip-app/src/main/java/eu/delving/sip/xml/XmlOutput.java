@@ -34,12 +34,7 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -70,18 +65,13 @@ public class XmlOutput {
             {"dbpedia-owl", "http://dbpedia.org/ontology/"},
             {"dbprop", "http://dbpedia.org/property/"}
     };
-    private File outputXmlFile;
-    private File tempOutputFile;
+
     private XMLEventFactory eventFactory = XMLToolFactory.xmlEventFactory();
-    private OutputStream outputStream;
+    private final ByteArrayOutputStream buffer = new ByteArrayOutputStream(1024 * 8);
     private XMLEventWriter out;
 
-    public XmlOutput(File outputXmlFile, Map<String, RecDef.Namespace> namespaces) throws IOException, XMLStreamException {
-        this.outputXmlFile = outputXmlFile;
-        FileUtils.deleteQuietly(outputXmlFile);
-        this.tempOutputFile = new File(outputXmlFile.getParentFile(), outputXmlFile.getName() + ".temp");
-        outputStream = new BufferedOutputStream(new FileOutputStream(tempOutputFile));
-        out = XMLToolFactory.xmlOutputFactory().createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+    public XmlOutput(Map<String, RecDef.Namespace> namespaces) throws IOException, XMLStreamException {
+        out = XMLToolFactory.xmlOutputFactory().createXMLEventWriter(new OutputStreamWriter(buffer, "UTF-8"));
         out.add(eventFactory.createStartDocument());
         out.add(eventFactory.createCharacters("\n"));
         StringBuilder schemaLocation = new StringBuilder();
@@ -121,24 +111,11 @@ public class XmlOutput {
         out.add(eventFactory.createEndElement(RDF_PREFIX, RDF_URI, RDF_RECORD_TAG));
     }
 
-    public void finish(boolean aborted) {
-        try {
-            out.add(eventFactory.createCharacters("\n"));
-            out.add(eventFactory.createEndElement(RDF_PREFIX, RDF_URI, RDF_ROOT_TAG));
-            out.add(eventFactory.createCharacters("\n"));
-            out.add(eventFactory.createEndDocument());
-            out.flush();
-            outputStream.close();
-            if (aborted) {
-                FileUtils.deleteQuietly(tempOutputFile);
-            }
-            else {
-                FileUtils.moveFile(tempOutputFile, outputXmlFile);
-            }
-        }
-        catch (Exception e) {
-            throw new RuntimeException("Trouble closing xml output", e);
-        }
+    public void finish() throws XMLStreamException {
+        out.add(eventFactory.createCharacters("\n"));
+        out.add(eventFactory.createEndElement(RDF_PREFIX, RDF_URI, RDF_ROOT_TAG));
+        out.add(eventFactory.createCharacters("\n"));
+        out.add(eventFactory.createEndDocument());
     }
 
     private void writeElement(Element element, int depth) throws XMLStreamException {
@@ -193,4 +170,7 @@ public class XmlOutput {
         for (int walk = 0; walk < depth; walk++) out.add(eventFactory.createCharacters("   "));
     }
 
+    public byte[] toBytes() {
+        return buffer.toByteArray();
+    }
 }

@@ -21,6 +21,7 @@
 
 package eu.delving.sip.files;
 
+import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.MappingException;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlNodePrinter;
@@ -50,6 +51,8 @@ import static org.apache.commons.io.FileUtils.writeLines;
  */
 
 public class ReportWriter {
+
+    private final Object lock = new Object();
     private File reportFile;
     private File reportIndexFile;
     private File reportConclusionFile;
@@ -74,10 +77,37 @@ public class ReportWriter {
         this.out = new OutputStreamWriter(count, "UTF-8");
     }
 
-    public void invalid(MappingResult mappingResult, Exception e) throws IOException {
+    public void invalid(MappingResult mappingResult, Throwable e) throws IOException {
         report(ReportType.INVALID, e.getMessage());
         out.write(mappingResult.toXml());
         terminate();
+    }
+
+    public boolean recordError(MetadataRecord metadataRecord, MappingResult result, Throwable e) {
+        if (e == null) {
+            throw new NullPointerException();
+        }
+
+        try {
+            if (e instanceof DiscardRecordException) {
+                synchronized (lock) {
+                    discarded(metadataRecord, e.getMessage());
+                }
+                return false;
+            } else if (e instanceof MappingException) {
+                synchronized (lock) {
+                    unexpected(metadataRecord, (MappingException) e);
+                }
+            } else  {
+                synchronized (lock) {
+                    invalid(result, e);
+                }
+            }
+        } catch (IOException ioe) {
+            ioe.addSuppressed(e);
+            throw new RuntimeException(ioe);
+        }
+        return true;
     }
 
     public void discarded(MetadataRecord inputRecord, String discardMessage) throws IOException {

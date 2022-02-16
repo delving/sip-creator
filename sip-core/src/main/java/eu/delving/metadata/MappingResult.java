@@ -21,32 +21,43 @@
 
 package eu.delving.metadata;
 
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonWriter;
 import eu.delving.groovy.XmlSerializer;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.StringReader;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.rdf.model.ModelFactory;
 
+import static org.checkerframework.checker.units.UnitsTools.s;
 
 /**
  * The result of the mapping engine is wrapped in this class so that some post-processing and checking
  * can be done on the resulting Node tree.
- *
  */
 public class MappingResult {
+
+    private final static byte[] SEPARATOR_PREFIX = "# !$".getBytes();
+    private final static byte[] NEW_LINE = "\n".getBytes();
+
     private XmlSerializer serializer;
     private Node root;
     private String localId;
@@ -57,6 +68,59 @@ public class MappingResult {
         this.localId = localId;
         this.root = root;
         this.recDefTree = recDefTree;
+    }
+
+    private String sha1(byte[] input) throws NoSuchAlgorithmException {
+        MessageDigest mDigest = MessageDigest.getInstance("SHA1");
+        byte[] result = mDigest.digest(input);
+        return new String(Hex.encodeHex(result));
+    }
+
+    public byte[] toNQuad(Map<String, String> facts) {
+        try {
+            byte[] rdf = toRDF().getBytes(StandardCharsets.UTF_8);
+            Model model = ModelFactory.createDefaultModel().read(new ByteArrayInputStream(rdf), null, "RDF/XML");
+
+            ByteArrayOutputStream nquadBuffer = new ByteArrayOutputStream(rdf.length * 2);
+            RDFDataMgr.write(nquadBuffer, model, RDFFormat.NQUADS);
+            nquadBuffer.write(NEW_LINE);
+
+            ByteArrayOutputStream quadMapBuffer = new ByteArrayOutputStream(1024 * 4);
+            try (JsonWriter writer = new JsonWriter(new OutputStreamWriter(quadMapBuffer))) {
+                writer.beginObject();
+
+                String orgID = facts.get("orgId");
+                String spec = facts.get("spec");
+
+                writer.name("hubID");
+                writer.value(orgID + "_" + spec + "_" + localId);
+
+                writer.name("orgID");
+                writer.value(orgID);
+
+                writer.name("localID");
+                writer.value(localId);
+
+                writer.name("graphURI");
+                writer.value(facts.get("baseUrl"));
+
+                writer.name("datasetID");
+                writer.value(spec);
+
+                writer.name("contentHash");
+                writer.value(sha1(rdf));
+
+                writer.endObject();
+                writer.flush();
+            }
+
+            nquadBuffer.write(SEPARATOR_PREFIX);
+            nquadBuffer.write(quadMapBuffer.toByteArray());
+            nquadBuffer.write(NEW_LINE);
+            return nquadBuffer.toByteArray();
+        } catch (IOException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String getLocalId() {
@@ -71,8 +135,7 @@ public class MappingResult {
         try {
             URI uri = new URI(maybeUri);
             return uri.isAbsolute();
-        }
-        catch (URISyntaxException e) {
+        } catch (URISyntaxException e) {
             return false;
         }
     }
@@ -80,15 +143,15 @@ public class MappingResult {
     public List<String> getUriErrors() throws XPathExpressionException {
         List<String> errors = new ArrayList<String>();
         for (Map.Entry<String, XPathExpression> entry : recDefTree.getUriCheckPaths().entrySet()) {
-            // TODO causes the largest spikes in memory usage by a large margin even after the set of URI checks was significantly. See #38738404363a326970f52626ae6ac61deaebe2ec
+            // TODO causes the largest spikes in memory usage by a large margin even after the set of URI checks was significantly reduced. See #38738404363a326970f52626ae6ac61deaebe2ec
             NodeList nodeList = (NodeList) entry.getValue().evaluate(root, XPathConstants.NODESET);
             for (int walk = 0; walk < nodeList.getLength(); walk++) {
                 Node node = nodeList.item(walk);
                 String content = node.getTextContent();
                 if (!uriCheck(content)) {
                     errors.add(String.format(
-                            "At %s: not a URI: [%s]",
-                            entry.getKey(), content
+                        "At %s: not a URI: [%s]",
+                        entry.getKey(), content
                     ));
                 }
             }
@@ -98,10 +161,10 @@ public class MappingResult {
 
     public List<String> getRDFErrors() {
         List<String> errors = new ArrayList<String>();
-        String error = MappingResult.hasRDFError(toRDF());
-        if (error.length() > 0) {
-            errors.add(error);
-        }
+//        String error = MappingResult.hasRDFError(toRDF());
+//        if (error.length() > 0) {
+//            errors.add(error);
+//        }
         return errors;
     }
 
@@ -123,15 +186,5 @@ public class MappingResult {
 
     public String toString() {
         return toXml();
-    }
-
-    public static String hasRDFError(String rdf) {
-        try {
-            InputStream in = new ByteArrayInputStream(rdf.getBytes("UTF-8"));
-            Model mm = ModelFactory.createDefaultModel().read(in, null, "RDF/XML");
-        } catch (Exception e) {
-            return e.toString();
-        }
-        return "";
     }
 }
