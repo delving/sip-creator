@@ -30,14 +30,15 @@ import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.ReportWriter;
 import eu.delving.sip.model.Feedback;
-import eu.delving.sip.model.SipModel;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import javax.swing.*;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,14 +48,10 @@ import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import static eu.delving.sip.files.Storage.XSD_VALIDATION;
-
 /**
  * Process an input file, mapping it to output records which are validated and used to gather statistics.
  * A validation report is produced. Output can be recorded for experts as well.  The processing is paused
  * for user input when invalid records are encountered.
- *
- *
  */
 
 public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork {
@@ -69,12 +66,12 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private ProgressListener progressListener;
     private final Termination termination = new Termination();
     private final Object lock = new Object();
+    private NQuadWriter nQuadWriter;
 
     private void info(String message) {
         if (feedback != null) {
             feedback.info(message);
-        }
-        else {
+        } else {
             System.out.println(message);
         }
     }
@@ -93,14 +90,14 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     }
 
     public FileProcessor(
-            Feedback feedback,
-            boolean enableXSDValidation,
-            DataSet dataSet,
-            RecMapping recMapping,
-            boolean allowInvalid,
-            GroovyCodeResource groovyCodeResource,
-            UriGenerator uriGenerator,
-            Listener listener
+        Feedback feedback,
+        boolean enableXSDValidation,
+        DataSet dataSet,
+        RecMapping recMapping,
+        boolean allowInvalid,
+        GroovyCodeResource groovyCodeResource,
+        UriGenerator uriGenerator,
+        Listener listener
     ) {
         this.feedback = feedback;
         this.enableXSDValidation = enableXSDValidation;
@@ -154,11 +151,13 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         groovyCodeResource.clearMappingScripts();
         try {
             // TODO record count is never used
-            MetadataParser parser = new MetadataParser(getDataSet().openSourceInputStream(), -1);
+            MetadataParser parser = new MetadataParser(getDataSet().openSourceInputStream());
             parser.setProgressListener(progressListener);
             ReportWriter reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
 
             File outputDir = createEmptyOutputDir();
+            nQuadWriter = new NQuadWriter(outputDir.toPath());
+            nQuadWriter.start();
 
             Consumer consumer = new Consumer(reportWriter);
             int engineCount = (int) Math.round(Runtime.getRuntime().availableProcessors() * 1.1);
@@ -193,8 +192,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             }
             info(Thread.currentThread().getName() + " about to consume");
             consumer.run();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             termination.dueToException(e);
             feedback.alert("File processing setup problem", e);
         }
@@ -204,7 +202,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         File sipDir = getDataSet().targetOutput().getParentFile();
         File outputDir = new File(sipDir, "output");
         if (!outputDir.exists()) {
-            if(!outputDir.mkdir()) {
+            if (!outputDir.mkdir()) {
                 throw new IllegalStateException("Unable to create directory: " + outputDir);
             }
         } else {
@@ -214,45 +212,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             }
         }
         return outputDir;
-    }
-
-    private class MappingOutput {
-        final MetadataRecord metadataRecord;
-        final MappingResult mappingResult;
-        final Exception exception;
-
-        private MappingOutput(MetadataRecord metadataRecord, MappingResult mappingResult, Exception exception) {
-            this.metadataRecord = metadataRecord;
-            this.mappingResult = mappingResult;
-            this.exception = exception;
-        }
-
-        public void record(ReportWriter reportWriter, XmlOutput xmlOutput) {
-            try {
-                if (exception == null) {
-                    xmlOutput.write(mappingResult.getLocalId(), mappingResult.root());
-                }
-                else if (exception instanceof DiscardRecordException) {
-                    synchronized (lock) {
-                        reportWriter.discarded(metadataRecord, exception.getMessage());
-                    }
-                }
-                else if (exception instanceof MappingException) {
-                    synchronized (lock) {
-                        reportWriter.unexpected(metadataRecord, (MappingException) exception);
-                    }
-                    termination.dueToException(exception);
-                }
-                else {
-                    synchronized (lock) {
-                        reportWriter.invalid(mappingResult, exception);
-                    }
-                }
-            }
-            catch (Exception e) {
-                termination.dueToException(e);
-            }
-        }
     }
 
     private class MetadataParserRunner implements Runnable {
@@ -266,29 +225,24 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             thread.setName(getClass().getName());
         }
 
-        public MetadataRecord nextRecord() throws InterruptedException {
-            return outputQueue.take();
+        public void drainTo(List<MetadataRecord> collector, int capacity) {
+            outputQueue.drainTo(collector, capacity);
         }
 
         @Override
         public void run() {
             MetadataRecord record;
-            try {
-                while (true) {
-                    try {
-                        if (!((record = metadataParser.nextRecord()) != null)) break;
-                        outputQueue.add(record);
-                        while(outputQueue.size() > 1000) {
-                            Thread.sleep(1000);
-                        }
-                    } catch (XMLStreamException | IOException | CancelException | InterruptedException e) {
-                        termination.dueToException(e);
-                        break;
+            while (true) {
+                try {
+                    if (!((record = metadataParser.nextRecord()) != null)) break;
+                    outputQueue.add(record);
+                    while (outputQueue.size() > 5000) {
+                        System.out.println("Sleeping... " + System.currentTimeMillis());
+                        Thread.sleep(250);
                     }
-                }
-            } finally {
-                for (int i = 0; i < 100; i++) {
-                    outputQueue.add(MetadataRecord.poisonPill());
+                } catch (XMLStreamException | IOException | CancelException | InterruptedException e) {
+                    termination.dueToException(e);
+                    break;
                 }
             }
         }
@@ -316,18 +270,19 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     recordCount += engine.recordCount;
                     validCount += engine.validCount;
                 } catch (InterruptedException e) {
-                    termination.dueToException(e);
+                    // nothing to do here
                 }
             }
+            nQuadWriter.stop();
+
             if (termination.isIncomplete()) {
                 info("Abort report writer");
                 if (reportWriter != null) {
                     reportWriter.abort();
                 }
-            }
-            else {
+            } else {
                 info(String.format("Finish report writer records=%d valid=%d", recordCount, validCount));
-                if(reportWriter != null) {
+                if (reportWriter != null) {
                     reportWriter.finish(validCount, recordCount - validCount);
                 }
                 termination.normalCompletion();
@@ -351,7 +306,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         public int validCount;
         final File outputDir;
         final Map<String, RecDef.Namespace> namespaceMap;
-        final  ReportWriter reportWriter;
+        final ReportWriter reportWriter;
         final List<AssertionTest> assertionTests;
         final MappingRunner MappingRunner;
 
@@ -382,117 +337,89 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             thread.start();
         }
 
-        public void accept(MetadataRecord metadataRecord, MappingResult mappingResult, Exception exception) {
-            try {
-                MappingOutput mappingOutput = new MappingOutput(metadataRecord, mappingResult, exception);
-                recordCount++;
-                if (mappingOutput.exception == null) {
-                    validCount++;
-                }
+        public void accept(MappingResult mappingResult) throws XMLStreamException, IOException, InterruptedException {
+            validCount++;
 
-                if(Application.canWritePocketFiles()) {
-                    File outputFile = new File(outputDir, mappingOutput.metadataRecord.getRecordNumber() + ".xml");
-                    XmlOutput xmlOutput = new XmlOutput(outputFile, namespaceMap);
-                    mappingOutput.record(reportWriter, xmlOutput);
-                    xmlOutput.finish(false);
-                }
-            } catch (XMLStreamException | IOException e) {
-                termination.dueToException(e);
+            byte[] nQuad = mappingResult.toNQuad(dataSet.getDataSetFacts());
+            byte[] xml = null;
+            if (Application.canWritePocketFiles()) {
+                XmlOutput xmlOutput = new XmlOutput(namespaceMap);
+                xmlOutput.write(mappingResult.getLocalId(), mappingResult.root());
+                xmlOutput.finish();
+
+                xml = xmlOutput.toBytes();
             }
+            nQuadWriter.put(new NQuadWriter.Input(nQuad, xml));
         }
 
         @Override
         public void run() {
-            try {
-                while (termination.notYet()) {
-                    MetadataRecord record = metadataParserRunner.nextRecord();
+            final int capacity = 50;
+            final ArrayList<MetadataRecord> records = new ArrayList<>(capacity);
 
-                    if (record == null || record.isPoison()) break;
+            while (termination.notYet()) {
+
+                records.clear();
+                metadataParserRunner.drainTo(records, capacity);
+                for (MetadataRecord record : records) {
 
                     try {
-                        Node node = null;
-                        try {
-                            node = MappingRunner.runMapping(record);
-                        } catch (DiscardRecordException e) {
-                            reportWriter.discarded(record, e.toString());
-                        }
+                        recordCount++;
+                        MappingResult result = runMapping(record);
+                        accept(result);
+                    } catch (Throwable e) {
 
-                        if (node == null) continue;
-                        MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, MappingRunner.getRecDefTree());
-                        List<String> uriErrors = result.getUriErrors();
-                        try {
-                            if (!uriErrors.isEmpty()) {
-                                StringBuilder uriErrorsString = new StringBuilder();
-                                for (String uriError: uriErrors) {
-                                    uriErrorsString.append(uriError).append("\n");
-                                }
-                                throw new Exception("URI Errors\n"+ uriErrorsString);
-                            }
-                            if (validator == null) {
-                                accept(record, result, null);
-                            }
-                            else {
-                                try {
-                                    Source source = new DOMSource(node);
-                                    validator.validate(source);
-                                    for (AssertionTest assertionTest : assertionTests) {
-                                        String violation = assertionTest.getViolation(result.root());
-                                        if (violation != null) throw new AssertionException(violation);
-                                    }
-                                    accept(record, result, null);
-                                }
-                                catch (Exception e) {
-                                    accept(record, result, e);
-                                    if (!allowInvalid) {
-                                        termination.askHowToProceed(record, e);
-                                    }
-                                }
-                            }
+                        boolean isFatal = reportWriter.recordError(record, null, e);
+                        if (isFatal) {
+                            termination.dueToException(e);
+                            return;
                         }
-                        catch (Exception e) {
-                            accept(record, result, e);
-                            if (!allowInvalid) {
-                                termination.askHowToProceed(record, e);
-                            }
-                        }
-
-
-                    }
-                    catch (DiscardRecordException e) {
-                        accept(record, null, e);
-                    }
-                    catch (MappingException e) {
-                        accept(record, null, e);
-                        termination.dueToException(record, e);
+                    } finally {
+                        isDone = true;
                     }
                 }
             }
-            catch (Exception e) {
-                termination.dueToException(e);
-            } finally {
-                isDone = true;
+        }
+
+        private MappingResult runMapping(MetadataRecord record) throws XPathExpressionException, MappingException, AssertionException, IOException, SAXException {
+            Node node = MappingRunner.runMapping(record);
+            if (node == null) return null;
+            MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, MappingRunner.getRecDefTree());
+            validate(node, result);
+            return result;
+        }
+
+        private void validate(Node node, MappingResult result) throws XPathExpressionException, AssertionException, IOException, SAXException {
+            List<String> uriErrors = result.getUriErrors();
+            if (!uriErrors.isEmpty()) {
+                StringBuilder uriErrorsString = new StringBuilder();
+                for (String uriError : uriErrors) {
+                    uriErrorsString.append(uriError).append("\n");
+                }
+                throw new RuntimeException("URI Errors\n" + uriErrorsString);
+            }
+            if (validator != null) {
+                Source source = new DOMSource(node);
+                validator.validate(source);
+                for (AssertionTest assertionTest : assertionTests) {
+                    String violation = assertionTest.getViolation(result.root());
+                    if (violation != null) throw new AssertionException(violation);
+                }
             }
         }
     }
 
-    private enum NextStep {
-        CONTINUE,
-        INVESTIGATE,
-        ABORT
-    }
-
     private class Termination {
         private MetadataRecord failedRecord;
-        private Exception exception;
-        private boolean cancelled, completed;
-        private NextStep nextStep = NextStep.CONTINUE;
+        private Throwable exception;
+        private boolean completed;
 
         boolean notYet() {
             return !completed && !isIncomplete();
         }
 
         boolean isIncomplete() {
-            return cancelled || failedRecord != null || exception != null;
+            return failedRecord != null || exception != null;
         }
 
         int getRecordNumber() {
@@ -506,21 +433,15 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             }
         }
 
-        void dueToCancellation() {
-            cancelled = true;
-            listener.aborted(FileProcessor.this);
-        }
-
-        void dueToException(Exception exception) {
+        void dueToException(Throwable exception) {
             dueToException(null, exception);
         }
 
-        synchronized void dueToException(MetadataRecord failedRecord, Exception exception) {
+        synchronized void dueToException(MetadataRecord failedRecord, Throwable exception) {
             if (this.exception == null) { // only show one of them
                 if (feedback != null) {
                     feedback.alert("Problem processing", exception);
-                }
-                else {
+                } else {
                     System.out.println("Problem processing: ");
                     exception.printStackTrace();
                 }
@@ -529,54 +450,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             this.exception = exception;
             if (listener != null) {
                 listener.failed(FileProcessor.this);
-            }
-        }
-
-        synchronized void askHowToProceed(MetadataRecord failedRecord, Exception exception) {
-            switch (nextStep) {
-                case CONTINUE:
-                    break;
-                case INVESTIGATE:
-                case ABORT:
-                    return;
-            }
-            nextStep = blockForNextStep(failedRecord.getRecordNumber());
-            switch (nextStep) {
-                case CONTINUE:
-                    break;
-                case INVESTIGATE:
-                    this.exception = exception; // prevent reporting, because they chose to investigate
-                    dueToException(failedRecord, exception);
-                    break;
-                case ABORT:
-                    dueToCancellation();
-                    break;
-            }
-        }
-
-        private NextStep blockForNextStep(int recordNumber) {
-            JRadioButton continueButton = new JRadioButton(String.format(
-                    "<html><b>Continue</b> - Continue the %s mapping of data set %s, discarding invalid record %d",
-                    getPrefix(), getSpec(), recordNumber
-            ));
-            JRadioButton investigateButton = new JRadioButton(String.format(
-                    "<html><b>Investigate</b> - Stop and fix the %s mapping of data set %s, with invalid record %d in view",
-                    getPrefix(), getSpec(), recordNumber
-            ));
-            ButtonGroup bg = new ButtonGroup();
-            bg.add(continueButton);
-            continueButton.setSelected(true);
-            bg.add(investigateButton);
-            if (feedback.form("Invalid Record! How to proceed?", continueButton, investigateButton)) {
-                if (investigateButton.isSelected()) {
-                    return NextStep.INVESTIGATE;
-                }
-                else {
-                    return NextStep.CONTINUE;
-                }
-            }
-            else {
-                return NextStep.ABORT;
             }
         }
     }

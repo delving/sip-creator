@@ -21,7 +21,6 @@
 
 package eu.delving.groovy;
 
-import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -35,25 +34,15 @@ import java.util.regex.Pattern;
 
 public class MetadataRecord {
     private GroovyNode rootNode;
-    // TODO record count is never used
-    private int recordNumber, recordCount;
+    private int recordNumber;
 
-    public static MetadataRecord create(GroovyNode rootNode, int recordNumber, int recordCount) {
-        return new MetadataRecord(rootNode, recordNumber, recordCount);
+    public static MetadataRecord create(GroovyNode rootNode, int recordNumber) {
+        return new MetadataRecord(rootNode, recordNumber);
     }
 
-    public static MetadataRecord poisonPill() {
-        return new MetadataRecord(null, -1, -1);
-    }
-
-    private MetadataRecord(GroovyNode rootNode, int recordNumber, int recordCount) {
+    private MetadataRecord(GroovyNode rootNode, int recordNumber) {
         this.rootNode = rootNode;
         this.recordNumber = recordNumber;
-        this.recordCount = recordCount;
-    }
-
-    public boolean isPoison() {
-        return rootNode == null;
     }
 
     public GroovyNode getRootNode() {
@@ -72,11 +61,6 @@ public class MetadataRecord {
         return recordNumber;
     }
 
-    // TODO record count is never used
-    public int getRecordCount() {
-        return recordCount;
-    }
-
     private boolean checkFor(GroovyNode groovyNode, Pattern pattern) {
         if (groovyNode.text != null && pattern.matcher(groovyNode.text).find()) {
             return true;
@@ -90,7 +74,7 @@ public class MetadataRecord {
     }
 
     public String toString() {
-        return String.format("MetadataRecord(%d / %d)", recordNumber, recordCount);
+        return String.format("MetadataRecord(%d / ?)", recordNumber);
     }
 
 }

@@ -93,10 +93,6 @@ public class Stats {
         namespaces.put(prefix, uri);
     }
 
-    public void freshStats() {
-        recordStats = new RecordStats();
-    }
-
     public void recordValue(Path path, String value) {
         ValueStats valueStats = fieldValueMap.get(path);
         if (valueStats == null) fieldValueMap.put(path, valueStats = new ValueStats());
@@ -128,7 +124,7 @@ public class Stats {
 
     public Map<String, String> namespaces = new HashMap<String, String>();
 
-    public RecordStats recordStats;
+    public RecordStats recordStats = new RecordStats();
 
     @XStreamAlias("field-value-stats")
     public Map<Path, ValueStats> fieldValueMap = new HashMap<Path, ValueStats>();

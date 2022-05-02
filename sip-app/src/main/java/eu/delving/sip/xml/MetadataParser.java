@@ -24,7 +24,6 @@ package eu.delving.sip.xml;
 import eu.delving.XMLToolFactory;
 import eu.delving.groovy.GroovyNode;
 import eu.delving.groovy.MetadataRecord;
-import eu.delving.groovy.MetadataRecordFactory;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.StringUtil;
 import eu.delving.metadata.Tag;
@@ -53,21 +52,20 @@ import static eu.delving.sip.files.Storage.RECORD_CONTAINER;
 public class MetadataParser {
     private InputStream inputStream;
     private XMLStreamReader input;
-    private int recordIndex, recordCount;
+    private int recordIndex;
     private Map<String, String> namespaces = new TreeMap<String, String>();
     private Path path = Path.create();
-    private MetadataRecordFactory factory = new MetadataRecordFactory(namespaces);
     private ProgressListener progressListener;
     private boolean isSourceExhausted;
 
-    public MetadataParser(InputStream inputStream, int recordCount) throws XMLStreamException {
+    public MetadataParser(InputStream inputStream) throws XMLStreamException {
         this.inputStream = inputStream;
         this.input = XMLToolFactory.xmlInputFactory().createXMLStreamReader("Metadata", inputStream);
     }
 
     public void setProgressListener(ProgressListener progressListener) {
         this.progressListener = progressListener;
-        progressListener.prepareFor(recordCount);
+        progressListener.prepareFor(0);
     }
 
     @SuppressWarnings("unchecked")
@@ -125,7 +123,7 @@ public class MetadataParser {
                     if (node != null) {
                         if (path.equals(RECORD_CONTAINER)) {
                             // TODO record count is never used
-                            metadataRecord = factory.fromGroovyNode(node, recordIndex++, recordCount);
+                            metadataRecord = MetadataRecord.create(node, recordIndex++);
                             if (progressListener != null) {
                                 progressListener.setProgress(recordIndex);
                             }
