@@ -1,5 +1,5 @@
 @groovy.transform.CompileStatic
-String calculateAge(String birthDate, String deathDate, boolean automaticDateReordering = false) { // #def
+String calculateAge(String birthDate, String deathDate, boolean automaticDateReordering = false, boolean ignoreErrors = false) { // #def
     def dateFormatter = new java.text.SimpleDateFormat("yyyy-MM-dd")
     if (birthDate == null
         || deathDate == null
@@ -15,16 +15,25 @@ String calculateAge(String birthDate, String deathDate, boolean automaticDateReo
     try {
         parsedBirthDate = dateFormatter.parse(birthDate);
     } catch (java.text.ParseException e) {
+        if (ignoreErrors) {
+            return ""
+        }
         throw new IllegalArgumentException("unable to parse birth date", e)
     }
     try {
         parsedDeathDate = dateFormatter.parse(deathDate);
     } catch (java.text.ParseException e) {
+        if (ignoreErrors) {
+            return ""
+        }
         throw new IllegalArgumentException("unable to parse death date", e)
     }
 
     if (parsedBirthDate.after(parsedDeathDate)) {
         if (!automaticDateReordering) {
+            if (ignoreErrors) {
+                return ""
+            }
             throw new IllegalArgumentException("birth date " + birthDate + " is more recent than death date " + deathDate)
         } else {
             def birth = parsedBirthDate
@@ -37,12 +46,16 @@ String calculateAge(String birthDate, String deathDate, boolean automaticDateReo
 
     Calendar calendar = Calendar.getInstance()
     calendar.setTimeInMillis(ageInMilliseconds)
-    return String.valueOf(calendar.get(Calendar.YEAR) - 1970)
+    def age = calendar.get(Calendar.YEAR) - 1970
+    if (age > 130) {
+        return ""
+    }
+    return String.valueOf(age)
 }
 
 @groovy.transform.CompileStatic
-String calculateAgeRange(String birthDate, String deathDate, boolean automaticDateReordering = false) { // #def
-    def age = calculateAge(birthDate, deathDate, automaticDateReordering)
+String calculateAgeRange(String birthDate, String deathDate, boolean automaticDateReordering = false, boolean ignoreErrors = false) { // #def
+    def age = calculateAge(birthDate, deathDate, automaticDateReordering, ignoreErrors)
     if(age == "") {
         return ""
     }
