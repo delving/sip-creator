@@ -1,6 +1,10 @@
 # Changelog
 
 ## unreleased
+
+### Added
+
+-  maximum age is 130 and errors can be ignored for builtin functions `calculateAge` and `calculateAgeRange` [[GH520]](https://github.com/delving/sip-creator/pull/520) 
  
 - history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.5...master
 
