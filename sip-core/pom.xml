@@ -24,11 +24,11 @@
     <artifactId>sip-core</artifactId>
     <packaging>jar</packaging>
     <name>SIP-Core</name>
-    <version>1.2.5</version>
+    <version>1.2.6</version>
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-creator</artifactId>
-        <version>1.2.3</version>
+        <version>1.2.6</version>
     </parent>
     <dependencies>
         <dependency>
