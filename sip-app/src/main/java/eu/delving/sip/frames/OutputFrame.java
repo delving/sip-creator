@@ -23,8 +23,10 @@ package eu.delving.sip.frames;
 
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.KeystrokeHelper;
+import eu.delving.sip.model.MappingCompileModel;
 import eu.delving.sip.model.SipModel;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import javax.swing.*;
@@ -33,6 +35,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,6 +76,16 @@ public class OutputFrame extends FrameBase {
         final JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Output record"));
 
+        final DefaultComboBoxModel outputTypes = new DefaultComboBoxModel();
+
+        outputTypes.addElement("RDF/XML");
+        outputTypes.addElement("JSONLD,COMPACT/FLAT");
+
+        final JComboBox outputTypesBox = new JComboBox(outputTypes);
+        outputTypesBox.setSelectedIndex(0);
+
+        p.add(outputTypesBox, BorderLayout.NORTH);
+
         final RSyntaxTextArea outputArea = new RSyntaxTextArea(sipModel.getRecordCompileModel().getOutputDocument());
         outputArea.setCodeFoldingEnabled(true);
         RTextScrollPane tsp = new RTextScrollPane(outputArea);
@@ -100,6 +113,21 @@ public class OutputFrame extends FrameBase {
             public void changedUpdate(DocumentEvent documentEvent) {
             }
         });
+
+        outputTypesBox.addActionListener(e -> {
+            String selection = outputTypesBox.getSelectedItem().toString();
+
+            final MappingCompileModel mappingModel = sipModel.getRecordCompileModel();
+            if (selection.indexOf("JSONLD") >= 0) {
+                mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_JSON, outputArea);
+            } else {
+                mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_XML, outputArea);
+            }
+
+            mappingModel.triggerCompile();
+        });
+
+
         outputArea.getInputMap().put(KeystrokeHelper.DOWN, "next");
         outputArea.getInputMap().put(KeystrokeHelper.RIGHT, "next");
         outputArea.getInputMap().put(KeystrokeHelper.UP, "prev");

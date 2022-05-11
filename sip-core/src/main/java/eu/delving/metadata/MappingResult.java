@@ -113,12 +113,15 @@ public class MappingResult {
         return serializer.toXml(root, recDefTree != null);
     }
 
-    public String toRDF() {
-        String rdf = toString();
+    public static String toJenaCompliantRDF(String rdf) {
         rdf = rdf.replaceAll("naa:RDF|edm:RDF|nant:RDF", "rdf:RDF");
         rdf = rdf.replaceAll(" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"", "");
         rdf = rdf.replaceAll("<rdf:RDF ", "$0xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" ");
         return rdf;
+    }
+
+    public String toRDF() {
+        return MappingResult.toJenaCompliantRDF(toString());
     }
 
     public String toString() {

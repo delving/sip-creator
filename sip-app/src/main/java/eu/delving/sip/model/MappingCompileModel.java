@@ -21,6 +21,11 @@
 
 package eu.delving.sip.model;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonWriter;
 import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.groovy.MappingRunner;
@@ -41,7 +46,12 @@ import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
@@ -53,12 +63,15 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.StyleConstants;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactoryConfigurationException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -85,6 +98,7 @@ public class MappingCompileModel {
     private RSyntaxDocument codeDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_GROOVY);
     private RSyntaxDocument docDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_XML);
     private RSyntaxDocument outputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_XML);
+    private RSyntaxTextArea outputArea;
     private TriggerTimer triggerTimer = new TriggerTimer();
     private Type type;
     private Validator validator;
@@ -131,6 +145,11 @@ public class MappingCompileModel {
                 nodeMapping.setDocumentation(documentToString(docDocument));
             }
         });
+    }
+
+    public void setOutputDocument(String style, RSyntaxTextArea outputArea) {
+        outputDocument = new RSyntaxDocument(style);
+        this.outputArea = outputArea;
     }
 
     public void setEnabled(boolean enabled) {
@@ -212,7 +231,7 @@ public class MappingCompileModel {
 
     // === privates
 
-    private void triggerCompile() {
+    public void triggerCompile() {
         if (!enabled) return;
         MappingRunner = null;
         triggerTimer.triggerSoon(COMPILE_DELAY);
@@ -435,9 +454,37 @@ public class MappingCompileModel {
         }
 
         private void compilationComplete(Completion completion, Node node, String error) {
-            String xml = node == null ? "No XML" : serializer.toXml(node, true);
-            if (error != null) xml = String.format("## %s ##\n\n%s\n## OUTPUT ##\n%s", completion, error, xml);
-            sipModel.exec(new DocumentSetter(outputDocument, xml, false));
+            String output = node == null ? "No XML" : serializer.toXml(node, true);
+            String syntaxStyle = outputDocument.getSyntaxStyle();
+            if (error == null && syntaxStyle.equals(SyntaxConstants.SYNTAX_STYLE_JSON)) {
+                try {
+                    output = MappingResult.toJenaCompliantRDF(output);
+                    InputStream in = new ByteArrayInputStream(output.getBytes(StandardCharsets.UTF_8));
+                    Model model = ModelFactory.createDefaultModel().read(in, null, "RDF/XML");
+
+                    ByteArrayOutputStream out = new ByteArrayOutputStream(2048);
+                    RDFDataMgr.write(out, model, RDFFormat.JSONLD_COMPACT_FLAT);
+
+                    Reader jsonReader = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()));
+                    JsonElement json = new JsonParser().parse(jsonReader);
+                    output = new GsonBuilder()
+                        .setPrettyPrinting()
+                        .create()
+                        .toJson(json);
+                } catch (Throwable t) {
+                    ByteArrayOutputStream errorBuffer = new ByteArrayOutputStream();
+                    try(PrintWriter writer = new PrintWriter(errorBuffer)) {
+                        t.printStackTrace(writer);
+                        writer.flush();
+                        error = new String(errorBuffer.toByteArray(), StandardCharsets.UTF_8);
+                    }
+                }
+            }
+            if (error != null) output = String.format("## %s ##\n\n%s\n## OUTPUT ##\n%s", completion, error, output);
+            if (error == null && outputArea != null) {
+                outputArea.setDocument(outputDocument);
+            }
+            sipModel.exec(new DocumentSetter(outputDocument, output, false));
         }
 
         public String toString() {
@@ -488,6 +535,7 @@ public class MappingCompileModel {
 
     private class TriggerTimer implements ActionListener {
         private Timer timer = new Timer(COMPILE_DELAY, this);
+        private RSyntaxTextArea outputArea;
 
         private TriggerTimer() {
             timer.setRepeats(false);
