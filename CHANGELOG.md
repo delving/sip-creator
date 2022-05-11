@@ -8,7 +8,8 @@
 
 ### Added
 
--  maximum age is 130 and errors can be ignored for builtin functions `calculateAge` and `calculateAgeRange` [[GH520]](https://github.com/delving/sip-creator/pull/520) 
+-  maximum age is 130 and errors can be ignored for builtin functions `calculateAge` and `calculateAgeRange` [[GH-520]](https://github.com/delving/sip-creator/pull/520) 
+- add JSON-LD view option to the 'big-picture' output panel. [[GH-521]](https://github.com/delving/sip-creator/pull/521)
  
 - history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.5...master
 
