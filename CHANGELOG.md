@@ -2,11 +2,15 @@
 
 ## unreleased
 
+- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.7...master
+
 ## v1.2.7 (2022-06-27)
 
 ### Changed
 
 - Hyphen in calculateAgeRange to be consistent [[GH-523]](https://github.com/delving/sip-creator/pull/523)
+
+- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.6...sip-creator-v1.2.7
 
 ## v1.2.6 (2022-05-10)
 
