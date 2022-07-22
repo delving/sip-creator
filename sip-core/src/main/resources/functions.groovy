@@ -65,7 +65,7 @@ String calculateAgeRange(String birthDate, String deathDate, boolean automaticDa
         return "0 – 10"
     }
     if(age > 100) {
-        return "100–"
+        return "100 – 130"
     }
 
     def rangeStart = age - (age - 1) % 10
