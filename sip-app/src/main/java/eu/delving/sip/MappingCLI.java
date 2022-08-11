@@ -93,35 +93,35 @@ public class MappingCLI {
         }
 
         MappingCLI mappingCLI = new MappingCLI();
-        mappingCLI.startMapping(inputFile, mappingFile, recDefFile, validationFile, outputDir);
+        mappingCLI.startMapping(Files.readAllBytes(inputFile), mappingFile, recDefFile, validationFile, outputDir);
     }
 
     private static void exitWithHelpMessage() {
         System.exit(-1);
     }
 
-    public void startMapping(Path inputFile,
+    public void startMapping(byte[] data,
                              Path mappingFile,
                              Path recDefFile,
                              Path validationFile,
                              Path outputDir) throws Exception {
         System.out.println("Starting mapping engine with:");
-        System.out.println("Input file: " + inputFile);
-        System.out.println("Mapping file: " + inputFile);
-        System.out.println("Rec definition file: " + inputFile);
-        System.out.println("Validation file: " + inputFile);
+        System.out.println("Data: size=" + data.length);
+        System.out.println("Mapping file: " + mappingFile);
+        System.out.println("Rec definition file: " + recDefFile);
+        System.out.println("Validation file: " + validationFile);
         System.out.println("Output directory: " + outputDir);
 
-        processSourceXML(inputFile, mappingFile, recDefFile, validationFile, outputDir);
+        processSourceXML(data, mappingFile, recDefFile, validationFile, outputDir);
     }
 
-    private void processSourceXML(Path inputFile,
+    private void processSourceXML(byte[] data,
                                   Path mappingFile,
                                   Path recDefFile,
                                   Path validationFile,
                                   Path outputDir) throws IOException {
         RecMapping recMapping = getRecMapping(mappingFile, recDefFile);
-        DataSet sourceXML = new CLIDatasetImpl(inputFile, outputDir);
+        DataSet sourceXML = new CLIDatasetImpl(data, outputDir);
 
         FileProcessor.UriGenerator uriGenerator = new SipModel.Generator(
             "http://delving.org/narthex",

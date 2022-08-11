@@ -2,8 +2,9 @@ package eu.delving;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import com.thoughtworks.xstream.core.ClassLoaderReference;
 import com.thoughtworks.xstream.core.TreeMarshallingStrategy;
-import com.thoughtworks.xstream.security.NoTypePermission;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.security.NullPermission;
 import com.thoughtworks.xstream.security.PrimitiveTypePermission;
 import eu.delving.metadata.Path;
@@ -13,9 +14,15 @@ import java.util.Collection;
 
 public class XStreamFactory {
 
+    private static ClassLoader classLoader = XStreamFactory.class.getClassLoader();
+
+    public static void init() {
+        System.out.println(classLoader);
+    }
+
     public static XStream getStreamFor(Class clazz) {
         XStream stream = XStreamFactory.createSecureXStream();
-
+        stream.setClassLoader(classLoader);
         stream.setMarshallingStrategy(new TreeMarshallingStrategy());
         stream.registerConverter(new Tag.Converter());
         stream.registerConverter(new Path.Converter());
@@ -34,7 +41,7 @@ public class XStreamFactory {
 
         stream.allowTypeHierarchy(Collection.class);
         stream.allowTypeHierarchy(String.class);
-        stream.allowTypesByWildcard(new String[] {
+        stream.allowTypesByWildcard(new String[]{
             "eu.delving.sip.actions.*",
             "eu.delving.sip.base.*",
             "eu.delving.sip.files.*",
@@ -52,7 +59,8 @@ public class XStreamFactory {
     }
 
     public static XStream createSecureXStream() {
-        XStream stream = new XStream(new PureJavaReflectionProvider());
+        System.out.println(classLoader);
+        XStream stream = new XStream(new PureJavaReflectionProvider(), new StaxDriver(), new ClassLoaderReference(classLoader));
         return XStreamFactory.asSecureXStream(stream);
     }
 }

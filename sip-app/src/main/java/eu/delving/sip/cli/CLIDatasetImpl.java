@@ -9,33 +9,27 @@ import eu.delving.sip.files.*;
 import eu.delving.stats.Stats;
 
 import javax.xml.validation.Validator;
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
 
 public class CLIDatasetImpl implements DataSet {
 
-    private final Path inputFile;
+    private final byte[] data;
     private final Path outputDir;
 
-    public CLIDatasetImpl(Path inputFile, Path outputDir) {
-        this.inputFile = inputFile;
+    public CLIDatasetImpl(byte[] data, Path outputDir) {
+        this.data = data;
         this.outputDir = outputDir;
     }
 
     @Override
     public InputStream openSourceInputStream() {
-        try {
-            return new GZIPInputStream(Files.newInputStream(inputFile));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return new ByteArrayInputStream(data);
     }
 
     @Override
