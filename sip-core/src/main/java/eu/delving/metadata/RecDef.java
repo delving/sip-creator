@@ -197,7 +197,7 @@ public class RecDef {
                 for (String target : targets) {
                     Elem targetTemplate = templatesByTag.get(target);
                     if (targetTemplate == null) {
-                        throw new IllegalStateException("Unable to locate template with tag=" + template.target);
+                        throw new IllegalStateException("Unable to locate template with tag=" + target);
                     }
                 }
             }
