@@ -46,7 +46,7 @@ public class BulkMappingRunner extends AbstractMappingRunner {
             if (e.getCause() instanceof DiscardRecordException) {
                 throw (DiscardRecordException) e.getCause();
             }
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to process record(id=" + metadataRecord.getId() + ")", e);
         }
     }
 
