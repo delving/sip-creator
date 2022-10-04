@@ -2,9 +2,22 @@
 
 ## unreleased
 
+- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.7...master
+
+## v1.2.7 (2022-06-27)
+
+### Changed
+
+- Hyphen in calculateAgeRange to be consistent [[GH-523]](https://github.com/delving/sip-creator/pull/523)
+
+- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.6...sip-creator-v1.2.7
+
+## v1.2.6 (2022-05-10)
+
 ### Added
 
--  maximum age is 130 and errors can be ignored for builtin functions `calculateAge` and `calculateAgeRange` [[GH520]](https://github.com/delving/sip-creator/pull/520) 
+- maximum age is 130 and errors can be ignored for builtin functions `calculateAge` and `calculateAgeRange` [[GH-520]](https://github.com/delving/sip-creator/pull/520) 
+- add JSON-LD view option to the 'big-picture' output panel. [[GH-521]](https://github.com/delving/sip-creator/pull/521)
  
 - history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.5...master
 
