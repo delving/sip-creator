@@ -19,7 +19,7 @@ public class BulkMappingRunner extends AbstractMappingRunner {
     private CompiledScript compiledScript;
 
     /**
-     * @param recMapping represents to mapping to be applied
+     * @param recMapping    represents to mapping to be applied
      * @param generatedCode the code to be executed against each record
      */
     public BulkMappingRunner(final RecMapping recMapping, final String generatedCode) {
@@ -46,7 +46,7 @@ public class BulkMappingRunner extends AbstractMappingRunner {
             if (e.getCause() instanceof DiscardRecordException) {
                 throw (DiscardRecordException) e.getCause();
             }
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to process record(id=" + metadataRecord.getId() + ", number=" + metadataRecord.getRecordNumber() + ")", e);
         }
     }
 
