@@ -31,6 +31,9 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.ReportWriter;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.RiotException;
 import org.w3c.dom.Node;
 
 import javax.swing.*;
@@ -38,8 +41,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -419,6 +425,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
                         if (node == null) continue;
                         MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, MappingRunner.getRecDefTree());
+                        validateRDF(record, result);
                         List<String> uriErrors = result.getUriErrors();
                         try {
                             if (!uriErrors.isEmpty()) {
@@ -472,6 +479,16 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             } finally {
                 isDone = true;
             }
+        }
+    }
+
+    private void validateRDF(MetadataRecord record, MappingResult result) {
+        try {
+            String output = MappingResult.toJenaCompliantRDF(result.toRDF());
+            InputStream in = new ByteArrayInputStream(output.getBytes(StandardCharsets.UTF_8));
+            ModelFactory.createDefaultModel().read(in, null, "RDF/XML");
+        } catch (RiotException e) {
+            throw new RuntimeException("Error for record(id=" + record.getId() + ", number=" + record.getRecordNumber() + ")", e);
         }
     }
 
