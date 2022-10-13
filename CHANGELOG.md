@@ -1,8 +1,17 @@
 # Changelog
 
 ## unreleased
+ 
+- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.8...master
 
-- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.7...master
+## v1.2.8 (2022-10-13)
+
+### Changed
+
+- log record identifier and count on error [[GH-525]](https://github.com/delving/sip-creator/pull/525)
+- RDF validation errors should throw an exception during validation [[GH-526]](https://github.com/delving/sip-creator/pull/526)
+
+- history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.7...v1.2.8
 
 ## v1.2.7 (2022-06-27)
 
