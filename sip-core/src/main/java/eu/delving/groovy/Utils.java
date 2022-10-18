@@ -6,10 +6,18 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.script.SimpleBindings;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 public class Utils {
 
@@ -71,5 +79,28 @@ public class Utils {
             }
         }
         for (Node kill : dead) node.removeChild(kill);
+    }
+
+    public static String sha256(String value) {
+        return sha256(value.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static String sha256(byte[] value) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.update(value);
+            return Base64.getEncoder().encodeToString(digest.digest());
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String sha256(Node node) throws TransformerException {
+        DOMSource dom = new DOMSource(node);
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        StreamResult streamResult = new StreamResult(new OutputStreamWriter(buffer));
+        transformer.transform(dom, streamResult);
+        return sha256(buffer.toByteArray());
     }
 }

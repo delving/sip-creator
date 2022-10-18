@@ -21,6 +21,9 @@
 
 package eu.delving.groovy;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -29,8 +32,6 @@ import java.util.regex.Pattern;
  * consumes.  The XML content is recorded in the composite tree of GroovyNode and
  * GroovyList instances, and we also hold the record number and the total number
  * of records.
- *
- *
  */
 
 public class MetadataRecord {
@@ -50,6 +51,10 @@ public class MetadataRecord {
         this.rootNode = rootNode;
         this.recordNumber = recordNumber;
         this.recordCount = recordCount;
+    }
+
+    public String sha256() {
+        return rootNode.sha256();
     }
 
     public boolean isPoison() {

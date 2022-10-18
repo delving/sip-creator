@@ -39,19 +39,18 @@ import org.w3c.dom.Node;
 import javax.swing.*;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Validator;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.stream.Collectors;
 
 import static eu.delving.sip.files.Storage.XSD_VALIDATION;
 
@@ -75,6 +74,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private ProgressListener progressListener;
     private final Termination termination = new Termination();
     private final Object lock = new Object();
+    private final CopyOnWriteArrayList<List<String>> hashes = new CopyOnWriteArrayList<List<String>>();
 
     private void info(String message) {
         if (feedback != null) {
@@ -199,6 +199,16 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             }
             info(Thread.currentThread().getName() + " about to consume");
             consumer.run();
+
+            File hashesFile = new File(outputDir, "hash.csv");
+            try(Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(hashesFile)))) {
+                for(List<String> hashLine : hashes) {
+                    String line = hashLine.stream().collect(Collectors.joining(","));
+                    writer.write(line);
+                    writer.write('\n');
+                }
+                writer.flush();
+            }
         }
         catch (Exception e) {
             termination.dueToException(e);
@@ -409,6 +419,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         @Override
         public void run() {
+            final ArrayList localHashes = new ArrayList<List<String>>();
+
             try {
                 while (termination.notYet()) {
                     MetadataRecord record = metadataParserRunner.nextRecord();
@@ -424,7 +436,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         }
 
                         if (node == null) continue;
+
+
+
                         MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, MappingRunner.getRecDefTree());
+                        localHashes.add(Arrays.asList(record.getId(), record.sha256(), result.sha256(), "new"));
                         validateRDF(record, result);
                         List<String> uriErrors = result.getUriErrors();
                         try {
@@ -477,6 +493,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             catch (Exception e) {
                 termination.dueToException(e);
             } finally {
+                hashes.addAll(localHashes);
                 isDone = true;
             }
         }

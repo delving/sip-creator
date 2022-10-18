@@ -21,11 +21,13 @@
 
 package eu.delving.metadata;
 
+import eu.delving.groovy.Utils;
 import eu.delving.groovy.XmlSerializer;
 import org.apache.jena.rdf.model.Model;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
@@ -57,6 +59,10 @@ public class MappingResult {
         this.localId = localId;
         this.root = root;
         this.recDefTree = recDefTree;
+    }
+
+    public String sha256() throws TransformerException {
+        return Utils.sha256(root);
     }
 
     public String getLocalId() {

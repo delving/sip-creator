@@ -84,6 +84,30 @@ public class GroovyNode {
         setNodeValue(nodeValue);
     }
 
+    public String sha256() {
+        StringBuilder builder = new StringBuilder();
+        sha256(builder);
+        return Utils.sha256(builder.toString());
+    }
+
+    public void sha256(StringBuilder builder) {
+        builder.append(qName.getPrefix());
+        builder.append(qName.getLocalPart());
+        builder.append(qName.getNamespaceURI());
+        builder.append(qName.getQualifiedName());
+
+        builder.append(text);
+
+        for (Map.Entry<String, String> entry : attributes.entrySet()) {
+            builder.append(entry.getKey());
+            builder.append(entry.getValue());
+        }
+
+        for (GroovyNode child : children) {
+            child.sha256(builder);
+        }
+    }
+
     public Map<String, String> attributes() {
         return attributes;
     }
