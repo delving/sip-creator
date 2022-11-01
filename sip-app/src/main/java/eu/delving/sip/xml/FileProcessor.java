@@ -46,6 +46,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Validator;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -74,7 +75,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private ProgressListener progressListener;
     private final Termination termination = new Termination();
     private final Object lock = new Object();
-    private final CopyOnWriteArrayList<List<String>> hashes = new CopyOnWriteArrayList<List<String>>();
+    private final List<List<String>> hashes = new CopyOnWriteArrayList<>();
+    private final Map<String, List<String>> previousHashes = new HashMap<>();
 
     private void info(String message) {
         if (feedback != null) {
@@ -165,6 +167,14 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             ReportWriter reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
 
             File outputDir = createEmptyOutputDir();
+            java.nio.file.Path inputHashes = new File(dataSet.getSipFile(), "hash.csv").toPath();
+            if (Files.exists(inputHashes)) {
+                for (String line : Files.readAllLines(inputHashes)) {
+                    String[] parts = line.split(",");
+                    previousHashes.put(parts[0], Arrays.asList(parts[0], parts[1], parts[2], parts[3], parts[4]));
+                }
+            }
+
 
             Consumer consumer = new Consumer(reportWriter);
             int engineCount = (int) Math.round(Runtime.getRuntime().availableProcessors() * 1.1);
@@ -200,13 +210,55 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             info(Thread.currentThread().getName() + " about to consume");
             consumer.run();
 
-            File hashesFile = new File(outputDir, "hash.csv");
+            String now = Long.toString(System.currentTimeMillis());
+
+            File hashesFile = new File(dataSet.getSipFile(), "hash.csv");
             try(Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(hashesFile)))) {
-                for(List<String> hashLine : hashes) {
-                    String line = hashLine.stream().collect(Collectors.joining(","));
+
+                Set<String> hubIdentifiers = new HashSet<>();
+                for (List<String> hashLine : hashes) {
+                    String hubID = hashLine.get(0);
+                    String inputHash = hashLine.get(1);
+                    String outputHash = hashLine.get(2);
+                    String modified = now;
+
+                    String status = "new";
+                    List<String> prev = previousHashes.get(hubID);
+                    if (prev != null) {
+                        String prevInputHash = prev.get(1);
+                        String prevOutputHash = prev.get(2);
+                        if (!inputHash.equals(prevInputHash)) {
+                            status = "input_modified";
+                        } else if (!outputHash.equals(prevOutputHash)) {
+                            status = "output_modified";
+                        } else {
+                            status = "identical";
+                            modified = prev.get(3);
+                        }
+                    }
+
+                    hubIdentifiers.add(hubID);
+
+                    String line = String.format("%s,%s,%s,%s,%s", hubID, inputHash, outputHash, modified, status);
                     writer.write(line);
                     writer.write('\n');
                 }
+
+                for(Map.Entry<String, List<String>> entry : previousHashes.entrySet()) {
+                    if(!hubIdentifiers.contains(entry.getKey())) {
+                        List<String> prev = entry.getValue();
+                        String hubID = prev.get(0);
+                        String inputHash = prev.get(1);
+                        String outputHash = prev.get(2);
+                        String deleted = Long.toString(System.currentTimeMillis());
+                        String status = "deleted";
+
+                        String line = String.format("%s,%s,%s,%s,%s", hubID, inputHash, outputHash, deleted, status);
+                        writer.write(line);
+                        writer.write('\n');
+                    }
+                }
+
                 writer.flush();
             }
         }
@@ -440,7 +492,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
 
                         MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, MappingRunner.getRecDefTree());
-                        localHashes.add(Arrays.asList(record.getId(), record.sha256(), result.sha256(), "new"));
+
+                        String orgID = dataSet.getDataSetFacts().get("orgId");
+                        String hubID = String.format("%s_%s_%s", orgID, dataSet.getSpec(), record.getId());
+                        List<String> line = Arrays.asList(hubID, record.sha256(), result.sha256());
+                        localHashes.add(line);
                         validateRDF(record, result);
                         List<String> uriErrors = result.getUriErrors();
                         try {
