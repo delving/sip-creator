@@ -95,12 +95,16 @@ public class Utils {
         }
     }
 
-    public static String sha256(Node node) throws TransformerException {
+    public static String sha256(Node node) {
         DOMSource dom = new DOMSource(node);
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        StreamResult streamResult = new StreamResult(new OutputStreamWriter(buffer));
-        transformer.transform(dom, streamResult);
-        return sha256(buffer.toByteArray());
+        try {
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            StreamResult streamResult = new StreamResult(new OutputStreamWriter(buffer));
+            transformer.transform(dom, streamResult);
+            return sha256(buffer.toByteArray());
+        } catch (TransformerException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

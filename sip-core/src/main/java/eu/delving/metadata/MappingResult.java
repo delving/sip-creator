@@ -61,7 +61,7 @@ public class MappingResult {
         this.recDefTree = recDefTree;
     }
 
-    public String sha256() throws TransformerException {
+    public String sha256() {
         return Utils.sha256(root);
     }
 

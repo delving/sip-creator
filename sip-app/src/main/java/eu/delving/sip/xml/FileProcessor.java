@@ -30,8 +30,6 @@ import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.ReportWriter;
 import eu.delving.sip.model.Feedback;
-import eu.delving.sip.model.SipModel;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RiotException;
 import org.w3c.dom.Node;
@@ -39,10 +37,7 @@ import org.w3c.dom.Node;
 import javax.swing.*;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Validator;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -51,9 +46,7 @@ import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.stream.Collectors;
-
-import static eu.delving.sip.files.Storage.XSD_VALIDATION;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Process an input file, mapping it to output records which are validated and used to gather statistics.
@@ -157,6 +150,23 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         progressListener.setProgressMessage("Map, validate, gather stats");
     }
 
+    private String getStatus(String hubID, String inputHash, String outputHash) {
+        String status = "new";
+        List<String> prev = previousHashes.get(hubID);
+        if (prev != null) {
+            String prevInputHash = prev.get(1);
+            String prevOutputHash = prev.get(2);
+            if (!inputHash.equals(prevInputHash)) {
+                status = "input_modified";
+            } else if (!outputHash.equals(prevOutputHash)) {
+                status = "output_modified";
+            } else {
+                status = "identical";
+            }
+        }
+        return status;
+    }
+
     @Override
     public void run() {
         groovyCodeResource.clearMappingScripts();
@@ -184,6 +194,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             MappingRunner MappingRunner = new BulkMappingRunner(recMapping, code);
             List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
 
+            PocketWriter pocketWriter = new PocketWriter(outputDir, recDef().getNamespaceMap(), reportWriter);
+
             MetadataParserRunner metadataParserRunner = new MetadataParserRunner(parser);
             metadataParserRunner.start();
             for (int walk = 0; walk < engineCount; walk++) {
@@ -202,8 +214,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     recDef().getNamespaceMap(),
                     reportWriter,
                     assertionTests,
-                    MappingRunner
-                );
+                    MappingRunner,
+                    pocketWriter);
                 consumer.register(engine);
                 engine.start();
             }
@@ -222,19 +234,10 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     String outputHash = hashLine.get(2);
                     String modified = now;
 
-                    String status = "new";
-                    List<String> prev = previousHashes.get(hubID);
-                    if (prev != null) {
-                        String prevInputHash = prev.get(1);
-                        String prevOutputHash = prev.get(2);
-                        if (!inputHash.equals(prevInputHash)) {
-                            status = "input_modified";
-                        } else if (!outputHash.equals(prevOutputHash)) {
-                            status = "output_modified";
-                        } else {
-                            status = "identical";
-                            modified = prev.get(3);
-                        }
+                    String status = getStatus(hubID, inputHash, outputHash);
+                    if (status.equals("identical")) {
+                        List<String> prev = previousHashes.get(hubID);
+                        modified = prev.get(3);
                     }
 
                     hubIdentifiers.add(hubID);
@@ -275,12 +278,13 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             if(!outputDir.mkdir()) {
                 throw new IllegalStateException("Unable to create directory: " + outputDir);
             }
-        } else {
-            File[] files = Objects.requireNonNull(outputDir.listFiles());
-            for (File file : files) {
-                if (!file.delete()) throw new IllegalStateException("Unable to delete file: " + file);
-            }
         }
+//        else {
+//            File[] files = Objects.requireNonNull(outputDir.listFiles());
+//            for (File file : files) {
+//                if (!file.delete()) throw new IllegalStateException("Unable to delete file: " + file);
+//            }
+//        }
         return outputDir;
     }
 
@@ -407,8 +411,40 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
     }
 
+    private class PocketWriter implements Runnable {
+
+        private final File outputDir;
+        private final BlockingQueue<MappingOutput> queue = new LinkedBlockingQueue<>();
+        private final Map<String, RecDef.Namespace> namespaceMap;
+        private final ReportWriter reportWriter;
+
+        private PocketWriter(File outputDir, Map<String, RecDef.Namespace> namespaceMap, ReportWriter reportWriter) {
+            this.outputDir = outputDir;
+            this.namespaceMap = namespaceMap;
+            this.reportWriter = reportWriter;
+        }
+
+        @Override
+        public void run() {
+            File outputFile = new File(outputDir, "output.xml");
+
+            MappingOutput mappingOutput;
+            try {
+                XmlOutput xmlOutput = new XmlOutput(outputFile, namespaceMap);
+                while ((mappingOutput = queue.take()) != null) {
+                    mappingOutput.record(reportWriter, xmlOutput);
+                }
+                xmlOutput.finish(false);
+                Files.copy(outputFile.toPath(), outputFile.getParentFile().toPath().resolve(System.currentTimeMillis() + ".xml"));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     private class MappingEngine implements Runnable {
         private final MetadataParserRunner metadataParserRunner;
+        private final ArrayList localHashes = new ArrayList<List<String>>();
         private final Validator validator;
         private final boolean allowInvalid;
         private final Termination termination;
@@ -422,6 +458,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         final  ReportWriter reportWriter;
         final List<AssertionTest> assertionTests;
         final MappingRunner MappingRunner;
+        final PocketWriter pocketWriter;
 
         private MappingEngine(int index,
                               MetadataParserRunner metadataParserRunner,
@@ -431,8 +468,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                               Map<String, RecDef.Namespace> namespaceMap,
                               ReportWriter reportWriter,
                               List<AssertionTest> assertionTests,
-                              MappingRunner MappingRunner
-        ) {
+                              MappingRunner MappingRunner,
+                              PocketWriter pocketWriter) {
             this.metadataParserRunner = metadataParserRunner;
             this.validator = validator;
             this.allowInvalid = allowInvalid;
@@ -442,6 +479,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             this.reportWriter = reportWriter;
             this.assertionTests = assertionTests;
             this.MappingRunner = MappingRunner;
+            this.pocketWriter = pocketWriter;
             this.thread = new Thread(this);
             this.thread.setName("MappingEngine" + index);
         }
@@ -451,28 +489,35 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
 
         public void accept(MetadataRecord metadataRecord, MappingResult mappingResult, Exception exception) {
-            try {
-                MappingOutput mappingOutput = new MappingOutput(metadataRecord, mappingResult, exception);
-                recordCount++;
-                if (mappingOutput.exception == null) {
-                    validCount++;
-                }
+            MappingOutput mappingOutput = new MappingOutput(metadataRecord, mappingResult, exception);
+            recordCount++;
+            if (mappingOutput.exception == null) {
+                validCount++;
 
-                if(Application.canWritePocketFiles()) {
-                    File outputFile = new File(outputDir, mappingOutput.metadataRecord.getRecordNumber() + ".xml");
-                    XmlOutput xmlOutput = new XmlOutput(outputFile, namespaceMap);
-                    mappingOutput.record(reportWriter, xmlOutput);
-                    xmlOutput.finish(false);
+                String orgID = dataSet.getDataSetFacts().get("orgId");
+                String hubID = String.format("%s_%s_%s", orgID, dataSet.getSpec(), metadataRecord.getId());
+                String inputHash = metadataRecord.sha256();
+                String outputHash = mappingResult.sha256();
+
+                List<String> line = Arrays.asList(hubID, inputHash, outputHash);
+                localHashes.add(line);
+
+                String status = getStatus(hubID, inputHash, outputHash);
+                if (!status.equals("identical") && Application.canWritePocketFiles()) {
+                    pocketWriter.queue.add(mappingOutput);
                 }
-            } catch (XMLStreamException | IOException e) {
-                termination.dueToException(e);
             }
+
+//                if(Application.canWritePocketFiles()) {
+//                    File outputFile = new File(outputDir, mappingOutput.metadataRecord.getRecordNumber() + ".xml");
+//                    XmlOutput xmlOutput = new XmlOutput(outputFile, namespaceMap);
+//                    mappingOutput.record(reportWriter, xmlOutput);
+//                    xmlOutput.finish(false);
+//                }
         }
 
         @Override
         public void run() {
-            final ArrayList localHashes = new ArrayList<List<String>>();
-
             try {
                 while (termination.notYet()) {
                     MetadataRecord record = metadataParserRunner.nextRecord();
@@ -492,11 +537,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
 
                         MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, MappingRunner.getRecDefTree());
-
-                        String orgID = dataSet.getDataSetFacts().get("orgId");
-                        String hubID = String.format("%s_%s_%s", orgID, dataSet.getSpec(), record.getId());
-                        List<String> line = Arrays.asList(hubID, record.sha256(), result.sha256());
-                        localHashes.add(line);
                         validateRDF(record, result);
                         List<String> uriErrors = result.getUriErrors();
                         try {
