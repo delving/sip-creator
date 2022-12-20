@@ -184,6 +184,10 @@ public class RecDef {
     }
 
     private Map<String, Elem> resolveTemplates() {
+        if(templates == null) {
+            return new HashMap<>();
+        }
+
         Map<String, Elem> templatesByTag = new HashMap<>();
         for (Elem template : templates) {
             templatesByTag.put(template.tag.toString(), template);
