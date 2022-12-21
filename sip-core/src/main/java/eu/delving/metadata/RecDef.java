@@ -61,8 +61,6 @@ import java.util.TreeMap;
  * Bookmarks are a mechanism which provides for more easy navigation of elaborate record definitions
  * which are hard to work with due to their size.  Each bookmark can also include its own documentation,
  * which can instruct the mapper how to use the element to which it refers.
- *
- *
  */
 
 @XStreamAlias("record-definition")
@@ -81,8 +79,7 @@ public class RecDef {
             RecDef recDef = (RecDef) XStreamFactory.getStreamFor(RecDef.class).fromXML(inReader);
             recDef.resolve();
             return recDef;
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -118,6 +115,8 @@ public class RecDef {
 
     @XStreamAlias("elem-groups")
     public List<ElemGroup> elemGroups;
+
+    public List<Elem> templates;
 
     public Elem root;
 
@@ -184,12 +183,41 @@ public class RecDef {
         return String.format("RecDef(%s/%s)", prefix, version);
     }
 
+    private Map<String, Elem> resolveTemplates() {
+        if(templates == null) {
+            return new HashMap<>();
+        }
+
+        Map<String, Elem> templatesByTag = new HashMap<>();
+        for (Elem template : templates) {
+            templatesByTag.put(template.tag.toString(), template);
+        }
+
+        for (Elem template : templates) {
+
+            if (template.target != null) {
+
+                String[] targets = template.target.split(",");
+                for (String target : targets) {
+                    Elem targetTemplate = templatesByTag.get(target);
+                    if (targetTemplate == null) {
+                        throw new IllegalStateException("Unable to locate template with tag=" + target);
+                    }
+                }
+            }
+        }
+        return templatesByTag;
+    }
+
     private void resolve() {
         if (prefix == null || version == null) throw new RuntimeException("Prefix and/or version missing");
         if (attrs != null) for (Attr attr : attrs) attr.tag = attr.tag.defaultPrefix(prefix);
         if (attrGroups != null) for (AttrGroup attrGroup : attrGroups) attrGroup.resolve(this);
         if (elems != null) for (Elem elem : elems) elem.tag = elem.tag.defaultPrefix(prefix);
-        root.resolve(Path.create(), this);
+
+        Map<String, Elem> templatesByTag = resolveTemplates();
+        root.resolve(Path.create(), this, templatesByTag);
+
         if (docs != null) for (Doc doc : docs) doc.resolve(this);
         if (opts != null) for (OptList optList : opts) optList.resolve(this);
     }
@@ -491,6 +519,9 @@ public class RecDef {
         @XStreamOmitField
         public boolean subelementsAdded;
 
+        @XStreamAsAttribute
+        public String target;
+
         @Override
         public String toString() {
             return tag.toString();
@@ -519,7 +550,7 @@ public class RecDef {
             return null;
         }
 
-        public void resolve(Path path, RecDef recDef) {
+        public void resolve(Path path, RecDef recDef, Map<String, Elem> templatesByTag) {
             if (tag == null) throw new RuntimeException("Null tag at: " + path);
             path = path.child(tag);
             tag = tag.defaultPrefix(recDef.prefix);
@@ -555,7 +586,19 @@ public class RecDef {
                 elemList.addAll(subelements);
                 subelementsAdded = true;
             }
-            for (Elem elem : elemList) elem.resolve(path, recDef);
+
+            if (target != null) {
+                String[] targets = target.split(",");
+                for (String target : targets) {
+                    Elem template = templatesByTag.get(target);
+                    if (template == null) {
+                        throw new IllegalStateException("Unable to find template with tag=" + target);
+                    }
+                    elemList.add(template.deepCopy());
+                }
+            }
+
+            for (Elem elem : elemList) elem.resolve(path, recDef, templatesByTag);
         }
 
         public Elem deepCopy() {
