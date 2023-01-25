@@ -590,9 +590,12 @@ public class RecDef {
             if (target != null) {
                 String[] targets = target.split(",");
                 for (String target : targets) {
+                    if(target.isEmpty()) {
+                        continue;
+                    }
                     Elem template = templatesByTag.get(target);
                     if (template == null) {
-                        throw new IllegalStateException("Unable to find template with tag=" + target);
+                        throw new IllegalStateException("Unable to locate template with tag=" + target);
                     }
                     elemList.add(template.deepCopy());
                 }
