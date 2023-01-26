@@ -1,6 +1,10 @@
 # Changelog
 
 ## unreleased
+
+### Fixed
+
+- empty template targets in RecDef are now allowed [[GH-528]](https://github.com/delving/sip-creator/pull/528)
  
 - history of changes: see https://github.com/delving/sip-creator/compare/sip-creator-v1.2.8...master
 
