@@ -24,7 +24,7 @@
     <artifactId>sip-core</artifactId>
     <packaging>jar</packaging>
     <name>SIP-Core</name>
-    <version>1.2.8</version>
+    <version>1.2.9</version>
     <parent>
         <groupId>eu.delving</groupId>
         <artifactId>sip-creator</artifactId>
