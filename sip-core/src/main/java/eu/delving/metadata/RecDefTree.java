@@ -71,6 +71,7 @@ public class RecDefTree implements RecDefNodeListener {
         this.recDef = recDef;
         this.root = RecDefNode.create(this, recDef);
         this.pathContext = new RecDefNamespaceContext(recDef.namespaces);
+        System.out.println("hi");
     }
 
     public void setListener(RecDefNodeListener listener) {
@@ -155,5 +156,10 @@ public class RecDefTree implements RecDefNodeListener {
 
     private XPath createPath() {
         return XMLToolFactory.xpath(pathContext);
+    }
+
+    public interface SourceTree {
+
+        boolean contains(NodeMapping nodeMapping);
     }
 }

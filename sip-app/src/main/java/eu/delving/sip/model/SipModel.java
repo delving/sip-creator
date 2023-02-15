@@ -289,6 +289,8 @@ public class SipModel {
                     dataSetFacts.set(facts);
                     statsModel.getHintsModel().set(hints);
                     statsModel.setStatistics(stats);
+                    recMapping.validateMappings(new StatsModel.SourceTreeImpl(statsModel));
+                    dataSetModel.getMappingModel().setRecMapping(recMapping);
                     exec(new Work() {
                         @Override
                         public void run() {

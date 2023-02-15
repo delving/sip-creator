@@ -100,6 +100,10 @@ public class RecMapping {
         this.recDefTree = recDefTree;
         // add the node mappings harvest from the record definition
         recDefTree.getRoot().collectNodeMappings(nodeMappings);
+        System.out.println(recDefTree);
+        for (NodeMapping nm : nodeMappings) {
+            System.out.println(nm.inputPath);
+        }
     }
 
     public String getPrefix() {
@@ -207,6 +211,26 @@ public class RecMapping {
         }
     }
 
+    public void validateMappings(RecDefTree.SourceTree sourceTree) {
+        for(NodeMapping nm : recDefTree.getNodeMappings()) {
+            RecDefNode node = recDefTree.getRecDefNode(nm.outputPath);
+            System.out.println(nm + ", in: " + nm.inputPath + "; out: " + nm.outputPath + "=" + node);
+            if(node == null) {
+                System.out.println(nm + ", in: " + nm.inputPath + "; out: " + nm.outputPath + "=" + node);
+            }
+            if(!sourceTree.contains(nm)) {
+                nm.inputPathMissing = true;
+                System.out.println("[BAD]: " + nm + ", in: " + nm.inputPath + "; out: " + nm.outputPath);
+                if (node != null) {
+                    node.inputPathMissing = true;
+                }
+                // throw new IllegalStateException("ah!");
+            } else {
+                System.out.println("[OK]: " + nm + ", in: " + nm.inputPath + "; out: " + nm.outputPath);
+            }
+        }
+    }
+
     public static RecMapping create(RecDefTree recDefTree) throws MetadataException {
         RecMapping recMapping = new RecMapping(recDefTree);
         recMapping.resolve();
@@ -222,6 +246,7 @@ public class RecMapping {
     }
 
     public static RecMapping read(File file, RecDefModel recDefModel) throws MetadataException {
+        System.out.println(file);
         InputStream is = null;
         try {
             is = new FileInputStream(file);

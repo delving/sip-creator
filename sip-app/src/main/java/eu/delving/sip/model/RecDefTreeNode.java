@@ -93,6 +93,9 @@ public class RecDefTreeNode extends FilterNode {
 
     @Override
     public String getStringToFilter() {
+        if (recDefNode.isRequired()) {
+            return recDefNode.getTag() + " <required>";
+        }
         return recDefNode.getTag().toString();
     }
 
@@ -113,6 +116,9 @@ public class RecDefTreeNode extends FilterNode {
     }
 
     public String toString() {
+        if (recDefNode.requiresNodeMappings()) {
+            return recDefNode.toString() + " <required>";
+        }
         return recDefNode.toString();
     }
 
@@ -235,10 +241,19 @@ public class RecDefTreeNode extends FilterNode {
 
         private void setColor(boolean selected, RecDefTreeNode node) {
             Color color = node.isHighlighted() ? HIGHLIGHTED_COLOR : MAPPED_COLOR;
+
             if (selected) {
                 setOpaque(false);
                 setBackground(Color.WHITE);
                 setForeground(color);
+            }  else if(node.recDefNode.requiresNodeMappings()) {
+                setOpaque(true);
+                setBackground(Color.YELLOW);
+                setForeground(Color.BLACK);
+            }else if (node.recDefNode.inputPathMissing) {
+                setOpaque(true);
+                setBackground(Color.RED);
+                setForeground(Color.WHITE);
             }
             else {
                 setOpaque(true);
@@ -248,7 +263,12 @@ public class RecDefTreeNode extends FilterNode {
         }
 
         private void markNodeMappings(RecDefTreeNode node) {
-            setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), getCommaList(node)));
+            String text = String.format("<html><b>%s</b> &larr; %s", node.toString(), getCommaList(node));
+            if (node.recDefNode.requiresNodeMappings()) {
+                setText(text + " [required]");
+            } else {
+                setText(text);
+            }
         }
 
         private String getCommaList(RecDefTreeNode node) {
