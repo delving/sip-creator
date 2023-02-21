@@ -67,7 +67,6 @@ public class DataSetModel implements RecDefModel {
         statsModel = new StatsModel(sipModel);
         this.mappingModel = new MappingModel(sipModel);
         stateCheckTimer = new StateCheckTimer(sipModel);
-        System.out.println(statsModel);
     }
 
     public void shutdown() {
