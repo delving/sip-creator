@@ -214,19 +214,12 @@ public class RecMapping {
     public void validateMappings(RecDefTree.SourceTree sourceTree) {
         for(NodeMapping nm : recDefTree.getNodeMappings()) {
             RecDefNode node = recDefTree.getRecDefNode(nm.outputPath);
-            System.out.println(nm + ", in: " + nm.inputPath + "; out: " + nm.outputPath + "=" + node);
-            if(node == null) {
-                System.out.println(nm + ", in: " + nm.inputPath + "; out: " + nm.outputPath + "=" + node);
-            }
             if(!sourceTree.contains(nm)) {
                 nm.inputPathMissing = true;
-                System.out.println("[BAD]: " + nm + ", in: " + nm.inputPath + "; out: " + nm.outputPath);
+                System.err.println("[BAD]: input path is missing for '" + nm + ", in: " + nm.inputPath + "; out: " + nm.outputPath + "'");
                 if (node != null) {
                     node.inputPathMissing = true;
                 }
-                // throw new IllegalStateException("ah!");
-            } else {
-                System.out.println("[OK]: " + nm + ", in: " + nm.inputPath + "; out: " + nm.outputPath);
             }
         }
     }
