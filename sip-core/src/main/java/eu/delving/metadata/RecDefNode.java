@@ -73,6 +73,11 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return elem != null && elem.required;
     }
 
+    public boolean isSimple() {
+        System.out.println("is simple: " + elem);
+        return elem != null && elem.simple;
+    }
+
     public boolean requiresNodeMappings() {
         Map<Path, NodeMapping> nodeMappings = getNodeMappings();
         if(!isRequired()) {

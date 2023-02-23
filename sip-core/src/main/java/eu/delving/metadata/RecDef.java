@@ -385,6 +385,9 @@ public class RecDef {
         public boolean required;
 
         @XStreamAsAttribute
+        public boolean simple;
+
+        @XStreamAsAttribute
         public boolean uriCheck;
 
         @XStreamAsAttribute
@@ -469,6 +472,9 @@ public class RecDef {
 
         @XStreamAsAttribute
         public boolean required;
+
+        @XStreamAsAttribute
+        public boolean simple;
 
         @XStreamAsAttribute
         public boolean singular;

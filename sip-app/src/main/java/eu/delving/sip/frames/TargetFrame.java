@@ -39,8 +39,7 @@ import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.*;
 
-import static eu.delving.sip.base.KeystrokeHelper.MENU_E;
-import static eu.delving.sip.base.KeystrokeHelper.configAction;
+import static eu.delving.sip.base.KeystrokeHelper.*;
 import static eu.delving.sip.base.SwingHelper.scrollVH;
 
 /**
@@ -84,6 +83,7 @@ public class TargetFrame extends FrameBase {
         treePanel.add(scrollVH("Record Definition", recDefTree));
         JMenu view = new JMenu("View");
         view.add(new ExpandRootAction());
+        view.add(new SimpleOnlyAction());
         view.add(hideAttributes);
         view.add(autoFold);
         JMenuBar bar = new JMenuBar();
@@ -267,6 +267,22 @@ public class TargetFrame extends FrameBase {
                 mappingModel.getRecDefTreeRoot().getRecDefTreeNode(node).fireChanged();
             }
         });
+    }
+
+    private class SimpleOnlyAction extends AbstractAction {
+
+        private SimpleOnlyAction() {
+            configAction(this, "Expand simple nodes", null, MENU_S);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
+            if (root != null) {
+                root.setSimpleOnly(true);
+                recDefTree.collapsePath(root.getRecDefPath());
+            }
+        }
     }
 
     private class ExpandRootAction extends AbstractAction {
