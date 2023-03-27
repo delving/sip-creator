@@ -30,6 +30,7 @@ import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaVersion;
+import eu.delving.sip.Application;
 import eu.delving.sip.base.NodeTransferHandler;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;
@@ -42,6 +43,7 @@ import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.sip.xml.FileProcessor;
 import eu.delving.sip.xml.MetadataParser;
 import eu.delving.stats.Stats;
+import org.apache.jena.riot.RDFFormat;
 
 import javax.swing.*;
 import java.io.UnsupportedEncodingException;
@@ -384,7 +386,8 @@ public class SipModel {
             allowInvalid,
             groovyCodeResource,
             new Generator(narthexUrl, dataSet.getSpec(), getMappingModel().getPrefix()),
-            listener
+            listener,
+            Application.getRDFFormat()
         ));
     }
 

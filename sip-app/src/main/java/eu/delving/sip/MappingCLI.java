@@ -11,6 +11,7 @@ import eu.delving.sip.cli.CLIProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.xml.FileProcessor;
+import org.apache.jena.riot.RDFFormat;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -136,7 +137,8 @@ public class MappingCLI {
             false,
             groovyCodeResource,
             uriGenerator,
-            new CLIProcessorListener()
+            new CLIProcessorListener(),
+            RDFFormat.RDFXML
         );
         fileProcessor.setProgressListener(new CLIProgressListener());
         fileProcessor.run();

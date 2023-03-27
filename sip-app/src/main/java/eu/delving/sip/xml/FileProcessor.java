@@ -33,6 +33,7 @@ import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RiotException;
 import org.w3c.dom.Node;
 
@@ -46,6 +47,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +77,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private ProgressListener progressListener;
     private final Termination termination = new Termination();
     private final Object lock = new Object();
+    private RDFFormat rdfFormat;
 
     private void info(String message) {
         if (feedback != null) {
@@ -106,7 +109,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             boolean allowInvalid,
             GroovyCodeResource groovyCodeResource,
             UriGenerator uriGenerator,
-            Listener listener
+            Listener listener,
+            RDFFormat rdfFormat
     ) {
         this.feedback = feedback;
         this.enableXSDValidation = enableXSDValidation;
@@ -116,6 +120,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         this.groovyCodeResource = groovyCodeResource;
         this.uriGenerator = uriGenerator;
         this.listener = listener;
+        this.rdfFormat = rdfFormat;
     }
 
     public String getSpec() {
@@ -397,10 +402,16 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 }
 
                 if(Application.canWritePocketFiles()) {
-                    File outputFile = new File(outputDir, mappingOutput.metadataRecord.getRecordNumber() + ".xml");
-                    XmlOutput xmlOutput = new XmlOutput(outputFile, namespaceMap);
-                    mappingOutput.record(reportWriter, xmlOutput);
-                    xmlOutput.finish(false);
+                    if(rdfFormat == RDFFormat.RDFXML) {
+                        File outputFile = new File(outputDir, mappingOutput.metadataRecord.getRecordNumber() + ".xml");
+                        XmlOutput xmlOutput = new XmlOutput(outputFile, namespaceMap);
+                        mappingOutput.record(reportWriter, xmlOutput);
+                        xmlOutput.finish(false);
+                    } else {
+                        File outputFile = new File(outputDir, mappingOutput.metadataRecord.getRecordNumber() + JenaHelper.getExtension(rdfFormat));
+                        String output = JenaHelper.convertRDF(mappingResult.toRDF(), rdfFormat);
+                        Files.write(outputFile.toPath(), output.getBytes(StandardCharsets.UTF_8));
+                    }
                 }
             } catch (XMLStreamException | IOException e) {
                 termination.dueToException(e);
