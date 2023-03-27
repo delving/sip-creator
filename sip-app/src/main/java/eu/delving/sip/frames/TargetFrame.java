@@ -271,15 +271,18 @@ public class TargetFrame extends FrameBase {
 
     private class SimpleOnlyAction extends AbstractAction {
 
+        private boolean simplyOnly = false;
+
         private SimpleOnlyAction() {
             configAction(this, "Expand simple nodes", null, MENU_S);
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            simplyOnly = !simplyOnly;
             RecDefTreeNode root = sipModel.getMappingModel().getRecDefTreeRoot();
             if (root != null) {
-                root.setSimpleOnly(true);
+                root.setSimpleOnly(simplyOnly);
                 recDefTree.collapsePath(root.getRecDefPath());
             }
         }
