@@ -114,7 +114,7 @@ public class MappingResult {
     }
 
     public static String toJenaCompliantRDF(String rdf) {
-        rdf = rdf.replaceAll("naa:RDF|edm:RDF|nant:RDF", "rdf:RDF");
+        rdf = rdf.replaceAll("naa:RDF|edm:RDF|nant:RDF|nkc:RDF", "rdf:RDF");
         rdf = rdf.replaceAll(" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"", "");
         rdf = rdf.replaceAll("<rdf:RDF ", "$0xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" ");
         return rdf;
