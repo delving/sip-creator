@@ -47,6 +47,7 @@ import static eu.delving.metadata.OptRole.ROOT;
  *
  */
 public class RecDefNode implements Comparable<RecDefNode> {
+    public boolean inputPathMissing;
     private RecDefNode parent;
     private Path path;
     private RecDef.Elem elem;
@@ -66,6 +67,23 @@ public class RecDefNode implements Comparable<RecDefNode> {
 
     public static RecDefNode create(RecDefNodeListener listener, RecDef recDef) {
         return new RecDefNode(listener, null, recDef.root, null, recDef.prefix, null, null); // only root element
+    }
+
+    public boolean isRequired() {
+        return elem != null && elem.required;
+    }
+
+    public boolean isSimple() {
+        System.out.println("is simple: " + elem);
+        return elem != null && elem.simple;
+    }
+
+    public boolean requiresNodeMappings() {
+        Map<Path, NodeMapping> nodeMappings = getNodeMappings();
+        if(!isRequired()) {
+            return false;
+        }
+        return nodeMappings == null || nodeMappings.isEmpty();
     }
 
     private RecDefNode(RecDefNodeListener listener, RecDefNode parent, RecDef.Elem elem, RecDef.Attr attr, String defaultPrefix, OptBox optBox, DynOpt dynOpt) {
@@ -367,5 +385,4 @@ public class RecDefNode implements Comparable<RecDefNode> {
         }
         return name;
     }
-
 }
