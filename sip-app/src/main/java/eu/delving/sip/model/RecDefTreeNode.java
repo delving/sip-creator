@@ -54,7 +54,6 @@ public class RecDefTreeNode extends FilterNode {
     private RecDefPath recDefPath;
     private Vector<RecDefTreeNode> children = new Vector<RecDefTreeNode>();
     private String html;
-    private boolean hidden;
 
     public static RecDefTreeNode create(RecDefNode recDefNode) {
         return new RecDefTreeNode(null, recDefNode);
@@ -73,20 +72,6 @@ public class RecDefTreeNode extends FilterNode {
         }
     }
 
-    public void setSimpleOnly(boolean simpleOnly) {
-        hidden = simpleOnly ? !recDefNode.isSimple() : false;
-        if(!children.isEmpty()) {
-            boolean allHidden = hidden;
-            for (RecDefTreeNode child : children) {
-                child.setSimpleOnly(simpleOnly);
-                if (!child.hidden) {
-                    allHidden = false;
-                }
-            }
-            hidden = allHidden;
-        }
-    }
-
     @Override
     public Object getParent() {
         return parent;
@@ -102,7 +87,7 @@ public class RecDefTreeNode extends FilterNode {
     }
 
     public Vector<RecDefTreeNode> getChildren() {
-        return new Vector<>(children.stream().filter(c -> !c.hidden).collect(Collectors.toSet()));
+        return children;
     }
 
     @Override

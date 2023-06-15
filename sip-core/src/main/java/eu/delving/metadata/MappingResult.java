@@ -53,6 +53,8 @@ public class MappingResult {
     private RecDefTree recDefTree;
 
     public MappingResult(XmlSerializer serializer, String localId, Node root, RecDefTree recDefTree) {
+        System.out.println(localId);
+        System.out.println(recDefTree.getRoot());
         this.serializer = serializer;
         this.localId = localId;
         this.root = root;
