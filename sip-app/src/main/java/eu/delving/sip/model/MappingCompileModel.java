@@ -451,7 +451,7 @@ public class MappingCompileModel {
             String syntaxStyle = outputDocument.getSyntaxStyle();
             if (error == null) {
                 try {
-                    output = JenaHelper.convertRDF(output, rdfFormat);
+                    output = JenaHelper.convertRDF(recMapping.getDefaultPrefix(), output, rdfFormat);
                 } catch (Throwable t) {
                     ByteArrayOutputStream errorBuffer = new ByteArrayOutputStream();
                     try(PrintWriter writer = new PrintWriter(errorBuffer)) {

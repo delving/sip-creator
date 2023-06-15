@@ -73,6 +73,10 @@ public class RecDefNode implements Comparable<RecDefNode> {
         return elem != null && elem.required;
     }
 
+    public String getDefaultPrefix() {
+        return defaultPrefix;
+    }
+
     public boolean isSimple() {
         return elem != null && elem.simple;
     }

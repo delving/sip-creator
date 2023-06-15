@@ -409,7 +409,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         xmlOutput.finish(false);
                     } else {
                         File outputFile = new File(outputDir, mappingOutput.metadataRecord.getRecordNumber() + JenaHelper.getExtension(rdfFormat));
-                        String output = JenaHelper.convertRDF(mappingResult.toRDF(), rdfFormat);
+                        String output = JenaHelper.convertRDF(mappingResult.getRecDefTree().getRoot().getDefaultPrefix(), mappingResult.toRDF(), rdfFormat);
                         Files.write(outputFile.toPath(), output.getBytes(StandardCharsets.UTF_8));
                     }
                 }
@@ -495,7 +495,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     private void validateRDF(MetadataRecord record, MappingResult result) {
         try {
-            String output = MappingResult.toJenaCompliantRDF(result.toRDF());
+            String output = MappingResult.toJenaCompliantRDF(result.getRecDefTree().getRoot().getDefaultPrefix(), result.toRDF());
             InputStream in = new ByteArrayInputStream(output.getBytes(StandardCharsets.UTF_8));
             ModelFactory.createDefaultModel().read(in, null, "RDF/XML");
         } catch (RiotException e) {

@@ -106,6 +106,10 @@ public class RecMapping {
         }
     }
 
+    public String getDefaultPrefix() {
+        return recDefTree.getRoot().getDefaultPrefix();
+    }
+
     public String getPrefix() {
         return prefix;
     }

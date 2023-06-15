@@ -15,15 +15,15 @@ import java.nio.charset.StandardCharsets;
 
 public class JenaHelper {
 
-    public static String convertRDF(Node node, RDFFormat outputFormat) {
+    public static String convertRDF(String defaultPrefix, Node node, RDFFormat outputFormat) {
         String rdf = new XmlSerializer().toXml(node, true);
-        return convertRDF(rdf, outputFormat);
+        return convertRDF(defaultPrefix, rdf, outputFormat);
     }
 
-    public static String convertRDF(String rdf, RDFFormat outputFormat) {
+    public static String convertRDF(String defaultPrefix, String rdf, RDFFormat outputFormat) {
         if (outputFormat == RDFFormat.RDFXML) return rdf;
 
-        byte[] out = convertRDFTo(rdf, outputFormat);
+        byte[] out = convertRDFTo(defaultPrefix, rdf, outputFormat);
         if (outputFormat == RDFFormat.JSONLD_COMPACT_FLAT) {
             return formatJSON(out);
         }
@@ -52,8 +52,8 @@ public class JenaHelper {
             .toJson(json);
     }
 
-    private static byte[] convertRDFTo(String rdf, RDFFormat outputFormat) {
-        String compliantRDF = MappingResult.toJenaCompliantRDF(rdf);
+    private static byte[] convertRDFTo(String defaultPrefix, String rdf, RDFFormat outputFormat) {
+        String compliantRDF = MappingResult.toJenaCompliantRDF(defaultPrefix, rdf);
         InputStream in = new ByteArrayInputStream(compliantRDF.getBytes(StandardCharsets.UTF_8));
         Model model = ModelFactory.createDefaultModel().read(in, null, "RDF/XML");
         ByteArrayOutputStream out = new ByteArrayOutputStream(2048);
