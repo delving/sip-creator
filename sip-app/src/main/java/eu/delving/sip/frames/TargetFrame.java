@@ -83,7 +83,8 @@ public class TargetFrame extends FrameBase {
         treePanel.add(scrollVH("Record Definition", recDefTree));
         JMenu view = new JMenu("View");
         view.add(new ExpandRootAction());
-        view.add(new SimpleOnlyAction());
+        // TODO fix simple mode
+        // view.add(new SimpleOnlyAction());
         view.add(hideAttributes);
         view.add(autoFold);
         JMenuBar bar = new JMenuBar();
