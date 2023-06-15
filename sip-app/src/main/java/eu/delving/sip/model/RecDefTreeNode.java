@@ -120,7 +120,6 @@ public class RecDefTreeNode extends FilterNode {
 
     public String toString() {
         String simple = recDefNode.isSimple() ? " simple" : "";
-        System.out.println(simple);
         if (recDefNode.requiresNodeMappings()) {
             return recDefNode.toString() + " <required>" + simple;
         }
