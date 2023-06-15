@@ -74,7 +74,6 @@ public class RecDefNode implements Comparable<RecDefNode> {
     }
 
     public boolean isSimple() {
-        System.out.println("is simple: " + elem);
         return elem != null && elem.simple;
     }
 
