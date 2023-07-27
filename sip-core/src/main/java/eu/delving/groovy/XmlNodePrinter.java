@@ -22,7 +22,7 @@
 package eu.delving.groovy;
 
 import groovy.util.IndentPrinter;
-import groovy.xml.QName;
+import groovy.namespace.QName;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.io.OutputStreamWriter;
