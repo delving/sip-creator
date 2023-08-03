@@ -243,7 +243,7 @@ public class RecMapping {
     }
 
     public static RecMapping read(File file, RecDefModel recDefModel) throws MetadataException {
-        System.out.println(file);
+        //System.out.println(file);
         InputStream is = null;
         try {
             is = new FileInputStream(file);
