@@ -100,10 +100,10 @@ public class RecMapping {
         this.recDefTree = recDefTree;
         // add the node mappings harvest from the record definition
         recDefTree.getRoot().collectNodeMappings(nodeMappings);
-        System.out.println(recDefTree);
-        for (NodeMapping nm : nodeMappings) {
-            System.out.println(nm.inputPath);
-        }
+        //System.out.println(recDefTree);
+        //for (NodeMapping nm : nodeMappings) {
+        //    System.out.println(nm.inputPath);
+        //}
     }
 
     public String getDefaultPrefix() {
