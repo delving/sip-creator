@@ -217,7 +217,7 @@ public class StatsModel {
         @Override
         public boolean contains(NodeMapping nodeMapping) {
             boolean containsNodeMapping = model.contains(nodeMapping);
-            System.out.println(nodeMapping + "=" + containsNodeMapping);
+            //System.out.println(nodeMapping + "=" + containsNodeMapping);
             return containsNodeMapping;
         }
     }
