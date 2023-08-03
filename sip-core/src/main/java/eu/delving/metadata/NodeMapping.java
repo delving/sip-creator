@@ -56,6 +56,7 @@ import static eu.delving.metadata.StringUtil.stringToLines;
 @XStreamAlias("node-mapping")
 public class NodeMapping {
 
+    @XStreamOmitField
     public boolean inputPathMissing;
 
     public static NodeMapping forConstant(String value) {
