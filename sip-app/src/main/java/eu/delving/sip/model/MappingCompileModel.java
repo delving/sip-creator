@@ -32,16 +32,7 @@ import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.AppMappingRunner;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlSerializer;
-import eu.delving.metadata.AssertionTest;
-import eu.delving.metadata.CodeGenerator;
-import eu.delving.metadata.EditPath;
-import eu.delving.metadata.MappingFunction;
-import eu.delving.metadata.MappingResult;
-import eu.delving.metadata.NodeMapping;
-import eu.delving.metadata.NodeMappingChange;
-import eu.delving.metadata.RecDefNode;
-import eu.delving.metadata.RecMapping;
-import eu.delving.metadata.StructureTest;
+import eu.delving.metadata.*;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
@@ -112,6 +103,7 @@ public class MappingCompileModel {
     private SipModel sipModel;
     private boolean trace;
     private List<AssertionTest> assertions;
+    private RDFFormat rdfFormat = RDFFormat.RDFXML;
 
     public enum Type {
         RECORD("record mapping"),
@@ -147,9 +139,10 @@ public class MappingCompileModel {
         });
     }
 
-    public void setOutputDocument(String style, RSyntaxTextArea outputArea) {
+    public void setOutputDocument(String style, RSyntaxTextArea outputArea, RDFFormat rdfFormat) {
         outputDocument = new RSyntaxDocument(style);
         this.outputArea = outputArea;
+        this.rdfFormat = rdfFormat;
     }
 
     public void setEnabled(boolean enabled) {
@@ -456,21 +449,9 @@ public class MappingCompileModel {
         private void compilationComplete(Completion completion, Node node, String error) {
             String output = node == null ? "No XML" : serializer.toXml(node, true);
             String syntaxStyle = outputDocument.getSyntaxStyle();
-            if (error == null && syntaxStyle.equals(SyntaxConstants.SYNTAX_STYLE_JSON)) {
+            if (error == null) {
                 try {
-                    output = MappingResult.toJenaCompliantRDF(output);
-                    InputStream in = new ByteArrayInputStream(output.getBytes(StandardCharsets.UTF_8));
-                    Model model = ModelFactory.createDefaultModel().read(in, null, "RDF/XML");
-
-                    ByteArrayOutputStream out = new ByteArrayOutputStream(2048);
-                    RDFDataMgr.write(out, model, RDFFormat.JSONLD_COMPACT_FLAT);
-
-                    Reader jsonReader = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()));
-                    JsonElement json = new JsonParser().parse(jsonReader);
-                    output = new GsonBuilder()
-                        .setPrettyPrinting()
-                        .create()
-                        .toJson(json);
+                    output = JenaHelper.convertRDF(recMapping.getDefaultPrefix(), output, rdfFormat);
                 } catch (Throwable t) {
                     ByteArrayOutputStream errorBuffer = new ByteArrayOutputStream();
                     try(PrintWriter writer = new PrintWriter(errorBuffer)) {

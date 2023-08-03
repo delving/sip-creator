@@ -100,6 +100,14 @@ public class RecMapping {
         this.recDefTree = recDefTree;
         // add the node mappings harvest from the record definition
         recDefTree.getRoot().collectNodeMappings(nodeMappings);
+        //System.out.println(recDefTree);
+        //for (NodeMapping nm : nodeMappings) {
+        //    System.out.println(nm.inputPath);
+        //}
+    }
+
+    public String getDefaultPrefix() {
+        return recDefTree.getRoot().getDefaultPrefix();
     }
 
     public String getPrefix() {
@@ -207,6 +215,19 @@ public class RecMapping {
         }
     }
 
+    public void validateMappings(RecDefTree.SourceTree sourceTree) {
+        for(NodeMapping nm : recDefTree.getNodeMappings()) {
+            RecDefNode node = recDefTree.getRecDefNode(nm.outputPath);
+            if(!sourceTree.contains(nm)) {
+                nm.inputPathMissing = true;
+                System.err.println("[BAD]: input path is missing for '" + nm + ", in: " + nm.inputPath + "; out: " + nm.outputPath + "'");
+                if (node != null) {
+                    node.inputPathMissing = true;
+                }
+            }
+        }
+    }
+
     public static RecMapping create(RecDefTree recDefTree) throws MetadataException {
         RecMapping recMapping = new RecMapping(recDefTree);
         recMapping.resolve();
@@ -222,6 +243,7 @@ public class RecMapping {
     }
 
     public static RecMapping read(File file, RecDefModel recDefModel) throws MetadataException {
+        //System.out.println(file);
         InputStream is = null;
         try {
             is = new FileInputStream(file);

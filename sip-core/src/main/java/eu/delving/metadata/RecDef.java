@@ -72,6 +72,7 @@ public class RecDef {
 
     public static final String DELVING_NAMESPACE_URI = "http://schemas.delving.eu/";
     public static final String DELVING_PREFIX = "delving";
+    public RecDefTree.SourceTree sourceTree;
 
     public static RecDef read(InputStream in) {
         try {
@@ -384,6 +385,9 @@ public class RecDef {
         public boolean required;
 
         @XStreamAsAttribute
+        public boolean simple;
+
+        @XStreamAsAttribute
         public boolean uriCheck;
 
         @XStreamAsAttribute
@@ -468,6 +472,9 @@ public class RecDef {
 
         @XStreamAsAttribute
         public boolean required;
+
+        @XStreamAsAttribute
+        public boolean simple;
 
         @XStreamAsAttribute
         public boolean singular;

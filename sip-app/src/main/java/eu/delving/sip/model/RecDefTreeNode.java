@@ -39,14 +39,13 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import static eu.delving.sip.base.SwingHelper.*;
 
 /**
  * Represent an element of a record definition in the tree, including an HTML representation and the associated
  * cell renderer.
- *
- *
  */
 
 public class RecDefTreeNode extends FilterNode {
@@ -93,12 +92,19 @@ public class RecDefTreeNode extends FilterNode {
 
     @Override
     public String getStringToFilter() {
+        if (recDefNode.isRequired()) {
+            return recDefNode.getTag() + " <required>";
+        }
         return recDefNode.getTag().toString();
     }
 
     @Override
     public boolean isAttr() {
         return recDefNode.isAttr();
+    }
+
+    public boolean isSimple() {
+        return recDefNode.isSimple();
     }
 
     @Override
@@ -113,7 +119,11 @@ public class RecDefTreeNode extends FilterNode {
     }
 
     public String toString() {
-        return recDefNode.toString();
+        String simple = recDefNode.isSimple() ? " simple" : "";
+        if (recDefNode.requiresNodeMappings()) {
+            return recDefNode.toString() + " <required>" + simple;
+        }
+        return recDefNode.toString() + simple;
     }
 
     public boolean hasChildElements() {
@@ -129,8 +139,7 @@ public class RecDefTreeNode extends FilterNode {
                 boolean pathShouldShow = pathToShow.equals(here) || pathToShow.isAncestorOf(here);
                 if (pathShouldShow) {
                     if (!tree.isExpanded(getRecDefPath())) tree.expandPath(getRecDefPath());
-                }
-                else if ((here.size() <= pathToShow.size() && !here.isAncestorOf(pathToShow)) && !tree.isCollapsed(getRecDefPath())) {
+                } else if ((here.size() <= pathToShow.size() && !here.isAncestorOf(pathToShow)) && !tree.isCollapsed(getRecDefPath())) {
                     tree.collapsePath(getRecDefPath());
                 }
                 for (RecDefTreeNode sub : children) if (!sub.recDefNode.isAttr()) sub.showPath(tree, pathToShow);
@@ -210,14 +219,11 @@ public class RecDefTreeNode extends FilterNode {
                 RecDefTreeNode node = (RecDefTreeNode) value;
                 if (node.recDefNode.isUnmappable()) {
                     setIcon(SwingHelper.ICON_UNMAPPABLE);
-                }
-                else if (node.recDefNode.isAttr()) {
+                } else if (node.recDefNode.isAttr()) {
                     setIcon(SwingHelper.ICON_ATTRIBUTE);
-                }
-                else if (node.hasChildElements()) {
+                } else if (node.hasChildElements()) {
                     setIcon(SwingHelper.ICON_COMPOSITE);
-                }
-                else {
+                } else {
                     setIcon(SwingHelper.ICON_VALUE);
                 }
                 if (node.recDefNode.isPopulated()) {
@@ -226,8 +232,7 @@ public class RecDefTreeNode extends FilterNode {
                 if (!node.recDefNode.getNodeMappings().isEmpty()) {
                     markNodeMappings(node);
                 }
-            }
-            else {
+            } else {
                 setIcon(SwingHelper.ICON_COMPOSITE);
             }
             return component;
@@ -235,12 +240,20 @@ public class RecDefTreeNode extends FilterNode {
 
         private void setColor(boolean selected, RecDefTreeNode node) {
             Color color = node.isHighlighted() ? HIGHLIGHTED_COLOR : MAPPED_COLOR;
+
             if (selected) {
                 setOpaque(false);
                 setBackground(Color.WHITE);
                 setForeground(color);
-            }
-            else {
+            } else if (node.recDefNode.requiresNodeMappings()) {
+                setOpaque(true);
+                setBackground(Color.YELLOW);
+                setForeground(Color.BLACK);
+            } else if (node.recDefNode.inputPathMissing) {
+                setOpaque(true);
+                setBackground(Color.RED);
+                setForeground(Color.WHITE);
+            } else {
                 setOpaque(true);
                 setBackground(color);
                 setForeground(Color.BLACK);
@@ -248,7 +261,12 @@ public class RecDefTreeNode extends FilterNode {
         }
 
         private void markNodeMappings(RecDefTreeNode node) {
-            setText(String.format("<html><b>%s</b> &larr; %s", node.toString(), getCommaList(node)));
+            String text = String.format("<html><b>%s</b> &larr; %s", node.toString(), getCommaList(node));
+            if (node.recDefNode.requiresNodeMappings()) {
+                setText(text + " [required]");
+            } else {
+                setText(text);
+            }
         }
 
         private String getCommaList(RecDefTreeNode node) {
@@ -257,8 +275,7 @@ public class RecDefTreeNode extends FilterNode {
                 for (Path path : nodeMapping.getInputPaths()) {
                     if (path.getTag(0).getLocalName().equals(Storage.CONSTANT_TAG)) {
                         inputStrings.add(String.format("\"%s\"", nodeMapping.getConstantValue()));
-                    }
-                    else {
+                    } else {
                         inputStrings.add(path.getTail());
                     }
                 }

@@ -26,7 +26,7 @@ import eu.delving.metadata.Path;
 import eu.delving.sip.base.SwingHelper;
 
 import javax.swing.*;
-import java.awt.Component;
+import java.awt.*;
 
 /**
  * An entry in the NodeMappingListModel, with its associated cell renderer.
@@ -95,11 +95,14 @@ public class NodeMappingEntry {
             NodeMappingEntry entry = (NodeMappingEntry) value;
             String string = getHtml(entry.nodeMapping);
             JLabel label = (JLabel) super.getListCellRendererComponent(list, string, index, selected, cellHasFocus);
-            if (entry.isHighlighted()) {
+            if (selected) {
+                setBackground(list.getSelectionBackground());
+            } else if (entry.getNodeMapping().inputPathMissing) {
+                setBackground(Color.RED);
+            } else if (entry.isHighlighted()) {
                 setBackground(SwingHelper.HIGHLIGHTED_COLOR);
-            }
-            else {
-                setBackground(selected ? list.getSelectionBackground() : list.getBackground());
+            } else {
+                setBackground(list.getBackground());
             }
             return label;
         }

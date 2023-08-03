@@ -39,8 +39,7 @@ import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.*;
 
-import static eu.delving.sip.base.KeystrokeHelper.MENU_E;
-import static eu.delving.sip.base.KeystrokeHelper.configAction;
+import static eu.delving.sip.base.KeystrokeHelper.*;
 import static eu.delving.sip.base.SwingHelper.scrollVH;
 
 /**

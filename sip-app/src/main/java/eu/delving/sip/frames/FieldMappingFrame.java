@@ -86,9 +86,11 @@ public class FieldMappingFrame extends FrameBase {
     private JList contextVarList = new ContextVarJList(contextVarModel);
     private UndoManager undoManager = new UndoManager();
     private JTabbedPane mainTab = new JTabbedPane();
+    private DictionaryPanel dictionaryPanel;
 
     public FieldMappingFrame(SipModel sipModel) {
         super(Which.FIELD_MAPPING, sipModel, "Field Mapping");
+        dictionaryPanel = new DictionaryPanel(sipModel);
         docArea = new RSyntaxTextArea(sipModel.getFieldCompileModel().getDocDocument());
         docArea.setTabSize(3);
         docArea.setLineWrap(true);
@@ -98,6 +100,7 @@ public class FieldMappingFrame extends FrameBase {
         outputArea = new RSyntaxTextArea(sipModel.getFieldCompileModel().getOutputDocument());
         outputArea.setWrapStyleWord(true);
         mainTab.addTab("Code", createCodeOutputPanel());
+        mainTab.addTab("Dictionary", dictionaryPanel);
         mainTab.addTab("Documentation", scrollVH(docArea));
         attachAccelerator(UNDO_ACTION, codeArea);
         attachAccelerator(REDO_ACTION, codeArea);

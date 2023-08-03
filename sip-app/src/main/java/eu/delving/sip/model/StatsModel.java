@@ -23,6 +23,7 @@ package eu.delving.sip.model;
 
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.Path;
+import eu.delving.metadata.RecDefTree;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.Storage;
@@ -35,6 +36,7 @@ import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -86,6 +88,24 @@ public class StatsModel {
             }
         }
         return nodes.isEmpty() ? null : nodes;
+    }
+
+    public boolean contains(NodeMapping nodeMapping) {
+        return contains((SourceTreeNode) sourceTreeModel.getRoot(), nodeMapping);
+    }
+
+    public boolean contains(SourceTreeNode node, NodeMapping nodeMapping) {
+       // if (node.getNodeMappings().contains(nodeMapping) && findNodeForInputPath(node, nodeMapping) != null) return true;
+        for(Path p : nodeMapping.getInputPaths()) {
+            if(findNodeForInputPath(p, node) != null) return true;
+        }
+        //System.out.println("[NODE]: " + node + ", " + node.getNodeMappings());
+        for (SourceTreeNode child : node.getChildren()) {
+            if (contains(child, nodeMapping)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void setStatistics(Stats stats) {
@@ -186,4 +206,19 @@ public class StatsModel {
         }
     }
 
+    public static class SourceTreeImpl implements RecDefTree.SourceTree {
+
+        private final StatsModel model;
+
+        public SourceTreeImpl(StatsModel model) {
+            this.model = model;
+        }
+
+        @Override
+        public boolean contains(NodeMapping nodeMapping) {
+            boolean containsNodeMapping = model.contains(nodeMapping);
+            //System.out.println(nodeMapping + "=" + containsNodeMapping);
+            return containsNodeMapping;
+        }
+    }
 }

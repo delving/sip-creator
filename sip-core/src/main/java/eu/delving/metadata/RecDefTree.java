@@ -156,4 +156,9 @@ public class RecDefTree implements RecDefNodeListener {
     private XPath createPath() {
         return XMLToolFactory.xpath(pathContext);
     }
+
+    public interface SourceTree {
+
+        boolean contains(NodeMapping nodeMapping);
+    }
 }

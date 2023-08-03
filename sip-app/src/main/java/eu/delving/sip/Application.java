@@ -54,6 +54,7 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
+import org.apache.jena.riot.RDFFormat;
 
 import javax.swing.*;
 import java.awt.*;
@@ -108,6 +109,26 @@ public class Application {
 
     public static boolean canWritePocketFiles() {
         return "true".equals(sipProperties.getProp().getProperty("writePocketFiles"));
+    }
+
+    public static RDFFormat getRDFFormat() {
+        String rdfFormat = sipProperties.getProp().getProperty("rdfFormat");
+        if ("RDF/XML".equals(rdfFormat)) {
+            return RDFFormat.RDFXML;
+        }
+        if ("JSONLD".equals(rdfFormat)) {
+            return RDFFormat.JSONLD_COMPACT_FLAT;
+        }
+        if ("NQUADS".equals(rdfFormat)) {
+            return RDFFormat.NQUADS;
+        }
+        if ("NTRIPLES".equals(rdfFormat)) {
+            return RDFFormat.NTRIPLES;
+        }
+        if ("TURTLE".equals(rdfFormat)) {
+            return RDFFormat.TURTLE;
+        }
+        return RDFFormat.RDFXML;
     }
 
     private Application(final File storageDir) throws StorageException {

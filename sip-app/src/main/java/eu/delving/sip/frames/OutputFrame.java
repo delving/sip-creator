@@ -25,6 +25,7 @@ import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.KeystrokeHelper;
 import eu.delving.sip.model.MappingCompileModel;
 import eu.delving.sip.model.SipModel;
+import org.apache.jena.riot.RDFFormat;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -35,7 +36,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,6 +80,9 @@ public class OutputFrame extends FrameBase {
 
         outputTypes.addElement("RDF/XML");
         outputTypes.addElement("JSONLD,COMPACT/FLAT");
+        outputTypes.addElement("NQUADS");
+        outputTypes.addElement("NTRIPLES");
+        outputTypes.addElement("TURTLE");
 
         final JComboBox outputTypesBox = new JComboBox(outputTypes);
         outputTypesBox.setSelectedIndex(0);
@@ -116,12 +119,19 @@ public class OutputFrame extends FrameBase {
 
         outputTypesBox.addActionListener(e -> {
             String selection = outputTypesBox.getSelectedItem().toString();
+            setError(outputArea, false);
 
             final MappingCompileModel mappingModel = sipModel.getRecordCompileModel();
-            if (selection.indexOf("JSONLD") >= 0) {
-                mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_JSON, outputArea);
+            if (selection.contains("JSONLD")) {
+                mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_JSON, outputArea, RDFFormat.JSONLD_COMPACT_FLAT);
+            } else if (selection.contains("NQUADS")) {
+                mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_NONE, outputArea, RDFFormat.NQUADS);
+            } else if (selection.contains("TURTLE")) {
+                mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_NONE, outputArea, RDFFormat.TURTLE);
+            } else if (selection.contains("NTRIPLES")) {
+                mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_NONE, outputArea, RDFFormat.NTRIPLES);
             } else {
-                mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_XML, outputArea);
+                mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_XML, outputArea, RDFFormat.RDFXML);
             }
 
             mappingModel.triggerCompile();
