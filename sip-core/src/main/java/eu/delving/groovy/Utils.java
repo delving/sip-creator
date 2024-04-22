@@ -72,4 +72,9 @@ public class Utils {
         }
         for (Node kill : dead) node.removeChild(kill);
     }
+
+    public static String stripNonPrinting(String xmlString) {
+        // Replace non-printable characters with an empty string
+        return xmlString.replaceAll("[^\\x20-\\x7e]", "");
+    }
 }

@@ -22,6 +22,7 @@
 package eu.delving.sip.xml;
 
 import eu.delving.XMLToolFactory;
+import eu.delving.groovy.Utils;
 import eu.delving.metadata.RecDef;
 import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Element;
@@ -163,12 +164,12 @@ public class XmlOutput {
             switch (kid.getNodeType()) {
                 case Node.TEXT_NODE:
                     if (text.isEmpty()) break;
-                    out.add(eventFactory.createCharacters(text));
+                    out.add(eventFactory.createCharacters(Utils.stripNonPrinting(text)));
                     textKids = true;
                     break;
                 case Node.CDATA_SECTION_NODE:
                     if (text.isEmpty()) break;
-                    out.add(eventFactory.createCData(text));
+                    out.add(eventFactory.createCData(Utils.stripNonPrinting(text)));
                     textKids = true;
                     break;
                 case Node.ATTRIBUTE_NODE:

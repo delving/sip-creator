@@ -25,6 +25,7 @@ import eu.delving.XMLToolFactory;
 import eu.delving.groovy.GroovyNode;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.MetadataRecordFactory;
+import eu.delving.groovy.Utils;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.StringUtil;
 import eu.delving.metadata.Tag;
@@ -116,10 +117,10 @@ public class MetadataParser {
                     }
                     break;
                 case XMLEvent.CHARACTERS:
-                    if (node != null) value.append(input.getText());
+                    if (node != null) value.append(Utils.stripNonPrinting(input.getText()));
                     break;
                 case XMLEvent.CDATA:
-                    if (node != null) value.append(String.format("<![CDATA[%s]]>", input.getText()));
+                    if (node != null) value.append(String.format("<![CDATA[%s]]>", Utils.stripNonPrinting(input.getText())));
                     break;
                 case XMLEvent.END_ELEMENT:
                     if (node != null) {

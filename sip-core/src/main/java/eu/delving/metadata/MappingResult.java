@@ -21,6 +21,7 @@
 
 package eu.delving.metadata;
 
+import eu.delving.groovy.Utils;
 import eu.delving.groovy.XmlSerializer;
 import org.apache.jena.rdf.model.Model;
 import org.w3c.dom.Node;
@@ -31,7 +32,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -125,7 +125,7 @@ public class MappingResult {
     }
 
     public String toString() {
-        return toXml();
+        return Utils.stripNonPrinting(toXml());
     }
 
     public static String hasRDFError(String rdf) {

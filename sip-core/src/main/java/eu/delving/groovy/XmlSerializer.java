@@ -101,10 +101,10 @@ public class XmlSerializer {
                     Node kid = kids.item(walk);
                     switch (kid.getNodeType()) {
                         case Node.TEXT_NODE:
-                            out.add(eventFactory.createCharacters(kid.getTextContent()));
+                            out.add(eventFactory.createCharacters(Utils.stripNonPrinting(kid.getTextContent())));
                             break;
                         case Node.CDATA_SECTION_NODE:
-                            out.add(eventFactory.createCData(kid.getTextContent()));
+                            out.add(eventFactory.createCData(Utils.stripNonPrinting(kid.getTextContent())));
                             break;
                         case Node.ATTRIBUTE_NODE:
                             break;
@@ -156,10 +156,10 @@ public class XmlSerializer {
             Node kid = kids.item(walk);
             switch (kid.getNodeType()) {
                 case Node.TEXT_NODE:
-                    out.add(eventFactory.createCharacters(kid.getTextContent()));
+                 out.add(eventFactory.createCharacters(Utils.stripNonPrinting(kid.getTextContent())));
                     break;
                 case Node.CDATA_SECTION_NODE:
-                    out.add(eventFactory.createCData(kid.getTextContent()));
+                   out.add(eventFactory.createCData(Utils.stripNonPrinting(kid.getTextContent())));
                     break;
                 case Node.ATTRIBUTE_NODE:
                     break;
