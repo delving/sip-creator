@@ -357,11 +357,20 @@ public class CodeGenerator {
                         if (comma) codeOut.line(",");
                         trace();
 
+                        Boolean isNotEmpty = sub.getTag().toString().equals("xml:lang");
+
                         codeOut.line_("%s (", tag.toBuilderCall());
                         codeOut.line_("%s : {", sub.getTag().toBuilderCall());
+                        if (isNotEmpty) {
+                            codeOut.line("if (%s && %s != \"\") {", groovyParams.peek(), groovyParams.peek());
+                            codeOut.in();
+                        }
                         codeOut.start(nodeMapping);
                         toAttributeCode(nodeMapping, groovyParams);
                         codeOut.end(nodeMapping);
+                        if (isNotEmpty) {
+                            codeOut._line("}");
+                        }
                         codeOut._line("}");
 
                         comma = true;
