@@ -30,32 +30,24 @@ import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.ReportWriter;
 import eu.delving.sip.model.Feedback;
-import eu.delving.sip.model.SipModel;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RiotException;
 import org.w3c.dom.Node;
+import com.github.luben.zstd.ZstdOutputStream;
 
 import javax.swing.*;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Validator;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
-
-import static eu.delving.sip.files.Storage.XSD_VALIDATION;
 
 /**
  * Process an input file, mapping it to output records which are validated and used to gather statistics.
@@ -127,6 +119,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         return dataSet.getSpec();
     }
 
+    public String getRecordID(String identifier) {
+        String[] parts = identifier.split(getPrefix()+"/");
+        return parts.length > 0 ? parts[parts.length - 1] : "";
+    }
+
     public int getFailedRecordNumber() {
         return termination.getRecordNumber();
     }
@@ -161,55 +158,90 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     }
 
     @Override
-    public void run() {
-        groovyCodeResource.clearMappingScripts();
-        try {
-            // TODO record count is never used
-            MetadataParser parser = new MetadataParser(getDataSet().openSourceInputStream(), -1);
-            parser.setProgressListener(progressListener);
-            ReportWriter reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
-
-            File outputDir = createEmptyOutputDir();
-
-            Consumer consumer = new Consumer(reportWriter);
-            int engineCount = (int) Math.round(Runtime.getRuntime().availableProcessors() * 1.1);
-            info(String.format("Processing with %d engines", engineCount));
-
-            String code = new CodeGenerator(recMapping).withEditPath(null).withTrace(false).toRecordMappingCode();
-            MappingRunner MappingRunner = new BulkMappingRunner(recMapping, code);
-            List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
-
-            MetadataParserRunner metadataParserRunner = new MetadataParserRunner(parser);
-            metadataParserRunner.start();
-            for (int walk = 0; walk < engineCount; walk++) {
-                Validator validator = null;
-                if (enableXSDValidation) {
-                    validator = dataSet.newValidator();
-                    validator.setErrorHandler(null);
-                }
-                MappingEngine engine = new MappingEngine(
-                    walk,
-                    metadataParserRunner,
-                    validator,
-                    allowInvalid,
-                    termination,
-                    outputDir,
-                    recDef().getNamespaceMap(),
-                    reportWriter,
-                    assertionTests,
-                    MappingRunner
-                );
-                consumer.register(engine);
-                engine.start();
-            }
-            info(Thread.currentThread().getName() + " about to consume");
-            consumer.run();
+public void run() {
+    groovyCodeResource.clearMappingScripts();
+    
+    // Declare all resources outside try block
+    MetadataParser parser = null;
+    ReportWriter reportWriter = null;
+    File outputFile = null;
+    OutputStream outputStream = null;
+    ZstdOutputStream zstdOutputStream = null;
+    Consumer consumer = null;
+    MetadataParserRunner metadataParserRunner = null;
+    
+    try {
+        parser = new MetadataParser(getDataSet().openSourceInputStream(), -1);
+        parser.setProgressListener(progressListener);
+        reportWriter = getDataSet().openReportWriter(recMapping.getRecDefTree().getRecDef());
+        File outputDir = createEmptyOutputDir();
+        outputFile = createOutputFile();
+        if (outputFile.exists()) {
+            throw new Exception("Output file already exists");
         }
-        catch (Exception e) {
-            termination.dueToException(e);
-            feedback.alert("File processing setup problem", e);
+        outputStream = Files.newOutputStream(outputFile.toPath());
+        zstdOutputStream = new ZstdOutputStream(outputStream);
+        consumer = new Consumer(reportWriter);
+        
+        int engineCount = (int) Math.round(Runtime.getRuntime().availableProcessors() * 1.1);
+        info(String.format("Processing with %d engines", engineCount));
+        
+        String code = new CodeGenerator(recMapping).withEditPath(null).withTrace(false).toRecordMappingCode();
+        MappingRunner mappingRunner = new BulkMappingRunner(recMapping, code);
+        List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource);
+        
+        metadataParserRunner = new MetadataParserRunner(parser);
+        metadataParserRunner.start();
+        
+        for (int walk = 0; walk < engineCount; walk++) {
+            Validator validator = null;
+            if (enableXSDValidation) {
+                validator = dataSet.newValidator();
+                validator.setErrorHandler(null);
+            }
+            MappingEngine engine = new MappingEngine(
+                walk,
+                metadataParserRunner,
+                validator,
+                allowInvalid,
+                termination,
+                outputDir,
+                zstdOutputStream,
+                recDef().getNamespaceMap(),
+                reportWriter,
+                assertionTests,
+                mappingRunner
+            );
+            consumer.register(engine);
+            engine.start();
+        }
+        
+        info(Thread.currentThread().getName() + " about to consume");
+        consumer.run();
+        
+    } catch (Exception e) {
+        termination.dueToException(e);
+        feedback.alert("File processing setup problem", e);
+    } finally {
+        // Close resources in reverse order of creation
+        try {
+            if (zstdOutputStream != null) {
+                zstdOutputStream.flush();
+                zstdOutputStream.close();
+            }
+            if (outputStream != null) {
+                outputStream.flush();
+                outputStream.close();
+                finishOutputFile(outputFile);
+            }
+            if (parser != null) {
+                parser.close();
+            }
+        } catch (IOException e) {
+            feedback.alert("Error closing resources", e);
         }
     }
+}
 
     private File createEmptyOutputDir() {
         File sipDir = getDataSet().targetOutput().getParentFile();
@@ -227,6 +259,22 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         return outputDir;
     }
 
+    private File createOutputFile() {
+        DataSet dataSet = getDataSet();
+        File targetOutput = dataSet.targetOutput();
+        File sipDir = targetOutput.getParentFile();
+        String timestamp = new SimpleDateFormat("yyyy-MM-dd-HHmmss").format(Calendar.getInstance().getTime());
+        return new File(sipDir, timestamp + "__processed.rdf.zst.inprogress");
+    }
+
+    private void finishOutputFile(File outputFile) {
+        String inprogress = ".inprogress";
+        String path = outputFile.getPath();
+        if (path.endsWith(inprogress)) {
+            outputFile.renameTo(new File(path.substring(0, path.length() - inprogress.length())));
+        }
+    }
+
     private class MappingOutput {
         final MetadataRecord metadataRecord;
         final MappingResult mappingResult;
@@ -238,10 +286,12 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             this.exception = exception;
         }
 
-        public void record(ReportWriter reportWriter, XmlOutput xmlOutput) {
+        public void record(ReportWriter reportWriter, OutputStream outputStream) {
             try {
                 if (exception == null) {
-                    xmlOutput.write(mappingResult.getLocalId(), mappingResult.root());
+                    synchronized (lock) {
+                        mappingResult.toByteArrayOutputStream(Application.orgID(), getSpec()).writeTo(outputStream);
+                    }
                 }
                 else if (exception instanceof DiscardRecordException) {
                     synchronized (lock) {
@@ -361,6 +411,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         public int recordCount;
         public int validCount;
         final File outputDir;
+        final OutputStream outputStream;
         final Map<String, RecDef.Namespace> namespaceMap;
         final  ReportWriter reportWriter;
         final List<AssertionTest> assertionTests;
@@ -371,6 +422,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                               Validator validator,
                               boolean allowInvalid, Termination termination,
                               File outputDir,
+                              OutputStream outputStream,
                               Map<String, RecDef.Namespace> namespaceMap,
                               ReportWriter reportWriter,
                               List<AssertionTest> assertionTests,
@@ -381,6 +433,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             this.allowInvalid = allowInvalid;
             this.termination = termination;
             this.outputDir = outputDir;
+            this.outputStream = outputStream;
             this.namespaceMap = namespaceMap;
             this.reportWriter = reportWriter;
             this.assertionTests = assertionTests;
@@ -401,19 +454,16 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     validCount++;
                 }
 
-                if(Application.canWritePocketFiles()) {
-                    if(rdfFormat == RDFFormat.RDFXML) {
-                        File outputFile = new File(outputDir, mappingOutput.metadataRecord.getRecordNumber() + ".xml");
-                        XmlOutput xmlOutput = new XmlOutput(outputFile, namespaceMap);
-                        mappingOutput.record(reportWriter, xmlOutput);
-                        xmlOutput.finish(false);
+                if (Application.canWritePocketFiles()) {
+                    if (rdfFormat == RDFFormat.RDFXML) {
+                        mappingOutput.record(reportWriter, outputStream);
                     } else {
                         File outputFile = new File(outputDir, mappingOutput.metadataRecord.getRecordNumber() + JenaHelper.getExtension(rdfFormat));
                         String output = JenaHelper.convertRDF(mappingResult.getRecDefTree().getRoot().getDefaultPrefix(), mappingResult.toRDF(), rdfFormat);
                         Files.write(outputFile.toPath(), output.getBytes(StandardCharsets.UTF_8));
                     }
                 }
-            } catch (XMLStreamException | IOException e) {
+            } catch (IOException e) {
                 termination.dueToException(e);
             }
         }
@@ -435,7 +485,9 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         }
 
                         if (node == null) continue;
-                        MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, MappingRunner.getRecDefTree());
+                        // Not sure why this previously generated a URI for localId, which was not done for RDF in the UI
+                        //MappingResult result = new MappingResult(serializer, uriGenerator.generateUri(record.getId()), node, MappingRunner.getRecDefTree());
+                        MappingResult result = new MappingResult(serializer, record.getId(), node, MappingRunner.getRecDefTree());
                         validateRDF(record, result);
                         List<String> uriErrors = result.getUriErrors();
                         try {

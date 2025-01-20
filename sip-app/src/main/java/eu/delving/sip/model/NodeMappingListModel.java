@@ -149,7 +149,7 @@ public class NodeMappingListModel extends AbstractListModel<NodeMappingEntry> {
     public int indexOf(NodeMapping nodeMapping) {
         int index = 0;
         for (NodeMappingEntry entry : entries) {
-            if (entry.getNodeMapping() == nodeMapping) return index;
+            if (entry.getNodeMapping().equals(nodeMapping)) return index;
             index++;
         }
         throw new RuntimeException("Node mapping not found: " + nodeMapping);

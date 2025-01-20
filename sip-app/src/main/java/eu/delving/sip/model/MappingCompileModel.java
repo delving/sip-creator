@@ -33,6 +33,7 @@ import eu.delving.groovy.AppMappingRunner;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlSerializer;
 import eu.delving.metadata.*;
+import eu.delving.sip.Application;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
@@ -356,7 +357,7 @@ public class MappingCompileModel {
                                     compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
                                 } else {
                                     notifyMappingComplete(result);
-                                    compilationComplete(Completion.JUST_FINE, node, null);
+                                    compilationComplete(Completion.JUST_FINE, node, null, result);
                                 }
                             }
                         } catch (SAXException e) {
@@ -385,7 +386,7 @@ public class MappingCompileModel {
                             compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
                         } else {
                             notifyMappingComplete(result);
-                            compilationComplete(Completion.JUST_FINE, node, null);
+                            compilationComplete(Completion.JUST_FINE, node, null, result);
                         }
                     }
 //                    else {
@@ -447,7 +448,14 @@ public class MappingCompileModel {
         }
 
         private void compilationComplete(Completion completion, Node node, String error) {
-            String output = node == null ? "No XML" : serializer.toXml(node, true);
+            compilationComplete(completion, node, error, null);
+        }
+
+        private void compilationComplete(Completion completion, Node node, String error, MappingResult result) {
+            // Let MappingResult manage XML serialization, including possibly appending comment with hash, etc.
+            //String output = node == null ? "No XML" : serializer.toXml(node, true);
+            String output = result == null ? "No XML" : result.toXml(Application.orgID(), getDataSet().getSpec());
+
             String syntaxStyle = outputDocument.getSyntaxStyle();
             if (error == null) {
                 try {

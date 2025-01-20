@@ -33,9 +33,10 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import javax.xml.bind.DatatypeConverter;
+import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,17 @@ public class XmlSerializer {
     private List<String> indentStrings = new ArrayList<String>();
 
     public String toXml(Node node, boolean fromMapping) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            OutputStreamWriter writer = new OutputStreamWriter(outputStream, "UTF-8");
+            writeXml(writer, node, fromMapping);
+            return outputStream.toString("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void writeXml(OutputStreamWriter writer, Node node, boolean fromMapping) {
         if (node.getNodeType() != Node.ELEMENT_NODE)
             throw new IllegalArgumentException("toXml should only be called on an element");
         try {
@@ -65,7 +77,8 @@ public class XmlSerializer {
                 nslist.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
             }
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            XMLEventWriter out = outputFactory.createXMLEventWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+            //OutputStreamWriter writer = new OutputStreamWriter(outputStream, "UTF-8");
+            XMLEventWriter out = outputFactory.createXMLEventWriter(writer);
             out.add(eventFactory.createStartDocument());
             out.add(eventFactory.createCharacters("\n"));
             List<Attribute> attributes = getAttributes(node);
@@ -120,12 +133,8 @@ public class XmlSerializer {
             if (fromMapping) out.add(eventFactory.createCharacters("\n"));
             out.add(eventFactory.createEndDocument());
             out.flush();
-            return new String(outputStream.toByteArray(), "UTF-8");
         }
         catch (XMLStreamException e) {
-            throw new RuntimeException(e);
-        }
-        catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -224,4 +233,5 @@ public class XmlSerializer {
             gatherNamespaces(sub, namespaces);
         }
     }
+
 }

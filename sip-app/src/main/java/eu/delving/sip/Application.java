@@ -111,6 +111,10 @@ public class Application {
         return "true".equals(sipProperties.getProp().getProperty("writePocketFiles"));
     }
 
+    public static String orgID() {
+        return sipProperties.getProp().getProperty("orgID");
+    }
+
     public static RDFFormat getRDFFormat() {
         String rdfFormat = sipProperties.getProp().getProperty("rdfFormat");
         if ("RDF/XML".equals(rdfFormat)) {

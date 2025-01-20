@@ -226,7 +226,8 @@ public class CreateModel {
                             for (SourceTreeNode node : sourceTreeNodes) {
                                 for (NodeMapping nodeMapping : node.getNodeMappings()) {
                                     sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping).setHighlighted();
-                                    sipModel.getMappingModel().getRecDefTreeRoot().getRecDefTreeNode(nodeMapping.recDefNode).setHighlighted();
+                                    RecDefTreeNode treeNode = sipModel.getMappingModel().getRecDefTreeRoot().getRecDefTreeNode(nodeMapping.recDefNode);
+                                    if (treeNode != null) treeNode.setHighlighted();
                                 }
                             }
                             break;

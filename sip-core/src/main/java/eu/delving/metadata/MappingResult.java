@@ -21,19 +21,23 @@
 
 package eu.delving.metadata;
 
+import eu.delving.XMLToolFactory;
 import eu.delving.groovy.Utils;
 import eu.delving.groovy.XmlSerializer;
 import org.apache.jena.rdf.model.Model;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.DigestOutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -109,8 +113,45 @@ public class MappingResult {
         return root;
     }
 
-    public String toXml() {
+    /*public String toXml() {
         return serializer.toXml(root, recDefTree != null);
+    }*/
+
+    public String toXml() {
+        return toXml("unknown", "unknown");
+    }
+
+    public String toXml(String orgId, String spec) {
+        try {
+            return toByteArrayOutputStream(orgId, spec).toString("UTF-8");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ByteArrayOutputStream toByteArrayOutputStream(String orgId, String spec) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8192);
+        MessageDigest digest = null;
+        try {
+            digest = MessageDigest.getInstance("SHA1"); // Changed to SHA1
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        DigestOutputStream digestStream = new DigestOutputStream(outputStream, digest);
+        OutputStreamWriter writer = new OutputStreamWriter(digestStream, "UTF-8");
+        serializer.writeXml(writer, root, recDefTree != null);
+
+        // Use DatatypeConverter like the Scala version
+        String hash = DatatypeConverter.printHexBinary(digestStream.getMessageDigest().digest()).toLowerCase();
+
+        // XML comments may not contain double dashes (--) so if there are any then divide them with a space (- -)
+        String comment = String.format("<urn:%s_%s_%s/graph__%s>", orgId, spec, getLocalId(), hash);
+        writer.write("<!--");
+        writer.write(comment.replaceAll("\\-\\-", "- -"));
+        writer.write("-->\n");
+        writer.flush();
+
+        return outputStream;
     }
 
     public static String toJenaCompliantRDF(String defaultPrefix, String rdf) {
@@ -137,4 +178,5 @@ public class MappingResult {
         }
         return "";
     }
+
 }
