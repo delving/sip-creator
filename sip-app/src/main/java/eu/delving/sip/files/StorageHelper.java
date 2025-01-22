@@ -21,6 +21,8 @@
 
 package eu.delving.sip.files;
 
+import com.github.luben.zstd.ZstdInputStream;
+import com.github.luben.zstd.ZstdOutputStream;
 import eu.delving.metadata.Hasher;
 import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
@@ -54,8 +56,10 @@ import static eu.delving.sip.files.Storage.MAX_UNIQUE_VALUE_LENGTH;
 import static eu.delving.sip.files.Storage.UNIQUE_VALUE_CONVERTER;
 
 /**
- * This class contains helpers for the StorageImpl to lean on.  It does all of the searching for file name
- * patterns that the storage system needs, as well as maintaining the previous versions of various
+ * This class contains helpers for the StorageImpl to lean on. It does all of
+ * the searching for file name
+ * patterns that the storage system needs, as well as maintaining the previous
+ * versions of various
  * types of files.
  *
  *
@@ -83,7 +87,8 @@ public class StorageHelper {
         if (file.exists()) {
             List<String> lines = FileUtils.readLines(file, "UTF-8");
             for (String line : lines) {
-                if (line.startsWith("#")) continue;
+                if (line.startsWith("#"))
+                    continue;
                 int equals = line.indexOf("=");
                 if (equals < 0) {
                     continue;
@@ -132,20 +137,32 @@ public class StorageHelper {
 
     static InputStream zipIn(File file) throws StorageException {
         try {
-            return new GZIPInputStream(new FileInputStream(file));
-        }
-        catch (IOException e) {
-            throw new StorageException(String.format("Unable to create input stream from %s", file.getAbsolutePath()), e);
+            if (file.getName().endsWith((".zst"))) {
+                return new ZstdInputStream(new FileInputStream(file));
+            } else {
+                return new GZIPInputStream(new FileInputStream(file));
+            }
+        } catch (IOException e) {
+            throw new StorageException(String.format("Unable to create input stream from %s", file.getAbsolutePath()),
+                    e);
         }
     }
 
     public static OutputStream zipOut(File file) throws StorageException {
         try {
-            return new GZIPOutputStream(new FileOutputStream(file));
+            if (file.getName().endsWith((".zst"))) {
+                return new ZstdOutputStream(new FileOutputStream(file));
+            } else {
+                return new GZIPOutputStream(new FileOutputStream(file));
+            }
+        } catch (IOException e) {
+            throw new StorageException(String.format("Unable to create output stream from %s", file.getAbsolutePath()),
+                    e);
         }
-        catch (IOException e) {
-            throw new StorageException(String.format("Unable to create output stream from %s", file.getAbsolutePath()), e);
-        }
+    }
+
+    static File reportJsonFile(File dir, String prefix) {
+        return findOrNull(dir, 0, new NameFileFilter(FileType.REPORT_JSON.getName(prefix)), FileType.REPORT_JSON);
     }
 
     static File reportFile(File dir, String prefix) {
@@ -161,6 +178,13 @@ public class StorageHelper {
     }
 
     public static File statsFile(File dir) {
+        File sourceFile = sourceFile(dir);
+        if (sourceFile != null) {
+            String hash = Hasher.extractHash(sourceFile);
+            if (hash != null) {
+                return new File(dir, hash + Hasher.SEPARATOR + SOURCE_STATS_ZSTD.getName());
+            }
+        }
         return new File(dir, SOURCE_STATS.getName());
     }
 
@@ -172,13 +196,16 @@ public class StorageHelper {
     public static String datasetNameFromSipZip(File file) {
         String n = file.getName();
         int uu = n.indexOf("__");
-        if (uu < 0) throw new RuntimeException("No dataset name contained in " + n);
+        if (uu < 0) {
+            return n;
+        }
         return n.substring(0, uu);
     }
 
     public static DateTime dateTimeFromSipZip(File file) {
         DateTime dateTime = dateTimeFromSipZip(file.getName());
-        if (dateTime == null) dateTime = new DateTime(file.lastModified());
+        if (dateTime == null)
+            dateTime = new DateTime(file.lastModified());
         return dateTime;
     }
 
@@ -191,8 +218,7 @@ public class StorageHelper {
             int hour = Integer.parseInt(matcher.group(4));
             int minute = Integer.parseInt(matcher.group(5));
             return new DateTime(year, month, day, hour, minute);
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -200,22 +226,34 @@ public class StorageHelper {
     static Pattern EXTRACT_DATE = Pattern.compile(".*(\\d{4})_(\\d{2})_(\\d{2})_(\\d{2})_(\\d{2}).*");
 
     static File findOrCreate(File directory, Storage.FileType fileType) {
-        if (fileType.getName() == null) throw new RuntimeException("Expected name");
+        if (fileType.getName() == null)
+            throw new RuntimeException("Expected name");
         File file = findOrNull(directory, 0, new NameFileFilter(fileType.getName()), fileType);
-        if (file == null) file = new File(directory, fileType.getName());
+        if (file == null) {
+            switch (fileType) {
+                case SOURCE:
+                    file = findOrNull(directory, 0, new NameFileFilter(SOURCE_ZSTD.getName()), SOURCE_ZSTD);
+                    break;
+            }
+        }
+        if (file == null)
+            file = new File(directory, fileType.getName());
         return file;
     }
 
     static File findOrCreate(File directory, Storage.FileType fileType, String prefix) {
-        if (fileType.getName(prefix) == null) throw new RuntimeException("Expected name");
+        if (fileType.getName(prefix) == null)
+            throw new RuntimeException("Expected name");
         File file = findOrNull(directory, 0, new NameFileFilter(fileType.getName(prefix)), fileType);
-        if (file == null) file = new File(directory, fileType.getName(prefix));
+        if (file == null)
+            file = new File(directory, fileType.getName(prefix));
         return file;
     }
 
     static File findOrCreate(File directory, String name, FileFilter fileFilter, Storage.FileType fileType) {
         File file = findOrNull(directory, 0, fileFilter, fileType);
-        if (file == null) file = new File(directory, name);
+        if (file == null)
+            file = new File(directory, name);
         return file;
     }
 
@@ -226,11 +264,11 @@ public class StorageHelper {
 
     static void addLatestNoHash(File dir, FileType fileType, String prefix, List<File> list) throws StorageException {
         File latestFile = findLatestFile(dir, fileType, prefix);
-        if (!latestFile.exists()) return;
+        if (!latestFile.exists())
+            return;
         try {
             list.add(Hasher.ensureFileNotHashed(latestFile));
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new StorageException("Unable to hash file " + latestFile);
         }
     }
@@ -239,9 +277,11 @@ public class StorageHelper {
         File latestFile = null;
         for (File file : findLatestPrefixFiles(dir, fileType)) {
             String filePrefix = extractName(file, fileType);
-            if (filePrefix.equals(prefix)) latestFile = file;
+            if (filePrefix.equals(prefix))
+                latestFile = file;
         }
-        if (latestFile == null) latestFile = new File(dir, fileType.getName(prefix));
+        if (latestFile == null)
+            latestFile = new File(dir, fileType.getName(prefix));
         return latestFile;
     }
 
@@ -262,7 +302,8 @@ public class StorageHelper {
         Map<String, List<File>> map = new TreeMap<String, List<File>>();
         for (File file : files) {
             String prefix = extractName(file, fileType);
-            if (prefix == null) continue;
+            if (prefix == null)
+                continue;
             List<File> list = map.get(prefix);
             if (list == null) {
                 map.put(prefix, list = new ArrayList<File>());
@@ -273,8 +314,7 @@ public class StorageHelper {
         for (Map.Entry<String, List<File>> entry : map.entrySet()) {
             if (entry.getValue().size() == 1) {
                 latestFiles.add(entry.getValue().get(0));
-            }
-            else {
+            } else {
                 latestFiles.add(getRecent(entry.getValue().toArray(new File[entry.getValue().size()]), 0, fileType));
             }
         }
@@ -301,8 +341,7 @@ public class StorageHelper {
             name = name.substring(fileType.getPrefix().length());
             name = name.substring(0, name.length() - fileType.getSuffix().length());
             return name;
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -311,25 +350,30 @@ public class StorageHelper {
         if (file.exists()) {
             if (file.isDirectory()) {
                 File[] files = file.listFiles();
-                if (files != null) for (File sub : files) delete(sub);
+                if (files != null)
+                    for (File sub : files)
+                        delete(sub);
             }
             FileUtils.deleteQuietly(file);
         }
     }
 
     static File getRecent(File[] files, int which, Storage.FileType fileType) {
-        int maxHistory = fileType.getHistorySize();
+        return getRecent(files, which, fileType.getHistorySize());
+    }
+
+    static File getRecent(File[] files, int which, int maxHistory) {
         if (files == null || files.length <= which || which > maxHistory) {
             return null;
         }
         Arrays.sort(files, new LastModifiedComparator());
         if (files.length > maxHistory) {
             for (int walk = maxHistory; walk < files.length; walk++) {
-                //noinspection ResultOfMethodCallIgnored
+                // noinspection ResultOfMethodCallIgnored
                 files[walk].delete();
             }
         }
-        return files[which];
+        return which < maxHistory ? files[which] : null;
     }
 
     static class HashedPrefixFileFilter implements FileFilter {
@@ -367,20 +411,17 @@ public class StorageHelper {
             long lastB = b.lastModified();
             if (lastA > lastB) {
                 return -1;
-            }
-            else if (lastA < lastB) {
+            } else if (lastA < lastB) {
                 return 1;
-            }
-            else { // lastModified is only accurate to seconds (ends in 000) and we want the unhashed one at the top
+            } else { // lastModified is only accurate to seconds (ends in 000) and we want the
+                     // unhashed one at the top
                 int nameA = a.getName().length();
                 int nameB = b.getName().length();
                 if (nameA > nameB) {
                     return 1;
-                }
-                else if (nameB < nameA) {
+                } else if (nameB < nameA) {
                     return -1;
-                }
-                else {
+                } else {
                     return 0;
                 }
             }

@@ -23,12 +23,17 @@ package eu.delving.sip.frames;
 
 import eu.delving.groovy.GroovyNode;
 import eu.delving.groovy.MetadataRecord;
+import eu.delving.groovy.SourceMetadataRecord;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.model.SipModel;
+import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -67,6 +72,8 @@ public class InputFrame extends FrameBase {
     private JTree recordTree;
     private JComboBox<Filter> filterBox = new JComboBox<Filter>(Filter.values());
     private JTextField filterField = new JTextField();
+    private RSyntaxTextArea inputArea;
+    private RSyntaxDocument inputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_XML);
 
     private enum Filter {
         REGEX("Regex"),
@@ -108,7 +115,16 @@ public class InputFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
-        content.add(scrollVH(recordTree), BorderLayout.CENTER);
+        this.inputArea = new RSyntaxTextArea(sipModel.getRecordCompileModel().getOutputDocument());
+        inputArea.setCodeFoldingEnabled(true);
+        inputArea.setEditable(false);
+        inputArea.setDocument(inputDocument);
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollVH(inputArea), scrollVH(recordTree));
+        splitPane.setOneTouchExpandable(true);
+        splitPane.setDividerLocation(150);
+        splitPane.setDividerSize(30);
+        content.add(splitPane, BorderLayout.CENTER);
         content.add(createRecordButtonPanel(), BorderLayout.SOUTH);
     }
 
@@ -137,13 +153,33 @@ public class InputFrame extends FrameBase {
 
         @Override
         public void run() {
+            int docLength = inputDocument.getLength();
             if (metadataRecord == null) {
                 recordTree.setModel(EMPTY_MODEL);
+
+                try {
+                    inputDocument.remove(0, docLength);
+                } catch (BadLocationException e) {
+                    throw new RuntimeException(e);
+                }
             }
             else {
                 GroovyTreeNode root = new GroovyTreeNode(metadataRecord);
                 recordTree.setModel(new DefaultTreeModel(root));
                 root.expand();
+
+                try {
+                    inputDocument.remove(0, docLength);
+                    if (metadataRecord instanceof SourceMetadataRecord) {
+                        String sourceXML = ((SourceMetadataRecord) metadataRecord).getSourceXML();
+                        inputDocument.insertString(0, sourceXML, null);
+                        if (inputArea != null) {
+                            inputArea.setCaretPosition(0);
+                        }
+                    }
+                } catch (BadLocationException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }

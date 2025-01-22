@@ -55,17 +55,20 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static eu.delving.sip.files.Storage.SHACL_VALIDATION;
 import static eu.delving.sip.files.Storage.XSD_VALIDATION;
 
 /**
- * This is the grand model behind the whole SIP-Creator and it holds all of the other models.  Its state
- * corresponds that of a dataset with attention set specific record mapping within, described by its prefix.
+ * This is the grand model behind the whole SIP-Creator and it holds all of the
+ * other models. Its state
+ * corresponds that of a dataset with attention set specific record mapping
+ * within, described by its prefix.
  *
  *
  */
 
 public class SipModel {
-    private  SipProperties sipProperties;
+    private SipProperties sipProperties;
     private JDesktopPane desktop;
     private AllFrames.ViewSelector viewSelector;
     private WorkModel workModel;
@@ -95,7 +98,8 @@ public class SipModel {
         boolean accept(MetadataRecord record);
     }
 
-    public SipModel(JDesktopPane desktop, Storage storage, GroovyCodeResource groovyCodeResource, final Feedback feedback, SipProperties sipProperties) throws StorageException {
+    public SipModel(JDesktopPane desktop, Storage storage, GroovyCodeResource groovyCodeResource,
+            final Feedback feedback, SipProperties sipProperties) throws StorageException {
         this.desktop = desktop;
         this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
@@ -133,7 +137,8 @@ public class SipModel {
             }
 
             @Override
-            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
+            public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping,
+                    NodeMappingChange change) {
                 dataSetModel.deleteResults();
             }
 
@@ -151,13 +156,14 @@ public class SipModel {
             public void populationChanged(MappingModel mappingModel, RecDefNode node) {
             }
         });
-        // todo: on changes in create model?..  clearValidation(recordMapping);
+        // todo: on changes in create model?.. clearValidation(recordMapping);
         statsModel = new StatsModel(this);
     }
 
     public void saveProperties() {
         sipProperties.saveProperties();
     }
+
     public void shutdown() {
         dataSetModel.shutdown();
         mappingSaveTimer.shutdown();
@@ -246,7 +252,82 @@ public class SipModel {
     }
 
     public void setDataSet(DataSet dataSet, Swing success) {
-        exec(new DatasetLoader(dataSet, success));
+        exec(new DatasetAnalyzer(dataSet, new DatasetLoader(dataSet, success)));
+    }
+
+    private class DatasetAnalyzer implements Work.DataSetWork {
+        private DataSet dataSet;
+        private DatasetLoader success;
+
+        private DatasetAnalyzer(DataSet dataSet, DatasetLoader success) {
+            this.dataSet = dataSet;
+            this.success = success;
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.SET_DATASET;
+        }
+
+        @Override
+        public DataSet getDataSet() {
+            return dataSet;
+        }
+
+        @Override
+        public void run() {
+            try {
+                final Stats stats = dataSet.getStats();
+                if (stats != null) {
+                    if (success != null)
+                        exec(success);
+                    return;
+                }
+                final Map<String, String> facts = dataSet.getDataSetFacts();
+                final Map<String, String> hints = dataSet.getHints();
+                final SchemaVersion schemaVersion = dataSet.getSchemaVersion();
+                String prefix = schemaVersion.getPrefix();
+                dataSetModel.setDataSet(dataSet, prefix);
+                final RecMapping recMapping = dataSetModel.getRecMapping();
+                dataSetFacts.getFacts().clear();
+                dataSetFacts.getFacts().putAll(facts);
+                dataSetFacts.set("spec", dataSetModel.getDataSet().getSpec());
+                mappingHintsModel.initialize(prefix, dataSetModel);
+                dataSetModel.getMappingModel().setFacts(dataSetFacts.getFacts());
+                dataSetModel.getMappingModel().setSchemaVersion(schemaVersion);
+                recordCompileModel.setValidator(dataSetModel.newValidator());
+                recordCompileModel.setAssertions(
+                    AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource));
+                exec(new AnalysisParser(dataSetModel.getDataSet(), dataSetModel, statsModel.getMaxUniqueValueLength(),
+                    new AnalysisParser.Listener() {
+
+                    @Override
+                    public void success(final Stats stats) {
+                        try {
+                            dataSetModel.getDataSet().setStats(stats);
+                        } catch (StorageException e) {
+                            throw new RuntimeException(e);
+                        }
+                        if (success != null)
+                            exec(success);
+                    }
+
+                    @Override
+                    public void failure(String message, Exception exception) {
+                        if (message == null) {
+                            message = "Analysis failed";
+                        }
+                        if (exception != null) {
+                            feedback.alert(message, exception);
+                        }
+                    }
+                }));
+            } catch (Exception e) {
+                feedback.alert(String.format("Sorry, unable to switch to data set %s.", dataSet.getSpec()), e);
+                dataSetModel.clearDataSet();
+            }
+        }
+
     }
 
     private class DatasetLoader implements Work.DataSetWork {
@@ -285,7 +366,8 @@ public class SipModel {
                 dataSetModel.getMappingModel().setFacts(dataSetFacts.getFacts());
                 dataSetModel.getMappingModel().setSchemaVersion(schemaVersion);
                 recordCompileModel.setValidator(dataSetModel.newValidator());
-                recordCompileModel.setAssertions(AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource));
+                recordCompileModel.setAssertions(
+                        AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(), groovyCodeResource));
                 reportFileModel.refresh();
                 exec(() -> {
                     dataSetFacts.set(facts);
@@ -309,9 +391,9 @@ public class SipModel {
                     });
                     seekFirstRecord();
                 });
-                if (success != null) Swing.Exec.later(success);
-            }
-            catch (Exception e) {
+                if (success != null)
+                    Swing.Exec.later(success);
+            } catch (Exception e) {
                 feedback.alert(String.format("Sorry, unable to switch to data set %s.", dataSet.getSpec()), e);
                 dataSetModel.clearDataSet();
             }
@@ -320,7 +402,9 @@ public class SipModel {
     }
 
     public void analyzeFields() {
-        exec(new AnalysisParser(dataSetModel, statsModel.getMaxUniqueValueLength(), new AnalysisParser.Listener() {
+        exec(new AnalysisParser(dataSetModel.getDataSet(), dataSetModel, statsModel.getMaxUniqueValueLength(),
+            new AnalysisParser.Listener() {
+
             @Override
             public void success(final Stats stats) {
                 try {
@@ -329,8 +413,7 @@ public class SipModel {
                         statsModel.setStatistics(stats);
                         seekFirstRecord();
                     });
-                }
-                catch (StorageException e) {
+                } catch (StorageException e) {
                     feedback.alert("Problem storing statistics", e);
                 }
             }
@@ -366,10 +449,8 @@ public class SipModel {
             try {
                 return String.format(
                         "%s/resource/document/%s_%s/%s",
-                        matcher.group(1), spec, prefix, URLEncoder.encode(id, "UTF-8")
-                );
-            }
-            catch (UnsupportedEncodingException e) {
+                        matcher.group(1), spec, prefix, URLEncoder.encode(id, "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException("Unable to encode " + id);
             }
         }
@@ -381,16 +462,16 @@ public class SipModel {
         dataSet.deleteResults();
         getMappingModel().setLocked(true);
         exec(new FileProcessor(
-            getFeedback(),
-            getPreferences().getProperty(XSD_VALIDATION, "false").contentEquals("true"),
-            dataSet,
-            getMappingModel().getRecMapping(),
-            allowInvalid,
-            groovyCodeResource,
-            new Generator(narthexUrl, dataSet.getSpec(), getMappingModel().getPrefix()),
-            listener,
-            Application.getRDFFormat()
-        ));
+                getFeedback(),
+                getPreferences().getProperty(XSD_VALIDATION, "false").contentEquals("true"),
+                getPreferences().getProperty(SHACL_VALIDATION, "false").contentEquals("true"),
+                dataSet,
+                getMappingModel().getRecMapping(),
+                allowInvalid,
+                groovyCodeResource,
+                new Generator(narthexUrl, dataSet.getSpec(), getMappingModel().getPrefix()),
+                listener,
+                Application.getRDFFormat()));
     }
 
     public void seekReset() {
@@ -400,7 +481,8 @@ public class SipModel {
                 if (parser != null) {
                     parser.close();
                     parser = null;
-                    for (ParseListener parseListener : parseListeners) parseListener.updatedRecord(null);
+                    for (ParseListener parseListener : parseListeners)
+                        parseListener.updatedRecord(null);
                 }
             }
 
@@ -446,11 +528,13 @@ public class SipModel {
         public void run() {
             try {
                 if (parser == null) {
-                    parser = new MetadataParser(dataSetModel.getDataSet().openSourceInputStream(), statsModel.getRecordCount());
+                    parser = new MetadataParser(dataSetModel.getDataSet().openSourceInputStream(),
+                            statsModel.getRecordCount(), true);
                 }
                 parser.setNotExhausted();
                 parser.setProgressListener(progressListener);
-                for (MetadataRecord metadataRecord = parser.nextRecord(); metadataRecord != null && !metadataRecord.isPoison(); metadataRecord = parser.nextRecord()) {
+                for (MetadataRecord metadataRecord = parser.nextRecord(); metadataRecord != null
+                        && !metadataRecord.isPoison(); metadataRecord = parser.nextRecord()) {
                     if (scanPredicate == null || scanPredicate.accept(metadataRecord)) {
                         for (ParseListener parseListener : parseListeners) {
                             parseListener.updatedRecord(metadataRecord);
@@ -458,13 +542,12 @@ public class SipModel {
                         break;
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 feedback.alert("Unable to fetch the next record", e);
                 parser = null;
-            }
-            finally {
-                if (finished != null) exec(finished);
+            } finally {
+                if (finished != null)
+                    exec(finished);
             }
         }
 

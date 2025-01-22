@@ -21,6 +21,8 @@
 
 package eu.delving.sip.menus;
 
+import eu.delving.metadata.RecDefTree.SourceTree;
+import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
@@ -29,6 +31,7 @@ import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
+import eu.delving.sip.model.StatsModel;
 import eu.delving.stats.Stats;
 
 import javax.swing.*;
@@ -43,10 +46,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
+import static eu.delving.sip.files.Storage.SHACL_VALIDATION;
 import static eu.delving.sip.files.Storage.XSD_VALIDATION;
 
 /**
- * Special functions for experts, not to be spoken of in mixed company, or among people with potential heart
+ * Special functions for experts, not to be spoken of in mixed company, or among
+ * people with potential heart
  * conditions.
  *
  */
@@ -60,6 +65,7 @@ public class ExpertMenu extends JMenu {
         this.sipModel = sipModel;
         this.allFrames = allFrames;
         add(new ToggleXSDValidation());
+        add(new ToggleSHACLValidation());
         add(new SourceIncludedAction());
         add(new MaxUniqueValueLengthAction());
         add(new ReloadMappingAction());
@@ -78,15 +84,13 @@ public class ExpertMenu extends JMenu {
         public void actionPerformed(ActionEvent event) {
             String answer = sipModel.getFeedback().ask(
                     "Enter the maximum length for unique element value",
-                    String.valueOf(Stats.DEFAULT_MAX_UNIQUE_VALUE_LENGTH)
-            );
+                    String.valueOf(Stats.DEFAULT_MAX_UNIQUE_VALUE_LENGTH));
             if (answer != null) {
                 answer = answer.trim();
                 try {
                     int max = Integer.parseInt(answer);
                     sipModel.getStatsModel().setMaxUniqueValueLength(max);
-                }
-                catch (NumberFormatException e) {
+                } catch (NumberFormatException e) {
                     sipModel.getFeedback().alert("Not a number: " + answer);
                 }
             }
@@ -102,18 +106,17 @@ public class ExpertMenu extends JMenu {
         @Override
         public void actionPerformed(ActionEvent event) {
             String sourceIncludedString = sipModel.getStatsModel().getHintsModel().get("sourceIncluded");
-            if (sourceIncludedString == null) sourceIncludedString = "false";
+            if (sourceIncludedString == null)
+                sourceIncludedString = "false";
             String answer = sipModel.getFeedback().ask(
                     "Type 'true' if you want to have source included in the upload",
-                    sourceIncludedString
-            );
+                    sourceIncludedString);
             if (answer != null) {
                 answer = answer.trim();
                 try {
                     boolean sourceIncluded = Boolean.parseBoolean(answer);
                     sipModel.getStatsModel().getHintsModel().set("sourceIncluded", String.valueOf(sourceIncluded));
-                }
-                catch (NumberFormatException e) {
+                } catch (NumberFormatException e) {
                     sipModel.getFeedback().alert("Must be 'true' or 'false': " + answer);
                 }
             }
@@ -127,7 +130,8 @@ public class ExpertMenu extends JMenu {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            if (!sipModel.getMappingModel().hasRecMapping()) return;
+            if (!sipModel.getMappingModel().hasRecMapping())
+                return;
             sipModel.exec(new Work.DataSetPrefixWork() {
 
                 final MappingModel mm = sipModel.getMappingModel();
@@ -151,10 +155,12 @@ public class ExpertMenu extends JMenu {
                 @Override
                 public void run() {
                     try {
-                        dsm.getDataSet().setRecMapping(dsm.getRecMapping(), true);
-                        mm.setRecMapping(dsm.getRecMapping());
-                    }
-                    catch (StorageException e) {
+                        RecMapping recMapping = dsm.getRecMapping();
+                        DataSet dataSet = dsm.getDataSet();
+                        recMapping.validateMappings(new StatsModel.SourceTreeImpl(sipModel.getStatsModel()));
+                        dataSet.setRecMapping(recMapping, true);
+                        mm.setRecMapping(recMapping);
+                    } catch (StorageException e) {
                         sipModel.getFeedback().alert("Cannot setNarthexEntries the mapping", e);
                     }
                 }
@@ -162,17 +168,20 @@ public class ExpertMenu extends JMenu {
         }
     }
 
-    private class ToggleFrameArrangements extends AbstractAction {
+    private class ToggleFrameArrangements extends JCheckBoxMenuItem implements ItemListener {
         public ToggleFrameArrangements() {
             super("Toggle Frame Arrangement Editing");
+            addItemListener(this);
         }
 
         @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            for (FrameBase frame : allFrames.getFrames()) frame.toggleEditMenu();
+        public void itemStateChanged(ItemEvent e) {
+            int state = e.getStateChange();
+            boolean selected = state == ItemEvent.SELECTED;
+            for (FrameBase frame : allFrames.getFrames())
+                frame.toggleEditMenu(selected);
         }
     }
-
 
     private class ToggleXSDValidation extends JCheckBoxMenuItem implements ItemListener {
         public ToggleXSDValidation() {
@@ -191,6 +200,22 @@ public class ExpertMenu extends JMenu {
         }
     }
 
+    private class ToggleSHACLValidation extends JCheckBoxMenuItem implements ItemListener {
+        public ToggleSHACLValidation() {
+            super("Toggle SHACL Validation");
+            boolean state = sipModel.getPreferences().getProperty(SHACL_VALIDATION, "false").contentEquals("true");
+            setState(state);
+            addItemListener(this);
+        }
+
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            int state = e.getStateChange();
+            boolean selected = state == ItemEvent.SELECTED;
+            sipModel.getPreferences().setProperty(SHACL_VALIDATION, String.valueOf(selected));
+            sipModel.saveProperties();
+        }
+    }
 
     private class ShowMemory extends AbstractAction {
         public ShowMemory() {
@@ -203,15 +228,13 @@ public class ExpertMenu extends JMenu {
             sipModel.getFeedback().alert(
                     show("Total Memory", r.totalMemory()) +
                             show("Max Memory", r.maxMemory()) +
-                            show("Free Memory", r.freeMemory())
-            );
+                            show("Free Memory", r.freeMemory()));
         }
 
         private String show(String name, long value) {
             return String.format("%s: %dMb\n", name, value / 1024 / 1024);
         }
     }
-
 
     private class ShowMemoryConfigAction extends AbstractAction {
 
@@ -227,18 +250,19 @@ public class ExpertMenu extends JMenu {
             StringBuilder out = new StringBuilder();
             String JAR_NAME = "SIP-Creator-2014-XX-XX.jar";
             if (os.startsWith("Windows")) {
-                out.append(":: SIP-Creator Startup Batch file for Windows (more memory than ").append(totalMemory).append("Mb)\n");
+                out.append(":: SIP-Creator Startup Batch file for Windows (more memory than ").append(totalMemory)
+                        .append("Mb)\n");
                 out.append("java -jar -Xms1024m -Xmx1024m ").append(JAR_NAME);
-            }
-            else if (os.startsWith("Mac")) {
-                out.append("# SIP-Creator Startup Script for Mac OSX (more memory than ").append(totalMemory).append("Mb)\n");
+            } else if (os.startsWith("Mac")) {
+                out.append("# SIP-Creator Startup Script for Mac OSX (more memory than ").append(totalMemory)
+                        .append("Mb)\n");
                 out.append("java -jar -Xms1024m -Xmx1024m ").append(JAR_NAME);
-            }
-            else {
+            } else {
                 System.out.println("Unrecognized OS: " + os);
             }
             String script = out.toString();
-            final JDialog dialog = new JDialog(null, "Memory Not Configured Yet!", Dialog.ModalityType.APPLICATION_MODAL);
+            final JDialog dialog = new JDialog(null, "Memory Not Configured Yet!",
+                    Dialog.ModalityType.APPLICATION_MODAL);
             JTextArea scriptArea = new JTextArea(3, 40);
             scriptArea.setText(script);
             scriptArea.setSelectionStart(0);
@@ -260,12 +284,10 @@ public class ExpertMenu extends JMenu {
             centralPanel.setBorder(BorderFactory.createEmptyBorder(15, 25, 15, 25));
             centralPanel.add(new JLabel(
                     "<html><b>The SIP-Creator started directly can have too little default memory allocated." +
-                            "<br>It should be started with the following script:</b>"
-            ));
+                            "<br>It should be started with the following script:</b>"));
             centralPanel.add(scriptPanel);
             centralPanel.add(new JLabel(
-                    "<html><b>Please copy the above text into a batch or script file and execute that instead.</b>"
-            ));
+                    "<html><b>Please copy the above text into a batch or script file and execute that instead.</b>"));
             dialog.getContentPane().add(centralPanel, BorderLayout.CENTER);
             dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
             dialog.pack();

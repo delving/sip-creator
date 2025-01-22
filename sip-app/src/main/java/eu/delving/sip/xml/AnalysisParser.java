@@ -47,6 +47,7 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
     public static final int ELEMENT_STEP = 10000;
     private Stats stats = new Stats();
     private Listener listener;
+    private DataSet dataSet;
     private DataSetModel dataSetModel;
     private ProgressListener progressListener;
 
@@ -57,7 +58,8 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
         void failure(String message, Exception exception);
     }
 
-    public AnalysisParser(DataSetModel dataSetModel, int maxUniqueValueLength, Listener listener) {
+    public AnalysisParser(DataSet dataSet, DataSetModel dataSetModel, int maxUniqueValueLength, Listener listener) {
+        this.dataSet = dataSet;
         this.dataSetModel = dataSetModel;
         this.listener = listener;
         stats.maxUniqueValueLength = maxUniqueValueLength;
@@ -70,7 +72,7 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
 
     @Override
     public DataSet getDataSet() {
-        return dataSetModel.getDataSet();
+        return dataSet;
     }
 
     @Override
@@ -85,17 +87,19 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
             XMLInputFactory xmlif = XMLToolFactory.xmlInputFactory();
             Path path = Path.create();
             InputStream inputStream = null;
-            if (dataSetModel.isEmpty()) return;
+            if (dataSetModel != null && dataSetModel.isEmpty()) return;
             try {
-                switch (dataSetModel.getDataSetState()) {
-                    case SOURCED:
-                        inputStream = dataSetModel.getDataSet().openSourceInputStream();
-                        stats.freshStats();
-                        break;
-                    default:
-                        throw new IllegalStateException("Unexpected state: " + dataSetModel.getDataSetState());
+                if (dataSetModel != null) {
+                    switch (dataSetModel.getDataSetState()) {
+                        case SOURCED:
+                            break;
+                        default:
+                            throw new IllegalStateException("Unexpected state: " + dataSetModel.getDataSetState());
+                    }
                 }
-                stats.name = dataSetModel.getDataSet().getDataSetFacts().get("name");
+                inputStream = dataSet.openSourceInputStream();
+                stats.freshStats();
+                stats.name = dataSet.getDataSetFacts().get("name");
                 XMLStreamReader2 input = (XMLStreamReader2) xmlif.createXMLStreamReader(getClass().getName(), inputStream);
                 StringBuilder text = new StringBuilder();
                 int count = 0;
@@ -147,12 +151,14 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
             listener.failure("Cancellation", e);
         }
         catch (Exception e) {
-            switch (dataSetModel.getDataSetState()) {
-                case SOURCED:
-                    dataSetModel.getDataSet().deleteSource();
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected state " + dataSetModel.getDataSetState(), e);
+            if (dataSetModel != null) {
+                switch (dataSetModel.getDataSetState()) {
+                    case SOURCED:
+                        dataSetModel.getDataSet().deleteSource();
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected state " + dataSetModel.getDataSetState(), e);
+                }
             }
             listener.failure("The imported file contains errors, the file has been deleted", e);
         }

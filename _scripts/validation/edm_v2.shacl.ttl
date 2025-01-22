@@ -1,0 +1,1160 @@
+# EDM SHACL Shapes - Part 1: Prefixes and Root Shape
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix edm: <http://www.europeana.eu/schemas/edm/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix ore: <http://www.openarchives.org/ore/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix wgs84: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix rdaGr2: <http://rdvocab.info/ElementsGr2/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ebucore: <http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#> .
+
+# Root shape for EDM RDF
+edm:RDFShape 
+    a sh:NodeShape ;
+    sh:targetClass rdf:RDF ;
+    sh:property [
+        sh:path edm:ProvidedCHO ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:node edm:ProvidedCHOShape ; # Cross-resource validation
+    ] ;
+    sh:property [
+        sh:path ore:Aggregation ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:node edm:AggregationShape ; # Cross-resource validation
+    ] .
+
+# ProvidedCHO Shape - Complete fields with cross-resource validations
+edm:ProvidedCHOShape
+    a sh:NodeShape ;
+    sh:targetClass edm:ProvidedCHO ;
+    # DC Elements with cross-resource validations
+    sh:property [
+        sh:path dc:contributor ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or ( 
+            [ sh:class edm:Agent ]  # Must reference an Agent if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    sh:property [
+        sh:path dc:coverage ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class edm:Place ]  # Must reference a Place if IRI
+            [ sh:class edm:TimeSpan ]  # Or a TimeSpan
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    sh:property [
+        sh:path dc:creator ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class edm:Agent ]  # Must reference an Agent if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    sh:property [
+        sh:path dc:date ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class edm:TimeSpan ]  # Must reference a TimeSpan if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    sh:property [
+        sh:path dc:description ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path dc:format ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path dc:identifier ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    sh:property [
+        sh:path dc:language ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    sh:property [
+        sh:path dc:publisher ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class edm:Agent ]  # Must reference an Agent if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    sh:property [
+        sh:path dc:relation ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path dc:rights ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path dc:source ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path dc:subject ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class skos:Concept ]  # Must reference a Concept if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    sh:property [
+        sh:path dc:title ;
+        sh:nodeKind sh:Literal ;
+        sh:minCount 1 ;  # At least one title is required
+    ] ;
+    sh:property [
+        sh:path dc:type ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class skos:Concept ]  # Must reference a Concept if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    
+    # DC Terms with cross-resource validations
+    sh:property [
+        sh:path dcterms:alternative ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    sh:property [
+        sh:path dcterms:created ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class edm:TimeSpan ]  # Must reference a TimeSpan if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    sh:property [
+        sh:path dcterms:hasPart ;
+        sh:nodeKind sh:IRI ;
+        sh:class edm:ProvidedCHO ;  # Must reference another ProvidedCHO
+    ] ;
+    sh:property [
+        sh:path dcterms:isPartOf ;
+        sh:nodeKind sh:IRI ;
+        sh:class edm:ProvidedCHO ;  # Must reference another ProvidedCHO
+    ] ;
+    sh:property [
+        sh:path dcterms:spatial ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class edm:Place ]  # Must reference a Place if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    sh:property [
+        sh:path dcterms:temporal ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class edm:TimeSpan ]  # Must reference a TimeSpan if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    
+    # EDM properties with cross-resource validations
+    sh:property [
+        sh:path edm:currentLocation ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class edm:Place ]  # Must reference a Place if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    sh:property [
+        sh:path edm:hasMet ;
+        sh:nodeKind sh:IRI ;
+        sh:or (
+            [ sh:class edm:Agent ]  # Can reference an Agent
+            [ sh:class edm:Place ]  # Or a Place
+            [ sh:class edm:TimeSpan ]  # Or a TimeSpan
+        ) ;
+    ] ;
+    sh:property [
+        sh:path edm:isNextInSequence ;
+        sh:nodeKind sh:IRI ;
+        sh:class edm:ProvidedCHO ;  # Must reference another ProvidedCHO
+    ] ;
+    sh:property [
+        sh:path edm:type ;
+        sh:datatype xsd:string ;
+        sh:in ("TEXT" "VIDEO" "IMAGE" "SOUND" "3D") ;
+    ] ;
+    # Type-specific validation for TEXT type
+    sh:property [
+        sh:path dc:language ;
+        sh:minCount 1 ;
+        sh:if [
+            sh:path edm:type ;
+            sh:hasValue "TEXT" ;
+        ] ;
+    ] .
+
+# Aggregation Shape with cross-resource validations
+edm:AggregationShape
+    a sh:NodeShape ;
+    sh:targetClass ore:Aggregation ;
+    
+    # Required properties with cross-resource validations
+    sh:property [
+        sh:path edm:aggregatedCHO ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:class edm:ProvidedCHO ;  # Must reference a valid ProvidedCHO
+    ] ;
+    
+    sh:property [
+        sh:path edm:dataProvider ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class foaf:Organization ]  # Must reference an Organization if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    
+    # View properties with WebResource validation
+    sh:property [
+        sh:path edm:hasView ;
+        sh:nodeKind sh:IRI ;
+        sh:class edm:WebResource ;  # Must reference a valid WebResource
+    ] ;
+    
+    # Either isShownAt or isShownBy must be present
+    sh:or [
+        sh:node [
+            sh:property [
+                sh:path edm:isShownAt ;
+                sh:minCount 1 ;
+                sh:nodeKind sh:IRI ;
+                sh:class edm:WebResource ;
+            ]
+        ];
+        sh:node [
+            sh:property [
+                sh:path edm:isShownBy ;
+                sh:minCount 1 ;
+                sh:nodeKind sh:IRI ;
+                sh:class edm:WebResource ;
+            ]
+        ]
+    ] ;
+    
+    sh:property [
+        sh:path edm:object ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:class edm:WebResource ;  # Must reference a valid WebResource
+    ] ;
+    
+    sh:property [
+        sh:path edm:provider ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class foaf:Organization ]  # Must reference an Organization if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    
+    # Rights properties with validations
+    sh:property [
+        sh:path dc:rights ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    
+    sh:property [
+        sh:path edm:rights ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:or (
+            [
+                # Creative Commons pattern
+                sh:pattern "^http[:]//creativecommons[.]org/licenses/(by|by-sa|by-nd|by-nc|by-nc-sa|by-nc-nd)/[0-9.]+/.*$" ;
+            ]
+            [
+                # Rights Statements pattern
+                sh:pattern "^http[:]//rightsstatements[.]org/vocab/(NoC-NC|NoC-OKLR|InC|InC-EDU|InC-OW-EU|CNE)/1[.]0/$" ;
+            ]
+        ) ;
+    ] ;
+    
+    # UGC property
+    sh:property [
+        sh:path edm:ugc ;
+        sh:maxCount 1 ;
+        sh:in ("true") ;
+    ] ;
+    
+    # Intermediate Provider
+    sh:property [
+        sh:path edm:intermediateProvider ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class foaf:Organization ]  # Must reference an Organization if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    
+    # Additional validations
+    sh:property [
+        # Ensure provider is different from dataProvider if both are literals
+        sh:path edm:provider ;
+        sh:not [
+            sh:equals [
+                sh:path edm:dataProvider ;
+            ] ;
+        ] ;
+    ] ;
+    
+    # Ensure object has corresponding hasView if present
+    sh:property [
+        sh:path edm:object ;
+        sh:qualifiedValueShape [
+            sh:path [sh:inversePath edm:hasView] ;
+            sh:minCount 1 ;
+        ] ;
+    ] .
+
+# WebResource Shape with cross-resource validations
+edm:WebResourceShape
+    a sh:NodeShape ;
+    sh:targetClass edm:WebResource ;
+    
+    # DC Elements with cross-resource validations
+    sh:property [
+        sh:path dc:creator ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class edm:Agent ]  # Must reference an Agent if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    
+    sh:property [
+        sh:path dc:description ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    
+    sh:property [
+        sh:path dc:format ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class skos:Concept ]  # Can reference a format concept
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    
+    sh:property [
+        sh:path dc:rights ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    
+    sh:property [
+        sh:path dc:source ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    
+    sh:property [
+        sh:path dc:type ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class skos:Concept ]  # Can reference a type concept
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    
+    # DC Terms with cross-resource validations
+    sh:property [
+        sh:path dcterms:conformsTo ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    
+    sh:property [
+        sh:path dcterms:created ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class edm:TimeSpan ]  # Must reference a TimeSpan if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    
+    sh:property [
+        sh:path dcterms:extent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    
+    sh:property [
+        sh:path dcterms:hasPart ;
+        sh:nodeKind sh:IRI ;
+        sh:class edm:WebResource ;  # Must reference another WebResource
+    ] ;
+    
+    sh:property [
+        sh:path dcterms:isFormatOf ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    
+    sh:property [
+        sh:path dcterms:isPartOf ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    
+    sh:property [
+        sh:path dcterms:issued ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    
+    # EDM and technical metadata properties
+    sh:property [
+        sh:path edm:isNextInSequence ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:class edm:WebResource ;  # Must reference another WebResource
+    ] ;
+    
+    sh:property [
+        sh:path edm:rights ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:or (
+            [
+                # Creative Commons pattern
+                sh:pattern "^http[:]//creativecommons[.]org/licenses/(by|by-sa|by-nd|by-nc|by-nc-sa|by-nc-nd)/[0-9.]+/.*$" ;
+            ]
+            [
+                # Rights Statements pattern
+                sh:pattern "^http[:]//rightsstatements[.]org/vocab/(NoC-NC|NoC-OKLR|InC|InC-EDU|InC-OW-EU|CNE)/1[.]0/$" ;
+            ]
+        ) ;
+    ] ;
+    
+    # Technical Metadata
+    sh:property [
+        sh:path edm:codecName ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    sh:property [
+        sh:path ebucore:hasMimeType ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    sh:property [
+        sh:path ebucore:fileByteSize ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:datatype xsd:long ;
+    ] ;
+    
+    sh:property [
+        sh:path ebucore:duration ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:pattern "^[0-9]+$" ;  # Must be numeric
+    ] ;
+    
+    sh:property [
+        sh:path ebucore:width ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:datatype xsd:integer ;
+    ] ;
+    
+    sh:property [
+        sh:path ebucore:height ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:datatype xsd:integer ;
+    ] ;
+    
+    sh:property [
+        sh:path edm:spatialResolution ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:datatype xsd:nonNegativeInteger ;
+    ] ;
+    
+    sh:property [
+        sh:path ebucore:sampleSize ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:datatype xsd:integer ;
+    ] ;
+    
+    sh:property [
+        sh:path ebucore:sampleRate ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:datatype xsd:integer ;
+    ] ;
+    
+    sh:property [
+        sh:path ebucore:bitRate ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:datatype xsd:nonNegativeInteger ;
+    ] ;
+    
+    sh:property [
+        sh:path ebucore:frameRate ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:datatype xsd:double ;
+    ] ;
+    
+    sh:property [
+        sh:path edm:hasColorSpace ;
+        sh:maxCount 1 ;
+        sh:in ("CMY" "CMYK" "grayscale" "HCL" "HCLp" "HSB" "HSI" "HSL" "HSV" "HWB" 
+               "Lab" "LCHab" "LCHuv" "LMS" "Log" "Luv" "OHTA" "Rec601Luma" 
+               "Rec601YCbCr" "Rec709Luma" "Rec709YCbCr" "RGB" "scRGB" "sRGB" 
+               "XYZ" "xyY" "YCbCr" "YDbDr" "YCC" "YIQ" "YPbPr" "YUV" "other") ;
+    ] ;
+    
+    sh:property [
+        sh:path edm:componentColor ;
+        sh:maxCount 6 ;
+        sh:nodeKind sh:Literal ;
+        sh:pattern "^[0-9A-Fa-f]{6}$" ;  # Must be 6-digit hex color
+    ] ;
+    
+    sh:property [
+        sh:path ebucore:orientation ;
+        sh:maxCount 1 ;
+        sh:in ("landscape" "portrait") ;
+    ] ;
+    
+    sh:property [
+        sh:path ebucore:audioChannelNumber ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:datatype xsd:nonNegativeInteger ;
+    ] ;
+    
+    # Additional validations
+    sh:property [
+        sh:path dcterms:isReferencedBy ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    
+    sh:property [
+        sh:path edm:preview ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+    ] .
+
+  # Place Shape with cross-resource validations
+edm:PlaceShape
+    a sh:NodeShape ;
+    sh:targetClass edm:Place ;
+    
+    # Geographic coordinates
+    sh:property [
+        sh:path wgs84:lat ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:datatype xsd:float ;
+        sh:minInclusive -90 ;
+        sh:maxInclusive 90 ;
+    ] ;
+    
+    sh:property [
+        sh:path wgs84:long ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:datatype xsd:float ;
+        sh:minInclusive -180 ;
+        sh:maxInclusive 180 ;
+    ] ;
+    
+    sh:property [
+        sh:path wgs84:alt ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:datatype xsd:float ;
+    ] ;
+    
+    # SKOS labeling properties
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    sh:property [
+        sh:path skos:altLabel ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    sh:property [
+        sh:path skos:note ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    # Part relationships with cross-resource validation
+    sh:property [
+        sh:path dcterms:hasPart ;
+        sh:nodeKind sh:IRI ;
+        sh:class edm:Place ;  # Must reference another Place
+    ] ;
+    
+    sh:property [
+        sh:path dcterms:isPartOf ;
+        sh:nodeKind sh:IRI ;
+        sh:class edm:Place ;  # Must reference another Place
+    ] ;
+    
+    # Sequence relationships
+    sh:property [
+        sh:path edm:isNextInSequence ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:class edm:Place ;  # Must reference another Place
+    ] ;
+    
+    # Equivalent resources
+    sh:property [
+        sh:path owl:sameAs ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    
+    # Additional validations
+    
+    # If latitude is present, longitude must also be present and vice versa
+    sh:rule [
+        sh:name "Coordinate completeness" ;
+        sh:condition [
+            sh:path wgs84:lat ;
+            sh:minCount 1 ;
+        ] ;
+        sh:property [
+            sh:path wgs84:long ;
+            sh:minCount 1 ;
+        ] ;
+    ] ;
+    
+    sh:rule [
+        sh:name "Coordinate completeness reverse" ;
+        sh:condition [
+            sh:path wgs84:long ;
+            sh:minCount 1 ;
+        ] ;
+        sh:property [
+            sh:path wgs84:lat ;
+            sh:minCount 1 ;
+        ] ;
+    ] ;
+    
+    # A place should have at least one label (either preferred or alternative)
+    sh:or [
+        sh:property [
+            sh:path skos:prefLabel ;
+            sh:minCount 1 ;
+        ];
+        sh:property [
+            sh:path skos:altLabel ;
+            sh:minCount 1 ;
+        ]
+    ] ;
+    
+    # Hierarchy validation - a place cannot be part of itself
+    sh:property [
+        sh:path dcterms:isPartOf ;
+        sh:not [
+            sh:equals [
+                sh:path [sh:inversePath dcterms:hasPart] ;
+            ] ;
+        ] ;
+    ] ;
+    
+    # If a place is part of another place, there should be a reciprocal hasPart relationship
+    sh:property [
+        sh:path dcterms:isPartOf ;
+        sh:qualifiedValueShape [
+            sh:path [sh:inversePath dcterms:hasPart] ;
+            sh:minCount 1 ;
+        ] ;
+    ] ;
+    
+    # Geographic coordinates should be present for contemporary places
+    sh:property [
+        sh:path dcterms:temporal ;
+        sh:qualifiedValueShape [
+            sh:or (
+                [
+                    sh:path wgs84:lat ;
+                    sh:minCount 1 ;
+                ]
+                [
+                    sh:path skos:note ;
+                    sh:pattern "historical" ;  # Case-insensitive match for "historical"
+                ]
+            ) ;
+        ] ;
+    ] .
+
+# Agent Shape with cross-resource validations
+edm:AgentShape
+    a sh:NodeShape ;
+    sh:targetClass edm:Agent ;
+    
+    # SKOS labeling properties
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    sh:property [
+        sh:path skos:altLabel ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    sh:property [
+        sh:path skos:note ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    # DC properties with cross-resource validations
+    sh:property [
+        sh:path dc:date ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class edm:TimeSpan ]  # Must reference a TimeSpan if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    
+    sh:property [
+        sh:path dc:identifier ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    
+    # Part relationships with cross-resource validation
+    sh:property [
+        sh:path dcterms:hasPart ;
+        sh:nodeKind sh:IRI ;
+        sh:class edm:Agent ;  # Must reference another Agent
+    ] ;
+    
+    sh:property [
+        sh:path dcterms:isPartOf ;
+        sh:nodeKind sh:IRI ;
+        sh:class edm:Agent ;  # Must reference another Agent
+    ] ;
+    
+    # EDM specific properties
+    sh:property [
+        sh:path edm:begin ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    sh:property [
+        sh:path edm:end ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    sh:property [
+        sh:path edm:hasMet ;
+        sh:nodeKind sh:IRI ;
+        sh:or (
+            [ sh:class edm:Agent ]  # Can reference another Agent
+            [ sh:class edm:Place ]  # Or a Place
+            [ sh:class edm:TimeSpan ]  # Or a TimeSpan
+        ) ;
+    ] ;
+    
+    sh:property [
+        sh:path edm:isRelatedTo ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    
+    # FOAF properties
+    sh:property [
+        sh:path foaf:name ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    # RDAGR2 properties with cross-resource validations
+    sh:property [
+        sh:path rdaGr2:biographicalInformation ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    
+    sh:property [
+        sh:path rdaGr2:dateOfBirth ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    sh:property [
+        sh:path rdaGr2:dateOfDeath ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    sh:property [
+        sh:path rdaGr2:dateOfEstablishment ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    sh:property [
+        sh:path rdaGr2:dateOfTermination ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    sh:property [
+        sh:path rdaGr2:gender ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    sh:property [
+        sh:path rdaGr2:placeOfBirth ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class edm:Place ]  # Must reference a Place if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    
+    sh:property [
+        sh:path rdaGr2:placeOfDeath ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class edm:Place ]  # Must reference a Place if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    
+    sh:property [
+        sh:path rdaGr2:professionOrOccupation ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+        sh:or (
+            [ sh:class skos:Concept ]  # Can reference a Concept if IRI
+            [ sh:nodeKind sh:Literal ]  # Or be a literal
+        ) ;
+    ] ;
+    
+    # Equivalent resources
+    sh:property [
+        sh:path owl:sameAs ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    
+    # Additional validations
+    
+    # Must have at least one label or name
+    sh:or [
+        sh:property [
+            sh:path skos:prefLabel ;
+            sh:minCount 1 ;
+        ];
+        sh:property [
+            sh:path skos:altLabel ;
+            sh:minCount 1 ;
+        ];
+        sh:property [
+            sh:path foaf:name ;
+            sh:minCount 1 ;
+        ];
+    ] ;
+    
+    # Date consistency validations for persons
+    sh:rule [
+        sh:name "Birth before death" ;
+        sh:condition [
+            sh:and (
+                [
+                    sh:path rdaGr2:dateOfBirth ;
+                    sh:minCount 1 ;
+                ]
+                [
+                    sh:path rdaGr2:dateOfDeath ;
+                    sh:minCount 1 ;
+                ]
+            ) ;
+        ] ;
+        sh:property [
+            sh:path rdaGr2:dateOfBirth ;
+            sh:lessThan [
+                sh:path rdaGr2:dateOfDeath ;
+            ] ;
+        ] ;
+    ] ;
+    
+    # Date consistency validations for organizations
+    sh:rule [
+        sh:name "Establishment before termination" ;
+        sh:condition [
+            sh:and (
+                [
+                    sh:path rdaGr2:dateOfEstablishment ;
+                    sh:minCount 1 ;
+                ]
+                [
+                    sh:path rdaGr2:dateOfTermination ;
+                    sh:minCount 1 ;
+                ]
+            ) ;
+        ] ;
+        sh:property [
+            sh:path rdaGr2:dateOfEstablishment ;
+            sh:lessThan [
+                sh:path rdaGr2:dateOfTermination ;
+            ] ;
+        ] ;
+    ] ;
+    
+    # A person cannot have both birth/death and establishment/termination dates
+    sh:xone [
+        sh:property [
+            sh:or (
+                [
+                    sh:path rdaGr2:dateOfBirth ;
+                    sh:minCount 1 ;
+                ]
+                [
+                    sh:path rdaGr2:dateOfDeath ;
+                    sh:minCount 1 ;
+                ]
+            ) ;
+        ];
+        sh:property [
+            sh:or (
+                [
+                    sh:path rdaGr2:dateOfEstablishment ;
+                    sh:minCount 1 ;
+                ]
+                [
+                    sh:path rdaGr2:dateOfTermination ;
+                    sh:minCount 1 ;
+                ]
+            ) ;
+        ]
+    ] .
+
+
+# Concept Shape with cross-resource validations
+skos:ConceptShape
+    a sh:NodeShape ;
+    sh:targetClass skos:Concept ;
+    
+    # Labeling properties
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    sh:property [
+        sh:path skos:altLabel ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    sh:property [
+        sh:path skos:hiddenLabel ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    # Documentation properties
+    sh:property [
+        sh:path skos:note ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    sh:property [
+        sh:path skos:notation ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    
+    # Semantic Relations with cross-resource validations
+    sh:property [
+        sh:path skos:broader ;
+        sh:nodeKind sh:IRI ;
+        sh:class skos:Concept ;  # Must reference another Concept
+        # Validate that referenced concept exists and has inverse narrower relation
+        sh:qualifiedValueShape [
+            sh:path [sh:inversePath skos:narrower] ;
+            sh:minCount 1 ;
+        ] ;
+    ] ;
+    
+    sh:property [
+        sh:path skos:narrower ;
+        sh:nodeKind sh:IRI ;
+        sh:class skos:Concept ;  # Must reference another Concept
+        # Validate that referenced concept exists and has inverse broader relation
+        sh:qualifiedValueShape [
+            sh:path [sh:inversePath skos:broader] ;
+            sh:minCount 1 ;
+        ] ;
+    ] ;
+    
+    sh:property [
+        sh:path skos:related ;
+        sh:nodeKind sh:IRI ;
+        sh:class skos:Concept ;  # Must reference another Concept
+        # Validate that referenced concept has reciprocal related relation
+        sh:qualifiedValueShape [
+            sh:path [sh:inversePath skos:related] ;
+            sh:minCount 1 ;
+        ] ;
+    ] ;
+    
+    # Mapping Relations with cross-resource validations
+    sh:property [
+        sh:path skos:broadMatch ;
+        sh:nodeKind sh:IRI ;
+        sh:class skos:Concept ;
+    ] ;
+    
+    sh:property [
+        sh:path skos:narrowMatch ;
+        sh:nodeKind sh:IRI ;
+        sh:class skos:Concept ;
+    ] ;
+    
+    sh:property [
+        sh:path skos:relatedMatch ;
+        sh:nodeKind sh:IRI ;
+        sh:class skos:Concept ;
+    ] ;
+    
+    sh:property [
+        sh:path skos:exactMatch ;
+        sh:nodeKind sh:IRI ;
+        sh:class skos:Concept ;
+        # Validate symmetry of exact matches
+        sh:qualifiedValueShape [
+            sh:path [sh:inversePath skos:exactMatch] ;
+            sh:minCount 1 ;
+        ] ;
+    ] ;
+    
+    sh:property [
+        sh:path skos:closeMatch ;
+        sh:nodeKind sh:IRI ;
+        sh:class skos:Concept ;
+        # Validate symmetry of close matches
+        sh:qualifiedValueShape [
+            sh:path [sh:inversePath skos:closeMatch] ;
+            sh:minCount 1 ;
+        ] ;
+    ] ;
+    
+    # Concept Scheme membership
+    sh:property [
+        sh:path skos:inScheme ;
+        sh:nodeKind sh:IRI ;
+        sh:class skos:ConceptScheme ;
+    ] ;
+    
+    # Additional validations
+    
+    # Must have at least one preferred label
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:minCount 1 ;
+    ] ;
+    
+    # Can't have two preferred labels in the same language
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:uniqueLang true ;
+    ] ;
+    
+    # A concept cannot be its own broader/narrower term
+    sh:property [
+        sh:path skos:broader ;
+        sh:not [
+            sh:equals [
+                sh:path [sh:inversePath skos:narrower] ;
+            ] ;
+        ] ;
+    ] ;
+    
+    # Hierarchical relationship validation
+    sh:rule [
+        sh:name "No circular hierarchies" ;
+        sh:not [
+            sh:and (
+                [
+                    sh:path skos:broader ;
+                ]
+                [
+                    sh:path [sh:inversePath skos:narrower] ;
+                ]
+            ) ;
+        ] ;
+    ] ;
+    
+    # Mapping relationships should be used between concepts in different schemes
+    sh:rule [
+        sh:name "Mapping between schemes" ;
+        sh:condition [
+            sh:or (
+                [sh:path skos:exactMatch]
+                [sh:path skos:closeMatch]
+                [sh:path skos:broadMatch]
+                [sh:path skos:narrowMatch]
+                [sh:path skos:relatedMatch]
+            ) ;
+        ] ;
+        sh:property [
+            sh:path skos:inScheme ;
+            sh:not [
+                sh:equals [
+                    sh:path [sh:inversePath skos:inScheme] ;
+                ] ;
+            ] ;
+        ] ;
+    ] ;
+    
+    # Semantic relationship consistency
+    sh:xone [
+        # Either use semantic relations (broader/narrower/related)
+        sh:property [
+            sh:or (
+                [sh:path skos:broader]
+                [sh:path skos:narrower]
+                [sh:path skos:related]
+            ) ;
+        ];
+        # Or use mapping relations
+        sh:property [
+            sh:or (
+                [sh:path skos:broadMatch]
+                [sh:path skos:narrowMatch]
+                [sh:path skos:relatedMatch]
+                [sh:path skos:exactMatch]
+                [sh:path skos:closeMatch]
+            ) ;
+        ]
+    ] .
+

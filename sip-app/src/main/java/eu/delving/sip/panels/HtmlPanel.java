@@ -52,7 +52,7 @@ public class HtmlPanel extends JPanel {
         view.setContentType("text/html");
         view.setDocument(createHtmlDocument());
         view.setEditable(false);
-        add(SwingHelper.scrollV(view));
+        add(SwingHelper.scrollVH(view));
         setPreferredSize(new Dimension(200, 200));
     }
 

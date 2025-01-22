@@ -52,7 +52,8 @@ import java.util.StringTokenizer;
 import static eu.delving.XStreamFactory.getStreamFor;
 
 /**
- * Gather all the statistics together, identifying whether they are from imported or source.  Also convert one
+ * Gather all the statistics together, identifying whether they are from
+ * imported or source. Also convert one
  * to the other.
  */
 @XStreamAlias("delving-statistics")
@@ -73,8 +74,7 @@ public class Stats {
             Stats stats = (Stats) xstream.fromXML(inReader);
             stats.finish();
             return stats;
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -83,8 +83,7 @@ public class Stats {
         try {
             Writer outWriter = new OutputStreamWriter(out, "UTF-8");
             getStreamFor(Stats.class).toXML(stats, outWriter);
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -99,22 +98,28 @@ public class Stats {
 
     public void recordValue(Path path, String value) {
         ValueStats valueStats = fieldValueMap.get(path);
-        if (valueStats == null) fieldValueMap.put(path, valueStats = new ValueStats());
+        if (valueStats == null)
+            fieldValueMap.put(path, valueStats = new ValueStats());
         valueStats.recordOccurrence();
-        if (maxUniqueValueLength == 0) maxUniqueValueLength = DEFAULT_MAX_UNIQUE_VALUE_LENGTH;
-        if (value != null) valueStats.recordValue(value.trim(), maxUniqueValueLength);
+        if (maxUniqueValueLength == 0)
+            maxUniqueValueLength = DEFAULT_MAX_UNIQUE_VALUE_LENGTH;
+        if (value != null)
+            valueStats.recordValue(value.trim(), maxUniqueValueLength);
         if (recordStats != null && value != null) {
             recordStats.recordNonemptyOccurrence(path);
         }
     }
 
     public void recordRecordEnd() {
-        if (recordStats != null) recordStats.recordRecordEnd();
+        if (recordStats != null)
+            recordStats.recordRecordEnd();
     }
 
     public void finish() {
-        for (ValueStats stats : fieldValueMap.values()) stats.finish();
-        if (recordStats != null) recordStats.finish();
+        for (ValueStats stats : fieldValueMap.values())
+            stats.finish();
+        if (recordStats != null)
+            recordStats.finish();
     }
 
     @XStreamAsAttribute
@@ -156,7 +161,8 @@ public class Stats {
         public void recordRecordEnd() {
             for (Map.Entry<Path, Integer> entry : countPerRecord.entrySet()) {
                 Histogram histogram = frequencies.get(entry.getKey());
-                if (histogram == null) frequencies.put(entry.getKey(), histogram = new Histogram());
+                if (histogram == null)
+                    frequencies.put(entry.getKey(), histogram = new Histogram());
                 histogram.recordValue(entry.getValue().toString());
             }
             fieldCount.recordValue(String.valueOf(countPerRecord.size()));
@@ -165,7 +171,8 @@ public class Stats {
         }
 
         public void finish() {
-            for (Histogram histogram : frequencies.values()) histogram.finish(recordCount);
+            for (Histogram histogram : frequencies.values())
+                histogram.finish(recordCount);
             fieldCount.finish(recordCount);
         }
     }
@@ -198,31 +205,42 @@ public class Stats {
         }
 
         public void recordValue(String value, int maxUniqueValueLength) {
-            if (value.isEmpty()) return;
-            if (sample == null) sample = new Sample();
+            if (value.isEmpty())
+                return;
+            if (sample == null)
+                sample = new Sample();
             sample.recordValue(value);
-            if (wordCounts == null) wordCounts = new Histogram();
+            if (wordCounts == null)
+                wordCounts = new Histogram();
             int wordCount = 0;
-            for (StringTokenizer token = new StringTokenizer(value); token.hasMoreTokens(); token.nextToken()) wordCount++;
+            for (StringTokenizer token = new StringTokenizer(value); token.hasMoreTokens(); token.nextToken())
+                wordCount++;
             wordCounts.recordValue(String.valueOf(wordCount));
             if (!histogramTrimmed) {
-                if (values == null) values = new Histogram();
+                if (values == null)
+                    values = new Histogram();
                 values.recordValue(value);
-                if (values.isTrimmed()) histogramTrimmed = true;
+                if (values.isTrimmed())
+                    histogramTrimmed = true;
             }
             if (unique == null || unique) {
-                if (uniqueness == null) uniqueness = new Uniqueness(maxUniqueValueLength);
+                if (uniqueness == null)
+                    uniqueness = new Uniqueness(maxUniqueValueLength);
                 unique = uniqueness.isStillUnique(value);
-                if (!unique) uniqueness = null;
+                if (!unique)
+                    uniqueness = null;
             }
         }
 
         public String getSummary() {
             if (sample != null) {
-                if (unique != null && unique) return String.format("All %d values are completely unique", total);
-                return (values == null ? "No" : (values.trimmed ? "Trimmed" : "Full"))+" histogram of values available";
+                if (unique != null && unique)
+                    return String.format("All %d values are completely unique", total);
+                return (values == null ? "No" : (values.trimmed ? "Trimmed" : "Full"))
+                        + " histogram of values available";
             }
-            if (total == 1) return "Element appears just once.";
+            if (total == 1)
+                return "Element appears just once.";
             return String.format("Element appears %d times.", total);
         }
 
@@ -230,12 +248,12 @@ public class Stats {
             if (values != null) {
                 if (unique != null && unique) {
                     values = null;
-                }
-                else {
+                } else {
                     values.finish(total);
                 }
             }
-            if (wordCounts != null) wordCounts.finish(total);
+            if (wordCounts != null)
+                wordCounts.finish(total);
         }
 
         public boolean isUnique() {
@@ -250,13 +268,17 @@ public class Stats {
         public Set<String> values = new HashSet<String>();
 
         public void recordValue(String value) {
-            String trimmedValue = value.length() > SAMPLE_MAX_VALUE_LENGTH ? value.substring(0, SAMPLE_MAX_VALUE_LENGTH) + "..." : value;
-            if (values.size() < SAMPLE_SIZE || Math.random() > 0.1) values.add(trimmedValue);
+            String trimmedValue = value.length() > SAMPLE_MAX_VALUE_LENGTH
+                    ? value.substring(0, SAMPLE_MAX_VALUE_LENGTH) + "..."
+                    : value;
+            if (values.size() < SAMPLE_SIZE || Math.random() > 0.1)
+                values.add(trimmedValue);
             if (values.size() > SAMPLE_SIZE * 2) {
                 Iterator<String> walk = values.iterator();
                 while (walk.hasNext()) {
                     walk.next();
-                    if (Math.random() > 0.5) walk.remove();
+                    if (Math.random() > 0.5)
+                        walk.remove();
                 }
             }
         }
@@ -270,12 +292,13 @@ public class Stats {
         }
 
         private Set<String> getSelection(int size) {
-            if (values.size() <= size) return values;
+            if (values.size() <= size)
+                return values;
             List<String> list = new ArrayList<String>(values.size());
             list.addAll(values);
             Set<String> values = new HashSet<String>();
             while (values.size() < size) {
-                int index = (int)(Math.random() * list.size());
+                int index = (int) (Math.random() * list.size());
                 values.add(list.get(index));
                 list.remove(index);
             }
@@ -296,7 +319,8 @@ public class Stats {
         private boolean trimmed;
 
         @XStreamImplicit
-        public Map<String, Counter> counterMap = new HashMap<String, Counter>((int) (HISTOGRAM_MAX_SIZE * HISTOGRAM_OVERSAMPLING));
+        public Map<String, Counter> counterMap = new HashMap<String, Counter>(
+                (int) (HISTOGRAM_MAX_SIZE * HISTOGRAM_OVERSAMPLING));
 
         @XStreamOmitField
         private int storageSize;
@@ -316,7 +340,8 @@ public class Stats {
                 int countDown = HISTOGRAM_MAX_SIZE;
                 storageSize = 0;
                 for (Counter c : counters) {
-                    if (countDown-- == 0) break;
+                    if (countDown-- == 0)
+                        break;
                     counterMap.put(c.value, c);
                     storageSize += c.value.length();
                 }
@@ -354,7 +379,7 @@ public class Stats {
     }
 
     @XStreamAlias("count")
-    @XStreamConverter(value = ToAttributedValueConverter.class, strings = {"value"})
+    @XStreamConverter(value = ToAttributedValueConverter.class, strings = { "value" })
     public static class Counter implements Comparable<Counter> {
         @XStreamAsAttribute
         public int count;
@@ -376,7 +401,8 @@ public class Stats {
         @Override
         public int compareTo(Counter counter) {
             int diff = counter.count - count;
-            if (diff == 0) return value.compareTo(counter.value);
+            if (diff == 0)
+                return value.compareTo(counter.value);
             return diff;
         }
 
@@ -403,8 +429,10 @@ public class Stats {
         }
 
         public boolean isStillUnique(String value) {
-            if (value.length() > maxValueSize) value = value.substring(0, maxValueSize);
-            if (all.contains(value)) return false;
+            if (value.length() > maxValueSize)
+                value = value.substring(0, maxValueSize);
+            if (all.contains(value))
+                return false;
             all.add(value);
             if (!exceedsThreshold && all.size() > HOLD_THRESHOLD) {
                 Set<String> dbSet = DBMaker.newTempHashSet();
@@ -416,7 +444,8 @@ public class Stats {
         }
 
         public int getSize() {
-            if (all == null) return 0;
+            if (all == null)
+                return 0;
             return all.size();
         }
     }

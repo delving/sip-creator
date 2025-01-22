@@ -311,7 +311,7 @@ public class RecDef {
         public void resolve(RecDef recDef) {
             if (recDef.prefix == null) throw new RuntimeException("No prefix found");
             if (path != null) {
-                path = path.withDefaultPrefix(recDef.prefix);
+                path = path.withDefaultPrefix(recDef.root.tag.getPrefix());
                 boolean isAttr = path.peek().isAttribute();
                 Elem elem = isAttr ? null : recDef.root.findElem(path, 0);
                 Attr attr = isAttr ? recDef.root.findAttr(path, 0) : null;

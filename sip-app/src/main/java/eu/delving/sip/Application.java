@@ -23,6 +23,7 @@ package eu.delving.sip;
 
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.CachedResourceResolver;
+import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.sip.actions.UnlockMappingAction;
 import eu.delving.sip.actions.ValidateAction;
@@ -33,6 +34,7 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.VisualFeedback;
 import eu.delving.sip.base.Work;
+import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.HomeDirectory;
 import eu.delving.sip.files.SchemaFetcher;
 import eu.delving.sip.files.Storage;
@@ -44,8 +46,10 @@ import eu.delving.sip.frames.RemoteDataSetFrame;
 import eu.delving.sip.menus.ExpertMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.MappingModel;
+import eu.delving.sip.model.MappingModel.ChangeListenerAdapter;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.SipProperties;
+import eu.delving.sip.model.StatsModel;
 import eu.delving.sip.panels.StatusPanel;
 import eu.delving.sip.panels.WorkPanel;
 import org.apache.http.HttpResponse;
@@ -54,9 +58,15 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
+import org.apache.jena.query.ARQ;
 import org.apache.jena.riot.RDFFormat;
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import org.apache.jena.sys.JenaSystem;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
@@ -85,8 +95,10 @@ import static eu.delving.sip.files.Storage.NARTHEX_USERNAME;
 import static eu.delving.sip.model.MappingModel.ChangeListenerAdapter;
 
 /**
- * The main application, based on the SipModel and bringing everything together in a big frame with a central
- * desktop pane, with a side panel and panels along the bottom, as well as menus above.
+ * The main application, based on the SipModel and bringing everything together
+ * in a big frame with a central
+ * desktop pane, with a side panel and panels along the bottom, as well as menus
+ * above.
  *
  *
  */
@@ -101,14 +113,14 @@ public class Application {
     private AllFrames allFrames;
     private VisualFeedback feedback;
     private StatusPanel statusPanel;
-    private Timer resizeTimer;
+    // private Timer resizeTimer;
     private ExpertMenu expertMenu;
     private CreateSipZipAction createSipZipAction;
     private UnlockMappingAction unlockMappingAction;
     private final static SipProperties sipProperties = new SipProperties();
 
     public static boolean canWritePocketFiles() {
-        return "true".equals(sipProperties.getProp().getProperty("writePocketFiles"));
+        return !"false".equals(sipProperties.getProp().getProperty("writePocketFiles"));
     }
 
     public static String orgID() {
@@ -121,7 +133,7 @@ public class Application {
             return RDFFormat.RDFXML;
         }
         if ("JSONLD".equals(rdfFormat)) {
-            return RDFFormat.JSONLD_COMPACT_FLAT;
+            return RDFFormat.JSONLD_COMPACT_PRETTY;
         }
         if ("NQUADS".equals(rdfFormat)) {
             return RDFFormat.NQUADS;
@@ -136,23 +148,33 @@ public class Application {
     }
 
     private Application(final File storageDir) throws StorageException {
+        // Make sure Jena gets initialized properly, including ARQ
+        // (avoid problem with ARQ.getContext() being null in executable .jar)
+        JenaSystem.init();
+        ARQ.init();
+
         GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         desktop = new JDesktopPane();
         desktop.setMinimumSize(new Dimension(800, 600));
-        resizeTimer = new Timer(DEFAULT_RESIZE_INTERVAL, actionEvent -> {
-            resizeTimer.stop();
-            for (JInternalFrame frame : desktop.getAllFrames()) {
-                if (frame instanceof FrameBase) {
-                    ((FrameBase) frame).ensureOnScreen();
-                }
-            }
-        });
-        desktop.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent componentEvent) {
-                resizeTimer.restart();
-            }
-        });
+        // Probably we don't need to ensureOnScreen anymore (just click on a view button
+        // to reset)
+        /*
+         * resizeTimer = new Timer(DEFAULT_RESIZE_INTERVAL, actionEvent -> {
+         * resizeTimer.stop();
+         * for (JInternalFrame frame : desktop.getAllFrames()) {
+         * if (frame instanceof FrameBase) {
+         * ((FrameBase) frame).ensureOnScreen();
+         * }
+         * }
+         * });
+         * desktop.addComponentListener(new ComponentAdapter() {
+         * 
+         * @Override
+         * public void componentResized(ComponentEvent componentEvent) {
+         * resizeTimer.restart();
+         * }
+         * });
+         */
         feedback = new VisualFeedback(home, desktop, sipProperties.getProp());
         // todo: be sure to set this
         String serverUrl = sipProperties.getProp().getProperty(NARTHEX_URL, "http://delving.org/narthex");
@@ -160,8 +182,7 @@ public class Application {
         SchemaRepository schemaRepository;
         try {
             schemaRepository = new SchemaRepository(new SchemaFetcher(httpClient));
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new StorageException("Unable to create Schema Repository", e);
         }
         ResolverContext context = new ResolverContext();
@@ -211,7 +232,6 @@ public class Application {
             }
         });
         createSipZipAction = new CreateSipZipAction();
-        expertMenu = new ExpertMenu(sipModel, allFrames);
         statusPanel = new StatusPanel(sipModel);
         home = new JFrame();
         home.addComponentListener(new ComponentAdapter() {
@@ -221,12 +241,14 @@ public class Application {
             }
         });
         JPanel content = (JPanel) home.getContentPane();
+        content.setLayout(new BorderLayout());
         content.setFocusable(true);
         FrameBase dataSetFrame = new RemoteDataSetFrame(sipModel, networkClient);
         LogFrame logFrame = new LogFrame(sipModel);
         feedback.setLog(logFrame.getLog());
         allFrames = new AllFrames(sipModel, content, dataSetFrame, logFrame);
-        desktop.setBackground(new Color(190, 190, 200));
+        expertMenu = new ExpertMenu(sipModel, allFrames);
+        //desktop.setBackground(new Color(190, 190, 200));
         content.add(desktop, BorderLayout.CENTER);
         sipModel.getMappingModel().addChangeListener(new ChangeListenerAdapter() {
             @Override
@@ -280,8 +302,7 @@ public class Application {
                     DataSetModel dataSetModel = sipModel.getDataSetModel();
                     home.setTitle(String.format(
                             titleString() + " - [%s -> %s]",
-                            dataSetModel.getDataSet().getSpec(), dataSetModel.getPrefix().toUpperCase()
-                    ));
+                            dataSetModel.getDataSet().getSpec(), dataSetModel.getPrefix().toUpperCase()));
                     break;
             }
         });
@@ -292,8 +313,7 @@ public class Application {
     private String titleString() {
         if (version != null) {
             return String.format("SIP-App %s", version);
-        }
-        else {
+        } else {
             return "SIP-App Test";
         }
     }
@@ -307,12 +327,14 @@ public class Application {
         JPanel p = new JPanel(new GridLayout(1, 0, 6, 6));
         p.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createBevelBorder(0),
-                BorderFactory.createEmptyBorder(6, 6, 6, 6)
-        ));
+                BorderFactory.createEmptyBorder(6, 6, 6, 6)));
         p.add(statusPanel);
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.add(new WorkPanel(sipModel), BorderLayout.CENTER);
         rightPanel.add(createButtonPanel(), BorderLayout.WEST);
+        JPanel enforceMinimumHeight = new JPanel();
+        enforceMinimumHeight.setPreferredSize(new Dimension(0, 150));
+        rightPanel.add(enforceMinimumHeight, BorderLayout.EAST);
         p.add(rightPanel);
         return p;
     }
@@ -336,6 +358,45 @@ public class Application {
         @Override
         public void run() {
             sipModel.analyzeFields();
+            // ensure that the record definition is reloaded
+            reloadRecordDefinition(sipModel);
+        }
+    }
+
+    private void reloadRecordDefinition(SipModel sipModel) {
+        if (sipModel.getMappingModel().hasRecMapping()) {
+            sipModel.exec(new Work.DataSetPrefixWork() {
+                final MappingModel mm = sipModel.getMappingModel();
+                final DataSetModel dsm = sipModel.getDataSetModel();
+
+                @Override
+                public String getPrefix() {
+                    return sipModel.getMappingModel().getPrefix();
+                }
+
+                @Override
+                public DataSet getDataSet() {
+                    return sipModel.getDataSetModel().getDataSet();
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.RELOAD_MAPPING;
+                }
+
+                @Override
+                public void run() {
+                    try {
+                        RecMapping recMapping = dsm.getRecMapping();
+                        DataSet dataSet = dsm.getDataSet();
+                        recMapping.validateMappings(new StatsModel.SourceTreeImpl(sipModel.getStatsModel()));
+                        dataSet.setRecMapping(recMapping, true);
+                        mm.setRecMapping(recMapping);
+                    } catch (StorageException e) {
+                        sipModel.getFeedback().alert("Cannot set the mapping", e);
+                    }
+                }
+            });
         }
     }
 
@@ -343,9 +404,9 @@ public class Application {
         if (!sipModel.getWorkModel().isEmpty()) {
             boolean exitAnyway = feedback.confirm(
                     "Busy",
-                    "There are jobs busy, are you sure you want to exit?"
-            );
-            if (!exitAnyway) return;
+                    "There are jobs busy, are you sure you want to exit?");
+            if (!exitAnyway)
+                return;
         }
         sipProperties.saveProperties();
         System.exit(0);
@@ -353,12 +414,12 @@ public class Application {
 
     private void destroy() {
         sipModel.shutdown();
-        resizeTimer.stop();
+        // resizeTimer.stop();
         home.setVisible(false);
         home.dispose();
     }
 
-    public  static class ResolverContext implements CachedResourceResolver.Context {
+    public static class ResolverContext implements CachedResourceResolver.Context {
         private Storage storage;
         private HttpClient httpClient;
 
@@ -379,12 +440,10 @@ public class Application {
                 if (line.getStatusCode() != HttpStatus.SC_OK) {
                     throw new IOException(String.format(
                             "HTTP Error %s (%s) on %s",
-                            line.getStatusCode(), line.getReasonPhrase(), url
-                    ));
+                            line.getStatusCode(), line.getReasonPhrase(), url));
                 }
                 return EntityUtils.toString(response.getEntity());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException("Fetching problem: " + url, e);
             }
         }
@@ -413,13 +472,13 @@ public class Application {
 
         @Override
         public void run() {
-            if (application != null) application.destroy();
+            if (application != null)
+                application.destroy();
             try {
                 application = new Application(HomeDirectory.WORK_DIR);
                 application.home.setVisible(true);
                 application.allFrames.initiate();
-            }
-            catch (StorageException e) {
+            } catch (StorageException e) {
                 JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
                 e.printStackTrace();
             }
@@ -438,16 +497,17 @@ public class Application {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             setEnabled(false);
-            if (sipModel.getDataSetModel().isEmpty()) return;
+            if (sipModel.getDataSetModel().isEmpty())
+                return;
             try {
                 String sourceIncludedString = sipModel.getStatsModel().getHintsModel().get("sourceIncluded");
-                if (sourceIncludedString == null) sourceIncludedString = "false";
+                if (sourceIncludedString == null)
+                    sourceIncludedString = "false";
                 boolean sourceIncluded = Boolean.parseBoolean(sourceIncludedString);
                 sipModel.getDataSetModel().createSipZip(sourceIncluded);
                 sipModel.getFeedback().alert("A new SIP file has been created and is ready for upload.");
                 allFrames.initiate();
-            }
-            catch (StorageException e) {
+            } catch (StorageException e) {
                 sipModel.getFeedback().alert("Unable to create sip zip", e);
             }
         }
@@ -460,8 +520,7 @@ public class Application {
                 Properties pomProperties = new Properties();
                 pomProperties.load(resource.openStream());
                 return pomProperties.getProperty("version");
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.err.println("Cannot read maven resource");
             }
         }
@@ -470,13 +529,28 @@ public class Application {
 
     public static void main(final String[] args) throws Exception {
         version = getPomVersion();
+
         String lcOSName = System.getProperty("os.name").toLowerCase();
         final boolean isMac = lcOSName.startsWith("mac os x");
         if (isMac) {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
             System.setProperty("apple.awt.application.name", "SIP Creator");
+            // UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }
+
+        // In (at least) the GTK system look and feel, for JDesktopPane there is a task
+        // bar at the bottom
+        // which blocks view of the frames - disable it
+        UIManager.put("InternalFrame.useTaskBar", Boolean.FALSE);
+
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception ex) {
+            System.err.println("Failed to initialize FlatLaf look-and-feel");
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
+        // UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
         EventQueue.invokeLater(LAUNCH);
     }
 

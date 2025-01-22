@@ -34,6 +34,9 @@ import java.io.UnsupportedEncodingException;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -190,8 +193,14 @@ public class Hasher {
         return toHexadecimal(messageDigest.digest());
     }
 
-    public String prefixFileName(String fileName) {
-        return getHashString() + SEPARATOR + fileName;
+    public static String prefixFileName(String fileName) {
+        //return getHashString() + SEPARATOR + fileName;
+        return prefixFileName(fileName, Calendar.getInstance().getTime());
+    }
+
+    public static String prefixFileName(String fileName, Date time) {
+        String timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss").format(time);
+        return timestamp + SEPARATOR + fileName;
     }
 
     static final String HEXES = "0123456789ABCDEF";

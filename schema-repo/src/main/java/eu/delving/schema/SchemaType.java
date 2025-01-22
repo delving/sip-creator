@@ -31,7 +31,8 @@ public enum SchemaType {
     FACT_DEFINITIONS("definition-list.xml"),
     RECORD_DEFINITION("record-definition.xml"),
     VALIDATION_SCHEMA("validation.xsd"),
-    VIEW_DEFINITION("view-definition.xml");
+    VIEW_DEFINITION("view-definition.xml"),
+    SHACL_SHAPE("shacl.ttl");
 
     public final String fileName;
 

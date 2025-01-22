@@ -32,13 +32,15 @@ import eu.delving.metadata.Tag;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.files.Storage;
+import org.codehaus.stax2.ri.evt.Stax2EventAllocatorImpl;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.*;
 import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.util.XMLEventAllocator;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -60,10 +62,21 @@ public class MetadataParser {
     private MetadataRecordFactory factory = new MetadataRecordFactory(namespaces);
     private ProgressListener progressListener;
     private boolean isSourceExhausted;
+    private final boolean isAttachingSource;
+    private final XMLEventAllocator eventAllocator;
 
     public MetadataParser(InputStream inputStream, int recordCount) throws XMLStreamException {
+        this(inputStream, recordCount, false);
+    }
+
+    public MetadataParser(InputStream inputStream, int recordCount, boolean attachSource) throws XMLStreamException {
         this.inputStream = inputStream;
-        this.input = XMLToolFactory.xmlInputFactory().createXMLStreamReader("Metadata", inputStream);
+        XMLInputFactory inputFactory = XMLToolFactory.xmlInputFactory();
+        this.input = inputFactory.createXMLStreamReader("Metadata", inputStream);
+
+        this.isAttachingSource = attachSource;
+        // getEventAllocator() returns null: this.eventAllocator = XMLToolFactory.xmlInputFactory().getEventAllocator();
+        this.eventAllocator = attachSource ? new Stax2EventAllocatorImpl() : null;
     }
 
     public void setProgressListener(ProgressListener progressListener) {
@@ -79,7 +92,26 @@ public class MetadataParser {
         MetadataRecord metadataRecord = null;
         GroovyNode node = null;
         StringBuilder value = new StringBuilder();
+
+        StringWriter sourceWriter = null;
+        XMLEventWriter eventWriter = null;
+        boolean skipInitialWhitespace = true;
+        if (isAttachingSource) {
+            sourceWriter = new StringWriter(1024);
+            eventWriter = XMLToolFactory.xmlOutputFactory().createXMLEventWriter(sourceWriter);
+        }
+
         while (metadataRecord == null) {
+            if (isAttachingSource && path.parent() != null) {
+                if (!(skipInitialWhitespace && input.getEventType() == XMLEvent.CHARACTERS
+                    && input.getText().trim().length() == 0)) {
+                    if (!(input.getEventType() == XMLStreamConstants.END_ELEMENT && skipInitialWhitespace)) {
+                        eventWriter.add(eventAllocator.allocate(input));
+                        skipInitialWhitespace = false;
+                    }
+                }
+            }
+
             switch (input.getEventType()) {
                 case XMLEvent.START_DOCUMENT:
                     break;
@@ -152,6 +184,14 @@ public class MetadataParser {
             }
             input.next();
         }
+
+        if (isAttachingSource && metadataRecord != null) {
+            if (!skipInitialWhitespace) {
+                eventWriter.close();
+            }
+            return MetadataRecord.create(metadataRecord, sourceWriter.toString());
+        }
+
         return metadataRecord;
     }
 

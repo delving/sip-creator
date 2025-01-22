@@ -59,10 +59,10 @@ import java.util.SortedSet;
 
 public class CreateFrame extends FrameBase {
     private static final String SELECT_STATS = "<html><center><h3>Select Source</h3></center>" +
-            "<p>When you select from the source tree, this panel will" +
+            "<p>When you select from the source tree, this panel will " +
             "show statistical information about your selection</p></html>";
     private static final String SELECT_RECDEF = "<html><center><h3>Select Target</h3></center>" +
-            "<p>When you select from the target tree, this panel will" +
+            "<p>When you select from the target tree, this panel will " +
             "show documentation about your selection</p></html>";
     private CreateModel createModel;
     private HtmlPanel statsHtml = new HtmlPanel("Source Statistics");

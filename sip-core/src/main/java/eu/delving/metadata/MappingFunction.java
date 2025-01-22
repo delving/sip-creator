@@ -21,6 +21,7 @@
 
 package eu.delving.metadata;
 
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -35,7 +36,8 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
- * This class describes a utility function (closure) which is available in the mapping code so that
+ * This class describes a utility function (closure) which is available in the
+ * mapping code so that
  * re-used code need not be repeated.
  */
 @XStreamAlias("mapping-function")
@@ -128,17 +130,15 @@ public class MappingFunction implements Comparable<MappingFunction> {
     private void toUserCode(CodeOut codeOut, String editedCode) {
         if (editedCode != null) {
             StringUtil.indentCode(editedCode, codeOut);
-        }
-        else if (groovyCode != null) {
+        } else if (groovyCode != null) {
             StringUtil.indentCode(groovyCode, codeOut);
-        }
-        else {
+        } else {
             codeOut.line(DEFAULT_VALUE);
         }
     }
 
     public String toString() {
-        if(isStandard) {
+        if (isStandard) {
             return name + "(" + parameterNames.stream().collect(Collectors.joining(",")) + ")";
         }
         return String.format("%s(it)", name);
@@ -146,8 +146,10 @@ public class MappingFunction implements Comparable<MappingFunction> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         MappingFunction function = (MappingFunction) o;
         return !(name != null ? !name.equals(function.name) : function.name != null);
     }
@@ -169,7 +171,9 @@ public class MappingFunction implements Comparable<MappingFunction> {
     }
 
     public static FunctionList read(InputStream inputStream) {
-        return (FunctionList) XStreamFactory.getStreamFor(FunctionList.class).fromXML(inputStream);
+        XStream xstream = XStreamFactory.getStreamFor(FunctionList.class);
+        xstream.processAnnotations(MappingFunction.class);
+        xstream.processAnnotations(FunctionList.class);
+        return (FunctionList) xstream.fromXML(inputStream);
     }
 }
-

@@ -49,6 +49,7 @@ public class SwingHelper {
     public static Color NORMAL_BG = new Color(255, 255, 255);
     public static Color NORMAL_FG = new Color(0, 0, 0);
     public static Color ERROR_BG = new Color(255, 200, 200);
+    public static Color WARNING_BG = new Color(255, 255, 200);
     public static Color NOT_EDITABLE_BG = new Color(255, 255, 200);
     public static Color DELIMITER_BG = new Color(255, 255, 200);
     public static Color MAPPED_COLOR = new Color(220, 255, 220);
@@ -57,7 +58,6 @@ public class SwingHelper {
     public static Color HIGHLIGHTED_COLOR = new Color(112, 187, 212);
     public static Color LONG_TERM_JOB_COLOR = new Color(255, 180, 180);
     public static Color NORMAL_JOB_COLOR = new Color(200, 255, 200);
-    public static Color REPORT_ERROR = new Color(50, 0, 0);
 
     public static final Icon ICON_VALUE = icon("value");
     public static final Icon ICON_COMPOSITE = icon("composite");
@@ -89,8 +89,10 @@ public class SwingHelper {
     }
 
     public static void setDelimitedColor(JComponent component, boolean selected) {
-        component.setForeground(selected ? DELIMITER_BG : NORMAL_FG);
-        component.setBackground(selected ? NORMAL_BG : DELIMITER_BG);
+        //component.setForeground(selected ? DELIMITER_BG : NORMAL_FG);
+        component.setForeground(selected ? DELIMITER_BG : null);
+        //component.setBackground(selected ? NORMAL_BG : DELIMITER_BG);
+        component.setBackground(selected ? NORMAL_BG : null);
     }
 
     public static void setSourceNodeColor(JComponent component, SourceTreeNode node, boolean selected, Color normalColor) {
@@ -99,8 +101,10 @@ public class SwingHelper {
         }
         Color color = node.isHighlighted() ? HIGHLIGHTED_COLOR : normalColor;
         component.setOpaque(!selected);
-        component.setForeground(selected ? color : NORMAL_FG);
-        component.setBackground(selected ? NORMAL_BG : color);
+        //component.setForeground(selected ? color : NORMAL_FG);
+        component.setForeground(selected ? color : (color.equals(NORMAL_BG) ? null : NORMAL_FG));
+        //component.setBackground(selected ? NORMAL_BG : color);
+        component.setBackground(selected ? null : (color.equals(NORMAL_BG) ? null : color));
     }
 
     public static JComponent scrollCodeVH(RSyntaxTextArea content) {

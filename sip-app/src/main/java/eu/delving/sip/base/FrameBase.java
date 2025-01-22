@@ -49,7 +49,7 @@ import java.util.List;
  */
 
 public abstract class FrameBase extends JInternalFrame {
-    public static Insets INSETS = new Insets(2, /* top */ 8, /* left */ 14, /* bottom */ 10 /* right */);
+    public static Insets INSETS = new Insets(8, /* top */ 8, /* left */ 8, /* bottom */ 8 /* right */);
     private static final int DEFAULT_MOVE_INTERVAL = 1000;
     private static final int MARGIN = 12;
     private JMenuBar originalMenuBar;
@@ -146,9 +146,9 @@ public abstract class FrameBase extends JInternalFrame {
         this.arrange = arrange;
     }
 
-    public void toggleEditMenu() {
-        if (originalMenuBar == null && getJMenuBar() != null) originalMenuBar = getJMenuBar();
-        if (getJMenuBar() == originalMenuBar) {
+    public void toggleEditMenu(boolean isOn) {
+        if (isOn) {
+            if (originalMenuBar == null && getJMenuBar() != null) originalMenuBar = getJMenuBar();
             JMenuBar bar = new JMenuBar();
             JMenu menu = new JMenu("Edit");
             for (AdjustAction action : adjustActions) menu.add(action);
@@ -166,7 +166,8 @@ public abstract class FrameBase extends JInternalFrame {
             setJMenuBar(originalMenuBar);
             setTitle(title);
         }
-        validateTree();
+        // validateTree throws an illegal state exception but seems not to be needed anyway
+        //validateTree();
     }
 
     public Which getWhich() {
@@ -193,6 +194,7 @@ public abstract class FrameBase extends JInternalFrame {
 
     public void init() {
         if (!initialized) {
+            setFrameIcon(null);
             JPanel content = (JPanel) getContentPane();
             content.setBorder(BorderFactory.createEmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
             buildContent(content);
@@ -250,7 +252,7 @@ public abstract class FrameBase extends JInternalFrame {
      * of the frame and will move it back to the visible area when needed.
      */
     public void ensureOnScreen() {
-        Point loc = getLocation();
+        /*Point loc = getLocation();
         Dimension desktopSize = sipModel.getDesktop().getSize();
         if (loc.y - INSETS.top + 1 < 0) {
             loc.y = INSETS.top - 1;
@@ -263,7 +265,7 @@ public abstract class FrameBase extends JInternalFrame {
         if (loc.x + INSETS.right + 1 >= desktopSize.width) {
             loc.x = desktopSize.width - getWidth() + INSETS.right + 1;
             setLocation(loc);
-        }
+        }*/
     }
 
     public void setChildFrame(FrameBase childFrame) {

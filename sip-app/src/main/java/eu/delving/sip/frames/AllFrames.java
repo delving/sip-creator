@@ -262,7 +262,9 @@ public class AllFrames {
         arrangements.add(Box.createVerticalGlue());
         JPanel p = new JPanel(new BorderLayout());
         p.add(arrangements, BorderLayout.CENTER);
-        return scrollV(p);
+        //return scrollV(p);
+        return new JScrollPane(arrangements, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     }
 
     public static JComponent miniScrollV(String title, JComponent content) {
@@ -309,12 +311,12 @@ public class AllFrames {
         }
 
         Situation situate(Dimension all, int rows, int cols, boolean useInsets) {
-            int wx = all.width / cols - (all.width % 2);
-            int hx = all.height / rows - (all.height % 2);
+            int wx = (all.width - (useInsets ? INSETS.right : all.width % 2)) / cols;
+            int hx = (all.height - (useInsets ? INSETS.bottom : all.height % 2)) / rows;
             if (useInsets) {
                 return new Situation(
-                        new Point(original.getX() * wx - INSETS.left, original.getY() * hx - INSETS.top),
-                        new Dimension(original.getW() * wx + INSETS.left + INSETS.right, original.getH() * hx + INSETS.top + INSETS.bottom)
+                        new Point(original.getX() * wx + INSETS.left, original.getY() * hx + INSETS.top),
+                        new Dimension(original.getW() * wx - INSETS.left, original.getH() * hx - INSETS.top)
                 );
             }
             else {

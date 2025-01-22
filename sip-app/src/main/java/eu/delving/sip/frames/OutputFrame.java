@@ -26,6 +26,7 @@ import eu.delving.sip.base.KeystrokeHelper;
 import eu.delving.sip.model.MappingCompileModel;
 import eu.delving.sip.model.SipModel;
 import org.apache.jena.riot.RDFFormat;
+import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -34,28 +35,28 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static eu.delving.sip.base.SwingHelper.scrollVH;
 import static eu.delving.sip.base.SwingHelper.setError;
 
 /**
- * This frame shows the entire output record so that the user can see the "big picture" with only the
- * input tree and the output XML.  This frame also shows the errors as reported by the compile/validate
+ * This frame shows the entire output record so that the user can see the "big
+ * picture" with only the
+ * input tree and the output XML. This frame also shows the errors as reported
+ * by the compile/validate
  * system.
  *
  *
  */
 
 public class OutputFrame extends FrameBase {
-    private static final Font MONOSPACED = new Font("Monospaced", Font.BOLD, 12);
-    private JTextField searchField = new JTextField(25);
-    private JTextArea outputArea;
-    private List<Integer> found = new ArrayList<>();
-    private int foundSelected;
 
     public OutputFrame(final SipModel sipModel) {
         super(Which.OUTPUT, sipModel, "Output");
@@ -79,7 +80,7 @@ public class OutputFrame extends FrameBase {
         final DefaultComboBoxModel outputTypes = new DefaultComboBoxModel();
 
         outputTypes.addElement("RDF/XML");
-        outputTypes.addElement("JSONLD,COMPACT/FLAT");
+        outputTypes.addElement("JSONLD,COMPACT/PRETTY");
         outputTypes.addElement("NQUADS");
         outputTypes.addElement("NTRIPLES");
         outputTypes.addElement("TURTLE");
@@ -91,15 +92,53 @@ public class OutputFrame extends FrameBase {
 
         final RSyntaxTextArea outputArea = new RSyntaxTextArea(sipModel.getRecordCompileModel().getOutputDocument());
         outputArea.setCodeFoldingEnabled(true);
+        outputArea.setEditable(false);
         RTextScrollPane tsp = new RTextScrollPane(outputArea);
         p.add(tsp);
-        outputArea.getDocument().addDocumentListener(new DocumentListener() {
+        addOutputDocumentListener(outputArea, outputArea.getDocument());
+
+        outputTypesBox.addActionListener(e -> {
+            String selection = outputTypesBox.getSelectedItem().toString();
+            setError(outputArea, false);
+            stopSyntaxTextAreaSearch(outputArea);
+
+            final MappingCompileModel mappingModel = sipModel.getRecordCompileModel();
+            Document document;
+            if (selection.contains("JSONLD")) {
+                document = mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_JSON, outputArea,
+                        RDFFormat.JSONLD_COMPACT_PRETTY);
+            } else if (selection.contains("NQUADS")) {
+                document = mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_NONE, outputArea,
+                        RDFFormat.NQUADS);
+            } else if (selection.contains("TURTLE")) {
+                document = mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_NONE, outputArea,
+                        RDFFormat.TURTLE);
+            } else if (selection.contains("NTRIPLES")) {
+                document = mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_NONE, outputArea,
+                        RDFFormat.NTRIPLES);
+            } else {
+                document = mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_XML, outputArea,
+                        RDFFormat.RDFXML);
+            }
+            addOutputDocumentListener(outputArea, document);
+
+            mappingModel.triggerCompile();
+        });
+
+        p.add(scrollVH(outputArea), BorderLayout.CENTER);
+        p.add(createSyntaxTextAreaSearch(outputArea), BorderLayout.SOUTH);
+        return p;
+    }
+
+    private void addOutputDocumentListener(RSyntaxTextArea outputArea, Document document) {
+        document.addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
                 try {
                     String first = documentEvent.getDocument().getText(0, 1);
                     final boolean error = first.startsWith("#");
                     setError(outputArea, error);
+                    stopSyntaxTextAreaSearch(outputArea);
                     sipModel.exec(() -> {
                         outputArea.setCaretPosition(0);
                     });
@@ -116,96 +155,101 @@ public class OutputFrame extends FrameBase {
             public void changedUpdate(DocumentEvent documentEvent) {
             }
         });
+    }
 
-        outputTypesBox.addActionListener(e -> {
-            String selection = outputTypesBox.getSelectedItem().toString();
-            setError(outputArea, false);
+    public static JPanel createSyntaxTextAreaSearch(RSyntaxTextArea outputArea) {
+        boolean wasEditable = outputArea.isEditable();
+        JPanel sp = new JPanel();
 
-            final MappingCompileModel mappingModel = sipModel.getRecordCompileModel();
-            if (selection.contains("JSONLD")) {
-                mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_JSON, outputArea, RDFFormat.JSONLD_COMPACT_FLAT);
-            } else if (selection.contains("NQUADS")) {
-                mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_NONE, outputArea, RDFFormat.NQUADS);
-            } else if (selection.contains("TURTLE")) {
-                mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_NONE, outputArea, RDFFormat.TURTLE);
-            } else if (selection.contains("NTRIPLES")) {
-                mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_NONE, outputArea, RDFFormat.NTRIPLES);
-            } else {
-                mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_XML, outputArea, RDFFormat.RDFXML);
-            }
+        JTextField searchField = new JTextField(25);
+        searchField.addActionListener(new ActionListener() {
+            List<Integer> found = new ArrayList<>();
+            int foundSelected;
 
-            mappingModel.triggerCompile();
-        });
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                found.clear();
+                foundSelected = 0;
+                if (wasEditable) {
+                    outputArea.setEditable(false);
+                }
+                String xml = outputArea.getText().toLowerCase();
+                String sought = searchField.getText().toLowerCase();
+                if (!sought.isEmpty()) {
+                    int start = 0;
+                    while (found.size() < 10000) {
+                        int pos = xml.indexOf(sought, start);
+                        if (pos < 0)
+                            break;
+                        found.add(pos);
+                        start = pos + sought.length();
+                    }
+                    selectFound();
 
-
-        outputArea.getInputMap().put(KeystrokeHelper.DOWN, "next");
-        outputArea.getInputMap().put(KeystrokeHelper.RIGHT, "next");
-        outputArea.getInputMap().put(KeystrokeHelper.UP, "prev");
-        outputArea.getInputMap().put(KeystrokeHelper.LEFT, "prev");
-        outputArea.getActionMap().put("next", new NextAction());
-        outputArea.getActionMap().put("prev", new PrevAction());
-        searchField.addActionListener(e -> {
-            found.clear();
-            foundSelected = 0;
-            String xml = outputArea.getText().toLowerCase();
-            String sought = searchField.getText().toLowerCase();
-            if (!sought.isEmpty()) {
-                int start = 0;
-                while (found.size() < 30) {
-                    int pos = xml.indexOf(sought, start);
-                    if (pos < 0) break;
-                    found.add(pos);
-                    start = pos + sought.length();
+                    outputArea.getInputMap().put(KeystrokeHelper.DOWN, "next");
+                    outputArea.getInputMap().put(KeystrokeHelper.RIGHT, "next");
+                    outputArea.getInputMap().put(KeystrokeHelper.UP, "prev");
+                    outputArea.getInputMap().put(KeystrokeHelper.LEFT, "prev");
+                    outputArea.getActionMap().put("next", new AbstractAction() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            foundSelected++;
+                            selectFound();
+                        }
+                    });
+                    outputArea.getActionMap().put("prev", new AbstractAction() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            foundSelected--;
+                            selectFound();
+                        }
+                    });
+                } else {
+                    stopSyntaxTextAreaSearch(outputArea);
+                    if (wasEditable) {
+                        outputArea.setEditable(true);
+                    }
                 }
             }
-            selectFound();
+
+            void selectFound() {
+                if (!found.isEmpty()) {
+                    while (foundSelected < 0)
+                        foundSelected += found.size();
+                    foundSelected = foundSelected % found.size();
+                    final Integer pos = found.get(foundSelected);
+                    final int findLength = searchField.getText().length();
+                    if (findLength > 0) {
+                        outputArea.requestFocus();
+                        SwingUtilities.invokeLater(() -> {
+                            try {
+                                Rectangle viewRect = outputArea.modelToView(pos);
+                                outputArea.scrollRectToVisible(viewRect);
+                                outputArea.setCaretPosition(pos);
+                                outputArea.moveCaretPosition(pos + findLength);
+                            } catch (BadLocationException e) {
+                                throw new RuntimeException("Location bad", e);
+                            }
+                        });
+                    }
+                }
+            }
         });
-        JPanel sp = new JPanel();
+
         JLabel label = new JLabel("Search:", JLabel.RIGHT);
         label.setLabelFor(searchField);
         sp.add(label);
         sp.add(searchField);
+
         sp.add(new JLabel("Press ENTER, then use arrow keys"));
-        p.add(scrollVH(outputArea), BorderLayout.CENTER);
-        p.add(sp, BorderLayout.SOUTH);
-        return p;
+        return sp;
     }
 
-    private class PrevAction extends AbstractAction {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            foundSelected--;
-            selectFound();
-        }
+    public static void stopSyntaxTextAreaSearch(JTextArea outputArea) {
+        outputArea.getInputMap().remove(KeystrokeHelper.DOWN);
+        outputArea.getInputMap().remove(KeystrokeHelper.RIGHT);
+        outputArea.getInputMap().remove(KeystrokeHelper.UP);
+        outputArea.getInputMap().remove(KeystrokeHelper.LEFT);
     }
 
-    private class NextAction extends AbstractAction {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            foundSelected++;
-            selectFound();
-        }
-    }
-
-    private void selectFound() {
-        if (found.isEmpty()) {
-            outputArea.select(0, 0);
-        } else {
-            foundSelected = (foundSelected + found.size()) % found.size();
-            final Integer pos = found.get(foundSelected);
-            final int findLength = searchField.getText().length();
-            if (findLength == 0) return;
-            outputArea.requestFocus();
-            sipModel.exec(() -> {
-                try {
-                    Rectangle viewRect = outputArea.modelToView(pos);
-                    outputArea.scrollRectToVisible(viewRect);
-                    outputArea.setCaretPosition(pos);
-                    outputArea.moveCaretPosition(pos + findLength);
-                } catch (BadLocationException e) {
-                    throw new RuntimeException("Location bad", e);
-                }
-            });
-        }
-    }
 }

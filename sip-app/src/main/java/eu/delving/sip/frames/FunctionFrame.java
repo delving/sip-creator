@@ -78,15 +78,15 @@ public class FunctionFrame extends FrameBase {
     public FunctionFrame(SipModel sipModel) {
         super(Which.FUNCTIONS, sipModel, "Functions");
         inputArea = new JTextArea(sipModel.getFunctionCompileModel().getInputDocument());
-        inputArea.setFont(MONOSPACED);
+        setUpTextArea(inputArea);
         docArea = new JTextArea(sipModel.getFunctionCompileModel().getDocDocument());
-        docArea.setFont(MONOSPACED);
+        setUpTextArea(docArea);
         docArea.setLineWrap(true);
         docArea.setWrapStyleWord(true);
         codeArea = new JTextArea(sipModel.getFunctionCompileModel().getCodeDocument());
-        codeArea.setFont(MONOSPACED);
+        setUpTextArea(codeArea);
         outputArea = new JTextArea(sipModel.getFunctionCompileModel().getOutputDocument());
-        outputArea.setFont(MONOSPACED);
+        setUpTextArea(outputArea);
         factsList.setFont(MONOSPACED);
         libraryList.setFont(MONOSPACED);
         libraryList.setBackground(NOT_EDITABLE_BG);
@@ -97,6 +97,12 @@ public class FunctionFrame extends FrameBase {
         wireUp();
         attachAccelerator(UNDO_ACTION, codeArea);
         attachAccelerator(REDO_ACTION, codeArea);
+    }
+
+    private void setUpTextArea(JTextArea textArea) {
+        textArea.setFont(MONOSPACED);
+        textArea.setForeground(Color.BLACK);
+        textArea.setBackground(Color.WHITE);
     }
 
     @Override
@@ -531,7 +537,7 @@ public class FunctionFrame extends FrameBase {
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             FunctionEntry functionEntry = (FunctionEntry) value;
             Component component = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            component.setForeground(functionEntry.fromRecDef ? Color.GRAY : Color.BLACK);
+            component.setForeground(functionEntry.fromRecDef ? Color.GRAY : null);
             return component;
         }
     }

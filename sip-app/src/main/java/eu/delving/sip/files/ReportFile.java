@@ -21,22 +21,27 @@
 
 package eu.delving.sip.files;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.model.Feedback;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 
 import javax.swing.*;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
 
-import static eu.delving.sip.base.SwingHelper.REPORT_ERROR;
+import static eu.delving.sip.base.SwingHelper.*;
 
 /**
  * Handles navigation in a report file, optimizing where possible
@@ -45,40 +50,130 @@ import static eu.delving.sip.base.SwingHelper.REPORT_ERROR;
  */
 
 public class ReportFile {
-    private static final long LONG_SIZE = 8;
-    private static final int MAX_CACHE = 1000;
     private final DataSet dataSet;
     private final String prefix;
-    private final List<String> reportConclusion;
+    private final List<String> reportConclusions;
     private RandomAccessFile reportAccess;
-    private RandomAccessFile reportIndexAccess;
-    private List<Rec> invalidRecs;
-    private InvalidRecListModel invalidRecListModel = new InvalidRecListModel();
+    private List<Rec> reportedRecs;
+    private ReportedRecListModel reportedRecListModel = new ReportedRecListModel();
 
-    public ReportFile(File reportFile, File reportIndexFile, File reportConclusionFile, DataSet dataSet, String prefix) throws IOException {
-        this.reportAccess = new RandomAccessFile(reportFile, "r");
-        this.reportIndexAccess = new RandomAccessFile(reportIndexFile, "r");
-        if (reportConclusionFile.exists()) {
-            this.reportConclusion = FileUtils.readLines(reportConclusionFile);
-        }
-        else {
-            List<String> apology = new ArrayList<String>();
-            apology.add("No conclusions. They should appear after next validation");
-            this.reportConclusion = apology;
-        }
+    private ObjectMapper mapper = new ObjectMapper();
+
+    public ReportFile(File reportFile, DataSet dataSet, String prefix) throws IOException {
         this.dataSet = dataSet;
         this.prefix = prefix;
-        int recordCount = (int) (reportIndexAccess.length() / LONG_SIZE);
-        invalidRecs = new ArrayList<Rec>(recordCount);
-        for (int walk = 0; walk < Math.min(recordCount, MAX_CACHE); walk++) invalidRecs.add(new Rec(walk));
+
+        // Scan report JSON and index locations of record reports and conclusions report.
+        // Individual reports will be parsed later as they are needed.
+        IndividualReport conclusions = null;
+        this.reportedRecs = new ArrayList<>();
+        int index = 0;
+        if (reportFile != null) {
+            JsonFactory jsonFactory = JsonFactory.builder().build();
+            JsonParser json = jsonFactory.createParser(reportFile);
+            if (json.nextToken() == JsonToken.START_OBJECT) {
+                while (json.nextFieldName() != null) {
+                    switch (json.currentName()) {
+                        case "conclusions":
+                            switch (json.nextToken()) {
+                                case START_OBJECT:
+                                    long reportStart = json.getCurrentLocation().getByteOffset() - 1; // -1 to go back to {
+                                    json.skipChildren();
+                                    int reportSize = (int) (json.getCurrentLocation().getByteOffset() - reportStart);
+                                    conclusions = new IndividualReport(null, reportStart, reportSize);
+                                    break;
+                                case START_ARRAY:
+                                    json.skipChildren();
+                                    break;
+                            }
+                            break;
+                        case "records":
+                            switch (json.nextToken()) {
+                                case START_OBJECT:
+                                    while (json.nextFieldName() != null) {
+                                        String key = json.currentName();
+                                        switch (json.nextToken()) {
+                                            case START_OBJECT:
+                                                long recordStart = json.getCurrentLocation().getByteOffset() - 1; // -1 to go back to {
+                                                json.skipChildren();
+                                                int recordSize = (int) (json.getCurrentLocation().getByteOffset() - recordStart);
+                                                reportedRecs.add(new Rec(new IndividualReport(key, recordStart, recordSize), index++));
+                                                break;
+                                            case START_ARRAY:
+                                                json.skipChildren();
+                                                break;
+                                        }
+                                    }
+                                    break;
+                                case START_ARRAY:
+                                    json.skipChildren();
+                                    break;
+                            }
+                            break;
+                        default:
+                            switch (json.nextToken()) {
+                                case START_OBJECT:
+                                case START_ARRAY:
+                                    json.skipChildren();
+                                    break;
+                            }
+                    }
+                }
+            }
+            json.close();
+        }
+
+        // Now open the report file with random access to be able to access individual reports as needed
+        if (reportFile != null) {
+            this.reportAccess = new RandomAccessFile(reportFile, "r");
+        }
+
+        // Parse the conclusions report
+        if (conclusions != null) {
+            JsonNode report = conclusions.getNode();
+            reportConclusions = new ArrayList<>();
+            int total = report.get("total").asInt();
+            for (Iterator<Map.Entry<String, JsonNode>> it = report.fields(); it.hasNext(); ) {
+                Map.Entry<String, JsonNode> i = it.next();
+                int value = i.getValue().asInt();
+                reportConclusions.add(String.format("<center><b>%s:</b><br>%s<br>(%.1f%%)</center>",
+                    StringEscapeUtils.escapeHtml(StringUtils.capitalize(i.getKey().toLowerCase())),
+                    value,  total > 0 ? (((double) value) / total * 100) : 0f));
+            }
+        }  else {
+            List<String> apology = new ArrayList<>();
+            apology.add("No conclusions. They should appear after next validation");
+            this.reportConclusions = apology;
+        }
     }
 
-    public List<String> getReportConclusion() {
-        return reportConclusion;
+    class IndividualReport {
+        String key;
+        long start;
+        int size;
+
+        IndividualReport(String key, long start, int size) {
+            this.key = key;
+            this.start = start;
+            this.size = size;
+        }
+
+        JsonNode getNode() throws IOException {
+            synchronized (reportAccess) {
+                byte[] bytes = new byte[size];
+                reportAccess.seek(start);
+                reportAccess.read(bytes);
+                return mapper.readTree(bytes);
+            }
+        }
     }
 
-    public InvalidRecListModel getInvalidRecListModel() {
-        return invalidRecListModel;
+    public List<String> getReportConclusions() {
+        return reportConclusions;
+    }
+
+    public ReportedRecListModel getReportedRecListModel() {
+        return reportedRecListModel;
     }
 
     public DataSet getDataSet() {
@@ -89,29 +184,7 @@ public class ReportFile {
         return prefix;
     }
 
-    public void maintainCache() {
-        int count = 0;
-        for (Rec rec : invalidRecs) if (rec.lines != null) count++;
-        long tenSecondsAgo = System.currentTimeMillis() - 10 * 60 * 1000;
-        if (count > MAX_CACHE) {
-            for (Rec rec : invalidRecs) {
-                if (rec.lines == null) continue;
-                if (rec.touch < tenSecondsAgo) {
-                    rec.lines = null;
-                }
-            }
-        }
-    }
-
-    public List<Rec> prepareFetch() {
-        List<Rec> recsToRead = new ArrayList<Rec>();
-        for (Rec rec : invalidRecs) {
-            if (rec.needsReading()) recsToRead.add(rec);
-        }
-        return recsToRead;
-    }
-
-    public Work fetchRecords(final List<Rec> recsToRead, final Feedback feedback) {
+    public Work fetchRecords(final Feedback feedback) {
         return new Work.DataSetPrefixWork() {
             @Override
             public Job getJob() {
@@ -121,13 +194,10 @@ public class ReportFile {
             @Override
             public void run() {
                 try {
-                    for (Rec rec : recsToRead) {
-                        if (rec.seekPos < 0) {
-                            int recordNumber = rec.getRecordNumber();
-                            reportIndexAccess.seek(recordNumber * LONG_SIZE);
-                            rec.seekPos = reportIndexAccess.readLong();
-                        }
-                        rec.readIn();
+                    for (Rec rec : reportedRecs) {
+                        rec.readIn(true); // Just to update the list item with real data
+                        rec.lines = null; // Free memory
+                        rec.code = null;
                     }
                 }
                 catch (IOException e) {
@@ -148,83 +218,71 @@ public class ReportFile {
     }
 
     public void close() {
-        IOUtils.closeQuietly(reportIndexAccess);
         IOUtils.closeQuietly(reportAccess);
     }
 
     public class Rec {
+        private final IndividualReport report;
+        private final int index;
         private int recordNumber;
-        private long seekPos = -1;
-        private long touch;
         private ReportWriter.ReportType reportType = ReportWriter.ReportType.UNEXPECTED;
-        private String localId;
         private String error;
         private List<String> lines;
+        private String code;
 
-        public Rec(int recordNumber) {
-            this.recordNumber = recordNumber;
+        public Rec(IndividualReport report, int index) {
+            this.report = report;
+            this.index = index;
         }
 
         public int getRecordNumber() {
             return recordNumber;
         }
 
-        public void readIn() throws IOException {
-            reportAccess.seek(seekPos);
-            final List<String> freshLines = new ArrayList<String>();
-            boolean within = false;
-            while (true) {
-                String line = reportAccess.readLine();
-                if (line == null) break;
-                ReportStrings.Match startMatcher = ReportStrings.START.matcher(line);
-                if (startMatcher.matches()) {
-                    int startRecordNumber = Integer.parseInt(startMatcher.group(1));
-                    if (recordNumber < 0) {
-                        recordNumber = startRecordNumber;
-                    }
-                    else if (startRecordNumber != recordNumber) {
-                        throw new RuntimeException("Record number discrepancy: " + startRecordNumber + "vs" + recordNumber);
-                    }
-                    reportType = ReportWriter.ReportType.valueOf(startMatcher.group(2));
-                    switch (reportType) {
-                        case INVALID:
-                        case DISCARDED:
-                        case UNEXPECTED:
-                            error = startMatcher.group(3);
-                            break;
-                    }
-                    within = true;
-                    continue;
+        public void readIn(boolean updateList) throws IOException {
+            if (lines != null) {
+                // We're already done
+                return;
+            }
+            final List<String> lines = new ArrayList<>();
+            String code = null;
+            try {
+                JsonNode record = report.getNode();
+                this.recordNumber = record.get("recordNumber").asInt();
+                this.error = record.get("message").asText();
+                if (record.has("warnings")) {
+                    JsonNode warnings = record.get("warnings");
+                    warnings.forEach(new Consumer<JsonNode>() {
+                        @Override
+                        public void accept(JsonNode jsonNode) {
+                            String[] output = jsonNode.asText().split("\n");
+                            lines.addAll(List.of(output));
+                            lines.add("");
+                        }
+                    });
                 }
-                if (within && ReportStrings.END.matcher(line).matches()) break;
-                if (within) freshLines.add(line);
-            }
-            Swing.Exec.later(new Swing() {
-                @Override
-                public void run() {
-                    lines = freshLines;
-                    invalidRecListModel.fireContentsChanged(recordNumber);
+                reportType = ReportWriter.ReportType.valueOf(record.get("type").asText());
+                if (record.has("output")) {
+                    lines.add("See mapped output:");
+                    code = record.get("output").asText();
+                } else if (record.has("input")) {
+                    lines.add("See input record:");
+                    code = record.get("input").asText();
                 }
-            });
-        }
-
-        public String toString() {
-            if (lines == null) {
-                activate();
-                return "loading..." + recordNumber;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-            return String.format("%6d %s", recordNumber, reportType);
-        }
-
-        public boolean needsReading() {
-            return lines == null && touch > 0;
-        }
-
-        public Rec activate() {
-            if (lines == null) {
-                touch = System.currentTimeMillis();
+            this.lines = lines;
+            this.code = code;
+            if (updateList) {
+                // Don't do this unless necessary (when generating list contents) as it slows down selection
+                Swing.Exec.later(new Swing() {
+                    @Override
+                    public void run() {
+                        reportedRecListModel.fireContentsChanged(index);
+                    }
+                });
             }
-            return this;
         }
     }
 
@@ -239,53 +297,67 @@ public class ReportFile {
                 return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             }
             Rec rec = (Rec) value;
-            String string;
-            if (rec.lines == null) {
-                string = "Loading...";
-            }
-            else {
-                string = "<" + rec.getRecordNumber() + ":" + rec.reportType + "> " + rec.error;
-            }
+            String string = "<" + rec.getRecordNumber() + ":" + rec.reportType + "> " + rec.error;
             Component component = super.getListCellRendererComponent(list, string, index, isSelected, cellHasFocus);
-            if (!isSelected) component.setForeground(REPORT_ERROR);
+            if (!isSelected) {
+                switch (rec.reportType) {
+                    case INVALID:
+                        component.setBackground(ERROR_BG);
+                        component.setForeground(NORMAL_FG);
+                        break;
+                    case WARNING:
+                        component.setBackground(WARNING_BG);
+                        component.setForeground(NORMAL_FG);
+                        break;
+                }
+            }
             return component;
         }
     }
 
     public String toHtml(Rec rec) {
-        if (rec.lines == null) return "??";
+        if (rec.lines == null) {
+            try {
+                rec.readIn(false);
+            } catch (IOException e) {
+                // We tried
+            }
+        };
+        if (rec.lines == null) {
+            return "??";
+        }
         StringBuilder out = new StringBuilder("<html><table cellpadding=6>\n");
         out.append("<tr><td>\n");
-        out.append("<b>").append(rec.error).append("</b><br><br>\n");
+        out.append("<b>").append(rec.error).append("</b><br>\n");
         for (String line : rec.lines) {
-            out.append(StringEscapeUtils.escapeHtml(line)).append("<br>\n");
+            out.append("<br>\n").append(StringEscapeUtils.escapeHtml(line));
         }
         out.append("</td></tr>\n");
+        if (rec.code != null) {
+            out.append("</table><table cellpadding=6>\n");
+            out.append("<tr><td><pre>");
+            out.append(StringEscapeUtils.escapeHtml(rec.code));
+            out.append("</pre></td></tr>\n");
+        }
         out.append("</table>");
+        rec.lines = null; // Free memory
+        rec.code = null;
         return out.toString();
     }
 
-    public class InvalidRecListModel extends AbstractListModel<Rec> {
+    public class ReportedRecListModel extends AbstractListModel<Rec> {
         @Override
         public int getSize() {
-            return invalidRecs.size();
+            return reportedRecs.size();
         }
 
         @Override
         public Rec getElementAt(int index) {
-            return invalidRecs.get(index).activate();
+            return reportedRecs.get(index);
         }
 
-        public void fireContentsChanged(int recordNumber) {
-            int index = 0;
-            for (Rec invalidRec : invalidRecs) {
-                if (invalidRec.recordNumber == recordNumber) {
-                    fireContentsChanged(InvalidRecListModel.this, index, index);
-                    break;
-                }
-                index++;
-            }
+        public void fireContentsChanged(int index) {
+            fireContentsChanged(ReportedRecListModel.this, index, index);
         }
-
     }
 }

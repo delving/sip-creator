@@ -38,16 +38,14 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
+import java.awt.*;
 import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static eu.delving.sip.base.SwingHelper.scrollV;
+import static eu.delving.sip.base.SwingHelper.scrollVH;
 
 /**
  * Show the statistics bar charts and histograms for input, source, and output in various tabs.
@@ -177,9 +175,13 @@ public class StatsFrame extends FrameBase {
                 String name = (stats.name == null) ? sipModel.getDataSetModel().getDataSet().getSpec() : stats.name;
                 chartHelper = new ChartHelper(stats, statsSetName, name);
                 final StatsNode root = StatsNode.create(stats.fieldValueMap.keySet());
-                setPanelContent(treePanel, scrollV(tree));
+                setPanelContent(treePanel, scrollVH(tree));
+                JPanel enforceMinimumWidth = new JPanel();
+                enforceMinimumWidth.setPreferredSize(new Dimension(500, 0));
+                treePanel.add(enforceMinimumWidth, BorderLayout.SOUTH);
                 treeModel.setRoot(root);
                 expand = true;
+                expandIfNecessary();
                 setRecordStatPanels();
             }
         }

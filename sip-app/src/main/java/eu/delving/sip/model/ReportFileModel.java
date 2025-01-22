@@ -50,20 +50,6 @@ public class ReportFileModel {
 
     public ReportFileModel(final SipModel sipModel) {
         this.sipModel = sipModel;
-        Timer timer = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (reportFile != null) {
-                    List<ReportFile.Rec> fetch = reportFile.prepareFetch();
-                    if (!fetch.isEmpty()) {
-                        sipModel.exec(reportFile.fetchRecords(fetch, sipModel.getFeedback()));
-                    }
-                    reportFile.maintainCache();
-                }
-            }
-        });
-        timer.setRepeats(true);
-        timer.start();
     }
 
     public void setListener(Listener listener) {
@@ -85,10 +71,9 @@ public class ReportFileModel {
         }
         DataSet dataSet = sipModel.getDataSetModel().getDataSet();
         try {
-            ReportFile reportFile = dataSet.getReport();
+            reportFile = dataSet.getReport();
             if (reportFile != null) {
                 sipModel.getFeedback().info("There is a report file");
-                ReportFileModel.this.reportFile = reportFile;
             }
             else {
                 sipModel.getFeedback().info("There is no report file");
@@ -101,12 +86,19 @@ public class ReportFileModel {
             @Override
             public void run() {
                 listener.reportsUpdated(ReportFileModel.this);
+
+                // Load all reported records for display in the list
+                if (reportFile != null) {
+                    sipModel.exec(reportFile.fetchRecords(sipModel.getFeedback()));
+                }
             }
         });
     }
 
     public void shutdown() {
-        reportFile.close();
+        if (reportFile != null) {
+            reportFile.close();
+        }
     }
 
 }

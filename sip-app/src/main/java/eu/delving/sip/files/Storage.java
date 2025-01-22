@@ -48,7 +48,11 @@ public interface Storage {
         MAPPING(null, "mapping_", ".xml", "mapping_%s.xml", 30),
         REPORT(null, "report_", null, "report_%s.txt", 1),
         REPORT_INDEX(null, "report_", null, "report_%s.long", 1),
-        REPORT_CONCLUSION(null, "report-conclusion_", null, "report-conclusion_%s.txt", 1);
+        REPORT_CONCLUSION(null, "report-conclusion_", null, "report-conclusion_%s.txt", 1),
+        SOURCE_ZSTD("source.xml.zst", null, null, null, 2),
+        REPORT_JSON("report.json", "report_", null, "report_%s.json", 10),
+        PROCESSED("processed.rdf.zst", "processed_", null, "processed_%s.rdf.zst", 10),
+        SOURCE_STATS_ZSTD("stats-source.xml.zst");
 
         private String name, prefix, suffix, pattern;
         private int historySize = 1;
@@ -93,6 +97,7 @@ public interface Storage {
     String UNIQUE_VALUE_CONVERTER = "uniqueValueConverter";
     String SCHEMA_VERSIONS = "schemaVersions";
     String XSD_VALIDATION = "xsdValidation";
+    String SHACL_VALIDATION = "shaclValidation";
     String NARTHEX_URL = "narthexUrl";
     String NARTHEX_USERNAME = "narthexUsername";
     String NARTHEX_PASSWORD = "narthexPassword";

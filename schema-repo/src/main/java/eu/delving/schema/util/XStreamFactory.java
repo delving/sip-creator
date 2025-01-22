@@ -38,17 +38,17 @@ import java.util.Collection;
  *
  *
  */
-
 public class XStreamFactory {
     public static XStream getSchemasStream() {
         XStream xstream = new XStream(new PureJavaReflectionProvider());
-        // See http://x-stream.github.io/security.html#example
-        XStream.setupDefaultSecurity(xstream);
         xstream.setMode(XStream.NO_REFERENCES);
 
+        // Start with no permissions and explicitly add what's needed
+        xstream.addPermission(NoTypePermission.NONE); // Clear existing permissions
         xstream.addPermission(NullPermission.NULL);
         xstream.addPermission(PrimitiveTypePermission.PRIMITIVES);
 
+        // Allow specific type hierarchies
         xstream.allowTypeHierarchy(Schemas.class);
         xstream.allowTypeHierarchy(Schema.class);
         xstream.allowTypeHierarchy(Version.class);
@@ -56,7 +56,9 @@ public class XStreamFactory {
         xstream.allowTypeHierarchy(String.class);
         xstream.allowTypeHierarchy(Collection.class);
 
+        // Process annotations
         xstream.processAnnotations(Schemas.class);
+
         return xstream;
     }
 }

@@ -44,9 +44,9 @@ import java.util.Map;
 
 import org.apache.jena.rdf.model.ModelFactory;
 
-
 /**
- * The result of the mapping engine is wrapped in this class so that some post-processing and checking
+ * The result of the mapping engine is wrapped in this class so that some
+ * post-processing and checking
  * can be done on the resulting Node tree.
  *
  */
@@ -75,8 +75,7 @@ public class MappingResult {
         try {
             URI uri = new URI(maybeUri);
             return uri.isAbsolute();
-        }
-        catch (URISyntaxException e) {
+        } catch (URISyntaxException e) {
             return false;
         }
     }
@@ -84,7 +83,9 @@ public class MappingResult {
     public List<String> getUriErrors() throws XPathExpressionException {
         List<String> errors = new ArrayList<String>();
         for (Map.Entry<String, XPathExpression> entry : recDefTree.getUriCheckPaths().entrySet()) {
-            // TODO causes the largest spikes in memory usage by a large margin even after the set of URI checks was significantly. See #38738404363a326970f52626ae6ac61deaebe2ec
+            // TODO causes the largest spikes in memory usage by a large margin even after
+            // the set of URI checks was significantly. See
+            // #38738404363a326970f52626ae6ac61deaebe2ec
             NodeList nodeList = (NodeList) entry.getValue().evaluate(root, XPathConstants.NODESET);
             for (int walk = 0; walk < nodeList.getLength(); walk++) {
                 Node node = nodeList.item(walk);
@@ -92,8 +93,7 @@ public class MappingResult {
                 if (!uriCheck(content)) {
                     errors.add(String.format(
                             "At %s: not a URI: [%s]",
-                            entry.getKey(), content
-                    ));
+                            entry.getKey(), content));
                 }
             }
         }
@@ -113,9 +113,11 @@ public class MappingResult {
         return root;
     }
 
-    /*public String toXml() {
-        return serializer.toXml(root, recDefTree != null);
-    }*/
+    /*
+     * public String toXml() {
+     * return serializer.toXml(root, recDefTree != null);
+     * }
+     */
 
     public String toXml() {
         return toXml("unknown", "unknown");
@@ -144,7 +146,8 @@ public class MappingResult {
         // Use DatatypeConverter like the Scala version
         String hash = DatatypeConverter.printHexBinary(digestStream.getMessageDigest().digest()).toLowerCase();
 
-        // XML comments may not contain double dashes (--) so if there are any then divide them with a space (- -)
+        // XML comments may not contain double dashes (--) so if there are any then
+        // divide them with a space (- -)
         String comment = String.format("<urn:%s_%s_%s/graph__%s>", orgId, spec, getLocalId(), hash);
         writer.write("<!--");
         writer.write(comment.replaceAll("\\-\\-", "- -"));
@@ -166,7 +169,7 @@ public class MappingResult {
     }
 
     public String toString() {
-        return Utils.stripNonPrinting(toXml());
+        return Utils.stripNonPrinting(toXml("unknown", "unknown"));
     }
 
     public static String hasRDFError(String rdf) {

@@ -21,10 +21,11 @@ public class JenaHelper {
     }
 
     public static String convertRDF(String defaultPrefix, String rdf, RDFFormat outputFormat) {
-        if (outputFormat == RDFFormat.RDFXML) return rdf;
+        if (outputFormat == RDFFormat.RDFXML)
+            return rdf;
 
         byte[] out = convertRDFTo(defaultPrefix, rdf, outputFormat);
-        if (outputFormat == RDFFormat.JSONLD_COMPACT_FLAT) {
+        if (outputFormat == RDFFormat.JSONLD_COMPACT_PRETTY) {
             return formatJSON(out);
         }
         if (outputFormat == RDFFormat.NTRIPLES) {
@@ -47,9 +48,9 @@ public class JenaHelper {
         Reader jsonReader = new InputStreamReader(new ByteArrayInputStream(out));
         JsonElement json = new JsonParser().parse(jsonReader);
         return new GsonBuilder()
-            .setPrettyPrinting()
-            .create()
-            .toJson(json);
+                .setPrettyPrinting()
+                .create()
+                .toJson(json);
     }
 
     private static byte[] convertRDFTo(String defaultPrefix, String rdf, RDFFormat outputFormat) {
@@ -62,7 +63,7 @@ public class JenaHelper {
     }
 
     public static String getExtension(RDFFormat outputFormat) {
-        if (outputFormat == RDFFormat.JSONLD_COMPACT_FLAT) {
+        if (outputFormat == RDFFormat.JSONLD_COMPACT_PRETTY) {
             return ".json";
         }
         if (outputFormat == RDFFormat.NTRIPLES) {

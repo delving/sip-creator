@@ -93,8 +93,9 @@ public class RecMappingFrame extends FrameBase {
         sipModel.getMappingModel().addChangeListener(new MappingModel.ChangeListenerAdapter() {
             @Override
             public void lockChanged(MappingModel mappingModel, boolean locked) {
-                removeAction.setEnabled(!locked);
-                revertMappingMenu.setEnabled(!locked);
+                setFrameLocked(locked);
+                //removeAction.setEnabled(!locked);
+                //revertMappingMenu.setEnabled(!locked);
             }
         });
     }

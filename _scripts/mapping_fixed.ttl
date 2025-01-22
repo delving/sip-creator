@@ -1,0 +1,57 @@
+<http://data.brabantcloud.nl/resource/aggregation/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://www.europeana.eu/schemas/edm/rights> <https://rightsstatements.org/vocab/InC/1.0/> .
+<http://data.brabantcloud.nl/resource/aggregation/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://www.europeana.eu/schemas/edm/provider> "Erfgoed Brabant" .
+<http://data.brabantcloud.nl/resource/aggregation/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://www.europeana.eu/schemas/edm/object> <httpss://images.memorix.nl/enb_304/thumb/220x220/4dbab527-501c-9960-c88e-1c0fe05dd746.jpg> .
+<http://data.brabantcloud.nl/resource/aggregation/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://www.europeana.eu/schemas/edm/isShownBy> <httpss://images.memorix.nl/enb_304/thumb/500x500/4dbab527-501c-9960-c88e-1c0fe05dd746.jpg> .
+<http://data.brabantcloud.nl/resource/aggregation/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://www.europeana.eu/schemas/edm/isShownAt> <https://heemkundekringloonoptsandt.nl/collectie/algemeen/?diw-id=brabantcloud_enb-304-titels_enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> .
+<http://data.brabantcloud.nl/resource/aggregation/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://www.europeana.eu/schemas/edm/hasView> <httpss://images.memorix.nl/enb_304/thumb/500x500/4dbab527-501c-9960-c88e-1c0fe05dd746.jpg> .
+<http://data.brabantcloud.nl/resource/aggregation/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://www.europeana.eu/schemas/edm/dataProvider> "Heemkundekring Loon op t Sandt" .
+<http://data.brabantcloud.nl/resource/aggregation/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://www.europeana.eu/schemas/edm/aggregatedCHO> <http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> .
+<http://data.brabantcloud.nl/resource/aggregation/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives.org/ore/terms/Aggregation> .
+<http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://purl.org/dc/elements/1.1/description> "Omgevingsvergunningen:<p>Kasteellaan 19A 5175 BC</p><p>Baan achter de Plakken 1 5175 NP</p><p>Kerkstraat 2 5175 BB</p><p>Pastoor Kampstraat 2 5176 NP</p>" .
+<http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://purl.org/dc/terms/spatial> <https://sws.geonames.org/2759554> .
+<http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://purl.org/dc/elements/1.1/subject> "Gemeente en politiek" .
+<http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://purl.org/dc/elements/1.1/subject> "Bouwterreinen" .
+<http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://purl.org/dc/elements/1.1/type> "Artikel uit tijdschrift" .
+<http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://purl.org/dc/elements/1.1/subject> "Dorpsgezichten en straatnamen" .
+<http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://www.europeana.eu/schemas/edm/type> "TEXT" .
+<http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/ProvidedCHO> .
+<http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://purl.org/dc/terms/issued> "20-09-2023" .
+<http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://purl.org/dc/elements/1.1/title> "Bekendmakingen gemeente Loon op Zand week 38 2023"@sjoerd .
+<http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://purl.org/dc/elements/1.1/publisher> <https://data.brabantcloud.nl/resource/agent/enb-304-titels/0e47e03b-d96d-5eb6-6b8a-7423d434ec04> .
+<http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://www.europeana.eu/schemas/edm/currentLocation> "Digitaal archief" .
+<http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f> <http://purl.org/dc/elements/1.1/identifier> "041999" .
+<https://data.brabantcloud.nl/api/memorix/download/?uuid=4dbab527-501c-9960-c88e-1c0fe05dd746]&subtenant=enb_304> <http://schemas.delving.eu/nave/terms/resourceSortOrder> "1" .
+<https://data.brabantcloud.nl/api/memorix/download/?uuid=4dbab527-501c-9960-c88e-1c0fe05dd746]&subtenant=enb_304> <http://schemas.delving.eu/nave/terms/sourceDownload> "https://data.brabantcloud.nl/api/memorix/download/?uuid=4dbab527-501c-9960-c88e-1c0fe05dd746&subtenant=enb_304" .
+<https://data.brabantcloud.nl/api/memorix/download/?uuid=4dbab527-501c-9960-c88e-1c0fe05dd746]&subtenant=enb_304> <http://schemas.delving.eu/nave/terms/allowDeepZoom> "true" .
+<https://data.brabantcloud.nl/api/memorix/download/?uuid=4dbab527-501c-9960-c88e-1c0fe05dd746]&subtenant=enb_304> <http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#hasMimeType> "application/pdf" .
+<https://data.brabantcloud.nl/api/memorix/download/?uuid=4dbab527-501c-9960-c88e-1c0fe05dd746]&subtenant=enb_304> <http://schemas.delving.eu/nave/terms/allowSourceDownload> "true" .
+<https://data.brabantcloud.nl/api/memorix/download/?uuid=4dbab527-501c-9960-c88e-1c0fe05dd746]&subtenant=enb_304> <http://schemas.delving.eu/nave/terms/thumbLarge> "httpss://images.memorix.nl/enb_304/thumb/500x500/4dbab527-501c-9960-c88e-1c0fe05dd746.jpg" .
+<https://data.brabantcloud.nl/api/memorix/download/?uuid=4dbab527-501c-9960-c88e-1c0fe05dd746]&subtenant=enb_304> <http://schemas.delving.eu/nave/terms/allowPublicWebView> "true" .
+<https://data.brabantcloud.nl/api/memorix/download/?uuid=4dbab527-501c-9960-c88e-1c0fe05dd746]&subtenant=enb_304> <http://schemas.delving.eu/nave/terms/fullTextObjectUrl> "https://images.memorix.nl/enb_304/download/download/4dbab527-501c-9960-c88e-1c0fe05dd746" .
+<https://data.brabantcloud.nl/api/memorix/download/?uuid=4dbab527-501c-9960-c88e-1c0fe05dd746]&subtenant=enb_304> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
+<https://data.brabantcloud.nl/api/memorix/download/?uuid=4dbab527-501c-9960-c88e-1c0fe05dd746]&subtenant=enb_304> <http://schemas.delving.eu/nave/terms/thumbSmall> "httpss://images.memorix.nl/enb_304/thumb/220x220/4dbab527-501c-9960-c88e-1c0fe05dd746.jpg" .
+<https://data.brabantcloud.nl/api/memorix/download/?uuid=4dbab527-501c-9960-c88e-1c0fe05dd746]&subtenant=enb_304> <http://schemas.delving.eu/nave/terms/fullText> "null" .
+_:Bdf2fb30aX2D3551X2D415eX2D9a4dX2Dd270c3ba2254 <http://schemas.delving.eu/nave/terms/subjectAatLabel> "Bouwterreinen" .
+_:Bdf2fb30aX2D3551X2D415eX2D9a4dX2Dd270c3ba2254 <http://schemas.delving.eu/nave/terms/place> "Baarle-Nassau" .
+_:Bdf2fb30aX2D3551X2D415eX2D9a4dX2Dd270c3ba2254 <http://schemas.delving.eu/nave/terms/numberOfPages> "1" .
+_:Bdf2fb30aX2D3551X2D415eX2D9a4dX2Dd270c3ba2254 <http://schemas.delving.eu/nave/terms/date> "2020  2030" .
+_:Bdf2fb30aX2D3551X2D415eX2D9a4dX2Dd270c3ba2254 <http://schemas.delving.eu/nave/terms/collectionPart> "Historische geografie" .
+_:Bdf2fb30aX2D3551X2D415eX2D9a4dX2Dd270c3ba2254 <http://schemas.delving.eu/nave/terms/collectionPart> "Geschiedenis van het bestuur/politiek" .
+_:Bdf2fb30aX2D3551X2D415eX2D9a4dX2Dd270c3ba2254 <http://schemas.delving.eu/nave/terms/collectionType> "Bibliotheek" .
+_:Bdf2fb30aX2D3551X2D415eX2D9a4dX2Dd270c3ba2254 <http://schemas.delving.eu/nave/terms/collection> "Heemkundekring Loon op t Sandt" .
+_:Bdf2fb30aX2D3551X2D415eX2D9a4dX2Dd270c3ba2254 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schemas.delving.eu/nave/terms/BrabantCloudResource> .
+<https://data.brabantcloud.nl/resource/agent/enb-304-titels/0e47e03b-d96d-5eb6-6b8a-7423d434ec04> <http://schemas.delving.eu/nave/terms/publisherLabel> "De Duinkoerier" .
+<https://data.brabantcloud.nl/resource/agent/enb-304-titels/0e47e03b-d96d-5eb6-6b8a-7423d434ec04> <http://schemas.delving.eu/nave/terms/publisherLabel> "E.M. de Jong" .
+<https://data.brabantcloud.nl/resource/agent/enb-304-titels/0e47e03b-d96d-5eb6-6b8a-7423d434ec04> <http://schemas.delving.eu/nave/terms/placeOfPublication> "Baarle-Nassau" .
+<https://data.brabantcloud.nl/resource/agent/enb-304-titels/0e47e03b-d96d-5eb6-6b8a-7423d434ec04> <http://www.w3.org/2004/02/skos/core#prefLabel> "De Duinkoerier" .
+<https://data.brabantcloud.nl/resource/agent/enb-304-titels/0e47e03b-d96d-5eb6-6b8a-7423d434ec04> <http://www.w3.org/2004/02/skos/core#prefLabel> "E.M. de Jong" .
+<https://data.brabantcloud.nl/resource/agent/enb-304-titels/0e47e03b-d96d-5eb6-6b8a-7423d434ec04> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Agent> .
+_:B59bd208aX2D87b3X2D4b4dX2Dbf65X2D50ee84aa5743 <http://schemas.delving.eu/nave/terms/public> "true" .
+_:B59bd208aX2D87b3X2D4b4dX2Dbf65X2D50ee84aa5743 <http://schemas.delving.eu/nave/terms/allowSourceDownload> "false" .
+_:B59bd208aX2D87b3X2D4b4dX2Dbf65X2D50ee84aa5743 <http://schemas.delving.eu/nave/terms/allowLinkedOpenData> "true" .
+_:B59bd208aX2D87b3X2D4b4dX2Dbf65X2D50ee84aa5743 <http://schemas.delving.eu/nave/terms/allowDeepZoom> "true" .
+_:B59bd208aX2D87b3X2D4b4dX2Dbf65X2D50ee84aa5743 <http://schemas.delving.eu/nave/terms/featured> "false" .
+_:B59bd208aX2D87b3X2D4b4dX2Dbf65X2D50ee84aa5743 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schemas.delving.eu/nave/terms/DelvingResource> .
+<https://sws.geonames.org/2759554> <http://www.w3.org/2004/02/skos/core#prefLabel> "Baarle-Nassau" .
+<https://sws.geonames.org/2759554> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
+

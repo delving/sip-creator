@@ -1,0 +1,76 @@
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix edm: <http://www.europeana.eu/schemas/edm/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix ore: <http://www.openarchives.org/ore/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+edm:ProvidedCHOShape
+    a sh:NodeShape ;
+    sh:targetClass edm:ProvidedCHO ;
+    sh:property [
+        sh:path dc:title ;
+        sh:nodeKind sh:Literal ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path dc:description ;
+        sh:nodeKind sh:Literal ;
+    ] ;
+    sh:property [
+    sh:path dc:subject ;
+    sh:or (
+        # If it's a Blank Node or IRI, it must be a skos:Concept
+        [ 
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:class skos:Concept ;
+        ]
+        # If it's a Literal, allow it
+        [
+            sh:nodeKind sh:Literal ;
+        ]
+    ) ;
+] ;
+
+    sh:property [
+        sh:path edm:type ;
+        sh:datatype xsd:string ;
+        sh:in ("TEXT" "VIDEO" "IMAGE" "SOUND" "3D") ;
+    ] .
+
+edm:AggregationShape
+    a sh:NodeShape ;
+    sh:targetClass ore:Aggregation ;
+    sh:property [
+        sh:path edm:aggregatedCHO ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:class edm:ProvidedCHO ;
+    ] ;
+    sh:property [
+        sh:path edm:dataProvider ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:Literal ;  # or sh:IRI, depending on your requirements
+    ] ;
+    sh:or (
+        [
+            sh:property [
+                sh:path edm:isShownAt ;
+                sh:minCount 1 ;
+                sh:nodeKind sh:IRI ;
+            ]
+        ]
+        [
+            sh:property [
+                sh:path edm:isShownBy ;
+                sh:minCount 1 ;
+                sh:nodeKind sh:IRI ;
+            ]
+        ]
+    ) .

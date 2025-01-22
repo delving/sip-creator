@@ -76,7 +76,7 @@ public class XmlSerializer {
                 if (entry.getValue().trim().isEmpty()) continue;
                 nslist.add(eventFactory.createNamespace(entry.getKey(), entry.getValue()));
             }
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            //ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             //OutputStreamWriter writer = new OutputStreamWriter(outputStream, "UTF-8");
             XMLEventWriter out = outputFactory.createXMLEventWriter(writer);
             out.add(eventFactory.createStartDocument());

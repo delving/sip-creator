@@ -42,11 +42,15 @@ public class MetadataRecord {
         return new MetadataRecord(rootNode, recordNumber, recordCount);
     }
 
+    public static MetadataRecord create(MetadataRecord metadataRecord, String sourceXML) {
+        return new SourceMetadataRecord(metadataRecord, sourceXML);
+    }
+
     public static MetadataRecord poisonPill() {
         return new MetadataRecord(null, -1, -1);
     }
 
-    private MetadataRecord(GroovyNode rootNode, int recordNumber, int recordCount) {
+    MetadataRecord(GroovyNode rootNode, int recordNumber, int recordCount) {
         this.rootNode = rootNode;
         this.recordNumber = recordNumber;
         this.recordCount = recordCount;

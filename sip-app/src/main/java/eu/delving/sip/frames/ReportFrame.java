@@ -22,6 +22,7 @@
 package eu.delving.sip.frames;
 
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.ReportFile;
 import eu.delving.sip.model.ReportFileModel;
@@ -106,7 +107,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
 
         private JPanel createLeft() {
             JPanel p = new JPanel(new BorderLayout());
-            p.add(scrollV("Invalid Records for " + report.getPrefix().toUpperCase(), list), BorderLayout.CENTER);
+            p.add(scrollV("Reported Records for " + report.getPrefix().toUpperCase(), list), BorderLayout.CENTER);
             p.add(createConclusionPanel(), BorderLayout.SOUTH);
             return p;
         }
@@ -114,8 +115,8 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
         private JPanel createConclusionPanel() {
             JPanel p = new JPanel(new GridLayout(1, 0));
             p.setBorder(createCompoundBorder(createTitledBorder("Conclusions"),createEmptyBorder(10, 10, 10, 10)));
-            for (String line : report.getReportConclusion()) {
-                JLabel label = new JLabel(line, JLabel.CENTER);
+            for (String line : report.getReportConclusions()) {
+                JLabel label = new JLabel(String.format("<html><body>%s", line), JLabel.CENTER);
                 label.setOpaque(false);
                 label.setBackground(Color.WHITE);
                 p.add(label);
@@ -125,7 +126,7 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
 
         @SuppressWarnings("unchecked")
         private void createList() {
-            list = new JList<ReportFile.Rec>(report.getInvalidRecListModel());
+            list = new JList<ReportFile.Rec>(report.getReportedRecListModel());
             list.setCellRenderer(report.getCellRenderer()); // too bad this is untyped still
             list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -133,7 +134,12 @@ public class ReportFrame extends FrameBase implements ReportFileModel.Listener {
                 public void valueChanged(ListSelectionEvent e) {
                     final ReportFile.Rec rec = list.getSelectedValue();
                     if (rec == null) return;
-                    htmlPanel.setHtml(report.toHtml(rec));
+                    Swing.Exec.later(new Swing() {
+                        @Override
+                        public void run() {
+                            htmlPanel.setHtml(report.toHtml(rec));
+                        }
+                    });
                 }
             });
         }

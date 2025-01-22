@@ -27,11 +27,14 @@ import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaVersion;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.stats.Stats;
+import org.apache.jena.graph.Graph;
 
 import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +56,8 @@ public interface DataSet extends Comparable<DataSet> {
 
     Validator newValidator() throws StorageException;
 
+    Graph newShape() throws StorageException;
+
     DataSetState getState();
 
     Map<String, String> getDataSetFacts();
@@ -63,9 +68,11 @@ public interface DataSet extends Comparable<DataSet> {
 
     void deleteResults();
 
+    File getSourceFile();
+
     InputStream openSourceInputStream() throws StorageException;
 
-    File targetOutput();
+    File targetOutput() throws StorageException;
 
     Stats getStats();
 
@@ -79,9 +86,17 @@ public interface DataSet extends Comparable<DataSet> {
 
     List<File> getRecMappingFiles() throws StorageException;
 
-    ReportWriter openReportWriter(RecDef recDef) throws StorageException;
+    ReportWriter openReportWriter(String prefix, Date time) throws StorageException;
+
+    void finishReportWriter(String prefix, Date time) throws StorageException;
 
     ReportFile getReport() throws StorageException;
+
+    void clean(int maxHistory) throws StorageException;
+
+    OutputStream openProcessedOutputStream(String prefix, Date time) throws StorageException;
+
+    void finishProcessedOutput(String prefix, Date time) throws StorageException;
 
     void deleteSource();
 
@@ -92,4 +107,3 @@ public interface DataSet extends Comparable<DataSet> {
     void remove() throws StorageException;
 
 }
-

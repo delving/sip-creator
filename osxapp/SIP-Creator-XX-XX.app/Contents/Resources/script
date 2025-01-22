@@ -1,1 +1,0 @@
-java -jar -Xms1024m -Xmx1024m SIP-Creator-xx-xx.jar

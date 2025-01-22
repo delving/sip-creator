@@ -21,27 +21,22 @@
 
 package eu.delving.sip.files;
 
-import eu.delving.groovy.MappingException;
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import eu.delving.groovy.MetadataRecord;
 import eu.delving.groovy.XmlNodePrinter;
 import eu.delving.metadata.MappingResult;
-import org.apache.commons.io.output.CountingOutputStream;
 
 import javax.xml.xpath.XPathExpressionException;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.apache.commons.io.FileUtils.deleteQuietly;
-import static org.apache.commons.io.FileUtils.writeLines;
 
 /**
  * Describes how a report is written during dataset processing
@@ -50,88 +45,157 @@ import static org.apache.commons.io.FileUtils.writeLines;
  */
 
 public class ReportWriter {
-    private File reportFile;
-    private File reportIndexFile;
-    private File reportConclusionFile;
-    private CountingOutputStream count;
-    private Writer out;
-    private DataOutputStream indexOut;
-    private int recordNumber;
+    private File reportJsonFile;
+    private JsonGenerator json = null;
+    private Map<ReportType, AtomicInteger> counters = new HashMap<>();
 
     public enum ReportType {
         INVALID,
         DISCARDED,
-        UNEXPECTED
+        UNEXPECTED,
+        WARNING
     }
 
-    public ReportWriter(File reportFile, File reportIndexFile, File reportConclusionFile) throws FileNotFoundException, XPathExpressionException, UnsupportedEncodingException {
-        this.reportFile = reportFile;
-        this.reportIndexFile = reportIndexFile;
-        this.reportConclusionFile = reportConclusionFile;
-        deleteQuietly(reportConclusionFile);
-        this.indexOut = new DataOutputStream(new FileOutputStream(reportIndexFile));
-        this.count = new CountingOutputStream(new FileOutputStream(reportFile));
-        this.out = new OutputStreamWriter(count, "UTF-8");
+    public ReportWriter(File reportJsonFile)
+            throws IOException, XPathExpressionException {
+        this.reportJsonFile = reportJsonFile;
+        if (reportJsonFile != null) {
+            JsonFactory jsonFactory = JsonFactory.builder().build();
+            json = jsonFactory.createGenerator(reportJsonFile, JsonEncoding.UTF8);
+            json.writeStartObject();
+            json.writeFieldName("records");
+            json.writeStartObject();
+        }
+        for (ReportType reportType : ReportType.values()) {
+            counters.put(reportType, new AtomicInteger(0));
+        }
     }
 
-    public void invalid(MappingResult mappingResult, Exception e) throws IOException {
-        report(ReportType.INVALID, e.getMessage());
-        out.write(mappingResult.toXml());
-        terminate();
+    public void warn(MetadataRecord inputRecord, MappingResult mappingResult, List<String> events,
+                     Map<String, String> facts) throws IOException {
+        counters.get(ReportType.WARNING).incrementAndGet();
+        if (json != null) {
+            json.writeFieldName(inputRecord.getId());
+            json.writeStartObject();
+            json.writeFieldName("type");
+            json.writeString(ReportType.WARNING.name());
+            json.writeFieldName("recordNumber");
+            json.writeNumber(inputRecord.getRecordNumber());
+            json.writeFieldName("message");
+            json.writeString(events.size() + " warning(s) for " + inputRecord.getId());
+            json.writeFieldName("warnings");
+            json.writeStartArray();
+            for (String event : events) {
+                json.writeString(event);
+            }
+            json.writeEndArray();
+            if (mappingResult != null) {
+                json.writeFieldName("output");
+                json.writeString(toXml(mappingResult, facts));
+            }
+            json.writeEndObject();
+        }
     }
 
-    public void discarded(MetadataRecord inputRecord, String discardMessage) throws IOException {
-        report(ReportType.DISCARDED, discardMessage);
-        out.write("Reason: ");
-        out.write(discardMessage);
-        out.write("\n");
-        out.write(XmlNodePrinter.toXml(inputRecord.getRootNode()));
-        terminate();
+    public void invalid(MetadataRecord inputRecord, MappingResult mappingResult, Exception e,
+                        Map<String, String> facts) throws IOException {
+        counters.get(ReportType.INVALID).incrementAndGet();
+        if (json != null) {
+            json.writeFieldName(inputRecord.getId());
+            json.writeStartObject();
+            json.writeFieldName("type");
+            json.writeString(ReportType.INVALID.name());
+            json.writeFieldName("recordNumber");
+            json.writeNumber(inputRecord.getRecordNumber());
+            json.writeFieldName("error");
+            json.writeString(e.getClass().getCanonicalName());
+            json.writeFieldName("message");
+            json.writeString(e.getMessage());
+            if (mappingResult != null) {
+                json.writeFieldName("output");
+                json.writeString(toXml(mappingResult, facts));
+            }
+            json.writeEndObject();
+        }
     }
 
-    public void unexpected(MetadataRecord inputRecord, MappingException exception) throws IOException {
-        report(ReportType.UNEXPECTED, exception.getMessage());
-        exception.printStackTrace(new PrintWriter(out));
-        out.write(XmlNodePrinter.toXml(inputRecord.getRootNode()));
-        terminate();
+    public void discarded(MetadataRecord inputRecord, MappingResult mappingResult, Exception e,
+                          Map<String, String> facts) throws IOException {
+        counters.get(ReportType.DISCARDED).incrementAndGet();
+        if (json != null) {
+            json.writeFieldName(inputRecord.getId());
+            json.writeStartObject();
+            json.writeFieldName("type");
+            json.writeString(ReportType.DISCARDED.name());
+            json.writeFieldName("recordNumber");
+            json.writeNumber(inputRecord.getRecordNumber());
+            json.writeFieldName("message");
+            json.writeString(e.getMessage());
+            json.writeFieldName("input");
+            json.writeString(toXml(inputRecord));
+            json.writeEndObject();
+        }
+    }
+
+    public void unexpected(MetadataRecord inputRecord, MappingResult mappingResult, Exception e,
+                           Map<String, String> facts) throws IOException {
+        counters.get(ReportType.UNEXPECTED).incrementAndGet();
+        if (json != null) {
+            json.writeFieldName(inputRecord.getId());
+            json.writeStartObject();
+            json.writeFieldName("type");
+            json.writeString(ReportType.UNEXPECTED.name());
+            json.writeFieldName("recordNumber");
+            json.writeNumber(inputRecord.getRecordNumber());
+            json.writeFieldName("message");
+            json.writeString(e.getMessage());
+            json.writeFieldName("input");
+            json.writeString(toXml(inputRecord));
+            json.writeEndObject();
+        }
     }
 
     public void abort() {
         try {
-            out.close();
-            indexOut.close();
-        }
-        catch (IOException e) {
+            if (json != null) {
+                json.close();
+            }
+        } catch (IOException e) {
             throw new RuntimeException("Unable to close", e);
         }
-        deleteQuietly(reportFile);
-        deleteQuietly(reportIndexFile);
-        deleteQuietly(reportConclusionFile);
+        deleteQuietly(reportJsonFile);
     }
 
-    public void finish(int validCount, int invalidCount) {
+    public void finish(int totalCount, int processedCount) {
         try {
-            indexOut.close();
-            out.close();
-            List<String> lines = new ArrayList<String>();
-            lines.add(String.format("Total Records: %d", validCount + invalidCount));
-            lines.add(String.format("Valid Records: %d", validCount));
-            lines.add(String.format("Invalid Records: %d", invalidCount));
-            writeLines(reportConclusionFile, lines);
-        }
-        catch (IOException e) {
+            if (json != null) {
+                json.writeEndObject();
+                json.writeFieldName("conclusions");
+                json.writeStartObject();
+                json.writeFieldName("total");
+                json.writeNumber(totalCount);
+                json.writeFieldName("processed");
+                json.writeNumber(processedCount);
+                for (ReportType reportType : ReportType.values()) {
+                    json.writeFieldName(reportType.name());
+                    json.writeNumber(counters.get(reportType).get());
+                }
+                json.writeEndObject();
+                json.writeEndObject();
+                json.close();
+            }
+        } catch (IOException e) {
             throw new RuntimeException("Unable to finish report", e);
         }
-
     }
 
-    private void report(ReportType type, String message) throws IOException {
-        out.flush();
-        indexOut.writeLong(count.getByteCount());
-        out.write(String.format("<<%d,%s>>%s\n", recordNumber++, type, message));
+    private String toXml(MappingResult result, Map<String, String> facts) {
+        return result.toXml(facts.getOrDefault("orgId", "unknown"),
+            facts.getOrDefault("spec", "unknown"));
     }
 
-    private void terminate() throws IOException {
-        out.write("<<>>\n");
+    private String toXml(MetadataRecord inputRecord) {
+        return XmlNodePrinter.toXml(inputRecord.getRootNode());
     }
+
 }

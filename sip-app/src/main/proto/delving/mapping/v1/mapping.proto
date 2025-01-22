@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package mapping.v1;
+
+option go_package = "github.com/delving/hub3/gen/mapping/v1;mappingv1";
+option java_multiple_files = true;
+option java_outer_classname = "MappingServiceProto";
+option java_package = "eu.delving.sip.grpc";
+
+service MappingService {
+  rpc StartMapping(MappingRequest) returns (stream MappingProgress) {}
+  rpc MapRecord(SingleRecordRequest) returns (MappingResult) {}
+}
+
+message MappingRequest {
+  string dataset_id = 1;
+  string workspace_id = 2;
+}
+
+// Base request containing dataset identification
+message DatasetRequest {
+  string dataset_id = 1;
+  string workspace_id = 2;
+}
+
+// Single record mapping request
+message SingleRecordRequest {
+  // Required fields
+  string record_xml = 1;
+  DatasetRequest dataset = 2;
+  string local_record_id = 3;  // Added field for local record ID
+
+  // Optional fields - if not provided, will be loaded from dataset
+  optional string mapping_file = 4;
+  optional string record_definition = 5;
+  optional string validation_schema = 6;
+  bool validate = 7;
+  optional EditPath edit_path = 8;
+}
+
+message EditPath {
+  string node_mapping = 1;
+  string groovy_code = 2;
+}
+
+message MappingResult {
+  string mapped_xml = 1;
+  optional ErrorStatus error = 2;
+  repeated string validation_messages = 3;
+  // Add information about which files were actually used
+  string mapping_file_used = 4;
+  string record_definition_used = 5;
+  string validation_schema_used = 6;
+}
+
+
+message MappingProgress {
+  oneof update {
+    InitializationStatus initialization = 1;
+    ProcessingStatus processing = 2;
+    CompletionStatus completion = 3;
+    ErrorStatus error = 4;
+  }
+}
+
+message InitializationStatus {
+  string record_definition = 1;
+  string validation_schema = 2;
+  string mapping_file = 3;
+  string source_file = 4;
+  int64 initialization_time_ms = 5;
+}
+
+message ProcessingStatus {
+  int32 records_processed = 1;
+  optional int32 total_records = 2;
+  optional double percentage_complete = 3;
+  string current_operation = 4;
+  double records_per_second = 5;  
+  int64 elapsed_time_ms = 6;    
+}
+
+message CompletionStatus {
+  int64 total_time_ms = 1;
+  int64 processing_time_ms = 2;
+  int32 total_records_processed = 3;
+  double average_records_per_second = 4;  
+}
+
+message ErrorStatus {
+  string error_message = 1;
+  string stack_trace = 2;
+}

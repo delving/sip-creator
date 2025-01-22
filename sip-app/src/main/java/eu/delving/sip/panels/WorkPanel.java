@@ -102,6 +102,7 @@ public class WorkPanel extends JPanel {
             String show = toFullString(jobContext);
             Component component = super.getListCellRendererComponent(list, show, index, isSelected, cellHasFocus);
             Work work = jobContext.getWork();
+            component.setForeground(Color.BLACK);
             if (work == null) {
                 component.setBackground(Color.WHITE);
             }

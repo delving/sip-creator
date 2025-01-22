@@ -21,6 +21,7 @@
 
 package eu.delving.sip.files;
 
+import com.github.luben.zstd.ZstdOutputStream;
 import eu.delving.XMLToolFactory;
 import eu.delving.metadata.Hasher;
 import eu.delving.metadata.MetadataException;
@@ -36,11 +37,13 @@ import eu.delving.stats.Stats;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CountingInputStream;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RiotException;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import javax.xml.xpath.XPathExpressionException;
@@ -53,22 +56,21 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import static eu.delving.schema.SchemaType.RECORD_DEFINITION;
-import static eu.delving.schema.SchemaType.VALIDATION_SCHEMA;
+import static eu.delving.schema.SchemaType.*;
 import static eu.delving.sip.files.Storage.FileType.MAPPING;
 import static eu.delving.sip.files.StorageHelper.*;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 
 /**
- * This is an implementation of the Storage interface, with most of the functionality built into the inner class
+ * This is an implementation of the Storage interface, with most of the
+ * functionality built into the inner class
  * which implements the DataSet interface.
  *
  *
@@ -80,13 +82,17 @@ public class StorageImpl implements Storage {
     private SchemaRepository schemaRepository;
     private static LSResourceResolver resolver;
 
-    public StorageImpl(File home, SchemaRepository schemaRepository, LSResourceResolver resolver) throws StorageException {
+    private static final String INPROGRESS_SUFFIX = ".inprogress";
+
+    public StorageImpl(File home, SchemaRepository schemaRepository, LSResourceResolver resolver)
+            throws StorageException {
         this.home = home;
         this.schemaRepository = schemaRepository;
         this.resolver = resolver;
         if (!home.exists()) {
             if (!home.mkdirs()) {
-                throw new StorageException(String.format("Unable to create storage directory in %s", home.getAbsolutePath()));
+                throw new StorageException(
+                        String.format("Unable to create storage directory in %s", home.getAbsolutePath()));
             }
         }
     }
@@ -94,7 +100,8 @@ public class StorageImpl implements Storage {
     @Override
     public File cache(String fileName) {
         File cacheDir = new File(home, CACHE_DIR);
-        if (!cacheDir.exists() && !cacheDir.mkdirs()) throw new RuntimeException("Couldn't create cache dir");
+        if (!cacheDir.exists() && !cacheDir.mkdirs())
+            throw new RuntimeException("Couldn't create cache dir");
         return new File(cacheDir, fileName);
     }
 
@@ -104,13 +111,17 @@ public class StorageImpl implements Storage {
         File[] list = home.listFiles();
         if (list != null) {
             for (File directory : list) {
-                if (!directory.isDirectory() || directory.getName().equals(CACHE_DIR)) continue;
+                if (!directory.isDirectory() || directory.getName().equals(CACHE_DIR))
+                    continue;
                 boolean hasFiles = false; // empty ones will not appear
                 File[] files = directory.listFiles();
                 if (files != null) {
-                    for (File file : files) if (file.isFile()) hasFiles = true;
-                    if (!hasFiles) continue;
-                    DataSetImpl impl = new DataSetImpl(directory,  schemaRepository);
+                    for (File file : files)
+                        if (file.isFile())
+                            hasFiles = true;
+                    if (!hasFiles)
+                        continue;
+                    DataSetImpl impl = new DataSetImpl(directory, schemaRepository);
                     map.put(directory.getName(), impl);
                 }
             }
@@ -122,7 +133,8 @@ public class StorageImpl implements Storage {
     public DataSet createDataSet(String sipFileName) throws StorageException {
         File directory = createDataSetDirectory(home, sipFileName);
         if (!directory.exists() && !directory.mkdirs()) {
-            throw new StorageException(String.format("Unable to create data set directory %s", directory.getAbsolutePath()));
+            throw new StorageException(
+                    String.format("Unable to create data set directory %s", directory.getAbsolutePath()));
         }
         return new DataSetImpl(directory, schemaRepository);
     }
@@ -168,18 +180,18 @@ public class StorageImpl implements Storage {
         }
 
         @Override
+        public Graph newShape() throws StorageException {
+            return shape(getSchemaVersion());
+        }
+
+        @Override
         public DataSetState getState() {
             File source = sourceFile(here);
             if (source.exists()) {
                 return postSourceState(source);
-            }
-            else {
+            } else {
                 return DataSetState.ABSENT;
             }
-        }
-
-        private boolean hasProcessingSucceeded() {
-            return reportConclusionFile(here, getSchemaVersion().getPrefix()).exists();
         }
 
         private DataSetState postSourceState(File source) {
@@ -187,13 +199,14 @@ public class StorageImpl implements Storage {
             if (statistics.exists() && statistics.lastModified() >= source.lastModified()) {
                 File mapping = findLatestFile(here, MAPPING, getSchemaVersion().getPrefix());
                 if (mapping.exists()) {
-                    return hasProcessingSucceeded() ? DataSetState.PROCESSED : DataSetState.MAPPING;
-                }
-                else {
+                    File reportJsonFile = reportJsonFile(here, getSchemaVersion().getPrefix());
+                    return (reportJsonFile != null && reportJsonFile.exists()
+                        && reportJsonFile.lastModified() >= mapping.lastModified())
+                        ? DataSetState.PROCESSED : DataSetState.MAPPING;
+                } else {
                     return DataSetState.ANALYZED_SOURCE;
                 }
-            }
-            else {
+            } else {
                 return DataSetState.SOURCED;
             }
         }
@@ -201,10 +214,10 @@ public class StorageImpl implements Storage {
         @Override
         public Map<String, String> getDataSetFacts() {
             try {
-                if (dataSetFacts == null) dataSetFacts = readFacts(factsFile(here));
+                if (dataSetFacts == null)
+                    dataSetFacts = readFacts(factsFile(here));
                 return dataSetFacts;
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 return new TreeMap<String, String>();
             }
         }
@@ -213,8 +226,7 @@ public class StorageImpl implements Storage {
         public Map<String, String> getHints() {
             try {
                 return readFacts(hintsFile(here));
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 return new TreeMap<String, String>();
             }
         }
@@ -224,8 +236,7 @@ public class StorageImpl implements Storage {
             File hintsFile = new File(here, FileType.HINTS.getName());
             try {
                 writeFacts(hintsFile, hints);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new StorageException("Unable to set hints", e);
             }
         }
@@ -245,8 +256,13 @@ public class StorageImpl implements Storage {
         }
 
         @Override
+        public File getSourceFile() {
+            return sourceFile(here);
+        }
+
+        @Override
         public File targetOutput() {
-            return targetFile(here, dataSetFacts, getSchemaVersion().getPrefix());
+            return targetFile(here, getDataSetFacts(), getSchemaVersion().getPrefix());
         }
 
         @Override
@@ -257,11 +273,9 @@ public class StorageImpl implements Storage {
                 try {
                     in = zipIn(statsFile);
                     return Stats.read(in);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     FileUtils.deleteQuietly(statsFile);
-                }
-                finally {
+                } finally {
                     IOUtils.closeQuietly(in);
                 }
             }
@@ -273,14 +287,12 @@ public class StorageImpl implements Storage {
             File statsFile = statsFile(here);
             if (stats == null) {
                 delete(statsFile);
-            }
-            else {
+            } else {
                 OutputStream out = null;
                 try {
                     out = zipOut(statsFile);
                     Stats.write(stats, out);
-                }
-                finally {
+                } finally {
                     IOUtils.closeQuietly(out);
                 }
             }
@@ -292,16 +304,14 @@ public class StorageImpl implements Storage {
             if (file.exists()) {
                 try {
                     return RecMapping.read(file, recDefModel);
+                } catch (Exception e) {
+                    throw new StorageException(String.format("Unable to read mapping from %s", file.getAbsolutePath()),
+                            e);
                 }
-                catch (Exception e) {
-                    throw new StorageException(String.format("Unable to read mapping from %s", file.getAbsolutePath()), e);
-                }
-            }
-            else {
+            } else {
                 try {
                     return RecMapping.create(recDefModel.createRecDefTree(getSchemaVersion()));
-                }
-                catch (MetadataException e) {
+                } catch (MetadataException e) {
                     throw new StorageException("Unable to load record definition", e);
                 }
             }
@@ -313,8 +323,7 @@ public class StorageImpl implements Storage {
                 RecMapping previousMapping = RecMapping.read(previousMappingFile, recDefModel);
                 setRecMapping(previousMapping, false);
                 return previousMapping;
-            }
-            catch (MetadataException e) {
+            } catch (MetadataException e) {
                 throw new StorageException("Unable to fetch previous mapping", e);
             }
         }
@@ -326,8 +335,7 @@ public class StorageImpl implements Storage {
             if (freeze) {
                 try {
                     Hasher.ensureFileHashed(file);
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     throw new StorageException("Unable to hash the mapping file name", e);
                 }
             }
@@ -339,39 +347,97 @@ public class StorageImpl implements Storage {
         }
 
         @Override
-        public ReportWriter openReportWriter(RecDef recDef) throws StorageException {
-            File reportFile = new File(here, FileType.REPORT.getName(recDef.prefix));
-            File reportIndexFile = new File(here, FileType.REPORT_INDEX.getName(recDef.prefix));
-            File reportConclusionFile = new File(here, FileType.REPORT_CONCLUSION.getName(recDef.prefix));
+        public ReportWriter openReportWriter(String prefix, Date time) throws StorageException {
+            String fileName = Hasher.prefixFileName(FileType.REPORT_JSON.getName(prefix), time);
+            File reportJson = new File(here, fileName + INPROGRESS_SUFFIX);
             try {
-                return new ReportWriter(reportFile, reportIndexFile, reportConclusionFile);
-            }
-            catch (IOException e) {
+                return new ReportWriter(reportJson);
+            } catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
-            }
-            catch (XPathExpressionException e) {
+            } catch (XPathExpressionException e) {
                 throw new StorageException("Cannot create xpath expression", e);
             }
+        }
+
+        @Override
+        public void finishReportWriter(String prefix, Date time) throws StorageException {
+            String fileName = Hasher.prefixFileName(FileType.REPORT_JSON.getName(prefix), time);
+            File reportJson = new File(here, fileName + INPROGRESS_SUFFIX);
+            if (!reportJson.exists()) {
+                throw new StorageException("Can't finish report in progress because it doesn't exist");
+            }
+            reportJson.renameTo(new File(here, fileName));
         }
 
         @Override
         public ReportFile getReport() throws StorageException {
             try {
                 String prefix = getSchemaVersion().getPrefix();
+
+                // If old-style report files exist, delete them
                 File reportFile = reportFile(here, prefix);
                 File reportIndexFile = reportIndexFile(here, prefix);
                 File reportConclusionFile = reportConclusionFile(here, prefix);
-                if (!(reportFile.exists() && reportIndexFile.exists() && reportConclusionFile.exists())) return null;
-                return new ReportFile(reportFile, reportIndexFile, reportConclusionFile, this, prefix);
-            }
-            catch (IOException e) {
+                deleteQuietly(reportFile);
+                deleteQuietly(reportIndexFile);
+                deleteQuietly(reportConclusionFile);
+
+                // Find the most recent JSON-format report file, if any
+                File reportJsonFile = reportJsonFile(here, prefix);
+                if (reportJsonFile == null || !reportJsonFile.exists()) {
+                    return null;
+                }
+                return new ReportFile(reportJsonFile, this, prefix);
+            } catch (IOException e) {
                 throw new StorageException("Cannot read validation report", e);
             }
         }
 
         @Override
+        public void clean(int maxHistory) throws StorageException {
+            String prefix = getSchemaVersion().getPrefix();
+
+            // Keep only the most recent of each
+            getRecent(here.listFiles(new NameFileFilter(FileType.SOURCE_ZSTD.getName())), 0, maxHistory);
+            getRecent(here.listFiles(new NameFileFilter(FileType.SOURCE_STATS_ZSTD.getName())), 0, maxHistory);
+            getRecent(here.listFiles(new NameFileFilter(FileType.MAPPING.getName(prefix))), 0, maxHistory);
+            getRecent(here.listFiles(new NameFileFilter(FileType.PROCESSED.getName(prefix))), 0, maxHistory);
+            getRecent(here.listFiles(new NameFileFilter(FileType.REPORT_JSON.getName(prefix))), 0, maxHistory);
+        }
+
+        @Override
+        public OutputStream openProcessedOutputStream(String prefix, Date time) throws StorageException {
+            // Look for existing files in order to trigger deleting old ones when needed
+            findOrNull(here, 0,  new NameFileFilter(FileType.PROCESSED.getName(prefix)), FileType.PROCESSED);
+
+            // Get the name of the new timestamped file
+            String fileName = Hasher.prefixFileName(FileType.PROCESSED.getName(prefix), time);
+            File processedFile = new File(here, fileName + INPROGRESS_SUFFIX);
+            if (processedFile.exists()) {
+                throw new StorageException("Processed output file already exists");
+            }
+            try {
+                OutputStream outputStream = Files.newOutputStream(processedFile.toPath());
+                return new ZstdOutputStream(outputStream);
+            } catch (IOException e) {
+                throw new StorageException("Error opening stream for processed output", e);
+            }
+        }
+
+        @Override
+        public void finishProcessedOutput(String prefix, Date time) throws StorageException {
+            String fileName = Hasher.prefixFileName(FileType.PROCESSED.getName(prefix), time);
+            File processedFile = new File(here, fileName + INPROGRESS_SUFFIX);
+            if (!processedFile.exists()) {
+                throw new StorageException("Can't finish processed output in progress because it doesn't exist");
+            }
+            processedFile.renameTo(new File(here, fileName));
+        }
+
+        @Override
         public void deleteSource() {
-            for (File file : findSourceFiles(here)) delete(file);
+            for (File file : findSourceFiles(here))
+                delete(file);
         }
 
         @Override
@@ -380,14 +446,15 @@ public class StorageImpl implements Storage {
             here.mkdir();
             long streamLength = sipZipFile.length();
 
-            try (InputStream inputStream = new FileInputStream(sipZipFile) ){
+            try (InputStream inputStream = new FileInputStream(sipZipFile)) {
                 ZipEntry zipEntry;
                 byte[] buffer = new byte[BLOCK_SIZE];
                 int bytesRead;
                 progressListener.prepareFor((int) (streamLength / BLOCK_SIZE));
                 CountingInputStream counting = new CountingInputStream(inputStream);
                 ZipInputStream zipInputStream = new ZipInputStream(counting);
-                String unzippedName = FileType.SOURCE.getName().substring(0, FileType.SOURCE.getName().length() - ".gz".length());
+                String unzippedName = FileType.SOURCE.getName().substring(0,
+                        FileType.SOURCE.getName().length() - ".gz".length());
                 try {
                     while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                         String fileName = zipEntry.getName();
@@ -400,30 +467,25 @@ public class StorageImpl implements Storage {
                                     outputStream.write(buffer, 0, bytesRead);
                                     progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE));
                                 }
-                            }
-                            finally {
+                            } finally {
                                 IOUtils.closeQuietly(outputStream);
                             }
-                        }
-                        else {
+                        } else {
                             File file = new File(here, fileName);
                             OutputStream output = null;
                             try {
                                 output = new FileOutputStream(file);
                                 IOUtils.copy(zipInputStream, output);
-                            }
-                            finally {
+                            } finally {
                                 IOUtils.closeQuietly(output);
                             }
                             progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE));
                         }
                     }
-                }
-                catch (CancelException e) {
+                } catch (CancelException e) {
                     throw new StorageException("Cancellation", e);
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new StorageException("Unable to accept SipZip file", e);
             }
         }
@@ -446,13 +508,16 @@ public class StorageImpl implements Storage {
                 narthexFacts.put(SCHEMA_VERSIONS, schemaVersion.toString());
                 addLatestNoHash(here, MAPPING, schemaVersion.getPrefix(), files);
                 File recDef = new File(here, schemaVersion.getFullFileName(RECORD_DEFINITION));
-                if (recDef.exists()) files.add(recDef);
+                if (recDef.exists())
+                    files.add(recDef);
                 File valSchema = new File(here, schemaVersion.getFullFileName(VALIDATION_SCHEMA));
-                if (valSchema.exists()) files.add(valSchema);
+                if (valSchema.exists())
+                    files.add(valSchema);
                 files.add(hintsFile(here));
                 writeFacts(narthexFactsFile(here), narthexFacts);
                 files.add(narthexFactsFile(here));
-                if (sourceIncluded) files.add(sourceFile(here));
+                if (sourceIncluded)
+                    files.add(sourceFile(here));
                 File sipZip = sipZip(HomeDirectory.UP_DIR, getSpec(), getSchemaVersion().getPrefix());
                 FileOutputStream fos = new FileOutputStream(sipZip);
                 ZipOutputStream zos = new ZipOutputStream(fos);
@@ -461,14 +526,14 @@ public class StorageImpl implements Storage {
                     FileInputStream fis = new FileInputStream(file);
                     zos.putNextEntry(new ZipEntry(file.getName()));
                     int length;
-                    while ((length = fis.read(buffer)) > 0) zos.write(buffer, 0, length);
+                    while ((length = fis.read(buffer)) > 0)
+                        zos.write(buffer, 0, length);
                     zos.closeEntry();
                     fis.close();
                 }
                 zos.close();
                 return sipZip;
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new StorageException("Unable to collect files for sip zip", e);
             }
         }
@@ -504,12 +569,10 @@ public class StorageImpl implements Storage {
                     FileUtils.write(file, recDefResponse.getSchemaText(), "UTF-8");
                 }
                 return RecDef.read(new FileInputStream(file));
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new StorageException("Unable to load " + fileName, e);
             }
         }
-
 
         private synchronized Validator validator(SchemaVersion schemaVersion) throws StorageException {
             String fileName = schemaVersion.getFullFileName(VALIDATION_SCHEMA);
@@ -524,25 +587,41 @@ public class StorageImpl implements Storage {
                     FileUtils.write(file, valResponse.getSchemaText(), "UTF-8");
                     StreamSource source = new StreamSource(new StringReader(valResponse.getSchemaText()));
                     return schemaFactory.newSchema(source).newValidator();
-                }
-                else {
+                } else {
                     return schemaFactory.newSchema(file).newValidator();
                 }
-            }
-            catch (SAXException e) {
+            } catch (SAXException e) {
                 throw new StorageException("Unable to create a validator: " + schemaVersion, e);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new StorageException("Unable to load " + fileName, e);
             }
+        }
+
+        private synchronized Graph shape(SchemaVersion schemaVersion) throws StorageException {
+            String fileName = schemaVersion.getFullFileName(SHACL_SHAPE);
+            File file = new File(here, fileName);
+            if (file.exists()) {
+                try {
+                    return RDFDataMgr.loadGraph(file.getAbsolutePath());
+                } catch (RiotException e) {
+                    throw new StorageException("Unable to load shape " + fileName, e);
+                }
+            }
+            return null;
         }
     }
 
     private static SchemaFactory schemaFactory(String prefix) {
         if (schemaFactory == null) {
             schemaFactory = XMLToolFactory.schemaFactory(prefix);
-            if (resolver != null) schemaFactory.setResourceResolver(resolver);
+            if (resolver != null)
+                schemaFactory.setResourceResolver(resolver);
         }
         return schemaFactory;
     }
+
+    private static String getTimestamp(Date time) {
+        return new SimpleDateFormat("yyyy-MM-dd'T'HHmmss").format(time);
+    }
+
 }

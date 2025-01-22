@@ -1,27 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
-<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
-    <appender name="console" class="org.apache.log4j.ConsoleAppender">
-        <param name="Target" value="System.out"/>
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d{ABSOLUTE} %t %-5p %C{1}:%L - %m%n"/>
-        </layout>
-    </appender>
-    <logger name="org.apache.http.impl.conn">
-      <level value="INFO"/>
-    </logger>
-    <logger name="org.apache.commons.httpclient">
-      <level value="INFO"/>
-    </logger>
-    <logger name="httpclient">
-      <level value="INFO"/>
-    </logger>
-    <logger name="org.apache.amber.oauth2">
-      <level value="INFO"/>
-    </logger>
-    <root>
-        <priority value="INFO"/>
-        <appender-ref ref="console"/>
-    </root>
-</log4j:configuration>
-
+<Configuration status="INFO">
+  <Appenders>
+    <Console name="console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{ABSOLUTE} %t %-5p %C{1}:%L - %m%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Logger name="org.apache.http.impl.conn" level="info"/>
+    <Logger name="org.apache.commons.httpclient" level="info"/>
+    <Logger name="httpclient" level="info"/>
+    <Logger name="org.apache.amber.oauth2" level="info"/>
+    <Root level="info">
+      <AppenderRef ref="console"/>
+    </Root>
+  </Loggers>
+</Configuration>

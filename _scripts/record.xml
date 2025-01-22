@@ -1,0 +1,74 @@
+<record xmlns:oai_enb="http://www.openarchives.org/OAI/2.0/oai_enb/" xmlns:dc="http://dublincore.org/documents/dcmi-namespace/" xmlns:mmm="http://api.memorix-maior.nl/REST/3.0/" xmlns:enb_dc="http://purl.org/enb_dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <header>
+    <identifier>enb_304.titels:60f0409c-0cf6-eed5-bd2b-e855224909fb:00d19e5e-92b1-b4fa-113d-a732cdd6f95f</identifier>
+    <datestamp>2023-10-07T17:21:14Z</datestamp>
+  </header>
+  <metadata>
+    <oai_enb:dc xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/          http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+      <enb_dc:set_title>Titels</enb_dc:set_title>
+      <enb_dc:tenant>enb_304</enb_dc:tenant>
+      <enb_dc:tenantname>Heemkundekring Loon op 't Sandt</enb_dc:tenantname>
+      <enb_dc:col_entiteit>60f0409c-0cf6-eed5-bd2b-e855224909fb</enb_dc:col_entiteit>
+      <enb_dc:entity_uuid>00d19e5e-92b1-b4fa-113d-a732cdd6f95f</enb_dc:entity_uuid>
+      <enb_dc:title>Bekendmakingen gemeente Loon op Zand week 38 2023</enb_dc:title>
+      <enb_dc:dcterms_identifier>041999</enb_dc:dcterms_identifier>
+      <enb_dc:spectrum_collection_name>Geschiedenis van het bestuur/politiek</enb_dc:spectrum_collection_name>
+      <enb_dc:spectrum_collection_name>Historische geografie</enb_dc:spectrum_collection_name>
+      <enb_dc:publication_type>Artikel uit tijdschrift</enb_dc:publication_type>
+      <enb_dc:dc_description>Omgevingsvergunningen:&lt;p&gt;Kasteellaan 19A 5175 BC&lt;/p&gt;&lt;p&gt;Baan achter de Plakken 1 5175 NP&lt;/p&gt;&lt;p&gt;Kerkstraat 2 5175 BB&lt;/p&gt;&lt;p&gt;Pastoor Kampstraat 2 5176 NP&lt;/p&gt;</enb_dc:dc_description>
+      <enb_dc:dc_subject>Dorpsgezichten en straatnamen</enb_dc:dc_subject>
+      <enb_dc:dc_subject>Gemeente en politiek</enb_dc:dc_subject>
+      <enb_dc:controlled_subjects>
+        <enb_dc:controlled_subjects_item>
+          <identifier>http://vocab.getty.edu/aat/300000811</identifier>
+          <term>bouwterreinen</term>
+        </enb_dc:controlled_subjects_item>
+      </enb_dc:controlled_subjects>
+      <enb_dc:year_publication>2023-09-20</enb_dc:year_publication>
+      <enb_dc:extent>1</enb_dc:extent>
+      <enb_dc:physical_details/>
+      <enb_dc:spectrum_standplaatsaanduiding>Digitaal archief</enb_dc:spectrum_standplaatsaanduiding>
+      <enb_dc:subcollectienaam/>
+      <enb_dc:publishers>
+        <enb_dc:publisher>
+          <enb_dc:title_record>00d19e5e-92b1-b4fa-113d-a732cdd6f95f</enb_dc:title_record>
+          <enb_dc:publisher>0e47e03b-d96d-5eb6-6b8a-7423d434ec04</enb_dc:publisher>
+          <enb_dc:geonameid>2759554</enb_dc:geonameid>
+          <enb_dc:geoname_name>Baarle-Nassau</enb_dc:geoname_name>
+          <enb_dc:country_name>Nederland</enb_dc:country_name>
+          <enb_dc:country_code>NL</enb_dc:country_code>
+          <enb_dc:admin1_name>Noord-Brabant</enb_dc:admin1_name>
+          <enb_dc:admin2_name>Gemeente Baarle-Nassau</enb_dc:admin2_name>
+          <enb_dc:type>organisatie</enb_dc:type>
+          <enb_dc:name_of_organization>De Duinkoerier</enb_dc:name_of_organization>
+          <enb_dc:surname>Jong</enb_dc:surname>
+          <enb_dc:surname_prefix>de</enb_dc:surname_prefix>
+          <enb_dc:name>E.M.</enb_dc:name>
+          <enb_dc:geslacht>man</enb_dc:geslacht>
+          <enb_dc:alternate_names>E.M.</enb_dc:alternate_names>
+          <enb_dc:alternate_spellings/>
+          <enb_dc:last_known_address_street>Postbus</enb_dc:last_known_address_street>
+          <enb_dc:last_known_address_number>8</enb_dc:last_known_address_number>
+          <enb_dc:last_known_address_postcode>5110 AA</enb_dc:last_known_address_postcode>
+          <enb_dc:last_known_address_city>Baarle-Nassau</enb_dc:last_known_address_city>
+          <enb_dc:last_known_address_country>Nederland</enb_dc:last_known_address_country>
+          <enb_dc:e_mail>uitgeverij@emdejong.nl</enb_dc:e_mail>
+          <enb_dc:telephone_number>013-5075534</enb_dc:telephone_number>
+        </enb_dc:publisher>
+      </enb_dc:publishers>
+    </oai_enb:dc>
+  </metadata>
+  <about>
+    <mmm:memorix xsi:schemaLocation="http://api.memorix-maior.nl/REST/3.0/ http://api.memorix-maior.nl/REST/3.0/MRX-API-ANY.xsd">
+      <image>
+        <thumbnail_small>https://images.memorix.nl/enb_304/thumb/220x220/4dbab527-501c-9960-c88e-1c0fe05dd746.jpg</thumbnail_small>
+        <thumbnail_large>https://images.memorix.nl/enb_304/thumb/500x500/4dbab527-501c-9960-c88e-1c0fe05dd746.jpg</thumbnail_large>
+        <mimetype>application/pdf</mimetype>
+        <filename>041999.pdf</filename>
+        <pdfDownload>https://images.memorix.nl/enb_304/download/download/4dbab527-501c-9960-c88e-1c0fe05dd746</pdfDownload>
+        <UrlToPdfInfo>http://api.memorix-maior.nl/dam/files/key/30afd54c-8a05-11e5-a67e-00155d012a81/tenant/enb_304/id/4dbab527-501c-9960-c88e-1c0fe05dd746?format=json</UrlToPdfInfo>
+      </image>
+      <url>http://api.memorix-maior.nl/collectiebeheer/oai-pmh?verb=GetRecord&amp;metadataPrefix=oai_enb&amp;tenant=enb&amp;key=30afd54c-8a05-11e5-a67e-00155d012a81&amp;identifier=enb_304.titels:60f0409c-0cf6-eed5-bd2b-e855224909fb:00d19e5e-92b1-b4fa-113d-a732cdd6f95f</url>
+    </mmm:memorix>
+  </about>
+</record>

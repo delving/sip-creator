@@ -25,6 +25,8 @@ null
 tmp*
 dist
 test-output
+.metals
+.bloop
 
 # sbt
 target

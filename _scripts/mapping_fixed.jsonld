@@ -1,0 +1,51 @@
+{
+  "@context": {
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "edm": "http://www.europeana.eu/schemas/edm/",
+    "dc": "http://purl.org/dc/elements/1.1/",
+    "dcterms": "http://purl.org/dc/terms/",
+    "ore": "http://www.openarchives.org/ore/terms/",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "ebucore": "http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#"
+  },
+  "@type": "rdf:RDF",
+  "@graph": [
+    {
+      "@type": "edm:ProvidedCHO",
+      "@id": "http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f",
+      "dc:description": "Omgevingsvergunningen:\u003cp\u003eKasteellaan 19A 5175 BC\u003c/p\u003e\u003cp\u003eBaan achter de Plakken 1 5175 NP\u003c/p\u003e\u003cp\u003eKerkstraat 2 5175 BB\u003c/p\u003e\u003cp\u003ePastoor Kampstraat 2 5176 NP\u003c/p\u003e",
+      "dc:identifier": "041999",
+      "dc:publisher": {
+        "@id": "https://data.brabantcloud.nl/resource/agent/enb-304-titels/0e47e03b-d96d-5eb6-6b8a-7423d434ec04"
+      },
+      "dc:subject": [
+        "Gemeente en politiek",
+        "Bouwterreinen",
+        "Dorpsgezichten en straatnamen"
+      ],
+      "dc:title": {
+        "@value": "Bekendmakingen gemeente Loon op Zand week 38 2023",
+        "@language": "sjoerd"
+      },
+      "dc:type": "Artikel uit tijdschrift",
+      "dcterms:issued": "20-09-2023",
+      "dcterms:spatial": {
+        "@id": "https://sws.geonames.org/2759554"
+      },
+      "edm:currentLocation": "Digitaal archief",
+      "edm:type": "TEXT"
+    },
+    {
+      "@type": "ore:Aggregation",
+      "@id": "http://data.brabantcloud.nl/resource/aggregation/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f",
+      "edm:aggregatedCHO": {
+        "@id": "http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f"
+      },
+      "edm:dataProvider": "Heemkundekring Loon op t Sandt",
+      "edm:isShownAt": "https://heemkundekringloonoptsandt.nl/collectie/algemeen/?diw-id=brabantcloud_enb-304-titels_enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f",
+      "edm:isShownBy": "https://images.memorix.nl/enb_304/thumb/500x500/4dbab527-501c-9960-c88e-1c0fe05dd746.jpg",
+      "edm:provider": "Erfgoed Brabant",
+      "edm:rights": "https://rightsstatements.org/vocab/InC/1.0/"
+    }
+  ]
+}

@@ -27,6 +27,7 @@ import eu.delving.metadata.Path;
 import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.FrameBase;
+import eu.delving.sip.base.KeystrokeHelper;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.model.MappingCompileModel;
 import eu.delving.sip.model.SipModel;
@@ -35,11 +36,12 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 
 import javax.swing.*;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Font;
+import javax.swing.text.BadLocationException;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import static eu.delving.sip.base.SwingHelper.scrollCodeVH;
 import static eu.delving.sip.base.SwingHelper.scrollVH;
@@ -63,8 +65,11 @@ public class MappingCodeFrame extends FrameBase {
     public MappingCodeFrame(final SipModel sipModel) {
         super(Which.MAPPING_CODE, sipModel, "Mapping Code");
         listArea.setFont(MONOSPACED);
+        listArea.setEditable(false);
         recordArea.setFont(MONOSPACED);
+        recordArea.setEditable(false);
         fieldArea.setFont(MONOSPACED);
+        fieldArea.setEditable(false);
         Ear ear = new Ear();
         sipModel.getFieldCompileModel().addListener(ear);
         sipModel.getRecordCompileModel().addListener(ear);
@@ -90,6 +95,7 @@ public class MappingCodeFrame extends FrameBase {
         JPanel p = new JPanel(new BorderLayout(10, 10));
         p.add(scrollCodeVH(recordArea), BorderLayout.CENTER);
         p.add(createCheckbox(), BorderLayout.SOUTH);
+        p.add(OutputFrame.createSyntaxTextAreaSearch(recordArea), BorderLayout.SOUTH);
         return p;
     }
 
@@ -162,6 +168,8 @@ public class MappingCodeFrame extends FrameBase {
         public void run() {
             if (code != null) {
                 textArea.setText(code);
+                textArea.setCaretPosition(0);
+                OutputFrame.stopSyntaxTextAreaSearch(textArea);
             }
             else {
                 textArea.setText("// No code");
@@ -206,6 +214,7 @@ public class MappingCodeFrame extends FrameBase {
                     }
                 }
                 textArea.setText(text.toString());
+                textArea.setCaretPosition(0);
             }
             else {
                 textArea.setText("// No mapping");

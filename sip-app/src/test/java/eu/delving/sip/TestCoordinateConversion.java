@@ -23,6 +23,8 @@ package eu.delving.sip;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+
+import eu.delving.XStreamFactory;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.MappingFunction;
 import groovy.lang.Binding;
@@ -67,7 +69,8 @@ public class TestCoordinateConversion {
     @Test
     public void runThrough() {
         for (String line : inputLines) {
-            if (line.trim().isEmpty()) continue;
+            if (line.trim().isEmpty())
+                continue;
             String latLongString = functionCall(line, false);
             checkLatLong(line, latLongString);
             String utmString = functionCall(line, true);
@@ -76,7 +79,8 @@ public class TestCoordinateConversion {
             String srid = matcher.group(1);
             String east = matcher.group(2);
             String north = matcher.group(3);
-            UTMRef ref = new UTMRef(Double.parseDouble(east), Double.parseDouble(north), 'V', Integer.parseInt(srid) % 100);
+            UTMRef ref = new UTMRef(Double.parseDouble(east), Double.parseDouble(north), 'V',
+                    Integer.parseInt(srid) % 100);
             String latLongConverted = String.format("%f, %f", ref.toLatLng().getLat(), ref.toLatLng().getLng());
             checkLatLong(line, latLongConverted);
         }
@@ -87,13 +91,11 @@ public class TestCoordinateConversion {
         double latitude = Double.parseDouble(latLong[0]);
         double longitude = Double.parseDouble(latLong[1]);
         Assert.assertTrue(
-            String.format("Latitude is outside Norway [%s]=>[%s]", line, latLongString),
-            latitude > 58.0 && latitude < 72.0
-        );
+                String.format("Latitude is outside Norway [%s]=>[%s]", line, latLongString),
+                latitude > 58.0 && latitude < 72.0);
         Assert.assertTrue(
-            String.format("Longitude is outside Norway [%s]=>[%s]", line, latLongString),
-            longitude > 4.0 && longitude < 30.0
-        );
+                String.format("Longitude is outside Norway [%s]=>[%s]", line, latLongString),
+                longitude > 4.0 && longitude < 30.0);
     }
 
     private String functionCall(String param, boolean utmOut) {
@@ -108,10 +110,7 @@ public class TestCoordinateConversion {
     }
 
     private static XStream getStream() {
-        XStream xstream = new XStream(new PureJavaReflectionProvider());
-        xstream.setMode(XStream.NO_REFERENCES);
-        xstream.processAnnotations(MappingFunction.class);
-        return xstream;
+        return XStreamFactory.getStreamFor(MappingFunction.class);
     }
 
 }

@@ -59,7 +59,8 @@ import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 
 /**
- * Show the datasets both local and on the server, so all info about their status is unambiguous.
+ * Show the datasets both local and on the server, so all info about their
+ * status is unambiguous.
  */
 
 public class RemoteDataSetFrame extends FrameBase {
@@ -94,7 +95,8 @@ public class RemoteDataSetFrame extends FrameBase {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 1 && OPEN_WORK_ITEM_ACTION.isEnabled()) {
-                    if (workItemList.getSelectedIndex() != workItemList.locationToIndex(e.getPoint())) return;
+                    if (workItemList.getSelectedIndex() != workItemList.locationToIndex(e.getPoint()))
+                        return;
                     OPEN_WORK_ITEM_ACTION.actionPerformed(null);
                 }
             }
@@ -122,10 +124,15 @@ public class RemoteDataSetFrame extends FrameBase {
             }
 
             private void change() {
-                String pattern = filterField.getText().trim();
-                downloadModel.setFilter(pattern);
-                workItemModel.setFilter(pattern);
-                uploadModel.setFilter(pattern);
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        String pattern = filterField.getText().trim();
+                        downloadModel.setFilter(pattern);
+                        workItemModel.setFilter(pattern);
+                        uploadModel.setFilter(pattern);
+                    }
+                });
             }
         });
 
@@ -145,12 +152,13 @@ public class RemoteDataSetFrame extends FrameBase {
 
     @Override
     protected void onOpen(boolean opened) {
-        if (opened) Swing.Exec.later(new Swing() {
-            @Override
-            public void run() {
-                downloadList.requestFocus();
-            }
-        });
+        if (opened)
+            Swing.Exec.later(new Swing() {
+                @Override
+                public void run() {
+                    downloadList.requestFocus();
+                }
+            });
     }
 
     @Override
@@ -232,7 +240,7 @@ public class RemoteDataSetFrame extends FrameBase {
     }
 
     private JPanel createFilterPanel() {
-        JLabel label = new JLabel("Filter:", JLabel.RIGHT);
+        JLabel label = new JLabel("Filter: ", JLabel.RIGHT);
         label.setLabelFor(filterField);
         JPanel p = new JPanel(new BorderLayout());
         p.add(label, BorderLayout.WEST);
@@ -275,11 +283,11 @@ public class RemoteDataSetFrame extends FrameBase {
         private DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
 
         @Override
-        public Component getListCellRendererComponent(JList list, DownloadItem downloadItem, int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList list, DownloadItem downloadItem, int index,
+                boolean isSelected, boolean cellHasFocus) {
             String html = String.format(
                     "<html>" + (downloadItem.local ? "%s" : "<b>%s</b>"),
-                    downloadItem.toString()
-            );
+                    downloadItem.toString());
             return defaultListCellRenderer.getListCellRendererComponent(list, html, index, isSelected, cellHasFocus);
         }
     };
@@ -298,11 +306,11 @@ public class RemoteDataSetFrame extends FrameBase {
         private DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
 
         @Override
-        public Component getListCellRendererComponent(JList list, WorkItem workItem, int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList list, WorkItem workItem, int index, boolean isSelected,
+                boolean cellHasFocus) {
             String html = String.format(
                     "<html><b>%s</b> %s",
-                    workItem.dataset.getSipFile().getName(), workItem.dataset.getState()
-            );
+                    workItem.dataset.getSipFile().getName(), workItem.dataset.getState());
             return defaultListCellRenderer.getListCellRendererComponent(list, html, index, isSelected, cellHasFocus);
         }
     };
@@ -331,18 +339,17 @@ public class RemoteDataSetFrame extends FrameBase {
         private DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
 
         @Override
-        public Component getListCellRendererComponent(JList list, UploadItem uploadItem, int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList list, UploadItem uploadItem, int index, boolean isSelected,
+                boolean cellHasFocus) {
             String html;
             if (uploadItem.sipEntry != null) {
                 html = String.format(
                         "<html><b>%s</b>",
-                        uploadItem.file.getName()
-                );
+                        uploadItem.file.getName());
             } else {
                 html = String.format(
                         "<html>%s",
-                        uploadItem.file.getName()
-                );
+                        uploadItem.file.getName());
             }
             return defaultListCellRenderer.getListCellRendererComponent(list, html, index, isSelected, cellHasFocus);
         }
@@ -351,47 +358,35 @@ public class RemoteDataSetFrame extends FrameBase {
     class DownloadModel extends AbstractListModel<DownloadItem> {
         private List<DownloadItem> downloadItems = new ArrayList<DownloadItem>();
         private String filter = "";
-        private Map<Integer, Integer> index;
+        private List<DownloadItem> filteredDownloadItems = downloadItems;
 
         @Override
         public int getSize() {
-            if (index != null) {
-                return index.size();
-            } else {
-                return downloadItems.size();
-            }
+            return filteredDownloadItems.size();
         }
 
         @Override
         public DownloadItem getElementAt(int rowIndex) {
-            if (index != null) {
-                return downloadItems.get(index.get(rowIndex));
-            } else {
-                return downloadItems.get(rowIndex);
-            }
+            return filteredDownloadItems.get(rowIndex);
         }
 
         public void setFilter(String filter) {
             this.filter = filter;
-            activateFilter();
+            //activateFilter();
             refreshDownloads();
         }
 
         public void activateFilter() {
             if (filter.isEmpty()) {
-                index = null;
+                filteredDownloadItems = downloadItems;
                 return;
             }
-            Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-            int actual = 0, virtual = 0;
+            downloadItems = new ArrayList<>();
             for (DownloadItem downloadItem : downloadItems) {
                 if (downloadItem.toString().contains(filter)) {
-                    map.put(virtual, actual);
-                    virtual++;
+                    filteredDownloadItems.add(downloadItem);
                 }
-                actual++;
             }
-            index = map;
         }
 
         public void refreshDownloads() {
@@ -400,14 +395,15 @@ public class RemoteDataSetFrame extends FrameBase {
             // get a set of all the remote file names
             Set<String> remoteFiles = new HashSet<String>();
             if (sipZips != null && sipZips.available != null)
-                for (SipEntry entry : sipZips.available) remoteFiles.add(entry.file);
+                for (SipEntry entry : sipZips.available)
+                    remoteFiles.add(entry.file);
             // clear
-            int size = getSize();
-            fireIntervalRemoved(this, 0, size);
+            fireIntervalRemoved(this, 0, getSize());
             Map<String, DownloadItem> downloadItemMap = new TreeMap<String, DownloadItem>();
             for (String remote : remoteFiles) {
                 DownloadItem item = downloadItemMap.get(remote);
-                if (item == null) downloadItemMap.put(remote, new DownloadItem(remote, datasetMap.containsKey(remote)));
+                if (item == null)
+                    downloadItemMap.put(remote, new DownloadItem(remote, datasetMap.containsKey(remote)));
             }
             downloadItems.clear();
             downloadItems.addAll(downloadItemMap.values());
@@ -424,7 +420,7 @@ public class RemoteDataSetFrame extends FrameBase {
     class WorkItemModel extends AbstractListModel<WorkItem> {
         private List<WorkItem> workItems = new ArrayList<WorkItem>();
         private String filter = "";
-        private Map<Integer, Integer> index;
+        private List<WorkItem> filteredWorkItems = workItems;
         private SortMode sortMode = SortMode.DATE;
 
         public void toggleSortMode() {
@@ -434,52 +430,39 @@ public class RemoteDataSetFrame extends FrameBase {
 
         @Override
         public int getSize() {
-            if (index != null) {
-                return index.size();
-            } else {
-                return workItems.size();
-            }
+            return filteredWorkItems.size();
         }
 
         @Override
         public WorkItem getElementAt(int rowIndex) {
-            if (index != null) {
-                return workItems.get(index.get(rowIndex));
-            } else {
-                return workItems.get(rowIndex);
-            }
+            return filteredWorkItems.get(rowIndex);
         }
 
         public void setFilter(String filter) {
             this.filter = filter;
-            activateFilter();
+            //activateFilter();
             refreshWorkItems();
         }
 
         public void activateFilter() {
             if (filter.isEmpty()) {
-                index = null;
+                filteredWorkItems = workItems;
                 return;
             }
-            Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-            int actual = 0, virtual = 0;
+            filteredWorkItems = new ArrayList<>();
             for (WorkItem workItem : workItems) {
                 if (workItem.dataset.getSpec().contains(filter)) {
-                    map.put(virtual, actual);
-                    virtual++;
+                    filteredWorkItems.add(workItem);
                 }
-                actual++;
             }
-            index = map;
         }
 
         public void refreshWorkItems() {
-            int size = getSize();
+            fireIntervalRemoved(this, 0, getSize());
             workItems.clear();
-            fireIntervalRemoved(this, 0, size);
-            for (Map.Entry<String, DataSet> entry: sipModel.getStorage().getDataSets().entrySet()) {
+            for (Map.Entry<String, DataSet> entry : sipModel.getStorage().getDataSets().entrySet()) {
                 DataSet dataSet = entry.getValue();
-                if (entry.getKey().endsWith(".sip.zip")) {
+                if (!dataSet.getSchemaVersion().getPrefix().equals("unknown")) {
                     workItems.add(new WorkItem(dataSet));
                 }
             }
@@ -502,59 +485,48 @@ public class RemoteDataSetFrame extends FrameBase {
     class UploadModel extends AbstractListModel<UploadItem> {
         private List<UploadItem> uploadItems = new ArrayList<UploadItem>();
         private String filter = "";
-        private Map<Integer, Integer> index;
+        private List<UploadItem> filteredUploadItems = uploadItems;
 
         @Override
         public int getSize() {
-            if (index != null) {
-                return index.size();
-            } else {
-                return uploadItems.size();
-            }
+            return filteredUploadItems.size();
         }
 
         @Override
         public UploadItem getElementAt(int rowIndex) {
-            if (index != null) {
-                return uploadItems.get(index.get(rowIndex));
-            } else {
-                return uploadItems.get(rowIndex);
-            }
+            return filteredUploadItems.get(rowIndex);
         }
 
         public void setFilter(String filter) {
             this.filter = filter;
-            activateFilter();
+            //activateFilter();
             refreshUploads();
         }
 
         public void activateFilter() {
             if (filter.isEmpty()) {
-                index = null;
+                filteredUploadItems = uploadItems;
                 return;
             }
-            Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-            int actual = 0, virtual = 0;
+            filteredUploadItems = new ArrayList<>();
             for (UploadItem uploadItem : uploadItems) {
                 if (uploadItem.getDatasetName().contains(filter)) {
-                    map.put(virtual, actual);
-                    virtual++;
+                    filteredUploadItems.add(uploadItem);
                 }
-                actual++;
             }
-            index = map;
         }
 
         public void refreshUploads() {
             Map<String, SipEntry> uploadedMap = new TreeMap<String, SipEntry>();
             if (sipZips != null && sipZips.uploaded != null) {
-                for (SipEntry entry : sipZips.uploaded) uploadedMap.put(entry.file, entry);
+                for (SipEntry entry : sipZips.uploaded)
+                    uploadedMap.put(entry.file, entry);
             }
             File[] uploadFiles = HomeDirectory.UP_DIR.listFiles();
-            if (uploadFiles == null) throw new RuntimeException();
-            int size = getSize();
+            if (uploadFiles == null)
+                throw new RuntimeException();
+            fireIntervalRemoved(this, 0, getSize());
             uploadItems.clear();
-            fireIntervalRemoved(this, 0, size);
             for (File uploadFile : uploadFiles) {
                 if (uploadFile.getPath().endsWith(".sip.zip")) {
                     UploadItem item = new UploadItem(uploadFile);
@@ -585,7 +557,8 @@ public class RemoteDataSetFrame extends FrameBase {
         }
 
         public void fetchList() {
-            if (!networkClient.narthexCredentials.areSet()) return;
+            if (!networkClient.narthexCredentials.areSet())
+                return;
             networkClient.fetchNarthexSipList(new NetworkClient.NarthexListListener() {
                 @Override
                 public void listReceived(NetworkClient.SipZips sipZips) {
@@ -624,7 +597,8 @@ public class RemoteDataSetFrame extends FrameBase {
 
         @Override
         public void actionPerformed(final ActionEvent actionEvent) {
-            if (selectedDownload == null) return;
+            if (selectedDownload == null)
+                return;
             setEnabled(false);
             try {
                 DataSet dataSet = sipModel.getStorage().createDataSet(selectedDownload.toString());
@@ -638,8 +612,7 @@ public class RemoteDataSetFrame extends FrameBase {
                                 downloadModel.refreshDownloads();
                                 workItemModel.refreshWorkItems();
                             }
-                        }
-                );
+                        });
             } catch (StorageException e) {
                 sipModel.getFeedback().alert("Unable to create data set called " + selectedDownload.toString(), e);
             }
@@ -651,7 +624,8 @@ public class RemoteDataSetFrame extends FrameBase {
     private class DownloadListener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
-            if (e.getValueIsAdjusting()) return;
+            if (e.getValueIsAdjusting())
+                return;
             int downloadIndex = downloadList.getSelectedIndex();
             if (downloadIndex < 0) {
                 DOWNLOAD_ACTION.putValue(Action.NAME, "Download");
@@ -679,7 +653,8 @@ public class RemoteDataSetFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (selectedWorkItems == null || selectedWorkItems.isEmpty()) return;
+            if (selectedWorkItems == null || selectedWorkItems.isEmpty())
+                return;
             sipModel.setDataSet(selectedWorkItems.get(0).dataset, new Swing() {
                 @Override
                 public void run() {
@@ -705,7 +680,8 @@ public class RemoteDataSetFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (selectedWorkItems == null) return;
+            if (selectedWorkItems == null)
+                return;
             try {
                 for (WorkItem selectedWorkItem : selectedWorkItems) {
                     selectedWorkItem.dataset.remove();
@@ -726,17 +702,19 @@ public class RemoteDataSetFrame extends FrameBase {
     private class WorkItemListener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
-            if (e.getValueIsAdjusting()) return;
+            if (e.getValueIsAdjusting())
+                return;
             int[] workItemIndices = workItemList.getSelectedIndices();
             if (workItemIndices.length == 0) {
                 selectedWorkItems = null;
                 OPEN_WORK_ITEM_ACTION.putValue(Action.NAME, "Open");
             } else {
                 selectedWorkItems = new ArrayList(workItemIndices.length);
-                for(int selectedIndex : workItemIndices) {
+                for (int selectedIndex : workItemIndices) {
                     selectedWorkItems.add(workItemModel.getElementAt(selectedIndex));
                 }
-                OPEN_WORK_ITEM_ACTION.putValue(Action.NAME, "Open " + selectedWorkItems.get(0).dataset.getSipFile().getName());
+                OPEN_WORK_ITEM_ACTION.putValue(Action.NAME,
+                        "Open " + selectedWorkItems.get(0).dataset.getSipFile().getName());
             }
             OPEN_WORK_ITEM_ACTION.checkEnabled();
             DELETE_WORK_ITEM_ACTION.checkEnabled();
@@ -759,7 +737,8 @@ public class RemoteDataSetFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (selectedUpload == null) return;
+            if (selectedUpload == null)
+                return;
             setEnabled(false);
             try {
                 networkClient.uploadNarthex(selectedUpload.file, selectedUpload.getDatasetName(), new Swing() {
@@ -791,7 +770,8 @@ public class RemoteDataSetFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            if (selectedUpload == null) return;
+            if (selectedUpload == null)
+                return;
             deleteQuietly(selectedUpload.file);
             uploadModel.refreshUploads();
         }
@@ -802,7 +782,8 @@ public class RemoteDataSetFrame extends FrameBase {
     private class UploadListener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
-            if (e.getValueIsAdjusting()) return;
+            if (e.getValueIsAdjusting())
+                return;
             JList list = (JList) e.getSource();
             int uploadIndex = list.getSelectedIndex();
             if (uploadIndex < 0) {
@@ -817,4 +798,3 @@ public class RemoteDataSetFrame extends FrameBase {
     }
 
 }
-

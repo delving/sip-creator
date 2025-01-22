@@ -24,6 +24,7 @@ package eu.delving.sip;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import eu.delving.XMLToolFactory;
+import eu.delving.XStreamFactory;
 import eu.delving.groovy.GroovyCodeResource;
 import eu.delving.metadata.Assertion;
 import eu.delving.metadata.AssertionTest;
@@ -62,7 +63,8 @@ public class TestAssertions {
     private DocContext modsContext;
 
     @Before
-    public void prep() throws ParserConfigurationException, IOException, SAXException, XPathFactoryConfigurationException {
+    public void prep()
+            throws ParserConfigurationException, IOException, SAXException, XPathFactoryConfigurationException {
         groovyCodeResource = new GroovyCodeResource(ClassLoader.getSystemClassLoader());
         modsDoc = parseDoc("mods.xml");
         icnDoc = parseDoc("icn.xml");
@@ -100,7 +102,7 @@ public class TestAssertions {
         for (StructureTest structureTest : structureTests) {
             switch (structureTest.getViolation(modsDoc)) {
                 case NONE:
-//                    System.out.println("OK: " + structureTest);
+                    // System.out.println("OK: " + structureTest);
                     break;
                 default:
                     Assert.fail();
@@ -114,10 +116,12 @@ public class TestAssertions {
         StructureTest.Factory factory = new StructureTest.Factory(modsContext);
         StructureTest structureTest = factory.create(Path.create("/mods:mods/mods:name/mods:namePart"), true, true);
         Assert.assertEquals("Unexpected Violation", StructureTest.Violation.NONE, structureTest.getViolation(modsDoc));
-//        System.out.println(structureTest + ": " + structureTest.getViolation(modsDoc));
+        // System.out.println(structureTest + ": " +
+        // structureTest.getViolation(modsDoc));
         structureTest = factory.create(Path.create("/mods:mods/mods:subject/@authority"), true, false);
         Assert.assertEquals("Unexpected Violation", StructureTest.Violation.NONE, structureTest.getViolation(modsDoc));
-//        System.out.println(structureTest + ": " + structureTest.getViolation(modsDoc));
+        // System.out.println(structureTest + ": " +
+        // structureTest.getViolation(modsDoc));
     }
 
     @Test
@@ -127,7 +131,8 @@ public class TestAssertions {
         Assertion.AssertionList assertionList = (Assertion.AssertionList) getStream().fromXML(assertionFile);
         AssertionTest.Factory factory = new AssertionTest.Factory(new DocContext(modsDoc), groovyCodeResource);
         List<AssertionTest> tests = new ArrayList<AssertionTest>();
-        for (Assertion assertion : assertionList.assertions) tests.add(factory.create(assertion));
+        for (Assertion assertion : assertionList.assertions)
+            tests.add(factory.create(assertion));
         // violation messages can be found in assertion-list.xml
         Assert.assertTrue(tests.get(0).getViolation(modsDoc).contains("No florida found in the string Agricultural"));
         Assert.assertTrue(tests.get(1).getViolation(modsDoc).contains("No florida found in Agricultural"));
@@ -137,10 +142,7 @@ public class TestAssertions {
     }
 
     private static XStream getStream() {
-        XStream xstream = new XStream(new PureJavaReflectionProvider());
-        xstream.setMode(XStream.NO_REFERENCES);
-        xstream.processAnnotations(Assertion.AssertionList.class);
-        return xstream;
+        return XStreamFactory.getStreamFor(Assertion.AssertionList.class);
     }
 
     public static class DocContext implements NamespaceContext {
@@ -156,7 +158,8 @@ public class TestAssertions {
         }
 
         private void gatherNamespacesFrom(Node node) {
-            if (node.getNodeType() != Node.ATTRIBUTE_NODE && node.getNodeType() != Node.ELEMENT_NODE) return;
+            if (node.getNodeType() != Node.ATTRIBUTE_NODE && node.getNodeType() != Node.ELEMENT_NODE)
+                return;
             if (!prefixUri.containsKey(node.getPrefix())) {
                 prefixUri.put(node.getPrefix(), node.getNamespaceURI());
                 uriPrefix.put(node.getNamespaceURI(), node.getPrefix());
@@ -180,7 +183,8 @@ public class TestAssertions {
         @Override
         public Iterator getPrefixes(String namespaceURI) {
             String prefix = getPrefix(namespaceURI);
-            if (prefix == null) return null;
+            if (prefix == null)
+                return null;
             List<String> list = new ArrayList<String>();
             list.add(prefix);
             return list.iterator();
@@ -192,6 +196,5 @@ public class TestAssertions {
         File file = new File(modsResource.getFile());
         return XMLToolFactory.documentBuilderFactory().newDocumentBuilder().parse(file);
     }
-
 
 }

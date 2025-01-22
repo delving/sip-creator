@@ -33,21 +33,28 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import static eu.delving.XStreamFactory.getStreamFor;
 
 /**
- * A record mapping describes how an input format is transformed into an output format in the form of a Groovy builder,
+ * A record mapping describes how an input format is transformed into an output
+ * format in the form of a Groovy builder,
  * which is dynamically generated.
  * <p/>
- * There are some givens, recorded in the facts, and then a set of node mappings, each identified with a path,
- * and containing mapping information such as a dictionary or a Groovy code snippet to do more elaborate
+ * There are some givens, recorded in the facts, and then a set of node
+ * mappings, each identified with a path,
+ * and containing mapping information such as a dictionary or a Groovy code
+ * snippet to do more elaborate
  * transformations.
  * <p/>
- * The recDefTree is an instance of the output record definition, which is not shared with any other record
- * mappings.  It is used to generate the Groovy builder code based on its hierarchical structure, which
+ * The recDefTree is an instance of the output record definition, which is not
+ * shared with any other record
+ * mappings. It is used to generate the Groovy builder code based on its
+ * hierarchical structure, which
  * is "decorated" with the various NodeMapping instances from this mapping.
  *
  *
@@ -57,14 +64,14 @@ import static eu.delving.XStreamFactory.getStreamFor;
 public class RecMapping {
 
     private static final String[][] HACK_VERSION_HINTS = {
-        {"icn", "1.0.0"},
-        {"abm", "1.0.0"},
-        {"tib", "1.0.1"},
-        {"ese", "3.4.0"},
-        {"aff", "0.1.0"},
-        {"itin", "1.0.0"},
-        {"lido", "1.0.0"},
-        {"ead", "1.2.3"},
+            { "icn", "1.0.0" },
+            { "abm", "1.0.0" },
+            { "tib", "1.0.1" },
+            { "ese", "3.4.0" },
+            { "aff", "0.1.0" },
+            { "itin", "1.0.0" },
+            { "lido", "1.0.0" },
+            { "ead", "1.2.3" },
     };
 
     @XStreamAsAttribute
@@ -100,10 +107,10 @@ public class RecMapping {
         this.recDefTree = recDefTree;
         // add the node mappings harvest from the record definition
         recDefTree.getRoot().collectNodeMappings(nodeMappings);
-        //System.out.println(recDefTree);
-        //for (NodeMapping nm : nodeMappings) {
-        //    System.out.println(nm.inputPath);
-        //}
+        // System.out.println(recDefTree);
+        // for (NodeMapping nm : nodeMappings) {
+        // System.out.println(nm.inputPath);
+        // }
     }
 
     public String getDefaultPrefix() {
@@ -115,11 +122,15 @@ public class RecMapping {
     }
 
     public SchemaVersion getSchemaVersion() {
-        if (prefix == null) throw new IllegalArgumentException("Mapping lacks prefix");
+        if (prefix == null)
+            throw new IllegalArgumentException("Mapping lacks prefix");
         if (schemaVersion == null) {
-            for (String[] hint : HACK_VERSION_HINTS) if (hint[0].equals(prefix)) schemaVersion = hint[1];
+            for (String[] hint : HACK_VERSION_HINTS)
+                if (hint[0].equals(prefix))
+                    schemaVersion = hint[1];
         }
-        if (schemaVersion == null) throw new IllegalStateException("Mapping lacks schemaVersion missing");
+        if (schemaVersion == null)
+            throw new IllegalStateException("Mapping lacks schemaVersion missing");
         return new SchemaVersion(prefix, schemaVersion);
     }
 
@@ -143,8 +154,7 @@ public class RecMapping {
         if (existing == null || !value.equals(existing)) {
             facts.put(fieldName, value);
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -162,7 +172,8 @@ public class RecMapping {
     }
 
     public MappingFunction createFunction(String name) {
-        if (hasFunction(name)) throw new RuntimeException("Function already exists: " + name);
+        if (hasFunction(name))
+            throw new RuntimeException("Function already exists: " + name);
         MappingFunction function = new MappingFunction(name);
         functions.add(function);
         return function;
@@ -180,6 +191,56 @@ public class RecMapping {
         return nodeMappings;
     }
 
+    /**
+     * Find a NodeMapping based on its RecDefNode's string representation
+     * 
+     * @param nodeMappingPath The string representation to match
+     * @return The matching NodeMapping
+     * @throws IllegalArgumentException if no matching NodeMapping is found
+     */
+    public NodeMapping findNodeMapping(String nodeMappingPath) {
+        List<NodeMapping> mappings = getRecDefTree().getNodeMappings();
+
+        return mappings.stream()
+                .filter(nm -> nm.recDefNode != null && nm.recDefNode.toString().equals(nodeMappingPath))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("No NodeMapping found for path: %s", nodeMappingPath)));
+    }
+
+    /**
+     * Find a NodeMapping based on its RecDefNode's string representation
+     * Provides detailed information about available mappings if no match is found
+     * 
+     * @param nodeMappingPath The string representation to match
+     * @return The matching NodeMapping
+     * @throws IllegalArgumentException if no matching NodeMapping is found,
+     *                                  including list of available paths
+     */
+    public NodeMapping findNodeMappingWithDetails(String nodeMappingPath) {
+        List<NodeMapping> mappings = getRecDefTree().getNodeMappings();
+
+        // First try exact match
+        Optional<NodeMapping> exactMatch = mappings.stream()
+                .filter(nm -> nm.recDefNode != null && nm.recDefNode.toString().equals(nodeMappingPath))
+                .findFirst();
+
+        if (exactMatch.isPresent()) {
+            return exactMatch.get();
+        }
+
+        // If no exact match, collect all available paths for error message
+        String availablePaths = mappings.stream()
+                .filter(nm -> nm.recDefNode != null)
+                .map(nm -> nm.recDefNode.toString())
+                .collect(Collectors.joining("\n  "));
+
+        throw new IllegalArgumentException(String.format(
+                "No NodeMapping found for path: %s\nAvailable paths:\n  %s",
+                nodeMappingPath,
+                availablePaths));
+    }
+
     public RecDefTree getRecDefTree() {
         return recDefTree;
     }
@@ -189,14 +250,17 @@ public class RecMapping {
     }
 
     private MappingFunction fetch(String name) {
-        for (MappingFunction existing : functions) if (existing.name.equals(name)) return existing;
+        for (MappingFunction existing : functions)
+            if (existing.name.equals(name))
+                return existing;
         return null;
     }
 
     private void resolve() {
         for (DynOpt dynOpt : dynOpts) {
             RecDefNode recDefNode = recDefTree.getRecDefNode(dynOpt.path);
-            if (recDefNode == null) throw new RuntimeException("Cannot find dyn-opt path " + dynOpt.path);
+            if (recDefNode == null)
+                throw new RuntimeException("Cannot find dyn-opt path " + dynOpt.path);
             recDefNode.addSibling(dynOpt);
         }
         if (!nodeMappings.isEmpty()) {
@@ -207,8 +271,7 @@ public class RecMapping {
                 RecDefNode node = recDefTree.getRoot().getNode(nodeMapping.outputPath);
                 if (node != null) {
                     node.addNodeMapping(nodeMapping);
-                }
-                else {
+                } else {
                     walk.remove();
                 }
             }
@@ -216,11 +279,12 @@ public class RecMapping {
     }
 
     public void validateMappings(RecDefTree.SourceTree sourceTree) {
-        for(NodeMapping nm : recDefTree.getNodeMappings()) {
+        for (NodeMapping nm : recDefTree.getNodeMappings()) {
             RecDefNode node = recDefTree.getRecDefNode(nm.outputPath);
-            if(!sourceTree.contains(nm)) {
+            if (!sourceTree.contains(nm)) {
                 nm.inputPathMissing = true;
-                System.err.println("[BAD]: input path is missing for '" + nm + ", in: " + nm.inputPath + "; out: " + nm.outputPath + "'");
+                System.err.println("[BAD]: input path is missing for '" + nm + ", in: " + nm.inputPath + "; out: "
+                        + nm.outputPath + "'");
                 if (node != null) {
                     node.inputPathMissing = true;
                 }
@@ -243,16 +307,14 @@ public class RecMapping {
     }
 
     public static RecMapping read(File file, RecDefModel recDefModel) throws MetadataException {
-        //System.out.println(file);
+        // System.out.println(file);
         InputStream is = null;
         try {
             is = new FileInputStream(file);
             return read(is, recDefModel);
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             throw new MetadataException(e);
-        }
-        finally {
+        } finally {
             IOUtils.closeQuietly(is);
         }
     }
@@ -261,8 +323,7 @@ public class RecMapping {
         try {
             Reader reader = new InputStreamReader(is, "UTF-8");
             return read(reader, recDefModel);
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -274,7 +335,8 @@ public class RecMapping {
         return recMapping;
     }
 
-    public static RecMapping upgrade(RecMapping previousVersion, String version, RecDefModel recDefModel) throws MetadataException {
+    public static RecMapping upgrade(RecMapping previousVersion, String version, RecDefModel recDefModel)
+            throws MetadataException {
         SchemaVersion schemaVersion = new SchemaVersion(previousVersion.getPrefix(), version);
         RecDefTree recDefTree = recDefModel.createRecDefTree(schemaVersion);
         RecMapping recMapping = new RecMapping(recDefTree);
@@ -287,11 +349,9 @@ public class RecMapping {
         try {
             os = new FileOutputStream(file);
             write(os, recMapping);
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
-        }
-        finally {
+        } finally {
             IOUtils.closeQuietly(os);
         }
     }
@@ -302,8 +362,7 @@ public class RecMapping {
             recMapping.dynOpts = recMapping.getRecDefTree().getDynOpts();
             recMapping.nodeMappings = recMapping.getRecDefTree().getNodeMappings();
             getStreamFor(RecMapping.class).toXML(recMapping, osWriter);
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
