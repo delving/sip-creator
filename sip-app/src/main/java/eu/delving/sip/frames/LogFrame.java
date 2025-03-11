@@ -25,6 +25,7 @@ import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.model.Feedback;
 import eu.delving.sip.model.SipModel;
+import io.sentry.Sentry;
 
 import javax.swing.*;
 import java.awt.BorderLayout;
@@ -58,6 +59,9 @@ public class LogFrame extends FrameBase {
                     PrintWriter out = new PrintWriter(writer);
                     throwable.printStackTrace(out);
                     logArea.append(writer.toString());
+
+                    // If Sentry is enabled, let it capture the exception
+                    Sentry.captureException(throwable);
                 }
             }
         };

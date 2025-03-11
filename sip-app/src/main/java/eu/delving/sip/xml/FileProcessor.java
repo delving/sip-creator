@@ -31,6 +31,7 @@ import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.ReportWriter;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.model.Feedback;
+import io.sentry.*;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -421,6 +422,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         @Override
         public void run() {
+            ITransaction transaction = Sentry.startTransaction("FileProcessor", "process");
+
             int recordCount = 0;
             int processedCount = 0;
             for (MappingEngine engine : engines) {
@@ -447,6 +450,10 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 if (reportWriter != null) {
                     reportWriter.abort();
                 }
+                if (transaction != null) {
+                    transaction.setStatus(SpanStatus.ABORTED);
+                    transaction.finish();
+                }
             } else {
                 info(String.format("Finish report writer records=%d", recordCount));
                 if (reportWriter != null) {
@@ -456,6 +463,12 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     } catch (StorageException e) {
                         feedback.alert("Error finishing report", e);
                     }
+                }
+                if (transaction != null) {
+                    transaction.setStatus(SpanStatus.OK);
+                    transaction.setMeasurement("records", recordCount);
+                    transaction.setMeasurement("processed", processedCount);
+                    transaction.finish();
                 }
                 termination.normalCompletion();
             }

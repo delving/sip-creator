@@ -2,6 +2,7 @@ package eu.delving.sip.grpc;
 
 import java.io.IOException;
 
+import eu.delving.sip.Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +60,7 @@ public class MappingServer {
             basePath = args[1];
         }
 
+        Application.init("grpc");
         final MappingServer server = new MappingServer(port, basePath);
         server.start();
         server.blockUntilShutdown();

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 
+import eu.delving.sip.Application;
 import eu.delving.sip.model.FactModel;
 import eu.delving.sip.xml.AnalysisParser;
 import eu.delving.stats.Stats;
@@ -51,6 +52,7 @@ public class SIPCLI implements Callable<Integer> {
     private boolean helpRequested = false;
 
     public static void main(String[] args) {
+        Application.init("cli");
         int exitCode = new CommandLine(new SIPCLI()).execute(args);
         System.exit(exitCode);
     }

@@ -52,6 +52,7 @@ import eu.delving.sip.model.SipProperties;
 import eu.delving.sip.model.StatsModel;
 import eu.delving.sip.panels.StatusPanel;
 import eu.delving.sip.panels.WorkPanel;
+import io.sentry.Sentry;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -527,8 +528,19 @@ public class Application {
         return null;
     }
 
-    public static void main(final String[] args) throws Exception {
+    public static void init(String runMode) {
         version = getPomVersion();
+
+        // Initialize Sentry using sentry.properties in classpath
+        Sentry.init(options -> {
+            options.setEnableExternalConfiguration(true);
+            options.setRelease(version);
+            options.setTag("mode", runMode);
+        });
+    }
+
+    public static void main(final String[] args) throws Exception {
+        init("gui");
 
         String lcOSName = System.getProperty("os.name").toLowerCase();
         final boolean isMac = lcOSName.startsWith("mac os x");
