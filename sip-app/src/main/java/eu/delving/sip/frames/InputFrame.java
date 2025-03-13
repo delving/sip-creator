@@ -56,8 +56,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import static eu.delving.sip.base.SwingHelper.StringTransferable;
-import static eu.delving.sip.base.SwingHelper.scrollVH;
+import static eu.delving.sip.base.SwingHelper.*;
 
 /**
  * This frame shows an input record's XML in the form of a tree, with an added ability to copy the values from
@@ -74,6 +73,7 @@ public class InputFrame extends FrameBase {
     private JTextField filterField = new JTextField();
     private RSyntaxTextArea inputArea;
     private RSyntaxDocument inputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_XML);
+    private String themeMode;
 
     private enum Filter {
         REGEX("Regex"),
@@ -116,6 +116,7 @@ public class InputFrame extends FrameBase {
     @Override
     protected void buildContent(Container content) {
         this.inputArea = new RSyntaxTextArea(sipModel.getRecordCompileModel().getOutputDocument());
+        setRSyntaxTheme(inputArea, themeMode);
         inputArea.setCodeFoldingEnabled(true);
         inputArea.setEditable(false);
         inputArea.setDocument(inputDocument);
@@ -435,4 +436,11 @@ public class InputFrame extends FrameBase {
             return COPY;
         }
     }
+
+    @Override
+    public void setTheme(String themeMode) {
+        this.themeMode = themeMode;
+        setRSyntaxTheme(inputArea, themeMode);
+    }
+
 }

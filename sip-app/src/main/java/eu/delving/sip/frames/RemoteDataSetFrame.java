@@ -462,8 +462,13 @@ public class RemoteDataSetFrame extends FrameBase {
             workItems.clear();
             for (Map.Entry<String, DataSet> entry : sipModel.getStorage().getDataSets().entrySet()) {
                 DataSet dataSet = entry.getValue();
-                if (!dataSet.getSchemaVersion().getPrefix().equals("unknown")) {
-                    workItems.add(new WorkItem(dataSet));
+                try {
+                    if (!dataSet.getSchemaVersion().getPrefix().equals("unknown")) {
+                        workItems.add(new WorkItem(dataSet));
+                    }
+                } catch (IllegalArgumentException e) {
+                    // Something wrong with the schema - ignore this dataset
+                    sipModel.getFeedback().alert(String.format("Error reading dataset at %s", dataSet.getSipFile()), e);
                 }
             }
 

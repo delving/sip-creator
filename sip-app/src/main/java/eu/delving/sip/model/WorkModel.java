@@ -86,7 +86,7 @@ public class WorkModel {
                     try {
                         Thread.sleep(30);
                         for (JobContext context : jobContexts) {
-                            if (context.isDone()) jobContexts.remove(context);
+                            if (context.doWork()) jobContexts.remove(context);
                         }
                     }
                     catch (NoSuchElementException e) {
@@ -219,7 +219,7 @@ public class WorkModel {
                 fireIntervalRemoved(this, 0, size);
             }
             for (JobContext context : jobContexts) {
-                if (context.isDone()) {
+                if (context.doWork()) {
                     jobContexts.remove(context);
                 }
                 else if (context.getWork().getJob() != Work.Job.CHECK_STATE) {
@@ -248,13 +248,17 @@ public class WorkModel {
             return queue.peek();
         }
 
-        public boolean isDone() {
+        public boolean doWork() {
             if (executor.isShutdown() || queue.isEmpty()) return true;
             if (!(future.isDone() || future.isCancelled())) return false;
             queue.remove();
             if (queue.isEmpty()) return true;
             launch();
             return false;
+        }
+
+        public boolean isDone() {
+            return executor.isShutdown() || queue.isEmpty();
         }
 
         public String getDataSet() {

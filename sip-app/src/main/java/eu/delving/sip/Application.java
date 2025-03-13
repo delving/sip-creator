@@ -28,7 +28,6 @@ import eu.delving.schema.SchemaRepository;
 import eu.delving.sip.actions.UnlockMappingAction;
 import eu.delving.sip.actions.ValidateAction;
 import eu.delving.sip.base.FrameBase;
-import eu.delving.sip.base.HttpClientFactory;
 import eu.delving.sip.base.NetworkClient;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
@@ -44,6 +43,8 @@ import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.frames.LogFrame;
 import eu.delving.sip.frames.RemoteDataSetFrame;
 import eu.delving.sip.menus.ExpertMenu;
+import eu.delving.sip.menus.HelpMenu;
+import eu.delving.sip.menus.ThemeMenu;
 import eu.delving.sip.model.DataSetModel;
 import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.MappingModel.ChangeListenerAdapter;
@@ -65,9 +66,7 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import org.apache.jena.sys.JenaSystem;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
@@ -80,7 +79,6 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
-import java.util.prefs.Preferences;
 
 import static eu.delving.sip.base.HttpClientFactory.createHttpClient;
 import static eu.delving.sip.base.KeystrokeHelper.MENU_W;
@@ -90,10 +88,7 @@ import static eu.delving.sip.files.DataSetState.ANALYZED_SOURCE;
 import static eu.delving.sip.files.DataSetState.MAPPING;
 import static eu.delving.sip.files.DataSetState.PROCESSED;
 import static eu.delving.sip.files.DataSetState.SOURCED;
-import static eu.delving.sip.files.Storage.NARTHEX_PASSWORD;
-import static eu.delving.sip.files.Storage.NARTHEX_URL;
-import static eu.delving.sip.files.Storage.NARTHEX_USERNAME;
-import static eu.delving.sip.model.MappingModel.ChangeListenerAdapter;
+import static eu.delving.sip.files.Storage.*;
 
 /**
  * The main application, based on the SipModel and bringing everything together
@@ -116,9 +111,12 @@ public class Application {
     private StatusPanel statusPanel;
     // private Timer resizeTimer;
     private ExpertMenu expertMenu;
+    private ThemeMenu themeMenu;
+    private HelpMenu helpMenu;
     private CreateSipZipAction createSipZipAction;
     private UnlockMappingAction unlockMappingAction;
     private final static SipProperties sipProperties = new SipProperties();
+    private static boolean isTelemetryIncluded = false;
 
     public static boolean canWritePocketFiles() {
         return !"false".equals(sipProperties.getProp().getProperty("writePocketFiles"));
@@ -154,29 +152,26 @@ public class Application {
         JenaSystem.init();
         ARQ.init();
 
-        GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
+        // Initialize look-and-feel
+        String themeMode = "light";
+        try {
+            themeMode = sipProperties.getProp().getProperty(THEME_MODE, themeMode);
+            UIManager.setLookAndFeel("dark".equals(themeMode) ? new FlatDarkLaf() : new FlatLightLaf());
+        } catch (Exception ex) {
+            System.err.println("Failed to initialize FlatLaf look-and-feel");
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+            }
+        }
+
+        // Initialize UI
         desktop = new JDesktopPane();
         desktop.setMinimumSize(new Dimension(800, 600));
-        // Probably we don't need to ensureOnScreen anymore (just click on a view button
-        // to reset)
-        /*
-         * resizeTimer = new Timer(DEFAULT_RESIZE_INTERVAL, actionEvent -> {
-         * resizeTimer.stop();
-         * for (JInternalFrame frame : desktop.getAllFrames()) {
-         * if (frame instanceof FrameBase) {
-         * ((FrameBase) frame).ensureOnScreen();
-         * }
-         * }
-         * });
-         * desktop.addComponentListener(new ComponentAdapter() {
-         * 
-         * @Override
-         * public void componentResized(ComponentEvent componentEvent) {
-         * resizeTimer.restart();
-         * }
-         * });
-         */
         feedback = new VisualFeedback(home, desktop, sipProperties.getProp());
+
+        // Initialize SipModel
+        GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
         // todo: be sure to set this
         String serverUrl = sipProperties.getProp().getProperty(NARTHEX_URL, "http://delving.org/narthex");
         HttpClient httpClient = createHttpClient(serverUrl).build();
@@ -192,8 +187,38 @@ public class Application {
         context.setHttpClient(httpClient);
         sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, sipProperties);
 
-        NetworkClient networkClient = new NetworkClient(sipModel, new NetworkClient.NarthexCredentials() {
+        // Initialize telemetry
+        String telemetryEnabled = sipModel.getPreferences().getProperty(TELEMETRY_ENABLED);
+        if (isTelemetryIncluded && telemetryEnabled == null) {
+            Object[] options = { "Yes, please", "No, thanks", "Exit" };
+            int telemetryOption = JOptionPane.showOptionDialog(null,
+                    "This application includes telemetry.\n\n" +
+                            "This means that telemetry data may be automatically submitted, including errors and metrics. " +
+                            "The data may also include personally identifiable information (PII) such as your IP address.\n\n" +
+                            "Do you want telemetry to be enabled? The answer can be changed later in the Help menu.",
+                    titleString(),
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[2]);
+            switch (telemetryOption) {
+                case 0:
+                    sipModel.getPreferences().setProperty(TELEMETRY_ENABLED, Boolean.toString(true));
+                    sipModel.saveProperties();
+                    initSentry("gui");
+                    break;
+                case 1:
+                    sipModel.getPreferences().setProperty(TELEMETRY_ENABLED, Boolean.toString(false));
+                    sipModel.saveProperties();
+                    break;
+                case 2:
+                    // Stop here
+                    return;
+            }
+        }
 
+        NetworkClient networkClient = new NetworkClient(sipModel, new NetworkClient.NarthexCredentials() {
             private SipProperties sipProperties = new SipProperties();
             private Properties props = sipProperties.getProp();
 
@@ -232,9 +257,11 @@ public class Application {
                 return props.getProperty(NARTHEX_PASSWORD, "").trim();
             }
         });
+
         createSipZipAction = new CreateSipZipAction();
         statusPanel = new StatusPanel(sipModel);
         home = new JFrame();
+        home.setTitle(titleString());
         home.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent componentEvent) {
@@ -248,8 +275,12 @@ public class Application {
         LogFrame logFrame = new LogFrame(sipModel);
         feedback.setLog(logFrame.getLog());
         allFrames = new AllFrames(sipModel, content, dataSetFrame, logFrame);
+        for (FrameBase frame : allFrames.getFrames()) {
+            frame.setTheme(themeMode);
+        }
         expertMenu = new ExpertMenu(sipModel, allFrames);
-        //desktop.setBackground(new Color(190, 190, 200));
+        themeMenu = new ThemeMenu(sipModel, allFrames);
+        helpMenu = new HelpMenu(sipModel, allFrames, isTelemetryIncluded);
         content.add(desktop, BorderLayout.CENTER);
         sipModel.getMappingModel().addChangeListener(new ChangeListenerAdapter() {
             @Override
@@ -352,6 +383,10 @@ public class Application {
         JMenuBar bar = new JMenuBar();
         bar.add(allFrames.getViewMenu());
         bar.add(expertMenu);
+        bar.add(themeMenu);
+        if (isTelemetryIncluded) {
+            bar.add(helpMenu);
+        }
         return bar;
     }
 
@@ -477,8 +512,13 @@ public class Application {
                 application.destroy();
             try {
                 application = new Application(HomeDirectory.WORK_DIR);
-                application.home.setVisible(true);
-                application.allFrames.initiate();
+                if (application.home == null) {
+                    // Startup aborted - exit
+                    System.exit(0);
+                } else {
+                    application.home.setVisible(true);
+                    application.allFrames.initiate();
+                }
             } catch (StorageException e) {
                 JOptionPane.showMessageDialog(null, "Unable to create the storage directory");
                 e.printStackTrace();
@@ -515,12 +555,35 @@ public class Application {
     }
 
     private static String getPomVersion() {
+        // Try to read the Maven artifact version
         URL resource = Application.class.getResource("/META-INF/maven/eu.delving/sip-app/pom.properties");
         if (resource != null) {
             try {
                 Properties pomProperties = new Properties();
                 pomProperties.load(resource.openStream());
-                return pomProperties.getProperty("version");
+                String pomVersion = pomProperties.getProperty("version");
+
+                // If this is a snapshot build:
+                // Check whether a Git commit hash is available (set by the automatic build)
+                String gitCommitHash = null;
+                if (pomVersion != null && pomVersion.endsWith("-SNAPSHOT")) {
+                    resource = Application.class.getResource("/sip-app.properties");
+                    if (resource != null) {
+                        try {
+                            Properties appProperties = new Properties();
+                            appProperties.load(resource.openStream());
+                            gitCommitHash = appProperties.getProperty("git-commit-hash-short");
+                        } catch (Exception e) {
+                            // Not important
+                        }
+                    }
+                }
+
+                if (pomVersion != null && gitCommitHash != null) {
+                    return String.format("%s (%s)", pomVersion, gitCommitHash);
+                } else {
+                    return pomVersion;
+                }
             } catch (Exception e) {
                 System.err.println("Cannot read maven resource");
             }
@@ -530,13 +593,21 @@ public class Application {
 
     public static void init(String runMode) {
         version = getPomVersion();
+        initSentry(runMode);
+    }
 
-        // Initialize Sentry using sentry.properties in classpath
-        Sentry.init(options -> {
-            options.setEnableExternalConfiguration(true);
-            options.setRelease(version);
-            options.setTag("mode", runMode);
-        });
+    public static void initSentry(String runMode) {
+        if (Application.class.getResource("/sentry.properties") != null) {
+            isTelemetryIncluded = true;
+            if ("true".equals(sipProperties.getProp().getProperty(TELEMETRY_ENABLED))) {
+                // Initialize Sentry using sentry.properties in classpath
+                Sentry.init(options -> {
+                    options.setEnableExternalConfiguration(true);
+                    options.setRelease(version);
+                    options.setTag("mode", runMode);
+                });
+            }
+        }
     }
 
     public static void main(final String[] args) throws Exception {
@@ -547,20 +618,12 @@ public class Application {
         if (isMac) {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
             System.setProperty("apple.awt.application.name", "SIP Creator");
-            // UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
 
         // In (at least) the GTK system look and feel, for JDesktopPane there is a task
         // bar at the bottom
         // which blocks view of the frames - disable it
         UIManager.put("InternalFrame.useTaskBar", Boolean.FALSE);
-
-        try {
-            UIManager.setLookAndFeel(new FlatLightLaf());
-        } catch (Exception ex) {
-            System.err.println("Failed to initialize FlatLaf look-and-feel");
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        }
         // UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
         EventQueue.invokeLater(LAUNCH);

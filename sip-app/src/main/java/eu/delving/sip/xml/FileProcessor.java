@@ -80,9 +80,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private final Object lock = new Object();
     private RDFFormat rdfFormat;
     private final Date time;
-    private final Map<String, String> facts;
-    private final String orgId;
-    private final String spec;
 
     public Feedback getFeedback() {
         return feedback;
@@ -179,12 +176,6 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         this.listener = listener;
         this.rdfFormat = rdfFormat;
         this.time = Calendar.getInstance().getTime();
-
-        // Prepare info for use while processing
-        this.facts = new HashMap<>(recMapping.getFacts()); // Copy the map
-        this.orgId = facts.getOrDefault("orgId", "unknown");
-        this.spec = getSpec();
-        facts.put("spec", spec); // Override spec in the map
     }
 
     public String getSpec() {
@@ -341,23 +332,23 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 if (exception == null) {
                     synchronized (lock) {
                         if (!events.isEmpty()) {
-                            reportWriter.warn(metadataRecord, mappingResult, events, facts);
+                            reportWriter.warn(metadataRecord, mappingResult, events, recMapping.getFacts());
                         }
-                        mappingResult.toByteArrayOutputStream(orgId, spec).writeTo(outputStream);
+                        mappingResult.toByteArrayOutputStream(recMapping.getFacts()).writeTo(outputStream);
                         return true;
                     }
                 } else if (exception instanceof DiscardRecordException) {
                     synchronized (lock) {
-                        reportWriter.discarded(metadataRecord, mappingResult, exception, facts);
+                        reportWriter.discarded(metadataRecord, mappingResult, exception, recMapping.getFacts());
                     }
                 } else if (exception instanceof MappingException) {
                     synchronized (lock) {
-                        reportWriter.unexpected(metadataRecord, mappingResult, exception, facts);
+                        reportWriter.unexpected(metadataRecord, mappingResult, exception, recMapping.getFacts());
                     }
                     termination.dueToException(exception);
                 } else {
                     synchronized (lock) {
-                        reportWriter.invalid(metadataRecord, mappingResult, exception, facts);
+                        reportWriter.invalid(metadataRecord, mappingResult, exception, recMapping.getFacts());
                     }
                 }
             } catch (Exception e) {

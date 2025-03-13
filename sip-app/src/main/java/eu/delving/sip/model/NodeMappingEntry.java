@@ -97,12 +97,16 @@ public class NodeMappingEntry {
             JLabel label = (JLabel) super.getListCellRendererComponent(list, string, index, selected, cellHasFocus);
             if (selected) {
                 setBackground(list.getSelectionBackground());
+                setForeground(list.getSelectionForeground());
             } else if (entry.getNodeMapping().inputPathMissing) {
                 setBackground(Color.RED);
+                setForeground(Color.BLACK);
             } else if (entry.isHighlighted()) {
                 setBackground(SwingHelper.HIGHLIGHTED_COLOR);
+                setForeground(Color.BLACK);
             } else {
                 setBackground(list.getBackground());
+                setForeground(list.getForeground());
             }
             return label;
         }

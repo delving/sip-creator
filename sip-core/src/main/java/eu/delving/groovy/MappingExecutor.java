@@ -10,6 +10,7 @@ import org.w3c.dom.Node;
 
 import javax.xml.validation.Validator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Utility class for executing mappings and collecting all validation results.
@@ -21,8 +22,7 @@ public class MappingExecutor {
 
     private final MappingRunner baseRunner;
     private final ValidatingMappingRunner validatingRunner;
-    private final String orgId;
-    private final String spec;
+    private final Map<String, String> facts;
 
     /**
      * Creates a new MappingExecutor with the given configuration.
@@ -41,17 +41,14 @@ public class MappingExecutor {
             String generatedCode,
             Validator validator,
             List<AssertionTest> assertions,
-            RDFFormat rdfFormat,
-            String orgId,
-            String spec) throws MappingException {
+            RDFFormat rdfFormat) throws MappingException {
         this.baseRunner = new BulkMappingRunner(recMapping, generatedCode);
         this.validatingRunner = new ValidatingMappingRunner(
                 baseRunner,
                 validator,
                 assertions,
                 rdfFormat);
-        this.orgId = orgId;
-        this.spec = spec;
+        this.facts = recMapping.getFacts();
     }
 
     /**
@@ -76,7 +73,7 @@ public class MappingExecutor {
                     baseRunner.getRecDefTree());
 
             // Generate the final output
-            String output = result.toXml(orgId, spec);
+            String output = result.toXml(facts);
 
             // Set successful results
             builder.withMappingResult(result)

@@ -74,22 +74,23 @@ public class FunctionFrame extends FrameBase {
     private JTextArea outputArea;
     private ModelStateListener modelStateListener = new ModelStateListener();
     private UndoManager undoManager = new UndoManager();
+    private String themeMode;
 
     public FunctionFrame(SipModel sipModel) {
         super(Which.FUNCTIONS, sipModel, "Functions");
         inputArea = new JTextArea(sipModel.getFunctionCompileModel().getInputDocument());
-        setUpTextArea(inputArea);
+        setUpTextArea(inputArea, themeMode);
         docArea = new JTextArea(sipModel.getFunctionCompileModel().getDocDocument());
-        setUpTextArea(docArea);
+        setUpTextArea(docArea, themeMode);
         docArea.setLineWrap(true);
         docArea.setWrapStyleWord(true);
         codeArea = new JTextArea(sipModel.getFunctionCompileModel().getCodeDocument());
-        setUpTextArea(codeArea);
+        setUpTextArea(codeArea, themeMode);
         outputArea = new JTextArea(sipModel.getFunctionCompileModel().getOutputDocument());
-        setUpTextArea(outputArea);
+        setUpTextArea(outputArea, themeMode);
         factsList.setFont(MONOSPACED);
         libraryList.setFont(MONOSPACED);
-        libraryList.setBackground(NOT_EDITABLE_BG);
+        libraryList.setBackground("dark".equals(themeMode) ? NOT_EDITABLE_BG_DARK : NOT_EDITABLE_BG);
         MappingFunction function = new MappingFunction("thisIsAVeryLongFunctionNameIndeed()");
         FunctionEntry entry = new FunctionEntry(function, false);
         libraryList.setPrototypeCellValue(entry);
@@ -99,10 +100,10 @@ public class FunctionFrame extends FrameBase {
         attachAccelerator(REDO_ACTION, codeArea);
     }
 
-    private void setUpTextArea(JTextArea textArea) {
+    private void setUpTextArea(JTextArea textArea, String themeMode) {
         textArea.setFont(MONOSPACED);
-        textArea.setForeground(Color.BLACK);
-        textArea.setBackground(Color.WHITE);
+        textArea.setForeground("dark".equals(themeMode) ? Color.WHITE : Color.BLACK);
+        textArea.setBackground("dark".equals(themeMode) ? Color.BLACK : Color.WHITE);
     }
 
     @Override
@@ -333,10 +334,10 @@ public class FunctionFrame extends FrameBase {
                 libraryList.clearSelection();
             }
             modelStateListener.setLibrary(this.library);
-            setEditable(codeArea, !library);
-            setEditable(docArea, !library);
-            setEditable(inputArea, !library);
-            setEditable(outputArea, !library);
+            setEditable(codeArea, !library, themeMode);
+            setEditable(docArea, !library, themeMode);
+            setEditable(inputArea, !library, themeMode);
+            setEditable(outputArea, !library, themeMode);
             exec(new Work() {
                 @Override
                 public void run() {
@@ -573,15 +574,24 @@ public class FunctionFrame extends FrameBase {
                 public void run() {
                     if (state == CompileState.ORIGINAL) undoManager.discardAllEdits();
                     if (lib) {
-                        setEditable(codeArea, false);
+                        setEditable(codeArea, false, themeMode);
                     }
                     else {
-                        state.setBackgroundOf(codeArea);
+                        state.setBackgroundOf(codeArea, themeMode);
                     }
                 }
             });
         }
     }
 
+    @Override
+    public void setTheme(String themeMode) {
+        this.themeMode = themeMode;
+        setUpTextArea(inputArea, themeMode);
+        setUpTextArea(docArea, themeMode);
+        setUpTextArea(codeArea, themeMode);
+        setUpTextArea(outputArea, themeMode);
+        libraryList.setBackground("dark".equals(themeMode) ? NOT_EDITABLE_BG_DARK : NOT_EDITABLE_BG);
+    }
 
 }

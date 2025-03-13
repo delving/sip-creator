@@ -60,9 +60,7 @@ import static eu.delving.sip.base.KeystrokeHelper.MENU_Z;
 import static eu.delving.sip.base.KeystrokeHelper.SH_MENU_Z;
 import static eu.delving.sip.base.KeystrokeHelper.attachAccelerator;
 import static eu.delving.sip.base.KeystrokeHelper.configAction;
-import static eu.delving.sip.base.SwingHelper.scrollV;
-import static eu.delving.sip.base.SwingHelper.scrollVH;
-import static eu.delving.sip.base.SwingHelper.setEditable;
+import static eu.delving.sip.base.SwingHelper.*;
 
 /**
  * Refining the mapping interactively involves editing the mapping code for an individual NodeMapping.  This involves
@@ -77,9 +75,9 @@ public class FieldMappingFrame extends FrameBase {
     private final Action REVERT_ACTION = new RevertAction();
     private final Action UNDO_ACTION = new UndoAction();
     private final Action REDO_ACTION = new RedoAction();
-    private JTextArea codeArea;
-    private JTextArea docArea;
-    private JTextArea outputArea;
+    private RSyntaxTextArea codeArea;
+    private RSyntaxTextArea docArea;
+    private RSyntaxTextArea outputArea;
     private FunctionListModel functionModel = new FunctionListModel();
     private JList functionList = new MappingFunctionJList(functionModel);
     private ContextVarListModel contextVarModel = new ContextVarListModel();
@@ -87,26 +85,10 @@ public class FieldMappingFrame extends FrameBase {
     private UndoManager undoManager = new UndoManager();
     private JTabbedPane mainTab = new JTabbedPane();
     private DictionaryPanel dictionaryPanel;
+    private String themeMode;
 
     public FieldMappingFrame(SipModel sipModel) {
         super(Which.FIELD_MAPPING, sipModel, "Field Mapping");
-        dictionaryPanel = new DictionaryPanel(sipModel);
-        docArea = new RSyntaxTextArea(sipModel.getFieldCompileModel().getDocDocument());
-        docArea.setTabSize(3);
-        docArea.setLineWrap(true);
-        docArea.setWrapStyleWord(true);
-        codeArea = new RSyntaxTextArea(sipModel.getFieldCompileModel().getCodeDocument());
-        codeArea.setTabSize(3);
-        outputArea = new RSyntaxTextArea(sipModel.getFieldCompileModel().getOutputDocument());
-        outputArea.setWrapStyleWord(true);
-        mainTab.addTab("Code", createCodeOutputPanel());
-        mainTab.addTab("Dictionary", dictionaryPanel);
-        mainTab.addTab("Documentation", scrollVH(docArea));
-        attachAccelerator(UNDO_ACTION, codeArea);
-        attachAccelerator(REDO_ACTION, codeArea);
-        new URLLauncher(sipModel, outputArea, sipModel.getFeedback());
-        wireUp();
-        handleEnablement();
     }
 
     private void handleEnablement() {
@@ -121,7 +103,28 @@ public class FieldMappingFrame extends FrameBase {
 
     @Override
     protected void buildContent(Container content) {
+        dictionaryPanel = new DictionaryPanel(sipModel);
+        docArea = new RSyntaxTextArea(sipModel.getFieldCompileModel().getDocDocument());
+        setRSyntaxTheme(docArea, themeMode);
+        docArea.setTabSize(3);
+        docArea.setLineWrap(true);
+        docArea.setWrapStyleWord(true);
+        codeArea = new RSyntaxTextArea(sipModel.getFieldCompileModel().getCodeDocument());
+        setRSyntaxTheme(codeArea, themeMode);
+        codeArea.setTabSize(3);
+        outputArea = new RSyntaxTextArea(sipModel.getFieldCompileModel().getOutputDocument());
+        setRSyntaxTheme(outputArea, themeMode);
+        outputArea.setWrapStyleWord(true);
+        outputArea.setEditable(false);
+        mainTab.addTab("Code", createCodeOutputPanel());
+        mainTab.addTab("Dictionary", dictionaryPanel);
+        mainTab.addTab("Documentation", scrollVH(docArea));
+        attachAccelerator(UNDO_ACTION, codeArea);
+        attachAccelerator(REDO_ACTION, codeArea);
+        new URLLauncher(sipModel, outputArea, sipModel.getFeedback());
         add(mainTab, BorderLayout.CENTER);
+        wireUp();
+        handleEnablement();
     }
 
     private JPanel createCodeOutputPanel() {
@@ -194,14 +197,14 @@ public class FieldMappingFrame extends FrameBase {
                     contextVarModel.setList(nodeMapping);
                     sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
                     exec(() -> {
-                        setEditable(codeArea, nodeMapping.isUserCodeEditable());
+                        setEditable(codeArea, nodeMapping.isUserCodeEditable(), themeMode);
                         mainTab.setSelectedIndex(nodeMapping.hasDictionary() ? 1 : 0);
                     });
                 } else {
                     contextVarModel.setList(null);
                     sipModel.getFieldCompileModel().setNodeMapping(null);
                     exec(() -> {
-                        setEditable(codeArea, false);
+                        setEditable(codeArea, false, themeMode);
                     });
                 }
             }
@@ -214,7 +217,7 @@ public class FieldMappingFrame extends FrameBase {
                         undoManager.discardAllEdits();
                         handleEnablement();
                     }
-                    state.setBackgroundOf(codeArea);
+                    state.setBackgroundOf(codeArea, themeMode);
                 });
             }
 
@@ -470,6 +473,14 @@ public class FieldMappingFrame extends FrameBase {
             setToolTipText("Selecting code and clicking here will insert\n" +
                 "a function call around the selected code");
         }
+    }
+
+    @Override
+    public void setTheme(String themeMode) {
+        this.themeMode = themeMode;
+        setRSyntaxTheme(codeArea, themeMode);
+        setRSyntaxTheme(docArea, themeMode);
+        setRSyntaxTheme(outputArea, themeMode);
     }
 
 }

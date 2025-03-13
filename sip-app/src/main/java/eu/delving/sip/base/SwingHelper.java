@@ -25,6 +25,7 @@ import eu.delving.metadata.*;
 import eu.delving.sip.model.SourceTreeNode;
 import eu.delving.stats.Stats;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rtextarea.RTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
@@ -47,10 +48,12 @@ import java.util.Map;
 
 public class SwingHelper {
     public static Color NORMAL_BG = new Color(255, 255, 255);
+    public static Color NORMAL_BG_DARK = new Color(0, 0, 0);
     public static Color NORMAL_FG = new Color(0, 0, 0);
     public static Color ERROR_BG = new Color(255, 200, 200);
     public static Color WARNING_BG = new Color(255, 255, 200);
     public static Color NOT_EDITABLE_BG = new Color(255, 255, 200);
+    public static Color NOT_EDITABLE_BG_DARK = new Color(55, 55, 0);
     public static Color DELIMITER_BG = new Color(255, 255, 200);
     public static Color MAPPED_COLOR = new Color(220, 255, 220);
     public static Color FACT_COLOR = new Color(212, 195, 255);
@@ -72,6 +75,25 @@ public class SwingHelper {
     public static final Icon ICON_FETCH_LIST = icon("fetch-list");
     public static final Icon ICON_EDIT = icon("edit");
 
+    public static Theme RSYNTAX_THEME_DEFAULT;
+    static {
+        try {
+            RSYNTAX_THEME_DEFAULT = Theme.load(SwingHelper.class.getResourceAsStream(
+                    "/org/fife/ui/rsyntaxtextarea/themes/default.xml"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static Theme RSYNTAX_THEME_DARK;
+    static {
+        try {
+            RSYNTAX_THEME_DARK = Theme.load(SwingHelper.class.getResourceAsStream(
+                    "/org/fife/ui/rsyntaxtextarea/themes/dark.xml"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static Icon icon(String resource) {
         String name = "/icons/" + resource + ".png";
         URL url = SwingHelper.class.getResource(name);
@@ -84,8 +106,23 @@ public class SwingHelper {
         component.setBackground(editable ? NORMAL_BG : NOT_EDITABLE_BG);
     }
 
-    public static void setError(JTextComponent component, boolean error) {
-        component.setBackground(error ? ERROR_BG : NORMAL_BG);
+    public static void setEditable(JTextComponent component, boolean editable, String themeMode) {
+        component.setEditable(editable);
+        if ("dark".equals(themeMode)) {
+            component.setBackground(editable ? NORMAL_BG_DARK : NOT_EDITABLE_BG_DARK);
+        } else {
+            component.setBackground(editable ? NORMAL_BG : NOT_EDITABLE_BG);
+        }
+    }
+
+    public static void setRSyntaxTheme(RSyntaxTextArea outputArea, String themeMode) {
+        Theme theme = "dark".equals(themeMode) ? RSYNTAX_THEME_DARK : RSYNTAX_THEME_DEFAULT;
+        if (theme != null && outputArea != null) {
+            theme.apply(outputArea);
+            if ("error".equals(themeMode)) {
+                outputArea.setBackground(ERROR_BG);
+            }
+        }
     }
 
     public static void setDelimitedColor(JComponent component, boolean selected) {

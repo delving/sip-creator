@@ -190,8 +190,7 @@ public class ReportWriter {
     }
 
     private String toXml(MappingResult result, Map<String, String> facts) {
-        return result.toXml(facts.getOrDefault("orgId", "unknown"),
-            facts.getOrDefault("spec", "unknown"));
+        return result.toXml(facts);
     }
 
     private String toXml(MetadataRecord inputRecord) {

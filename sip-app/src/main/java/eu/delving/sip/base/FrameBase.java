@@ -577,5 +577,8 @@ public abstract class FrameBase extends JInternalFrame {
         sipModel.exec(work);
     }
 
+    public void setTheme(String themeMode) {
+        // Override when custom code for refreshing the theme is needed
+    }
 
 }

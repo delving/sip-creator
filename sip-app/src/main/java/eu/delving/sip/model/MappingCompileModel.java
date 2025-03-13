@@ -470,7 +470,7 @@ public class MappingCompileModel {
             // Let MappingResult manage XML serialization, including possibly appending
             // comment with hash, etc.
             // String output = node == null ? "No XML" : serializer.toXml(node, true);
-            String output = result == null ? "No XML" : result.toXml(Application.orgID(), getDataSet().getSpec());
+            String output = result == null ? "No XML" : result.toXml(getDataSet().getDataSetFacts());
 
             String syntaxStyle = outputDocument.getSyntaxStyle();
             if (error == null) {

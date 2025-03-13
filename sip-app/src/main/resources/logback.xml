@@ -7,11 +7,12 @@
     </encoder>
   </appender>
 
-  <appender name="Sentry" class="io.sentry.logback.SentryAppender">
+  <!-- Don't use the Sentry logback integration for now -->
+  <!--<appender name="Sentry" class="io.sentry.logback.SentryAppender">-->
     <!-- See: https://docs.sentry.io/platforms/java/guides/logback/#configure -->
     <!--<minimumEventLevel>WARN</minimumEventLevel>-->
     <!--<minimumBreadcrumbLevel>DEBUG</minimumBreadcrumbLevel>-->
-  </appender>
+  <!--</appender>-->
 
   <root level="INFO">
     <!-- Comment out appender-ref to disable logging to console -->

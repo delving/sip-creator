@@ -178,6 +178,8 @@ class ProcessCommand implements Callable<Integer> {
                 prefix,
                 recMapping.getPrefix());
 
+        recMapping.getFacts().clear();
+        recMapping.getFacts().putAll(sourceXML.getDataSetFacts());
         return new FileProcessor(
                 new CLIFeedback(),
                 validateXsd,

@@ -52,7 +52,8 @@ public interface Storage {
         SOURCE_ZSTD("source.xml.zst", null, null, null, 2),
         REPORT_JSON("report.json", "report_", null, "report_%s.json", 10),
         PROCESSED("processed.rdf.zst", "processed_", null, "processed_%s.rdf.zst", 10),
-        SOURCE_STATS_ZSTD("stats-source.xml.zst");
+        SOURCE_STATS_ZSTD("stats-source.xml.zst"),
+        FACTS_JSON("sip.json");
 
         private String name, prefix, suffix, pattern;
         private int historySize = 1;
@@ -98,6 +99,8 @@ public interface Storage {
     String SCHEMA_VERSIONS = "schemaVersions";
     String XSD_VALIDATION = "xsdValidation";
     String SHACL_VALIDATION = "shaclValidation";
+    String THEME_MODE = "themeMode";
+    String TELEMETRY_ENABLED = "telemetryEnabled";
     String NARTHEX_URL = "narthexUrl";
     String NARTHEX_USERNAME = "narthexUsername";
     String NARTHEX_PASSWORD = "narthexPassword";

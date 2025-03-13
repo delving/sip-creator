@@ -254,7 +254,7 @@ public class ValidatingMappingRunner implements MappingRunner {
 
     private void validateRDF(MappingResult result) throws MappingException {
         try {
-            String rdfOutput = result.toXml("", ""); // Using empty strings as these aren't needed for validation
+            String rdfOutput = result.toXml();
 
             // Check RDF errors from the mapping result first
             List<String> rdfErrors = result.getRDFErrors();

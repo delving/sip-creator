@@ -43,8 +43,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import static eu.delving.sip.base.SwingHelper.scrollCodeVH;
-import static eu.delving.sip.base.SwingHelper.scrollVH;
+import static eu.delving.sip.base.SwingHelper.*;
 
 /**
  * This frame shows the entire builder that is responsible for transforming the input to output,
@@ -61,13 +60,16 @@ public class MappingCodeFrame extends FrameBase {
     private JCheckBox docuBox = new JCheckBox("Include Documentation");
     private JCheckBox codeBox = new JCheckBox("Include Groovy Code");
     private JCheckBox traceBox = new JCheckBox("Include Line Number Traces");
+    private String themeMode;
 
     public MappingCodeFrame(final SipModel sipModel) {
         super(Which.MAPPING_CODE, sipModel, "Mapping Code");
         listArea.setFont(MONOSPACED);
         listArea.setEditable(false);
+        setRSyntaxTheme(recordArea, themeMode);
         recordArea.setFont(MONOSPACED);
         recordArea.setEditable(false);
+        setRSyntaxTheme(fieldArea, themeMode);
         fieldArea.setFont(MONOSPACED);
         fieldArea.setEditable(false);
         Ear ear = new Ear();
@@ -220,6 +222,13 @@ public class MappingCodeFrame extends FrameBase {
                 textArea.setText("// No mapping");
             }
         }
+    }
+
+    @Override
+    public void setTheme(String themeMode) {
+        this.themeMode = themeMode;
+        setRSyntaxTheme(recordArea, themeMode);
+        setRSyntaxTheme(fieldArea, themeMode);
     }
 
 }

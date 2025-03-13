@@ -46,4 +46,12 @@ public enum CompileState {
     public void setBackgroundOf(JComponent component) {
         component.setBackground(color);
     }
+
+    public void setBackgroundOf(JComponent component, String themeMode) {
+        if ("dark".equals(themeMode)) {
+            component.setBackground(new Color(255 - color.getRed(), 255 - color.getGreen(), 255 - color.getBlue()));
+        } else {
+            component.setBackground(color);
+        }
+    }
 }

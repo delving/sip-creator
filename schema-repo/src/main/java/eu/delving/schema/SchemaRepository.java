@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,13 @@ public class SchemaRepository {
 
     public SchemaRepository(Fetcher fetcher) throws IOException {
         this.fetcher = fetcher;
-        this.schemas = (Schemas) XStreamFactory.getSchemasStream().fromXML(fetcher.fetchList());
+        try {
+            this.schemas = (Schemas) XStreamFactory.getSchemasStream().fromXML(fetcher.fetchList());
+        } catch (IOException e) {
+            // Possibly we're offline and can't fetch the schemas right now
+            this.schemas = new Schemas();
+            this.schemas.schemas = new ArrayList<>();
+        }
         try {
             this.messageDigest = MessageDigest.getInstance("MD5");
         }

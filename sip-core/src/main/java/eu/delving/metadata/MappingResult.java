@@ -39,6 +39,7 @@ import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -120,18 +121,18 @@ public class MappingResult {
      */
 
     public String toXml() {
-        return toXml("unknown", "unknown");
+        return toXml(Collections.emptyMap());
     }
 
-    public String toXml(String orgId, String spec) {
+    public String toXml(Map<String, String> facts) {
         try {
-            return toByteArrayOutputStream(orgId, spec).toString("UTF-8");
+            return toByteArrayOutputStream(facts).toString("UTF-8");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public ByteArrayOutputStream toByteArrayOutputStream(String orgId, String spec) throws IOException {
+    public ByteArrayOutputStream toByteArrayOutputStream(Map<String, String> facts) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8192);
         MessageDigest digest = null;
         try {
@@ -148,6 +149,8 @@ public class MappingResult {
 
         // XML comments may not contain double dashes (--) so if there are any then
         // divide them with a space (- -)
+        String orgId = facts.getOrDefault("orgId", "unknown");
+        String spec = facts.getOrDefault("spec", "unknown");
         String comment = String.format("<urn:%s_%s_%s/graph__%s>", orgId, spec, getLocalId(), hash);
         writer.write("<!--");
         writer.write(comment.replaceAll("\\-\\-", "- -"));
@@ -169,7 +172,7 @@ public class MappingResult {
     }
 
     public String toString() {
-        return Utils.stripNonPrinting(toXml("unknown", "unknown"));
+        return Utils.stripNonPrinting(toXml());
     }
 
     public static String hasRDFError(String rdf) {

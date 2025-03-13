@@ -21,6 +21,10 @@
 
 package eu.delving.sip.files;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import eu.delving.metadata.Hasher;
@@ -36,15 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -110,8 +106,42 @@ public class StorageHelper {
         FileUtils.writeLines(file, lines);
     }
 
+    static Map<String, String> readFactsJson(File file) throws IOException {
+        if (file.exists()) {
+            ObjectMapper jsonMapper = new ObjectMapper();
+            JsonNode baseNode = jsonMapper.readTree(file);
+            if (baseNode != null && baseNode.isObject()) {
+                JsonNode factsNode = baseNode.get("facts");
+                if (factsNode != null && factsNode.isObject()) {
+                    Map<String, String> facts = new TreeMap<>();
+                    for (Iterator<Map.Entry<String, JsonNode>> it = factsNode.fields(); it.hasNext(); ) {
+                        Map.Entry<String, JsonNode> entry = it.next();
+                        facts.put(entry.getKey(), entry.getValue().textValue());
+                    }
+                    return facts;
+                }
+            }
+        }
+        return null;
+    }
+
+    static void writeFactsJson(File file, Map<String, String> facts) throws IOException {
+        ObjectMapper jsonMapper = new ObjectMapper();
+        ObjectNode baseNode = jsonMapper.createObjectNode();
+        ObjectNode factsNode = baseNode.putObject("facts");
+        for (String key : facts.keySet()) {
+            factsNode.put(key, facts.get(key));
+        }
+        jsonMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        jsonMapper.writeValue(file, baseNode);
+    }
+
     static File factsFile(File dir) {
         return findOrCreate(dir, FACTS);
+    }
+
+    static File factsJsonFile(File dir) {
+        return findOrCreate(dir, FileType.FACTS_JSON);
     }
 
     static File narthexFactsFile(File dir) {
@@ -126,8 +156,9 @@ public class StorageHelper {
         return findOrCreate(dir, SOURCE);
     }
 
-    static File latestMappingFileOrNull(File dir) {
-        return findOrNull(dir, 0, new PrefixFileFilter(MAPPING), MAPPING);
+    static File mappingFile(File dir, String prefix) {
+        //return findOrNull(dir, 0, new PrefixFileFilter(MAPPING), MAPPING);
+        return new File(dir, MAPPING.getName(prefix));
     }
 
     static File targetFile(File dir, Map<String, String> facts, String prefix) {
@@ -241,36 +272,9 @@ public class StorageHelper {
         return file;
     }
 
-    static File findOrCreate(File directory, Storage.FileType fileType, String prefix) {
-        if (fileType.getName(prefix) == null)
-            throw new RuntimeException("Expected name");
-        File file = findOrNull(directory, 0, new NameFileFilter(fileType.getName(prefix)), fileType);
-        if (file == null)
-            file = new File(directory, fileType.getName(prefix));
-        return file;
-    }
-
-    static File findOrCreate(File directory, String name, FileFilter fileFilter, Storage.FileType fileType) {
-        File file = findOrNull(directory, 0, fileFilter, fileType);
-        if (file == null)
-            file = new File(directory, name);
-        return file;
-    }
-
     static File findOrNull(File directory, int which, FileFilter fileFilter, Storage.FileType fileType) {
         File[] files = directory.listFiles(fileFilter);
         return getRecent(files, which, fileType);
-    }
-
-    static void addLatestNoHash(File dir, FileType fileType, String prefix, List<File> list) throws StorageException {
-        File latestFile = findLatestFile(dir, fileType, prefix);
-        if (!latestFile.exists())
-            return;
-        try {
-            list.add(Hasher.ensureFileNotHashed(latestFile));
-        } catch (IOException e) {
-            throw new StorageException("Unable to hash file " + latestFile);
-        }
     }
 
     static File findLatestFile(File dir, FileType fileType, String prefix) {
@@ -283,6 +287,11 @@ public class StorageHelper {
         if (latestFile == null)
             latestFile = new File(dir, fileType.getName(prefix));
         return latestFile;
+    }
+
+    static File findNonHashedPrefixFile(File dir, FileType fileType, String prefix) {
+        // Return the file for the type and prefix which is not timestamped ("hashed")
+        return new File(dir, fileType.getName(prefix));
     }
 
     static List<File> findHashedPrefixFiles(File dir, FileType fileType, String prefix) {
@@ -400,6 +409,20 @@ public class StorageHelper {
         @Override
         public boolean accept(File file) {
             return file.isFile() && Hasher.extractFileName(file).equals(name);
+        }
+    }
+
+    static class HashedNameFileFilter implements FileFilter {
+        private String ending;
+
+        HashedNameFileFilter(String name) {
+            this.ending = Hasher.SEPARATOR + name;
+        }
+
+        @Override
+        public boolean accept(File file) {
+            String name = file.getName();
+            return file.isFile() && name.endsWith(ending);
         }
     }
 

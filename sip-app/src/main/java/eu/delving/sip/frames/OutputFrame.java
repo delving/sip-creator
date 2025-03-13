@@ -26,7 +26,6 @@ import eu.delving.sip.base.KeystrokeHelper;
 import eu.delving.sip.model.MappingCompileModel;
 import eu.delving.sip.model.SipModel;
 import org.apache.jena.riot.RDFFormat;
-import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -41,10 +40,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static eu.delving.sip.base.SwingHelper.scrollVH;
-import static eu.delving.sip.base.SwingHelper.setError;
+import static eu.delving.sip.base.SwingHelper.*;
 
 /**
  * This frame shows the entire output record so that the user can see the "big
@@ -57,6 +54,9 @@ import static eu.delving.sip.base.SwingHelper.setError;
  */
 
 public class OutputFrame extends FrameBase {
+
+    private RSyntaxTextArea outputArea;
+    private String themeMode;
 
     public OutputFrame(final SipModel sipModel) {
         super(Which.OUTPUT, sipModel, "Output");
@@ -90,7 +90,8 @@ public class OutputFrame extends FrameBase {
 
         p.add(outputTypesBox, BorderLayout.NORTH);
 
-        final RSyntaxTextArea outputArea = new RSyntaxTextArea(sipModel.getRecordCompileModel().getOutputDocument());
+        outputArea = new RSyntaxTextArea(sipModel.getRecordCompileModel().getOutputDocument());
+        setRSyntaxTheme(outputArea, themeMode);
         outputArea.setCodeFoldingEnabled(true);
         outputArea.setEditable(false);
         RTextScrollPane tsp = new RTextScrollPane(outputArea);
@@ -99,7 +100,7 @@ public class OutputFrame extends FrameBase {
 
         outputTypesBox.addActionListener(e -> {
             String selection = outputTypesBox.getSelectedItem().toString();
-            setError(outputArea, false);
+            setRSyntaxTheme(outputArea, themeMode);
             stopSyntaxTextAreaSearch(outputArea);
 
             final MappingCompileModel mappingModel = sipModel.getRecordCompileModel();
@@ -137,7 +138,7 @@ public class OutputFrame extends FrameBase {
                 try {
                     String first = documentEvent.getDocument().getText(0, 1);
                     final boolean error = first.startsWith("#");
-                    setError(outputArea, error);
+                    setRSyntaxTheme(outputArea, error ? "error" : themeMode);
                     stopSyntaxTextAreaSearch(outputArea);
                     sipModel.exec(() -> {
                         outputArea.setCaretPosition(0);
@@ -250,6 +251,12 @@ public class OutputFrame extends FrameBase {
         outputArea.getInputMap().remove(KeystrokeHelper.RIGHT);
         outputArea.getInputMap().remove(KeystrokeHelper.UP);
         outputArea.getInputMap().remove(KeystrokeHelper.LEFT);
+    }
+
+    @Override
+    public void setTheme(String themeMode) {
+        this.themeMode = themeMode;
+        setRSyntaxTheme(outputArea, themeMode);
     }
 
 }

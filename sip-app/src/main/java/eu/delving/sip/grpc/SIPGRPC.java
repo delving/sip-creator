@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import eu.delving.sip.Application;
 import eu.delving.sip.cli.CLIFeedback;
 import eu.delving.sip.cli.CLIProcessorListener;
 import eu.delving.sip.cli.SIPFilesFinder;
@@ -29,6 +30,20 @@ import io.grpc.stub.StreamObserver;
 public class SIPGRPC {
     private static final Logger logger = LoggerFactory.getLogger(SIPGRPC.class);
     private final GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        int port = 50051; // Default gRPC port
+        String basePath = "";
+        if (args.length > 0) {
+            port = Integer.parseInt(args[0]);
+            basePath = args[1];
+        }
+
+        Application.init("grpc");
+        final MappingServer server = new MappingServer(port, basePath);
+        server.start();
+        server.blockUntilShutdown();
+    }
 
     // New method for gRPC usage
     public void startMappingGrpc(Path sipDir, StreamObserver<MappingProgress> responseObserver)
@@ -57,6 +72,8 @@ public class SIPGRPC {
                 recMapping.getPrefix());
 
         // Create file processor
+        recMapping.getFacts().clear();
+        recMapping.getFacts().putAll(sourceXML.getDataSetFacts());
         FileProcessor fileProcessor = new FileProcessor(
                 progressListener instanceof GrpcProgressTracker ? progressListener.getFeedback() : new CLIFeedback(),
                 sipFiles.getProperties().getProperty(XSD_VALIDATION) == "true",

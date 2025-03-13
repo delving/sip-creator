@@ -31,6 +31,7 @@ import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaResponse;
 import eu.delving.schema.SchemaVersion;
+import eu.delving.sip.Application;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.stats.Stats;
@@ -56,7 +57,6 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.nio.file.Files;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
@@ -214,8 +214,38 @@ public class StorageImpl implements Storage {
         @Override
         public Map<String, String> getDataSetFacts() {
             try {
-                if (dataSetFacts == null)
-                    dataSetFacts = readFacts(factsFile(here));
+                if (dataSetFacts == null) {
+                    File factsJsonFile = factsJsonFile(here);
+                    Map<String, String> facts = readFactsJson(factsJsonFile);
+                    if (facts == null) {
+                        // JSON file doesn't exist or doesn't have facts - get facts from narthex_facts.txt
+                        facts = readFacts(factsFile(here));
+
+                        // If there aren't values for orgId or spec, try to figure them out
+                        final String orgIdKey = "orgId";
+                        final String specKey = "spec";
+                        final String unknown = "unknown";
+                        String orgId = facts.get(orgIdKey);
+                        if (orgId == null || orgId.isBlank()) {
+                            orgId = Application.orgID();
+                            if (orgId == null || orgId.isBlank()) {
+                                orgId = unknown;
+                            }
+                            facts.put(orgIdKey, orgId);
+                        }
+                        String spec = facts.get(specKey);
+                        if (spec == null || spec.isBlank()) {
+                            spec = getSpec();
+                            if (spec == null || spec.isBlank()) {
+                                spec = unknown;
+                            }
+                            facts.put(specKey, spec);
+                        }
+
+                        writeFactsJson(factsJsonFile, facts);
+                    }
+                    dataSetFacts = facts;
+                }
                 return dataSetFacts;
             } catch (IOException e) {
                 return new TreeMap<String, String>();
@@ -300,10 +330,16 @@ public class StorageImpl implements Storage {
 
         @Override
         public RecMapping getRecMapping(RecDefModel recDefModel) throws StorageException {
-            File file = findLatestFile(here, MAPPING, getSchemaVersion().getPrefix());
+            //File file = findLatestFile(here, MAPPING, getSchemaVersion().getPrefix());
+            // Always use the non-timestamped ("non-hashed") mapping file
+            File file = findNonHashedPrefixFile(here, MAPPING, getSchemaVersion().getPrefix());
             if (file.exists()) {
                 try {
-                    return RecMapping.read(file, recDefModel);
+                    RecMapping recMapping = RecMapping.read(file, recDefModel);
+                    recMapping.getFacts().clear();
+                    recMapping.getFacts().putAll(getDataSetFacts());
+                    recMapping.setSchemaVersion(getSchemaVersion());
+                    return recMapping;
                 } catch (Exception e) {
                     throw new StorageException(String.format("Unable to read mapping from %s", file.getAbsolutePath()),
                             e);
@@ -330,13 +366,18 @@ public class StorageImpl implements Storage {
 
         @Override
         public void setRecMapping(RecMapping recMapping, boolean freeze) throws StorageException {
-            File file = new File(here, FileType.MAPPING.getName(recMapping.getPrefix()));
+            String fileName = FileType.MAPPING.getName(recMapping.getPrefix());
+            File file = new File(here, fileName);
             RecMapping.write(file, recMapping);
             if (freeze) {
+                File timestamped = new File(here, Hasher.prefixFileName(fileName));
+                if (timestamped.exists()) {
+                    FileUtils.deleteQuietly(timestamped);
+                }
                 try {
-                    Hasher.ensureFileHashed(file);
+                    FileUtils.copyFile(file, timestamped);
                 } catch (IOException e) {
-                    throw new StorageException("Unable to hash the mapping file name", e);
+                    throw new StorageException("Unable to create timestamped mapping file", e);
                 }
             }
         }
@@ -398,11 +439,11 @@ public class StorageImpl implements Storage {
             String prefix = getSchemaVersion().getPrefix();
 
             // Keep only the most recent of each
-            getRecent(here.listFiles(new NameFileFilter(FileType.SOURCE_ZSTD.getName())), 0, maxHistory);
-            getRecent(here.listFiles(new NameFileFilter(FileType.SOURCE_STATS_ZSTD.getName())), 0, maxHistory);
-            getRecent(here.listFiles(new NameFileFilter(FileType.MAPPING.getName(prefix))), 0, maxHistory);
-            getRecent(here.listFiles(new NameFileFilter(FileType.PROCESSED.getName(prefix))), 0, maxHistory);
-            getRecent(here.listFiles(new NameFileFilter(FileType.REPORT_JSON.getName(prefix))), 0, maxHistory);
+            getRecent(here.listFiles(new HashedNameFileFilter(FileType.SOURCE_ZSTD.getName())), 0, maxHistory);
+            getRecent(here.listFiles(new HashedNameFileFilter(FileType.SOURCE_STATS_ZSTD.getName())), 0, maxHistory);
+            getRecent(here.listFiles(new HashedNameFileFilter(FileType.MAPPING.getName(prefix))), 0, maxHistory);
+            getRecent(here.listFiles(new HashedNameFileFilter(FileType.PROCESSED.getName(prefix))), 0, maxHistory);
+            getRecent(here.listFiles(new HashedNameFileFilter(FileType.REPORT_JSON.getName(prefix))), 0, maxHistory);
         }
 
         @Override
@@ -506,7 +547,8 @@ public class StorageImpl implements Storage {
                 // for the mapping matching the prefix
                 SchemaVersion schemaVersion = getSchemaVersion();
                 narthexFacts.put(SCHEMA_VERSIONS, schemaVersion.toString());
-                addLatestNoHash(here, MAPPING, schemaVersion.getPrefix(), files);
+                //addLatestNoHash(here, MAPPING, schemaVersion.getPrefix(), files);
+                files.add(mappingFile(here, schemaVersion.getPrefix()));
                 File recDef = new File(here, schemaVersion.getFullFileName(RECORD_DEFINITION));
                 if (recDef.exists())
                     files.add(recDef);
@@ -618,10 +660,6 @@ public class StorageImpl implements Storage {
                 schemaFactory.setResourceResolver(resolver);
         }
         return schemaFactory;
-    }
-
-    private static String getTimestamp(Date time) {
-        return new SimpleDateFormat("yyyy-MM-dd'T'HHmmss").format(time);
     }
 
 }
