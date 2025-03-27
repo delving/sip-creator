@@ -88,4 +88,10 @@ This project consists of two modules, because the part of the code responsible f
 
 If you want to know more about the SIP-Creator, contact us at __`sip-creator@delving.eu`__
 
+## License
+
+Copyright 2011-2025 Delving BV.
+
+SIP-Creator is licensed under the [EUPL](LICENSE).
+
 - - -

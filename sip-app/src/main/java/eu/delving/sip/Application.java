@@ -1,22 +1,18 @@
 /*
- * Copyright 2011, 2012 Delving BV
+ * Copyright 2011-2025 Delving BV
  *
- * Licensed under the EUPL, Version 1.0 or? as soon they
- * will be approved by the European Commission - subsequent
- * versions of the EUPL (the "Licence");
- * you may not use this work except in compliance with the
- * Licence.
+ * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by
+ * the European Commission - subsequent versions of the EUPL (the "Licence");
+ * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
  *
- * http://ec.europa.eu/idabc/eupl
+ * https://joinup.ec.europa.eu/software/page/eupl
  *
- * Unless required by applicable law or agreed to in
- * writing, software distributed under the Licence is
- * distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied.
- * See the Licence for the specific language governing
- * permissions and limitations under the Licence.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the Licence is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the Licence for the specific language governing permissions and
+ * limitations under the Licence.
  */
 
 package eu.delving.sip;
@@ -43,6 +39,7 @@ import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.frames.LogFrame;
 import eu.delving.sip.frames.RemoteDataSetFrame;
 import eu.delving.sip.menus.ExpertMenu;
+import eu.delving.sip.menus.FileMenu;
 import eu.delving.sip.menus.HelpMenu;
 import eu.delving.sip.menus.ThemeMenu;
 import eu.delving.sip.model.DataSetModel;
@@ -68,11 +65,7 @@ import org.apache.jena.sys.JenaSystem;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -110,6 +103,7 @@ public class Application {
     private VisualFeedback feedback;
     private StatusPanel statusPanel;
     // private Timer resizeTimer;
+    private FileMenu fileMenu;
     private ExpertMenu expertMenu;
     private ThemeMenu themeMenu;
     private HelpMenu helpMenu;
@@ -190,7 +184,7 @@ public class Application {
         // Initialize telemetry
         String telemetryEnabled = sipModel.getPreferences().getProperty(TELEMETRY_ENABLED);
         if (isTelemetryIncluded && telemetryEnabled == null) {
-            Object[] options = { "Yes, please", "No, thanks", "Exit" };
+            Object[] options = { "Yes, please", "No, thanks", "Close" };
             int telemetryOption = JOptionPane.showOptionDialog(null,
                     "This application includes telemetry.\n\n" +
                             "This means that telemetry data may be automatically submitted, including errors and metrics. " +
@@ -278,6 +272,12 @@ public class Application {
         for (FrameBase frame : allFrames.getFrames()) {
             frame.setTheme(themeMode);
         }
+        fileMenu = new FileMenu(sipModel, allFrames, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                quit();
+            }
+        });
         expertMenu = new ExpertMenu(sipModel, allFrames);
         themeMenu = new ThemeMenu(sipModel, allFrames);
         helpMenu = new HelpMenu(sipModel, allFrames, isTelemetryIncluded);
@@ -381,12 +381,11 @@ public class Application {
 
     private JMenuBar createMenuBar() {
         JMenuBar bar = new JMenuBar();
+        bar.add(fileMenu);
         bar.add(allFrames.getViewMenu());
         bar.add(expertMenu);
         bar.add(themeMenu);
-        if (isTelemetryIncluded) {
-            bar.add(helpMenu);
-        }
+        bar.add(helpMenu);
         return bar;
     }
 
@@ -617,7 +616,10 @@ public class Application {
         final boolean isMac = lcOSName.startsWith("mac os x");
         if (isMac) {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
-            System.setProperty("apple.awt.application.name", "SIP Creator");
+            System.setProperty("apple.awt.application.appearance", "system");
+            System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
+            System.setProperty("apple.awt.application.name", "SIP-Creator");
+            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "SIP-Creator");
         }
 
         // In (at least) the GTK system look and feel, for JDesktopPane there is a task
