@@ -27,7 +27,6 @@ import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaResponse;
 import eu.delving.schema.SchemaVersion;
-import eu.delving.sip.Application;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.stats.Stats;
@@ -74,15 +73,17 @@ import static org.apache.commons.io.FileUtils.deleteQuietly;
 
 public class StorageImpl implements Storage {
     private File home;
+    private Properties sipProperties;
     private static SchemaFactory schemaFactory;
     private SchemaRepository schemaRepository;
     private static LSResourceResolver resolver;
 
     private static final String INPROGRESS_SUFFIX = ".inprogress";
 
-    public StorageImpl(File home, SchemaRepository schemaRepository, LSResourceResolver resolver)
-            throws StorageException {
+    public StorageImpl(File home, Properties sipProperties, SchemaRepository schemaRepository,
+                       LSResourceResolver resolver)  throws StorageException {
         this.home = home;
+        this.sipProperties = sipProperties;
         this.schemaRepository = schemaRepository;
         this.resolver = resolver;
         if (!home.exists()) {
@@ -135,7 +136,7 @@ public class StorageImpl implements Storage {
         return new DataSetImpl(directory, schemaRepository);
     }
 
-    public static class DataSetImpl implements DataSet, Serializable {
+    public class DataSetImpl implements DataSet, Serializable {
 
         private File here;
         private Map<String, String> dataSetFacts;
@@ -223,7 +224,7 @@ public class StorageImpl implements Storage {
                         final String unknown = "unknown";
                         String orgId = facts.get(orgIdKey);
                         if (orgId == null || orgId.isBlank()) {
-                            orgId = Application.orgID();
+                            orgId = sipProperties.getProperty("orgID");
                             if (orgId == null || orgId.isBlank()) {
                                 orgId = unknown;
                             }
@@ -556,7 +557,7 @@ public class StorageImpl implements Storage {
                 files.add(narthexFactsFile(here));
                 if (sourceIncluded)
                     files.add(sourceFile(here));
-                File sipZip = sipZip(HomeDirectory.UP_DIR, getSpec(), getSchemaVersion().getPrefix());
+                File sipZip = sipZip(HomeDirectory.getUpDir(), getSpec(), getSchemaVersion().getPrefix());
                 FileOutputStream fos = new FileOutputStream(sipZip);
                 ZipOutputStream zos = new ZipOutputStream(fos);
                 byte[] buffer = new byte[1024];

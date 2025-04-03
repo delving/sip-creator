@@ -30,14 +30,26 @@ import java.awt.event.ActionListener;
 public class FileMenu extends JMenu {
     private final SipModel sipModel;
     private final AllFrames allFrames;
+    private final ActionListener projectListener;
     private final ActionListener closeListener;
 
-    public FileMenu(SipModel sipModel, AllFrames allFrames, ActionListener closeListener) {
+    public FileMenu(SipModel sipModel, AllFrames allFrames, ActionListener projectListener,
+                    ActionListener closeListener) {
         super("File");
         this.sipModel = sipModel;
         this.allFrames = allFrames;
+        this.projectListener = projectListener;
         this.closeListener = closeListener;
+        add(new ProjectMenuItem());
+        add(new JSeparator());
         add(new CloseMenuItem());
+    }
+
+    private class ProjectMenuItem extends JMenuItem {
+        public ProjectMenuItem() {
+            super("Switch Project");
+            addActionListener(projectListener);
+        }
     }
 
     private class CloseMenuItem extends JMenuItem {

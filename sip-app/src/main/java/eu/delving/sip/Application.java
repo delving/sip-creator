@@ -58,20 +58,23 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.apache.jena.query.ARQ;
-import org.apache.jena.riot.RDFFormat;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import org.apache.jena.sys.JenaSystem;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static eu.delving.sip.base.HttpClientFactory.createHttpClient;
 import static eu.delving.sip.base.KeystrokeHelper.MENU_W;
@@ -94,7 +97,6 @@ import static eu.delving.sip.files.Storage.*;
 
 public class Application {
     public static String version;
-    private static final int DEFAULT_RESIZE_INTERVAL = 1000;
     private SipModel sipModel;
     private Action validateAction;
     private JFrame home;
@@ -102,62 +104,93 @@ public class Application {
     private AllFrames allFrames;
     private VisualFeedback feedback;
     private StatusPanel statusPanel;
-    // private Timer resizeTimer;
     private FileMenu fileMenu;
     private ExpertMenu expertMenu;
     private ThemeMenu themeMenu;
     private HelpMenu helpMenu;
     private CreateSipZipAction createSipZipAction;
     private UnlockMappingAction unlockMappingAction;
-    private final static SipProperties sipProperties = new SipProperties();
-    private static boolean isTelemetryIncluded = false;
+    private static SipProperties appProperties = new SipProperties(true);
+    private static final boolean isTelemetryIncluded = Application.class.getResource("/sentry.properties") != null;
+    private static boolean isInitialLaunch = true;
 
-    public static boolean canWritePocketFiles() {
-        return !"false".equals(sipProperties.getProp().getProperty("writePocketFiles"));
-    }
+    private Application() throws StorageException {
+        // Differ between the first Application instantiation and re-launches (e.g., for switching projects)
+        boolean isInitialLaunch = Application.isInitialLaunch;
+        Application.isInitialLaunch = false;
 
-    public static String orgID() {
-        return sipProperties.getProp().getProperty("orgID");
-    }
-
-    public static RDFFormat getRDFFormat() {
-        String rdfFormat = sipProperties.getProp().getProperty("rdfFormat");
-        if ("RDF/XML".equals(rdfFormat)) {
-            return RDFFormat.RDFXML;
-        }
-        if ("JSONLD".equals(rdfFormat)) {
-            return RDFFormat.JSONLD_COMPACT_PRETTY;
-        }
-        if ("NQUADS".equals(rdfFormat)) {
-            return RDFFormat.NQUADS;
-        }
-        if ("NTRIPLES".equals(rdfFormat)) {
-            return RDFFormat.NTRIPLES;
-        }
-        if ("TURTLE".equals(rdfFormat)) {
-            return RDFFormat.TURTLE;
-        }
-        return RDFFormat.RDFXML;
-    }
-
-    private Application(final File storageDir) throws StorageException {
         // Make sure Jena gets initialized properly, including ARQ
         // (avoid problem with ARQ.getContext() being null in executable .jar)
-        JenaSystem.init();
-        ARQ.init();
+        if (isInitialLaunch) {
+            JenaSystem.init();
+            ARQ.init();
+        }
 
         // Initialize look-and-feel
-        String themeMode = "light";
-        try {
-            themeMode = sipProperties.getProp().getProperty(THEME_MODE, themeMode);
-            UIManager.setLookAndFeel("dark".equals(themeMode) ? new FlatDarkLaf() : new FlatLightLaf());
-        } catch (Exception ex) {
-            System.err.println("Failed to initialize FlatLaf look-and-feel");
+        String themeMode = appProperties.getProp().getProperty(THEME_MODE, "light");
+        if (isInitialLaunch) {
             try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception e) {
+                UIManager.setLookAndFeel("dark".equals(themeMode) ? new FlatDarkLaf() : new FlatLightLaf());
+            } catch (Exception ex) {
+                System.err.println("Failed to initialize FlatLaf look-and-feel");
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (Exception e) {
+                    // Ignore
+                }
             }
         }
+
+        // Initialize a temporary frame for use with any modal dialogs
+        // (e.g., to make sure that there is a taskbar icon)
+        JFrame startupFrame = new JFrame();
+        startupFrame.setTitle(titleString());
+        startupFrame.setUndecorated(true);
+        startupFrame.setLocationRelativeTo(null);
+        startupFrame.setVisible(true);
+
+        // Initialize telemetry
+        String telemetryEnabled = appProperties.getProp().getProperty(TELEMETRY_ENABLED);
+        if (isTelemetryIncluded && telemetryEnabled == null && isInitialLaunch) {
+            Object[] options = { "Yes, please", "No, thanks", "Close" };
+            int telemetryOption = JOptionPane.showOptionDialog(startupFrame,
+                    "This application includes telemetry.\n\n" +
+                            "This means that telemetry data may be automatically submitted, including errors and metrics. " +
+                            "The data may also include personally identifiable information (PII) such as your IP address.\n\n" +
+                            "Do you want telemetry to be enabled? The answer can be changed later in the Help menu.",
+                    titleString(),
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[2]);
+            switch (telemetryOption) {
+                case 0:
+                    appProperties.getProp().setProperty(TELEMETRY_ENABLED, Boolean.toString(true));
+                    appProperties.saveProperties();
+                    initSentry("gui");
+                    break;
+                case 1:
+                    appProperties.getProp().setProperty(TELEMETRY_ENABLED, Boolean.toString(false));
+                    appProperties.saveProperties();
+                    break;
+                case 2:
+                    // Stop here
+                    return;
+            }
+        }
+
+        // Initialize project
+        if (!showProjectDialog(startupFrame)) return;
+
+        // Transition from pre-startup to actual SIP-Creator startup
+        startupFrame.setVisible(false);
+        startupFrame.dispose();
+        final File storageDir = HomeDirectory.getWorkDir();
+        // Share app SipProperties instance for default (single) project to avoid instances overwriting changes
+        // (legacy - should normally be multi-project and different files from now on)
+        final SipProperties sipProperties = SipProperties.isSameAsAppPropertiesPath(
+                SipProperties.getSipPropertiesPath()) ? appProperties : new SipProperties();
 
         // Initialize UI
         desktop = new JDesktopPane();
@@ -176,44 +209,12 @@ public class Application {
             throw new StorageException("Unable to create Schema Repository", e);
         }
         ResolverContext context = new ResolverContext();
-        Storage storage = new StorageImpl(storageDir, schemaRepository, new CachedResourceResolver(context));
+        Storage storage = new StorageImpl(storageDir, sipProperties.getProp(), schemaRepository, new CachedResourceResolver(context));
         context.setStorage(storage);
         context.setHttpClient(httpClient);
-        sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, sipProperties);
-
-        // Initialize telemetry
-        String telemetryEnabled = sipModel.getPreferences().getProperty(TELEMETRY_ENABLED);
-        if (isTelemetryIncluded && telemetryEnabled == null) {
-            Object[] options = { "Yes, please", "No, thanks", "Close" };
-            int telemetryOption = JOptionPane.showOptionDialog(null,
-                    "This application includes telemetry.\n\n" +
-                            "This means that telemetry data may be automatically submitted, including errors and metrics. " +
-                            "The data may also include personally identifiable information (PII) such as your IP address.\n\n" +
-                            "Do you want telemetry to be enabled? The answer can be changed later in the Help menu.",
-                    titleString(),
-                    JOptionPane.YES_NO_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    options,
-                    options[2]);
-            switch (telemetryOption) {
-                case 0:
-                    sipModel.getPreferences().setProperty(TELEMETRY_ENABLED, Boolean.toString(true));
-                    sipModel.saveProperties();
-                    initSentry("gui");
-                    break;
-                case 1:
-                    sipModel.getPreferences().setProperty(TELEMETRY_ENABLED, Boolean.toString(false));
-                    sipModel.saveProperties();
-                    break;
-                case 2:
-                    // Stop here
-                    return;
-            }
-        }
+        sipModel = new SipModel(desktop, storage, groovyCodeResource, feedback, sipProperties, appProperties);
 
         NetworkClient networkClient = new NetworkClient(sipModel, new NetworkClient.NarthexCredentials() {
-            private SipProperties sipProperties = new SipProperties();
             private Properties props = sipProperties.getProp();
 
             @Override
@@ -273,6 +274,11 @@ public class Application {
             frame.setTheme(themeMode);
         }
         fileMenu = new FileMenu(sipModel, allFrames, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                quit(true);
+            }
+        }, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 quit();
@@ -340,6 +346,280 @@ public class Application {
         });
         attachAccelerator(new QuitAction(), home);
         attachAccelerator(statusPanel.getButtonAction(), home);
+    }
+
+    private boolean showProjectDialog(JFrame startupFrame) {
+        final String pocketMapperDirName = HomeDirectory.POCKETMAPPER_DIR_NAME;
+        final String workDirName = HomeDirectory.WORK_DIR_NAME;
+        final String sipPropertiesFileName = SipProperties.FILE_NAME;
+        boolean isOpeningProject = true;
+        while (isOpeningProject) {
+            class PocketMapperProject {
+                final File dir;
+                final String name;
+
+                PocketMapperProject(File dir) {
+                    this.dir = dir;
+                    this.name = dir.getName();
+                }
+
+                PocketMapperProject(File dir, String name) {
+                    this.dir = dir;
+                    this.name = name;
+                }
+
+                @Override
+                public String toString() {
+                    return name;
+                }
+            }
+            File pocketMapper = HomeDirectory.WORKSPACE_DIR; // use actual, parent PocketMapper dir
+            File[] projectDirs = pocketMapper.listFiles(pathname -> pathname.isDirectory() &&
+                    (new File(pathname, sipPropertiesFileName).isFile()
+                            || new File(pathname, pocketMapperDirName).isDirectory()));
+            DefaultListModel<PocketMapperProject> projectListModel = new DefaultListModel<>();
+            PocketMapperProject defaultProject = new PocketMapperProject(pocketMapper, "Default project (single-project PocketMapper)");
+            PocketMapperProject newProject = new PocketMapperProject(pocketMapper, "New project");
+            PocketMapperProject externalProject = new PocketMapperProject(null, "External project");
+            if (new File(pocketMapper, workDirName).isDirectory() && !new File(pocketMapper,
+                    workDirName + File.separator + sipPropertiesFileName).exists()) {
+                // Only show "Default project" if it exists (i.e., there is a work dir which isn't a project dir)
+                projectListModel.addElement(defaultProject);
+            }
+            projectListModel.addAll(Arrays.asList(newProject, externalProject));
+            projectListModel.addAll(Arrays.asList(projectDirs).stream().sorted().map(
+                    file -> new PocketMapperProject(file)).toList());
+            JList<PocketMapperProject> projectList = new JList<>(projectListModel);
+            projectList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            projectList.setSelectedIndex(0);
+            AtomicBoolean isDoubleClick = new AtomicBoolean(false);
+            projectList.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getClickCount() > 1) { // Double-click
+                        isDoubleClick.set(true);
+                        SwingUtilities.windowForComponent(projectList).dispose();
+                    }
+                }
+            });
+            JScrollPane scrollProjectList = new JScrollPane(projectList,
+                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            scrollProjectList.setPreferredSize(new Dimension(600, 400));
+            JLabel selectProjectLabel = new JLabel("Select a PocketMapper project:");
+            selectProjectLabel.setBorder(new EmptyBorder(0,10,10,10));
+            JButton folderButton = new JButton("Show in folder");
+            folderButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Desktop desktop = Desktop.getDesktop();
+                    PocketMapperProject showProject = projectList.getSelectedValue();
+                    if (showProject != null && showProject.dir != null) {
+                        try {
+                            desktop.open(showProject.dir);
+                        } catch (IOException ex) {
+                            // Ignore
+                        }
+                    }
+                }
+            });
+            JPanel message = new JPanel();
+            message.setLayout(new GridBagLayout());
+            GridBagConstraints constraints = new GridBagConstraints();
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.weightx = 1;
+            constraints.gridx = 0;
+            message.add(selectProjectLabel, constraints);
+            message.add(scrollProjectList, constraints);
+            message.add(folderButton, constraints);
+            message.addAncestorListener(new AncestorListener() {
+                @Override
+                public void ancestorAdded(AncestorEvent event) {
+                }
+                @Override
+                public void ancestorRemoved(AncestorEvent event) {
+                }
+                @Override
+                public void ancestorMoved(AncestorEvent event) {
+                    // Workaround to ensure the initial focus is on the project list
+                    Timer timer = new Timer(10, null);
+                    timer.addActionListener(e -> {
+                        if (projectList.hasFocus()) {
+                            timer.stop();
+                        }
+                        SwingUtilities.invokeLater(projectList::requestFocusInWindow);
+                    });
+                    timer.start();
+                }
+            });
+            Object[] options = {"Open", "Edit", "Cancel"};
+            int projectOption = JOptionPane.showOptionDialog(startupFrame,
+                    message,
+                    titleString(),
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    options,
+                    options[0]);
+            PocketMapperProject selectedProject = projectList.getSelectedValue();
+            if (isDoubleClick.get()) {
+                projectOption = 0; // project list being double-clicked interpreted as "Open"
+            }
+            switch (projectOption) {
+                case 0:
+                case 1:
+                    if (selectedProject == null) {
+                        return false;
+                    }
+                    File projectDir = selectedProject.dir;
+                    if (selectedProject == externalProject) {
+                        // Open an external project
+                        JFileChooser chooser = new JFileChooser();
+                        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                        if (chooser.showOpenDialog(startupFrame) == JFileChooser.APPROVE_OPTION) {
+                            projectDir = chooser.getSelectedFile();
+                        } else {
+                            break;
+                        }
+                    }
+                    File nestedPocketMapper = new File(projectDir, pocketMapperDirName);
+                    File workspaceDir = projectDir;
+                    if (selectedProject != defaultProject && nestedPocketMapper.isDirectory()) {
+                        // Support old multi-project setup achieved by setting user.home
+                        workspaceDir = nestedPocketMapper;
+                    }
+                    File sipPropertiesFile = new File(workspaceDir, sipPropertiesFileName);
+                    if (selectedProject == newProject || projectOption == 1) {
+                        // Open new (or edit) project
+                        String projectName = "";
+                        String propertiesText = "orgID=";
+                        boolean isCreatingProject = true;
+                        while (isCreatingProject) {
+                            JPanel newMessage = new JPanel();
+                            newMessage.setLayout(new GridBagLayout());
+                            JLabel projectNameLabel = new JLabel("Project name (e.g., \"my-test\"):");
+                            projectNameLabel.setBorder(new EmptyBorder(10, 0, 5, 0));
+                            JTextField projectNameText = new JTextField(projectName, 30);
+                            JLabel propertiesLabel = new JLabel("Provided SIP-Creator properties:");
+                            propertiesLabel.setBorder(new EmptyBorder(10, 0, 5, 0));
+                            JTextArea propertiesTextArea = new JTextArea(propertiesText);
+                            propertiesTextArea.setLineWrap(true);
+                            propertiesTextArea.setWrapStyleWord(true);
+                            JScrollPane propertiesScrollPane = new JScrollPane(propertiesTextArea,
+                                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                            propertiesScrollPane.setPreferredSize(new Dimension(600, 200));
+                            JButton pasteButton = new JButton("Paste from clipboard");
+                            pasteButton.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    propertiesTextArea.setText("");
+                                    propertiesTextArea.paste();
+                                }
+                            });
+                            if (selectedProject != newProject) {
+                                // Editing an existing project
+                                projectNameText.setText(projectDir.getName());
+                                projectNameText.setEditable(false);
+                                Properties currentProperties = new Properties();
+                                try {
+                                    currentProperties.load(new FileInputStream(sipPropertiesFile));
+                                    StringWriter stringWriter = new StringWriter();
+                                    currentProperties.store(stringWriter, null);
+                                    propertiesTextArea.setText(stringWriter.toString());
+                                } catch (IOException e) {
+                                    JOptionPane.showMessageDialog(startupFrame,
+                                            "Error loading SIP-Creator properties: " + e.getMessage(),
+                                            titleString(),
+                                            JOptionPane.WARNING_MESSAGE);
+                                    break;
+                                }
+                            }
+                            newMessage.add(projectNameLabel, constraints);
+                            newMessage.add(projectNameText, constraints);
+                            newMessage.add(propertiesLabel, constraints);
+                            newMessage.add(propertiesScrollPane, constraints);
+                            newMessage.add(pasteButton, constraints);
+                            Object[] newOptions = {selectedProject == newProject ? "Create" : "Save", "Cancel"};
+                            int newOption = JOptionPane.showOptionDialog(startupFrame,
+                                    newMessage,
+                                    titleString(),
+                                    JOptionPane.DEFAULT_OPTION,
+                                    JOptionPane.PLAIN_MESSAGE,
+                                    null,
+                                    newOptions,
+                                    newOptions[0]);
+                            if (newOption == 0) {
+                                projectName = projectNameText.getText();
+                                propertiesText = propertiesTextArea.getText();
+                                Properties projectProperties = new Properties();
+                                try {
+                                    projectProperties.load(new StringReader(propertiesText));
+                                } catch (Exception e) {
+                                    JOptionPane.showMessageDialog(startupFrame,
+                                            "Error reading SIP-Creator properties: " + e.getMessage(),
+                                            titleString(),
+                                            JOptionPane.WARNING_MESSAGE);
+                                }
+                                if (!projectName.matches("^[A-Za-z][A-Za-z0-9\\-_]*$")) {
+                                    JOptionPane.showMessageDialog(startupFrame,
+                                            "Invalid project name. " +
+                                                    "Please use A-Z, a-z, 0-9, -, and _, starting with a letter.",
+                                            titleString(),
+                                            JOptionPane.WARNING_MESSAGE);
+                                } else {
+                                    try {
+                                        if (selectedProject == newProject) {
+                                            HomeDirectory.createProject(projectName, projectProperties);
+                                        } else {
+                                            HomeDirectory.editProject(workspaceDir, projectProperties);
+                                            if (SipProperties.isSameAsAppPropertiesPath(sipPropertiesFile)) {
+                                                // The app properties were edited (e.g., for the default project)
+                                                JOptionPane.showMessageDialog(startupFrame,
+                                                        "The application will now close. " +
+                                                                "Please start it again for changes to take effect.",
+                                                        titleString(),
+                                                        JOptionPane.INFORMATION_MESSAGE);
+                                                return false; // close the application
+                                            }
+                                        }
+                                        isCreatingProject = false;
+                                        if (projectOption == 0) {
+                                            // If New project and using the Open button (not Edit) we're done,
+                                            // otherwise (if the Edit button was used) go back to selecting a project
+                                            isOpeningProject = false;
+                                        }
+                                    } catch (Exception e) {
+                                        JOptionPane.showMessageDialog(startupFrame,
+                                                "Error creating project: " + e.getMessage(),
+                                                titleString(),
+                                                JOptionPane.WARNING_MESSAGE);
+                                    }
+                                }
+                            } else {
+                                isCreatingProject = false;
+                            }
+                        }
+                    }  else {
+                        // Open existing project
+                        try {
+                            HomeDirectory.openProject(workspaceDir);
+                            isOpeningProject = false;
+                        } catch (Exception e) {
+                            JOptionPane.showMessageDialog(startupFrame,
+                                    "Error opening project: " + e.getMessage(),
+                                    titleString(),
+                                    JOptionPane.WARNING_MESSAGE);
+                        }
+                    }
+                    break;
+                case JOptionPane.CLOSED_OPTION:
+                default:
+                    // Stop here
+                    return false;
+            }
+        }
+        return true; // continue with launch
     }
 
     private String titleString() {
@@ -436,6 +716,10 @@ public class Application {
     }
 
     private void quit() {
+        quit(false);
+    }
+
+    private void quit(boolean isRelaunch) {
         if (!sipModel.getWorkModel().isEmpty()) {
             boolean exitAnyway = feedback.confirm(
                     "Busy",
@@ -443,13 +727,17 @@ public class Application {
             if (!exitAnyway)
                 return;
         }
-        sipProperties.saveProperties();
-        System.exit(0);
+        appProperties.saveProperties();
+        sipModel.shutdown();
+        if (isRelaunch) {
+            EventQueue.invokeLater(LAUNCH);
+        } else {
+            System.exit(0);
+        }
     }
 
     private void destroy() {
         sipModel.shutdown();
-        // resizeTimer.stop();
         home.setVisible(false);
         home.dispose();
     }
@@ -510,7 +798,7 @@ public class Application {
             if (application != null)
                 application.destroy();
             try {
-                application = new Application(HomeDirectory.WORK_DIR);
+                application = new Application();
                 if (application.home == null) {
                     // Startup aborted - exit
                     System.exit(0);
@@ -596,9 +884,8 @@ public class Application {
     }
 
     public static void initSentry(String runMode) {
-        if (Application.class.getResource("/sentry.properties") != null) {
-            isTelemetryIncluded = true;
-            if ("true".equals(sipProperties.getProp().getProperty(TELEMETRY_ENABLED))) {
+        if (isTelemetryIncluded) {
+            if ("true".equals(appProperties.getProp().getProperty(TELEMETRY_ENABLED))) {
                 // Initialize Sentry using sentry.properties in classpath
                 Sentry.init(options -> {
                     options.setEnableExternalConfiguration(true);

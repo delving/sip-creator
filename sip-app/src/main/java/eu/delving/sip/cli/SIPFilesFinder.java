@@ -17,6 +17,7 @@
 
 package eu.delving.sip.cli;
 
+import eu.delving.sip.model.SipProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,7 +119,7 @@ public class SIPFilesFinder {
         }
 
         private Storage setupStorage() throws StorageException {
-            String serverUrl = this.getProperties().getProperty(NARTHEX_URL, "http://delving.org/narthex");
+            String serverUrl = properties.getProperty(NARTHEX_URL, "http://delving.org/narthex");
             HttpClient httpClient = createHttpClient(serverUrl).build();
             SchemaRepository schemaRepository;
             try {
@@ -127,7 +128,7 @@ public class SIPFilesFinder {
                 throw new StorageException("Unable to create Schema Repository", e);
             }
             ResolverContext context = new ResolverContext();
-            Storage storage = new StorageImpl(this.getStorageDir(), schemaRepository,
+            Storage storage = new StorageImpl(this.getStorageDir(), properties, schemaRepository,
                     new CachedResourceResolver(context));
             context.setStorage(storage);
             context.setHttpClient(httpClient);
@@ -213,7 +214,7 @@ public class SIPFilesFinder {
 
     private static Properties loadPropertiesFromDir(File currentDir) throws IOException {
         Properties prop = new Properties();
-        File propsFile = new File(currentDir.getParentFile().getParentFile(), "sip-creator.properties");
+        File propsFile = new File(currentDir.getParentFile().getParentFile(), SipProperties.FILE_NAME);
 
         if (!propsFile.exists()) {
             throw new FileNotFoundException("Properties file not found at: " + propsFile.getAbsolutePath());

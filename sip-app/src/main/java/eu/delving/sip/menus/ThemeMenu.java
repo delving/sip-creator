@@ -52,12 +52,12 @@ public class ThemeMenu extends JMenu {
     }
 
     private String getMode() {
-        return sipModel.getPreferences().getProperty(THEME_MODE, "light");
+        return sipModel.getAppPreferences().getProperty(THEME_MODE, "light");
     }
 
     private void setMode(String mode) {
-        sipModel.getPreferences().setProperty(THEME_MODE, mode);
-        sipModel.saveProperties();
+        sipModel.getAppPreferences().setProperty(THEME_MODE, mode);
+        sipModel.saveAppProperties();
         switch (mode) {
             case "light":
                 darkMenuItem.setSelected(false);
@@ -99,7 +99,7 @@ public class ThemeMenu extends JMenu {
     private class LightMenuItem extends JRadioButtonMenuItem implements ItemListener {
         public LightMenuItem() {
             super("Light");
-            boolean state = sipModel.getPreferences().getProperty(THEME_MODE, "light").contentEquals("light");
+            boolean state = sipModel.getAppPreferences().getProperty(THEME_MODE, "light").contentEquals("light");
             setSelected(state);
             addItemListener(this);
         }
@@ -115,7 +115,7 @@ public class ThemeMenu extends JMenu {
     private class DarkMenuItem extends JRadioButtonMenuItem implements ItemListener {
         public DarkMenuItem() {
             super("Dark");
-            boolean state = sipModel.getPreferences().getProperty(THEME_MODE, "light").contentEquals("dark");
+            boolean state = sipModel.getAppPreferences().getProperty(THEME_MODE, "light").contentEquals("dark");
             setSelected(state);
             addItemListener(this);
         }

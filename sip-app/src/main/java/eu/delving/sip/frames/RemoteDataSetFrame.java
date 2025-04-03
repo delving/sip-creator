@@ -377,7 +377,7 @@ public class RemoteDataSetFrame extends FrameBase {
                 filteredDownloadItems = downloadItems;
                 return;
             }
-            downloadItems = new ArrayList<>();
+            filteredDownloadItems = new ArrayList<>();
             for (DownloadItem downloadItem : downloadItems) {
                 if (downloadItem.toString().contains(filter)) {
                     filteredDownloadItems.add(downloadItem);
@@ -523,7 +523,7 @@ public class RemoteDataSetFrame extends FrameBase {
                 for (SipEntry entry : sipZips.uploaded)
                     uploadedMap.put(entry.file, entry);
             }
-            File[] uploadFiles = HomeDirectory.UP_DIR.listFiles();
+            File[] uploadFiles = HomeDirectory.getUpDir().listFiles();
             if (uploadFiles == null)
                 throw new RuntimeException();
             fireIntervalRemoved(this, 0, getSize());

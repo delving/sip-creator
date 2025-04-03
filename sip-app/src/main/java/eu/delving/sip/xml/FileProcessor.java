@@ -519,21 +519,19 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             //try {
             MappingOutput mappingOutput = new MappingOutput(metadataRecord, mappingResult, exception, events);
             recordCount++;
-            if (Application.canWritePocketFiles()) {
-                if (rdfFormat == RDFFormat.RDFXML) {
-                    if (mappingOutput.record(reportWriter, outputStream)) {
-                        processedCount++;
-                    }
-                } else {
-                    // Only RDF/XML is supported without an output dir which is no longer used
-                    throw new RuntimeException("Only RDF/XML output format is currently supported");
-                    //File outputFile = new File(outputDir,
-                    //        mappingOutput.metadataRecord.getRecordNumber() + JenaHelper.getExtension(rdfFormat));
-                    //String output = JenaHelper.convertRDF(
-                    //        mappingResult.getRecDefTree().getRoot().getDefaultPrefix(), mappingResult.toRDF(),
-                    //        rdfFormat);
-                    //Files.write(outputFile.toPath(), output.getBytes(StandardCharsets.UTF_8));
+            if (rdfFormat == RDFFormat.RDFXML) {
+                if (mappingOutput.record(reportWriter, outputStream)) {
+                    processedCount++;
                 }
+            } else {
+                // Only RDF/XML is supported without an output dir which is no longer used
+                throw new RuntimeException("Only RDF/XML output format is currently supported");
+                //File outputFile = new File(outputDir,
+                //        mappingOutput.metadataRecord.getRecordNumber() + JenaHelper.getExtension(rdfFormat));
+                //String output = JenaHelper.convertRDF(
+                //        mappingResult.getRecDefTree().getRoot().getDefaultPrefix(), mappingResult.toRDF(),
+                //        rdfFormat);
+                //Files.write(outputFile.toPath(), output.getBytes(StandardCharsets.UTF_8));
             }
             //} catch (IOException e) {
             //    termination.dueToException(e);

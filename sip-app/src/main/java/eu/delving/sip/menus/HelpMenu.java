@@ -57,7 +57,7 @@ public class HelpMenu extends JMenu {
 
         public TelemetryMenuItem() {
             super("Enable telemetry");
-            isTelemetryEnabled = sipModel.getPreferences().getProperty(TELEMETRY_ENABLED, "false").contentEquals("true");
+            isTelemetryEnabled = sipModel.getAppPreferences().getProperty(TELEMETRY_ENABLED, "false").contentEquals("true");
             setSelected(isTelemetryEnabled);
             addItemListener(this);
         }
@@ -68,8 +68,8 @@ public class HelpMenu extends JMenu {
             //boolean selected = state == ItemEvent.SELECTED;
 
             // Clear the telemetry setting
-            sipModel.getPreferences().remove(TELEMETRY_ENABLED);
-            sipModel.saveProperties();
+            sipModel.getAppPreferences().remove(TELEMETRY_ENABLED);
+            sipModel.saveAppProperties();
             JOptionPane.showMessageDialog(sipModel.getDesktop(), "Please restart the application now to change the telemetry setting.",
                     "Telemetry", JOptionPane.INFORMATION_MESSAGE);
 

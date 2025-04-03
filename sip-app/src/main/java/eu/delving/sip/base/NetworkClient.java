@@ -322,7 +322,7 @@ public class NetworkClient {
                     switch (code) {
                         case OK:
                             dataSet.remove();
-                            File sipZipFile = new File(HomeDirectory.WORKSPACE_DIR, fileName);
+                            File sipZipFile = new File(HomeDirectory.getWorkspaceDir(), fileName);
                             sipZipFile.deleteOnExit();
                             FileOutputStream output = new FileOutputStream(sipZipFile);
                             progressListener.prepareFor((int) (entity.getContentLength() / BLOCK_SIZE));

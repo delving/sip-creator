@@ -65,12 +65,14 @@ import static eu.delving.sip.files.Storage.XSD_VALIDATION;
 
 public class SipModel {
     private SipProperties sipProperties;
+    private SipProperties appProperties;
     private JDesktopPane desktop;
     private AllFrames.ViewSelector viewSelector;
     private WorkModel workModel;
     private Storage storage;
     private GroovyCodeResource groovyCodeResource;
     private Properties preferences;
+    private Properties appPreferences;
     private Feedback feedback;
     private FunctionCompileModel functionCompileModel;
     private MappingCompileModel recordCompileModel;
@@ -95,13 +97,15 @@ public class SipModel {
     }
 
     public SipModel(JDesktopPane desktop, Storage storage, GroovyCodeResource groovyCodeResource,
-            final Feedback feedback, SipProperties sipProperties) throws StorageException {
+            final Feedback feedback, SipProperties sipProperties, SipProperties appProperties) throws StorageException {
         this.desktop = desktop;
         this.storage = storage;
         this.groovyCodeResource = groovyCodeResource;
         this.feedback = feedback;
         this.sipProperties = sipProperties;
+        this.appProperties = appProperties;
         this.preferences = sipProperties.getProp();
+        this.appPreferences = appProperties.getProp();
         this.workModel = new WorkModel(feedback);
         dataSetModel = new DataSetModel(this);
         functionCompileModel = new FunctionCompileModel(this, groovyCodeResource);
@@ -160,6 +164,10 @@ public class SipModel {
         sipProperties.saveProperties();
     }
 
+    public void saveAppProperties() {
+        appProperties.saveProperties();
+    }
+
     public void shutdown() {
         dataSetModel.shutdown();
         mappingSaveTimer.shutdown();
@@ -189,6 +197,10 @@ public class SipModel {
 
     public Properties getPreferences() {
         return preferences;
+    }
+
+    public Properties getAppPreferences() {
+        return appPreferences;
     }
 
     public Storage getStorage() {
@@ -467,7 +479,27 @@ public class SipModel {
                 groovyCodeResource,
                 new Generator(narthexUrl, dataSet.getSpec(), getMappingModel().getPrefix()),
                 listener,
-                Application.getRDFFormat()));
+                getRDFFormat()));
+    }
+
+    public RDFFormat getRDFFormat() {
+        String rdfFormat = sipProperties.getProp().getProperty("rdfFormat");
+        if ("RDF/XML".equals(rdfFormat)) {
+            return RDFFormat.RDFXML;
+        }
+        if ("JSONLD".equals(rdfFormat)) {
+            return RDFFormat.JSONLD_COMPACT_PRETTY;
+        }
+        if ("NQUADS".equals(rdfFormat)) {
+            return RDFFormat.NQUADS;
+        }
+        if ("NTRIPLES".equals(rdfFormat)) {
+            return RDFFormat.NTRIPLES;
+        }
+        if ("TURTLE".equals(rdfFormat)) {
+            return RDFFormat.TURTLE;
+        }
+        return RDFFormat.RDFXML;
     }
 
     public void seekReset() {

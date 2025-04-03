@@ -25,10 +25,17 @@ import java.util.Properties;
 import static eu.delving.sip.files.Storage.*;
 
 public class SipProperties {
+    public static final String FILE_NAME = "sip-creator.properties";
 
+    private final boolean isAppProperties;
     private Properties prop = new Properties();
 
     public SipProperties() {
+        this(false);
+    }
+
+    public SipProperties(boolean isAppProperties) {
+        this.isAppProperties = isAppProperties;
         loadProperties();
     }
 
@@ -73,14 +80,32 @@ public class SipProperties {
         }
     }
 
-    private File getPropertiesPath() {
+    public File getPropertiesPath() {
+        if (isAppProperties) {
+            return getAppPropertiesPath();
+        } else {
+            return getSipPropertiesPath();
+        }
+    }
+
+    public static File getAppPropertiesPath() {
         String propertyPath = System.getProperty("property.path");
         if (propertyPath != null) {
-            File propertyFile = new File(propertyPath);
-            return propertyFile;
+            return new File(propertyPath);
         }
-        String filename = "sip-creator.properties";
-        return new File(HomeDirectory.WORKSPACE_DIR.toString(), filename);
+        return new File(HomeDirectory.WORKSPACE_DIR.getPath(), FILE_NAME);
+    }
+
+    public static File getSipPropertiesPath() {
+        return new File(HomeDirectory.getWorkspaceDir().getPath(), FILE_NAME);
+    }
+
+    public static boolean isSameAsAppPropertiesPath(File sipPropertiesPath) {
+        try {
+            return getAppPropertiesPath().getCanonicalPath().equals(sipPropertiesPath.getCanonicalPath());
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     private void loadProperties() {
