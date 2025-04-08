@@ -1,0 +1,39 @@
+name: Maven build and native packaging
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    strategy:
+      matrix:
+        os: [macos-13, macos-15]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+      - name: Package for macOS
+        if: ${{ !startsWith(matrix.os, 'macos-') }}
+        run: bash _scripts/jpackage_macos.sh
+      - name: Archive built artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: exejar-and-native-packages
+          path: |
+            sip-app/target/*-exejar.jar
+            sip-app/target/*.dmg
