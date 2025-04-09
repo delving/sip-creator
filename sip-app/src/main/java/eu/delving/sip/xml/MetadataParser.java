@@ -43,10 +43,11 @@ import java.util.TreeMap;
 import static eu.delving.sip.files.Storage.RECORD_CONTAINER;
 
 /**
- * Iterate through the xml file, producing groovy node trees wrapped in MetadataRecord instances.
+ * Iterate through the xml file, producing groovy node trees wrapped in
+ * MetadataRecord instances.
  *
  *
-
+ *
  */
 
 public class MetadataParser {
@@ -68,10 +69,11 @@ public class MetadataParser {
     public MetadataParser(InputStream inputStream, int recordCount, boolean attachSource) throws XMLStreamException {
         this.inputStream = inputStream;
         XMLInputFactory inputFactory = XMLToolFactory.xmlInputFactory();
-        this.input = inputFactory.createXMLStreamReader("Metadata", inputStream);
+        this.input = inputFactory.createXMLStreamReader(inputStream, "UTF-8");
 
         this.isAttachingSource = attachSource;
-        // getEventAllocator() returns null: this.eventAllocator = XMLToolFactory.xmlInputFactory().getEventAllocator();
+        // getEventAllocator() returns null: this.eventAllocator =
+        // XMLToolFactory.xmlInputFactory().getEventAllocator();
         this.eventAllocator = attachSource ? new Stax2EventAllocatorImpl() : null;
     }
 
@@ -100,7 +102,7 @@ public class MetadataParser {
         while (metadataRecord == null) {
             if (isAttachingSource && path.parent() != null) {
                 if (!(skipInitialWhitespace && input.getEventType() == XMLEvent.CHARACTERS
-                    && input.getText().trim().length() == 0)) {
+                        && input.getText().trim().length() == 0)) {
                     if (!(input.getEventType() == XMLStreamConstants.END_ELEMENT && skipInitialWhitespace)) {
                         eventWriter.add(eventAllocator.allocate(input));
                         skipInitialWhitespace = false;
@@ -118,24 +120,25 @@ public class MetadataParser {
                         node = new GroovyNode(null, "input");
                         int idIndex = -1;
                         for (int walk = 0; walk < input.getAttributeCount(); walk++) {
-                            if (Storage.POCKET_ID.equals(input.getAttributeLocalName(walk))) idIndex = walk;
+                            if (Storage.POCKET_ID.equals(input.getAttributeLocalName(walk)))
+                                idIndex = walk;
                         }
                         if (idIndex < 0) {
                             throw new IOException("Expected record root to have @id");
                         }
-                        node.attributes().put(Storage.POCKET_ID, StringUtil.sanitizeId(input.getAttributeValue(idIndex)));
-                    }
-                    else if (node != null) {
+                        node.attributes().put(Storage.POCKET_ID,
+                                StringUtil.sanitizeId(input.getAttributeValue(idIndex)));
+                    } else if (node != null) {
                         node = new GroovyNode(node, input.getNamespaceURI(), input.getLocalName(), input.getPrefix());
-                        if (!input.getPrefix().isEmpty()) namespaces.put(input.getPrefix(), input.getNamespaceURI());
+                        if (!input.getPrefix().isEmpty())
+                            namespaces.put(input.getPrefix(), input.getNamespaceURI());
                         if (input.getAttributeCount() > 0) {
                             for (int walk = 0; walk < input.getAttributeCount(); walk++) {
                                 QName qName = input.getAttributeName(walk);
                                 String attrName;
                                 if (qName.getPrefix() == null || qName.getPrefix().isEmpty()) {
                                     attrName = qName.getLocalPart();
-                                }
-                                else {
+                                } else {
                                     attrName = String.format("%s:%s", qName.getPrefix(), qName.getLocalPart());
                                 }
                                 node.attributes().put(attrName, input.getAttributeValue(walk));
@@ -145,10 +148,12 @@ public class MetadataParser {
                     }
                     break;
                 case XMLEvent.CHARACTERS:
-                    if (node != null) value.append(Utils.stripNonPrinting(input.getText()));
+                    if (node != null)
+                        value.append(Utils.stripNonPrinting(input.getText()));
                     break;
                 case XMLEvent.CDATA:
-                    if (node != null) value.append(String.format("<![CDATA[%s]]>", Utils.stripNonPrinting(input.getText())));
+                    if (node != null)
+                        value.append(String.format("<![CDATA[%s]]>", Utils.stripNonPrinting(input.getText())));
                     break;
                 case XMLEvent.END_ELEMENT:
                     if (node != null) {
@@ -159,11 +164,11 @@ public class MetadataParser {
                                 progressListener.setProgress(recordIndex);
                             }
                             node = null;
-                        }
-                        else {
+                        } else {
                             String valueString = value.toString().trim();
                             value.setLength(0);
-                            if (!valueString.isEmpty()) node.setNodeValue(valueString);
+                            if (!valueString.isEmpty())
+                                node.setNodeValue(valueString);
                             node = node.parent();
                         }
                     }
@@ -194,8 +199,7 @@ public class MetadataParser {
     public void close() {
         try {
             input.close();
-        }
-        catch (XMLStreamException e) {
+        } catch (XMLStreamException e) {
             e.printStackTrace(); // should never happen
         }
     }
