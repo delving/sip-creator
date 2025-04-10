@@ -1,4 +1,4 @@
-name: Maven build and native packaging
+name: Maven build with native packaging
 
 on:
   push:
@@ -6,34 +6,106 @@ on:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
-    branches: [ "main" ]
 
 jobs:
-  build:
+  maven_build:
+    name: Maven build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+      - name: Make build preparations
+        run: bash _scripts/prepare_build.sh
+      - name: Add sentry.properties
+        if: vars.SENTRY_PROPERTIES_CONTENTS != ''
+        env:
+          SENTRY_PROPERTIES_CONTENTS: ${{ vars.SENTRY_PROPERTIES_CONTENTS }}
+        shell: bash
+        run: echo "$SENTRY_PROPERTIES_CONTENTS" > sip-app/src/main/resources/sentry.properties
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+      - name: Archive universal artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: universal
+          path: |
+            sip-app/target/sip-app-*-exejar.jar
+            !sip-app/target/sip-app-cli-*.jar
+            !sip-app/target/sip-app-grpc-*.jar
 
+  native_packaging:
+    name: Native packaging
+    needs: maven_build
     strategy:
       matrix:
         os: [macos-13, macos-15]
     runs-on: ${{ matrix.os }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - name: Download universal artifacts
+        uses: actions/download-artifact@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: maven
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
+          name: universal
+          path: sip-app/target
       - name: Package for macOS
-        if: ${{ !startsWith(matrix.os, 'macos-') }}
+        if: startsWith(matrix.os, 'macOS-')
         run: bash _scripts/jpackage_macos.sh
-      - name: Archive built artifacts
+      - name: Archive native artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: exejar-and-native-packages
+          name: native-${{ matrix.os }}
           path: |
-            sip-app/target/*-exejar.jar
             sip-app/target/*.dmg
+
+      - name: Configure SSH
+        if: vars.DEPLOY_HOST != '' && success()
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+      - name: Deploy native artifacts
+        if: vars.DEPLOY_HOST != '' && success()
+        shell: bash
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          DEPLOY_SNAPSHOTS: ${{ vars.DEPLOY_SNAPSHOTS }}
+          DEPLOY_RELEASES: ${{ vars.DEPLOY_RELEASES }}
+        run: |
+          case "${{ matrix.os }}" in
+            "macos-13")
+              nativeext="dmg"
+              nativetype="macos-x64"
+              nativepath=$(ls -1 sip-app/target/*.dmg | head -n 1)
+              ;;
+            "macos-15")
+              nativeext="dmg"
+              nativetype="macos-aarch64"
+              nativepath=$(ls -1 sip-app/target/*.dmg | head -n 1)
+              ;;
+            *)
+              echo "Unknown OS"
+              exit 1
+              ;;
+          esac
+          exejarpath=$(ls -1 sip-app/target/sip-app-*-exejar.jar | head -n 1)
+          pomversion=$(echo "$exejarpath" | xargs -n 1 basename | sed -r 's/sip\-app\-(.*)\-exejar\.jar/\1/')
+          gitcommithashshort=$(git rev-parse --short HEAD)
+          timestamp=$(date '+%Y-%m-%dT%H%M%S')
+          if [[ "$pomversion" =~ .*\-SNAPSHOT ]]; then
+            nativedest="$DEPLOY_SNAPSHOTS/sip-creator-$pomversion-$timestamp-$gitcommithashshort-$nativetype.$nativeext"
+          else
+            nativedest="$DEPLOY_RELEASES/sip-creator-$pomversion-$nativetype.$nativeext"
+          fi
+          # contents of: ssh-keyscan -p DEPLOY_PORT DEPLOY_HOST > deploy_known_hosts
+          echo "$DEPLOY_KNOWN_HOSTS" > deploy_known_hosts
+          scp -o UserKnownHostsFile=deploy_known_hosts -P "$DEPLOY_PORT" "$nativepath" "$DEPLOY_USER@$DEPLOY_HOST:$nativedest"
+          echo "Deploy complete"
