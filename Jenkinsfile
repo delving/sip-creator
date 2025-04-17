@@ -8,6 +8,7 @@ pipeline {
             steps {
                 echo 'Building'
                 gerritReview labels: [Verified: 0]
+                sh '[ -x _scripts/prepare_build.sh ] && _scripts/prepare_build.sh'
                 sh '[ -x ~/prepare_sip-creator.sh ] && ~/prepare_sip-creator.sh'
                 sh 'mvn clean install -Dmaven.test.skip'
             }

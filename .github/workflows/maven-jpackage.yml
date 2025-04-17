@@ -44,7 +44,7 @@ jobs:
     needs: maven_build
     strategy:
       matrix:
-        os: [macos-13, macos-15]
+        os: [macos-13, macos-15, windows-2025, windows-11-arm]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
@@ -57,12 +57,17 @@ jobs:
       - name: Package for macOS
         if: startsWith(matrix.os, 'macOS-')
         run: bash _scripts/jpackage_macos.sh
+      - name: Package for Windows
+        if: startsWith(matrix.os, 'windows-')
+        run: bash _scripts/jpackage_windows.sh
       - name: Archive native artifacts
         uses: actions/upload-artifact@v4
         with:
           name: native-${{ matrix.os }}
           path: |
             sip-app/target/*.dmg
+            sip-app/target/*.zip
+            sip-app/target/*.msi
 
       - name: Configure SSH
         if: vars.DEPLOY_HOST != '' && success()
@@ -80,16 +85,30 @@ jobs:
           DEPLOY_SNAPSHOTS: ${{ vars.DEPLOY_SNAPSHOTS }}
           DEPLOY_RELEASES: ${{ vars.DEPLOY_RELEASES }}
         run: |
+          nativeext_alt=""
+          nativepath_alt=""
           case "${{ matrix.os }}" in
             "macos-13")
-              nativeext="dmg"
               nativetype="macos-x64"
+              nativeext="dmg"
               nativepath=$(ls -1 sip-app/target/*.dmg | head -n 1)
               ;;
             "macos-15")
-              nativeext="dmg"
               nativetype="macos-aarch64"
+              nativeext="dmg"
               nativepath=$(ls -1 sip-app/target/*.dmg | head -n 1)
+              ;;
+            "windows-2025")
+              nativetype="windows-x64"
+              nativeext="zip"
+              nativepath=$(ls -1 sip-app/target/*.zip | head -n 1)
+              nativeext_alt="msi"
+              nativepath_alt=$(ls -1 sip-app/target/*.msi | head -n 1)
+              ;;
+            "windows-11-arm")
+              nativetype="windows-aarch64"
+              nativeext="zip"
+              nativepath=$(ls -1 sip-app/target/*.zip | head -n 1)
               ;;
             *)
               echo "Unknown OS"
@@ -98,14 +117,21 @@ jobs:
           esac
           exejarpath=$(ls -1 sip-app/target/sip-app-*-exejar.jar | head -n 1)
           pomversion=$(echo "$exejarpath" | xargs -n 1 basename | sed -r 's/sip\-app\-(.*)\-exejar\.jar/\1/')
-          gitcommithashshort=$(git rev-parse --short HEAD)
+          gitcommithashshort=$(git rev-parse --short=8 HEAD)
           timestamp=$(date '+%Y-%m-%dT%H%M%S')
           if [[ "$pomversion" =~ .*\-SNAPSHOT ]]; then
             nativedest="$DEPLOY_SNAPSHOTS/sip-creator-$pomversion-$timestamp-$gitcommithashshort-$nativetype.$nativeext"
+            nativedest_alt="$DEPLOY_SNAPSHOTS/sip-creator-$pomversion-$timestamp-$gitcommithashshort-$nativetype.$nativeext_alt"
           else
             nativedest="$DEPLOY_RELEASES/sip-creator-$pomversion-$nativetype.$nativeext"
+            nativedest_alt="$DEPLOY_RELEASES/sip-creator-$pomversion-$nativetype.$nativeext_alt"
           fi
           # contents of: ssh-keyscan -p DEPLOY_PORT DEPLOY_HOST > deploy_known_hosts
           echo "$DEPLOY_KNOWN_HOSTS" > deploy_known_hosts
-          scp -o UserKnownHostsFile=deploy_known_hosts -P "$DEPLOY_PORT" "$nativepath" "$DEPLOY_USER@$DEPLOY_HOST:$nativedest"
+          if [[ -x "$nativepath" ]]; then
+            scp -o UserKnownHostsFile=deploy_known_hosts -P "$DEPLOY_PORT" "$nativepath" "$DEPLOY_USER@$DEPLOY_HOST:$nativedest"
+          fi
+          if [[ -x "$nativepath_alt" ]]; then
+            scp -o UserKnownHostsFile=deploy_known_hosts -P "$DEPLOY_PORT" "$nativepath_alt" "$DEPLOY_USER@$DEPLOY_HOST:$nativedest_alt"
+          fi
           echo "Deploy complete"
