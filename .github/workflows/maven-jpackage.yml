@@ -30,6 +30,14 @@ jobs:
         run: echo "$SENTRY_PROPERTIES_CONTENTS" > sip-app/src/main/resources/sentry.properties
       - name: Build with Maven
         run: mvn -B package --file pom.xml
+      - name: Convert logo to Windows icon
+        shell: bash
+        run: |
+          # No longer needed when this works in jpackage_windows.sh
+          sudo apt update
+          sudo apt -y install imagemagick
+          # ImageMagick v6 - use 'convert' command instead of 'magick' (v7)
+          convert sip-app/src/main/resources/sip-creator-logo.png -define 'icon:auto-resize=256,128,64,48,32,24,16' sip-app/target/sip-creator-logo.ico
       - name: Archive universal artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -38,13 +46,16 @@ jobs:
             sip-app/target/sip-app-*-exejar.jar
             !sip-app/target/sip-app-cli-*.jar
             !sip-app/target/sip-app-grpc-*.jar
+            sip-app/target/sip-creator-logo.*
 
   native_packaging:
     name: Native packaging
     needs: maven_build
     strategy:
+      # If one OS build fails continue building others
+      fail-fast: false
       matrix:
-        os: [macos-13, macos-15, windows-2025, windows-11-arm]
+        os: [macos-13, macos-15, windows-2025, windows-11-arm, ubuntu-24.04, ubuntu-24.04-arm]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
@@ -66,6 +77,9 @@ jobs:
       - name: Package for Windows
         if: startsWith(matrix.os, 'windows-')
         run: bash _scripts/jpackage_windows.sh
+      - name: Package for Linux
+        if: startsWith(matrix.os, 'ubuntu-')
+        run: bash _scripts/jpackage_linux.sh
       - name: Archive native artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -74,6 +88,7 @@ jobs:
             sip-app/target/*.dmg
             sip-app/target/*.zip
             sip-app/target/*.msi
+            sip-app/target/*.tar.gz
 
       - name: Configure SSH
         if: vars.DEPLOY_HOST != '' && success()
@@ -95,7 +110,7 @@ jobs:
           nativepath_alt=""
           case "${{ matrix.os }}" in
             "macos-13")
-              nativetype="macos-x64"
+              nativetype="macos-x86_64"
               nativeext="dmg"
               nativepath=$(ls -1 sip-app/target/*.dmg | head -n 1)
               ;;
@@ -105,7 +120,7 @@ jobs:
               nativepath=$(ls -1 sip-app/target/*.dmg | head -n 1)
               ;;
             "windows-2025")
-              nativetype="windows-x64"
+              nativetype="windows-x86_64"
               nativeext="zip"
               nativepath=$(ls -1 sip-app/target/*.zip | head -n 1)
               nativeext_alt="msi"
@@ -115,6 +130,16 @@ jobs:
               nativetype="windows-aarch64"
               nativeext="zip"
               nativepath=$(ls -1 sip-app/target/*.zip | head -n 1)
+              ;;
+            "ubuntu-24.04")
+              nativetype="linux-x86_64"
+              nativeext="tar.gz"
+              nativepath=$(ls -1 sip-app/target/*.tar.gz | head -n 1)
+              ;;
+            "ubuntu-24.04-arm")
+              nativetype="linux-aarch64"
+              nativeext="tar.gz"
+              nativepath=$(ls -1 sip-app/target/*.tar.gz | head -n 1)
               ;;
             *)
               echo "Unknown OS"

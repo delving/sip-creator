@@ -54,6 +54,8 @@ jpackage \
 --main-class eu.delving.sip.Application \
 --main-jar "$mainjar" \
 --app-version "$version" \
+--vendor "Delving BV" \
+--description "Delving SIP-Creator" \
 --copyright "Copyright 2011-$yearnow Delving BV" \
 --java-options "-Dapple.awt.application.appearance=system" \
 --java-options '-splash:$APPDIR/sip-creator-logo.png' \
@@ -61,5 +63,4 @@ jpackage \
 --mac-package-name "SIP-Creator" \
 --icon sip-creator-logo.icns
 
-rm sip-creator-logo.icns
 echo "Done"
