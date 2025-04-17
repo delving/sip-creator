@@ -17,8 +17,10 @@
 
 package eu.delving.sip.menus;
 
+import eu.delving.sip.Application;
 import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.model.SipModel;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -89,6 +91,7 @@ public class HelpMenu extends JMenu {
         @Override
         public void actionPerformed(ActionEvent e) {
             String text = """
+<h1>%s</h1>
 <b>Copyright 2011-2025 Delving BV</b><br>
 <br>
 Licensed under the EUPL, Version 1.2 or – as soon they will be approved by<br>
@@ -103,6 +106,7 @@ distributed under the Licence is distributed on an "AS IS" basis,<br>
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<br>
 See the Licence for the specific language governing permissions and<br>
 limitations under the Licence.""";
+            text = String.format(text, StringEscapeUtils.escapeHtml(Application.titleString()));
             ImageIcon logo = new ImageIcon(getClass().getResource("/sip-creator-logo.png"));
 
             JEditorPane editorPane = new JEditorPane("text/html", text);

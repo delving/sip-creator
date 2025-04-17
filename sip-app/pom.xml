@@ -96,6 +96,7 @@
               <goal>single</goal>
             </goals>
             <configuration>
+              <attach>false</attach>
               <archive>
                 <manifest>
                   <addClasspath>true</addClasspath>
@@ -119,6 +120,7 @@
               <goal>single</goal>
             </goals>
             <configuration>
+              <attach>false</attach>
               <archive>
                 <manifest>
                   <addClasspath>true</addClasspath>
@@ -139,6 +141,7 @@
               <goal>single</goal>
             </goals>
             <configuration>
+              <attach>false</attach>
               <archive>
                 <manifest>
                   <addClasspath>true</addClasspath>

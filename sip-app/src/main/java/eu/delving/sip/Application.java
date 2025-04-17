@@ -152,7 +152,7 @@ public class Application {
         // Initialize telemetry
         String telemetryEnabled = appProperties.getProp().getProperty(TELEMETRY_ENABLED);
         if (isTelemetryIncluded && telemetryEnabled == null && isInitialLaunch) {
-            Object[] options = { "Yes, please", "No, thanks", "Close" };
+            Object[] options = { "Yes, enable", "No, thanks", "Cancel" };
             int telemetryOption = JOptionPane.showOptionDialog(startupFrame,
                     "This application includes telemetry.\n\n" +
                             "This means that telemetry data may be automatically submitted, including errors and metrics. " +
@@ -175,8 +175,10 @@ public class Application {
                     appProperties.saveProperties();
                     break;
                 case 2:
-                    // Stop here
-                    return;
+                case JOptionPane.CLOSED_OPTION:
+                default:
+                    // Decide later
+                    break;
             }
         }
 
@@ -622,11 +624,11 @@ public class Application {
         return true; // continue with launch
     }
 
-    private String titleString() {
+    public static String titleString() {
         if (version != null) {
-            return String.format("SIP-App %s", version);
+            return String.format("SIP-Creator %s", version);
         } else {
-            return "SIP-App Test";
+            return "SIP-Creator Test";
         }
     }
 
@@ -857,9 +859,9 @@ public class Application {
                     resource = Application.class.getResource("/sip-app.properties");
                     if (resource != null) {
                         try {
-                            Properties appProperties = new Properties();
-                            appProperties.load(resource.openStream());
-                            gitCommitHash = appProperties.getProperty("git-commit-hash-short");
+                            Properties buildProperties = new Properties();
+                            buildProperties.load(resource.openStream());
+                            gitCommitHash = buildProperties.getProperty("git-commit-hash-short");
                         } catch (Exception e) {
                             // Not important
                         }

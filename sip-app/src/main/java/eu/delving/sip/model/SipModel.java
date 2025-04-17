@@ -26,7 +26,6 @@ import eu.delving.metadata.NodeMappingChange;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.schema.SchemaVersion;
-import eu.delving.sip.Application;
 import eu.delving.sip.base.NodeTransferHandler;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Swing;

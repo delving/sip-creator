@@ -42,9 +42,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
 import static eu.delving.sip.base.NetworkClient.SipEntry;
@@ -656,7 +653,11 @@ public class RemoteDataSetFrame extends FrameBase {
         public void actionPerformed(ActionEvent actionEvent) {
             if (selectedWorkItems == null || selectedWorkItems.isEmpty())
                 return;
-            sipModel.setDataSet(selectedWorkItems.get(0).dataset, new Swing() {
+
+            // Create a fresh DataSet instance based on the work item's instance in case something is stale
+            DataSet dataSet = sipModel.getStorage().reloadDataSet(selectedWorkItems.get(0).dataset);
+
+            sipModel.setDataSet(dataSet, new Swing() {
                 @Override
                 public void run() {
                     setEnabled(true);

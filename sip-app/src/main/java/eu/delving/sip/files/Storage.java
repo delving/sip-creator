@@ -36,6 +36,8 @@ public interface Storage {
 
     DataSet createDataSet(String sipFileName) throws StorageException;
 
+    DataSet reloadDataSet(DataSet dataSet);
+
     enum FileType {
         SOURCE("source.xml.gz", null, null, null, 2),
         SOURCE_STATS("stats-source.xml.gz"),

@@ -54,7 +54,7 @@ public class SipProperties {
 
             output = new FileOutputStream(getPropertiesPath());
 
-            if (prop.isEmpty()) {
+            if (prop.isEmpty() && !isAppProperties) {
                 // set the properties value
                 prop.setProperty(NARTHEX_URL, "http://delving.org/narthex");
                 prop.setProperty(NARTHEX_USERNAME, "admin");

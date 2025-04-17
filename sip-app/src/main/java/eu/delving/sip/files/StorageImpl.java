@@ -136,10 +136,16 @@ public class StorageImpl implements Storage {
         return new DataSetImpl(directory, schemaRepository);
     }
 
+    @Override
+    public DataSet reloadDataSet(DataSet dataSet) {
+        return new DataSetImpl(dataSet.getSipFile(), schemaRepository);
+    }
+
     public class DataSetImpl implements DataSet, Serializable {
 
         private File here;
         private Map<String, String> dataSetFacts;
+        private SchemaVersion schemaVersion;
         private final SchemaRepository schemaRepository;
 
         public DataSetImpl(File here, SchemaRepository schemaRepository) {
@@ -159,11 +165,14 @@ public class StorageImpl implements Storage {
 
         @Override
         public SchemaVersion getSchemaVersion() {
-            String fact = getDataSetFacts().get(SCHEMA_VERSIONS);
-            if (fact == null) {
-                return new SchemaVersion("unknown", "0.0.0");
+            if (schemaVersion == null) {
+                String fact = getDataSetFacts().get(SCHEMA_VERSIONS);
+                if (fact == null) {
+                    schemaVersion = new SchemaVersion("unknown", "0.0.0");
+                }
+                schemaVersion = new SchemaVersion(fact);
             }
-            return new SchemaVersion(fact);
+            return schemaVersion;
         }
 
         @Override
