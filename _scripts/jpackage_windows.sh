@@ -31,7 +31,7 @@ jpackage \
 --copyright "Copyright 2011-$yearnow Delving BV" \
 --java-options '-splash:$APPDIR\sip-creator-logo.png' \
 --icon sip-creator-logo.ico
-7z a "SIP-Creator-$version.zip" SIP-Creator/*
+7z a "SIP-Creator-$version.zip" '.\SIP-Creator\*'
 
 echo "Running jpackage (msi)..."
 # If msi build isn't possible this command may fail

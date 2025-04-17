@@ -49,6 +49,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
       - name: Download universal artifacts
         uses: actions/download-artifact@v4
         with:
@@ -128,10 +134,10 @@ jobs:
           fi
           # contents of: ssh-keyscan -p DEPLOY_PORT DEPLOY_HOST > deploy_known_hosts
           echo "$DEPLOY_KNOWN_HOSTS" > deploy_known_hosts
-          if [[ -x "$nativepath" ]]; then
+          if [[ -f "$nativepath" ]]; then
             scp -o UserKnownHostsFile=deploy_known_hosts -P "$DEPLOY_PORT" "$nativepath" "$DEPLOY_USER@$DEPLOY_HOST:$nativedest"
           fi
-          if [[ -x "$nativepath_alt" ]]; then
+          if [[ -f "$nativepath_alt" ]]; then
             scp -o UserKnownHostsFile=deploy_known_hosts -P "$DEPLOY_PORT" "$nativepath_alt" "$DEPLOY_USER@$DEPLOY_HOST:$nativedest_alt"
           fi
           echo "Deploy complete"
