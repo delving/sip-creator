@@ -1,0 +1,32 @@
+name: Maven build for releases
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  maven_build:
+    name: Maven build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+      - name: Make build preparations
+        run: bash _scripts/prepare_build.sh
+      - name: Build and publish packages
+        run: mvn -B deploy --file pom.xml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload artifacts to the GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            sip-app/target/*.jar
+            sip-core/target/*.jar
+            schema-repo/target/*.jar
