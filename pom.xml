@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>eu.delving</groupId>
   <artifactId>sip-creator</artifactId>
-  <version>1.4.0-SNAPSHOT</version>
+  <version>1.4.0-RC1</version>
   <packaging>pom</packaging>
   <name>SIP-Creator</name>
   <description>This parent project defines the version management, repositories, etc for all the other modules.</description>
@@ -12,7 +12,7 @@
     <connection>scm:git:https://github.com/delving/sip-creator.git</connection>
     <developerConnection>scm:git:https://github.com/delving/sip-creator.git</developerConnection>
     <url>https://github.com/delving/sip-creator</url>
-    <tag>HEAD</tag>
+    <tag>v1.4.0-RC1</tag>
   </scm>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
