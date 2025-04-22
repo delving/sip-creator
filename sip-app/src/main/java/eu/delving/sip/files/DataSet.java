@@ -86,6 +86,8 @@ public interface DataSet extends Comparable<DataSet> {
 
     void finishReportWriter(String prefix, Date time) throws StorageException;
 
+    void cancelReportWriter(String prefix, Date time) throws StorageException;
+
     ReportFile getReport() throws StorageException;
 
     void clean(int maxHistory) throws StorageException;
@@ -93,6 +95,8 @@ public interface DataSet extends Comparable<DataSet> {
     OutputStream openProcessedOutputStream(String prefix, Date time) throws StorageException;
 
     void finishProcessedOutput(String prefix, Date time) throws StorageException;
+
+    void cancelProcessedOutput(String prefix, Date time) throws StorageException;
 
     void deleteSource();
 

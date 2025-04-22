@@ -5,11 +5,13 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  create:
   workflow_dispatch:
 
 jobs:
   maven_build:
     name: Maven build
+    if: github.event_name != 'create' || startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
@@ -48,8 +50,39 @@ jobs:
             !sip-app/target/sip-app-grpc-*.jar
             sip-app/target/sip-creator-logo.*
 
+      - name: Configure SSH
+        if: vars.DEPLOY_HOST != '' && success()
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+      - name: Deploy universal artifacts
+        if: vars.DEPLOY_HOST != '' && success()
+        shell: bash
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          DEPLOY_SNAPSHOTS: ${{ vars.DEPLOY_SNAPSHOTS }}
+          DEPLOY_RELEASES: ${{ vars.DEPLOY_RELEASES }}
+        run: |
+          exejarpath=$(ls -1 sip-app/target/sip-app-*-exejar.jar | head -n 1)
+          pomversion=$(echo "$exejarpath" | xargs -n 1 basename | sed -r 's/sip\-app\-(.*)\-exejar\.jar/\1/')
+          gitcommithashshort=$(git rev-parse --short=8 HEAD)
+          timestamp=$(date '+%Y-%m-%dT%H%M%S')
+          if [[ "$pomversion" =~ .*\-SNAPSHOT ]]; then
+            exejardest="$DEPLOY_SNAPSHOTS/sip-creator-$pomversion-$timestamp-$gitcommithashshort.jar"
+          else
+            exejardest="$DEPLOY_RELEASES/sip-creator-$pomversion.jar"
+          fi
+          # contents of: ssh-keyscan -p DEPLOY_PORT DEPLOY_HOST > deploy_known_hosts
+          echo "$DEPLOY_KNOWN_HOSTS" > deploy_known_hosts
+          scp -o UserKnownHostsFile=deploy_known_hosts -P "$DEPLOY_PORT" "$exejarpath" "$DEPLOY_USER@$DEPLOY_HOST:$exejardest"
+          echo "Deploy complete"
+
   native_packaging:
     name: Native packaging
+    if: github.event_name != 'create' || startsWith(github.ref, 'refs/tags/v')
     needs: maven_build
     strategy:
       # If one OS build fails continue building others
@@ -88,7 +121,7 @@ jobs:
             sip-app/target/*.dmg
             sip-app/target/*.zip
             sip-app/target/*.msi
-            sip-app/target/*.tar.gz
+            sip-app/target/*.tar.xz
 
       - name: Configure SSH
         if: vars.DEPLOY_HOST != '' && success()
@@ -133,13 +166,13 @@ jobs:
               ;;
             "ubuntu-24.04")
               nativetype="linux-x86_64"
-              nativeext="tar.gz"
-              nativepath=$(ls -1 sip-app/target/*.tar.gz | head -n 1)
+              nativeext="tar.xz"
+              nativepath=$(ls -1 sip-app/target/*.tar.xz | head -n 1)
               ;;
             "ubuntu-24.04-arm")
               nativetype="linux-aarch64"
-              nativeext="tar.gz"
-              nativepath=$(ls -1 sip-app/target/*.tar.gz | head -n 1)
+              nativeext="tar.xz"
+              nativepath=$(ls -1 sip-app/target/*.tar.xz | head -n 1)
               ;;
             *)
               echo "Unknown OS"

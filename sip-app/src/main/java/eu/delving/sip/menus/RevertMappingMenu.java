@@ -94,6 +94,9 @@ public class RevertMappingMenu extends JMenu implements MappingSaveTimer.ListRec
             try {
                 RecMapping previousMapping = sipModel.getDataSetModel().getDataSet().revertRecMapping(file, sipModel.getDataSetModel());
                 sipModel.getMappingModel().setRecMapping(previousMapping);
+
+                // Trigger a reload of the dataset in order to refresh source tree mappings
+                sipModel.setDataSet(sipModel.getDataSetModel().getDataSet(), () -> {});
             }
             catch (StorageException e) {
                 sipModel.getFeedback().alert("Unable to revert mapping", e);

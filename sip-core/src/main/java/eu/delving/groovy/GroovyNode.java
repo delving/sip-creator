@@ -21,6 +21,7 @@ import eu.delving.metadata.StringUtil;
 import groovy.lang.DelegatingMetaClass;
 import groovy.lang.GroovySystem;
 import groovy.lang.MetaClass;
+import groovy.transform.CompileStatic;
 import groovy.util.NodeList;
 import groovy.namespace.QName;
 
@@ -38,6 +39,7 @@ import java.util.*;
  *
  */
 @SuppressWarnings("unchecked")
+@CompileStatic
 public class GroovyNode {
 
     private GroovyNode parent;

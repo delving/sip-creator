@@ -2,7 +2,7 @@ name: Maven build for releases
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   maven_build:

@@ -41,11 +41,11 @@ import java.util.List;
  */
 
 public class MappingSaveTimer implements MappingModel.ChangeListener, MappingModel.SetListener, ActionListener, Work.DataSetPrefixWork {
-    private long nextFreeze;
     private SipModel sipModel;
-    private Timer triggerTimer = new Timer(200, this);
+    private final Timer triggerTimer;
+    private final Timer freezeTimer;
     private ListReceiver listReceiver;
-    private boolean freezeMode;
+    private boolean freezeMode = false;
     private boolean running = true;
 
     @Override
@@ -71,14 +71,15 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
 
     public MappingSaveTimer(SipModel sipModel) {
         this.sipModel = sipModel;
+        triggerTimer = new Timer(Storage.MAPPING_SAVE_DELAY, this);
         triggerTimer.setRepeats(false);
-        Timer kickTimer = new Timer((int) (Storage.MAPPING_FREEZE_INTERVAL / 10), new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                kick(true);
+        freezeTimer = new Timer(Storage.MAPPING_FREEZE_INTERVAL, e -> {
+            freezeMode = true;
+            if (!triggerTimer.isRunning()) {
+                triggerTimer.restart();
             }
         });
-        kickTimer.start();
+        freezeTimer.setRepeats(false);
     }
 
     public void setListReceiver(ListReceiver listReceiver) {
@@ -96,25 +97,15 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
         try {
             final RecMapping recMapping = sipModel.getMappingModel().getRecMapping();
             if (recMapping != null) {
-                boolean freeze = false;
-                if (System.currentTimeMillis() > nextFreeze) {
-                    nextFreeze = System.currentTimeMillis() + Storage.MAPPING_FREEZE_INTERVAL;
-                    freeze = true;
-                }
-                if (!freezeMode || freeze) {
-                    sipModel.getDataSetModel().getDataSet().setRecMapping(recMapping, freeze);
-                }
-                if (freeze) {
-                    if (listReceiver != null) sipModel.exec(new Swing() {
-                        @Override
-                        public void run() {
-                            try {
-                                List<File> recMappingFiles = sipModel.getDataSetModel().getDataSet().getRecMappingFiles();
-                                listReceiver.mappingFileList(recMappingFiles);
-                            }
-                            catch (StorageException e) {
-                                sipModel.getFeedback().alert("Unable to fetch mapping files", e);
-                            }
+                sipModel.getDataSetModel().getDataSet().setRecMapping(recMapping, freezeMode);
+                freezeMode = false;
+                if (listReceiver != null) {
+                    sipModel.exec(() -> {
+                        try {
+                            List<File> recMappingFiles = sipModel.getDataSetModel().getDataSet().getRecMappingFiles();
+                            listReceiver.mappingFileList(recMappingFiles);
+                        } catch (StorageException e) {
+                            sipModel.getFeedback().alert("Unable to fetch mapping files", e);
                         }
                     });
                 }
@@ -127,46 +118,51 @@ public class MappingSaveTimer implements MappingModel.ChangeListener, MappingMod
 
     @Override
     public void recMappingSet(MappingModel mappingModel) {
-        kick(false);
+        kick();
     }
 
     @Override
     public void lockChanged(MappingModel mappingModel, boolean locked) {
-        kick(false);
+        kick();
     }
 
     @Override
     public void functionChanged(MappingModel mappingModel, MappingFunction function) {
-        kick(false);
+        kick();
     }
 
     @Override
     public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping, NodeMappingChange change) {
-        kick(false);
+        kick();
     }
 
     @Override
     public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-        kick(false);
+        kick();
     }
 
     @Override
     public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
-        kick(false);
+        kick();
     }
 
     @Override
     public void populationChanged(MappingModel mappingModel, RecDefNode node) {
+        kick();
     }
 
     public void shutdown() {
         running = false;
         triggerTimer.stop();
+        freezeTimer.stop();
     }
 
-    private void kick(boolean freeze) {
-        this.freezeMode = freeze;
-        triggerTimer.restart();
+    private void kick() {
+        if (!triggerTimer.isRunning()) {
+            triggerTimer.restart();
+        }
+        if (!freezeTimer.isRunning()) {
+            freezeTimer.restart();
+        }
     }
 }
-

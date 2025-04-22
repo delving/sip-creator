@@ -42,12 +42,8 @@ import eu.delving.sip.menus.ExpertMenu;
 import eu.delving.sip.menus.FileMenu;
 import eu.delving.sip.menus.HelpMenu;
 import eu.delving.sip.menus.ThemeMenu;
-import eu.delving.sip.model.DataSetModel;
-import eu.delving.sip.model.MappingModel;
+import eu.delving.sip.model.*;
 import eu.delving.sip.model.MappingModel.ChangeListenerAdapter;
-import eu.delving.sip.model.SipModel;
-import eu.delving.sip.model.SipProperties;
-import eu.delving.sip.model.StatsModel;
 import eu.delving.sip.panels.StatusPanel;
 import eu.delving.sip.panels.WorkPanel;
 import io.sentry.Sentry;
@@ -75,6 +71,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static eu.delving.sip.base.HttpClientFactory.createHttpClient;
 import static eu.delving.sip.base.KeystrokeHelper.MENU_W;
@@ -97,6 +94,7 @@ import static eu.delving.sip.files.Storage.*;
 
 public class Application {
     public static String version;
+    public static String build;
     private SipModel sipModel;
     private Action validateAction;
     private JFrame home;
@@ -275,17 +273,7 @@ public class Application {
         for (FrameBase frame : allFrames.getFrames()) {
             frame.setTheme(themeMode);
         }
-        fileMenu = new FileMenu(sipModel, allFrames, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                quit(true);
-            }
-        }, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                quit();
-            }
-        });
+        fileMenu = new FileMenu(sipModel, allFrames, e -> quit(true), e -> quit());
         expertMenu = new ExpertMenu(sipModel, allFrames);
         themeMenu = new ThemeMenu(sipModel, allFrames);
         helpMenu = new HelpMenu(sipModel, allFrames, isTelemetryIncluded);
@@ -293,9 +281,9 @@ public class Application {
         sipModel.getMappingModel().addChangeListener(new ChangeListenerAdapter() {
             @Override
             public void lockChanged(MappingModel mappingModel, final boolean locked) {
-                sipModel.exec(() -> {
-                    unlockMappingAction.setEnabled(locked);
-                });
+            sipModel.exec(() -> {
+                unlockMappingAction.setEnabled(locked);
+            });
             }
         });
         validateAction = new ValidateAction(sipModel, allFrames.prepareForInvestigation(desktop));
@@ -632,6 +620,14 @@ public class Application {
         }
     }
 
+    public static String buildString() {
+        if (build != null) {
+            return build;
+        } else {
+            return "Unknown build";
+        }
+    }
+
     private JPanel createStatePanel() {
         statusPanel.setReaction(ABSENT, allFrames.prepareForNothing());
         statusPanel.setReaction(SOURCED, new InputAnalyzer());
@@ -724,18 +720,37 @@ public class Application {
     private void quit(boolean isRelaunch) {
         if (!sipModel.getWorkModel().isEmpty()) {
             boolean exitAnyway = feedback.confirm(
-                    "Busy",
-                    "There are jobs busy, are you sure you want to exit?");
+                "Busy",
+                "There are jobs busy, are you sure you want to exit?");
             if (!exitAnyway)
                 return;
         }
-        appProperties.saveProperties();
-        sipModel.shutdown();
-        if (isRelaunch) {
-            EventQueue.invokeLater(LAUNCH);
-        } else {
-            System.exit(0);
-        }
+        Timer quitTimer = new Timer(0, null);
+        quitTimer.setDelay(100); // Between-event delay
+        AtomicInteger count = new AtomicInteger(); // Safeguard in case jobs don't stop
+        quitTimer.addActionListener(event -> {
+            if (!sipModel.getWorkModel().isEmpty() && count.incrementAndGet() < 100) {
+                try {
+                    WorkModel.JobContext job = sipModel.getWorkModel().getListModel().getElementAt(0);
+                    WorkModel.ProgressIndicator progress = job.getProgressIndicator();
+                    if (progress != null) {
+                        progress.cancel();
+                    }
+                    return; // Check work model again next time
+                } catch (Exception e) {
+                    // E.g. index out of bounds
+                }
+            }
+            quitTimer.stop();
+            appProperties.saveProperties();
+            sipModel.shutdown();
+            if (isRelaunch) {
+                EventQueue.invokeLater(LAUNCH);
+            } else {
+                System.exit(0);
+            }
+        });
+        quitTimer.start();
     }
 
     private void destroy() {
@@ -843,7 +858,7 @@ public class Application {
         }
     }
 
-    private static String getPomVersion() {
+    private static void readArtifact() {
         // Try to read the Maven artifact version
         URL resource = Application.class.getResource("/META-INF/maven/eu.delving/sip-app/pom.properties");
         if (resource != null) {
@@ -852,36 +867,33 @@ public class Application {
                 pomProperties.load(resource.openStream());
                 String pomVersion = pomProperties.getProperty("version");
 
-                // If this is a snapshot build:
-                // Check whether a Git commit hash is available (set by the automatic build)
+                // Try to read build properties (set by the automatic build, see _scripts/prepare_build.sh)
                 String gitCommitHash = null;
-                if (pomVersion != null && pomVersion.endsWith("-SNAPSHOT")) {
-                    resource = Application.class.getResource("/sip-app.properties");
-                    if (resource != null) {
-                        try {
-                            Properties buildProperties = new Properties();
-                            buildProperties.load(resource.openStream());
-                            gitCommitHash = buildProperties.getProperty("git-commit-hash-short");
-                        } catch (Exception e) {
-                            // Not important
-                        }
+                resource = Application.class.getResource("/sip-app.properties");
+                if (resource != null) {
+                    try {
+                        Properties buildProperties = new Properties();
+                        buildProperties.load(resource.openStream());
+                        gitCommitHash = buildProperties.getProperty("git-commit-hash-short");
+                        build = buildProperties.getProperty("build-info");
+                    } catch (Exception e) {
+                        // Not important
                     }
                 }
 
-                if (pomVersion != null && gitCommitHash != null) {
-                    return String.format("%s (%s)", pomVersion, gitCommitHash);
+                if (pomVersion != null && pomVersion.endsWith("-SNAPSHOT") && gitCommitHash != null) {
+                    version = String.format("%s (%s)", pomVersion, gitCommitHash);
                 } else {
-                    return pomVersion;
+                    version = pomVersion;
                 }
             } catch (Exception e) {
                 System.err.println("Cannot read maven resource");
             }
         }
-        return null;
     }
 
     public static void init(String runMode) {
-        version = getPomVersion();
+        readArtifact();
         initSentry(runMode);
     }
 

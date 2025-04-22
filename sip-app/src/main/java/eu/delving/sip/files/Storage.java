@@ -112,5 +112,7 @@ public interface Storage {
     String POCKET_ID = "id";
     Path RECORD_CONTAINER = Path.create(String.format("/%s/%s", POCKETS, POCKET));
     Path UNIQUE_ELEMENT = Path.create(String.format("/%s/%s/@%s", POCKETS, POCKET, POCKET_ID));
-    long MAPPING_FREEZE_INTERVAL = 60000;
+
+    int MAPPING_SAVE_DELAY = 1000;
+    int MAPPING_FREEZE_INTERVAL = 60000;
 }

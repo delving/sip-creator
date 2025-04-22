@@ -34,6 +34,6 @@ jpackage \
 --java-options '-splash:$APPDIR/sip-creator-logo.png' \
 --icon sip-creator-logo.png
 mv "SIP-Creator" "sip-creator-$version"
-tar czf "sip-creator-$version.tar.gz" "sip-creator-$version"
+tar cJf "sip-creator-$version.tar.xz" "sip-creator-$version"
 
 echo "Done"

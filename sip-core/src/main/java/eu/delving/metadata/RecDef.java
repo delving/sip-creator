@@ -25,6 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 import eu.delving.XStreamFactory;
 import eu.delving.schema.SchemaVersion;
+import groovy.transform.CompileStatic;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -60,6 +61,7 @@ import java.util.TreeMap;
  */
 
 @XStreamAlias("record-definition")
+@CompileStatic
 public class RecDef {
 
     private static final String DELIM = "[ ,]+";

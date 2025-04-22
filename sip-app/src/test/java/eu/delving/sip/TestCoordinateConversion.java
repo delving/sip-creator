@@ -18,10 +18,10 @@
 package eu.delving.sip;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 
 import eu.delving.XStreamFactory;
 import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.metadata.GeoUtil;
 import eu.delving.metadata.MappingFunction;
 import groovy.lang.Binding;
 import groovy.lang.Script;
@@ -29,14 +29,11 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import uk.me.jstott.jcoord.UTMRef;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -75,9 +72,7 @@ public class TestCoordinateConversion {
             String srid = matcher.group(1);
             String east = matcher.group(2);
             String north = matcher.group(3);
-            UTMRef ref = new UTMRef(Double.parseDouble(east), Double.parseDouble(north), 'V',
-                    Integer.parseInt(srid) % 100);
-            String latLongConverted = String.format("%f, %f", ref.toLatLng().getLat(), ref.toLatLng().getLng());
+            String latLongConverted = GeoUtil.convertUTM(Integer.parseInt(srid) % 100 + " V " + east + " " + north, false);
             checkLatLong(line, latLongConverted);
         }
     }
@@ -95,6 +90,7 @@ public class TestCoordinateConversion {
     }
 
     private String functionCall(String param, boolean utmOut) {
+        //return GeoUtil.convertUTM(param, utmOut);
         Binding binding = new Binding();
         binding.setVariable("param", param);
         binding.setVariable("utmOut", utmOut);

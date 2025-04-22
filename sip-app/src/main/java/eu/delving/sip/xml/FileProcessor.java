@@ -19,7 +19,6 @@ package eu.delving.sip.xml;
 
 import eu.delving.groovy.*;
 import eu.delving.metadata.*;
-import eu.delving.sip.Application;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
@@ -274,7 +273,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     outputStream.flush();
                     outputStream.close();
                     try {
-                        getDataSet().finishProcessedOutput(getPrefix(), time);
+                        if (termination.isIncomplete()) {
+                            getDataSet().cancelProcessedOutput(getPrefix(), time);
+                        } else {
+                            getDataSet().finishProcessedOutput(getPrefix(), time);
+                        }
                     } catch (StorageException e) {
                         feedback.alert("Error finishing processed output", e);
                     }
@@ -382,7 +385,10 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         while (outputQueue.size() > 1000) {
                             Thread.sleep(1000);
                         }
-                    } catch (XMLStreamException | IOException | CancelException | InterruptedException e) {
+                    } catch (CancelException e) {
+                        termination.dueToCancellation();
+                        break;
+                    } catch (XMLStreamException | IOException | InterruptedException e) {
                         termination.dueToException(e);
                         break;
                     }
@@ -428,7 +434,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 try {
                     progressListener.setProgress(recordCount);
                 } catch (CancelException e) {
-                    termination.dueToException(e);
+                    termination.dueToCancellation();
                 }
             }
 
@@ -436,6 +442,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 info("Abort report writer");
                 if (reportWriter != null) {
                     reportWriter.abort();
+                    try {
+                        getDataSet().cancelReportWriter(getPrefix(), time);
+                    } catch (StorageException e) {
+                        feedback.alert("Error cancelling report", e);
+                    }
                 }
                 if (transaction != null) {
                     transaction.setStatus(SpanStatus.ABORTED);

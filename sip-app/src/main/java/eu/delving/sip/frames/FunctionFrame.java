@@ -397,13 +397,13 @@ public class FunctionFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            final MappingFunction selected = (MappingFunction) functionList.getSelectedValue();
+            final FunctionEntry selected = (FunctionEntry) functionList.getSelectedValue();
             if (selected != null) {
                 exec(new Work() {
                     @Override
                     public void run() {
-                        sipModel.getMappingModel().getRecMapping().removeFunction(selected);
-                        sipModel.getMappingModel().notifyFunctionChanged(selected);
+                        sipModel.getMappingModel().getRecMapping().removeFunction(selected.mappingFunction);
+                        sipModel.getMappingModel().notifyFunctionChanged(selected.mappingFunction);
                     }
 
                     @Override

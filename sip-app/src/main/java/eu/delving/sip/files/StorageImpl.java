@@ -203,7 +203,8 @@ public class StorageImpl implements Storage {
         private DataSetState postSourceState(File source) {
             File statistics = statsFile(here);
             if (statistics.exists() && statistics.lastModified() >= source.lastModified()) {
-                File mapping = findLatestFile(here, MAPPING, getSchemaVersion().getPrefix());
+                //File mapping = findLatestFile(here, MAPPING, getSchemaVersion().getPrefix());
+                File mapping = findNonHashedPrefixFile(here, MAPPING, getSchemaVersion().getPrefix());
                 if (mapping.exists()) {
                     File reportJsonFile = reportJsonFile(here, getSchemaVersion().getPrefix());
                     return (reportJsonFile != null && reportJsonFile.exists()
@@ -339,32 +340,36 @@ public class StorageImpl implements Storage {
             //File file = findLatestFile(here, MAPPING, getSchemaVersion().getPrefix());
             // Always use the non-timestamped ("non-hashed") mapping file
             File file = findNonHashedPrefixFile(here, MAPPING, getSchemaVersion().getPrefix());
+            RecMapping recMapping = null;
             if (file.exists()) {
                 try {
-                    RecMapping recMapping = RecMapping.read(file, recDefModel);
-                    recMapping.getFacts().clear();
-                    recMapping.getFacts().putAll(getDataSetFacts());
-                    recMapping.setSchemaVersion(getSchemaVersion());
-                    return recMapping;
+                    recMapping = RecMapping.read(file, recDefModel);
                 } catch (Exception e) {
                     throw new StorageException(String.format("Unable to read mapping from %s", file.getAbsolutePath()),
                             e);
                 }
             } else {
                 try {
-                    return RecMapping.create(recDefModel.createRecDefTree(getSchemaVersion()));
+                    recMapping = RecMapping.create(recDefModel.createRecDefTree(getSchemaVersion()));
                 } catch (MetadataException e) {
                     throw new StorageException("Unable to load record definition", e);
                 }
             }
+            recMapping.getFacts().clear();
+            recMapping.getFacts().putAll(getDataSetFacts());
+            recMapping.setSchemaVersion(getSchemaVersion());
+            return recMapping;
         }
 
         @Override
         public RecMapping revertRecMapping(File previousMappingFile, RecDefModel recDefModel) throws StorageException {
             try {
-                RecMapping previousMapping = RecMapping.read(previousMappingFile, recDefModel);
-                setRecMapping(previousMapping, false);
-                return previousMapping;
+                RecMapping recMapping = RecMapping.read(previousMappingFile, recDefModel);
+                recMapping.getFacts().clear();
+                recMapping.getFacts().putAll(getDataSetFacts());
+                recMapping.setSchemaVersion(getSchemaVersion());
+                setRecMapping(recMapping, true);
+                return recMapping;
             } catch (MetadataException e) {
                 throw new StorageException("Unable to fetch previous mapping", e);
             }
@@ -372,14 +377,14 @@ public class StorageImpl implements Storage {
 
         @Override
         public void setRecMapping(RecMapping recMapping, boolean freeze) throws StorageException {
+            if (recMapping.getFacts().isEmpty() && recMapping.getNodeMappings().isEmpty()) {
+                throw new StorageException("Trying to save an empty record mapping");
+            }
             String fileName = FileType.MAPPING.getName(recMapping.getPrefix());
             File file = new File(here, fileName);
             RecMapping.write(file, recMapping);
             if (freeze) {
                 File timestamped = new File(here, Hasher.prefixFileName(fileName));
-                if (timestamped.exists()) {
-                    FileUtils.deleteQuietly(timestamped);
-                }
                 try {
                     FileUtils.copyFile(file, timestamped);
                 } catch (IOException e) {
@@ -408,12 +413,25 @@ public class StorageImpl implements Storage {
 
         @Override
         public void finishReportWriter(String prefix, Date time) throws StorageException {
+            finishReportWriter(prefix, time, false);
+        }
+
+        public void finishReportWriter(String prefix, Date time, boolean isCancel) throws StorageException {
             String fileName = Hasher.prefixFileName(FileType.REPORT_JSON.getName(prefix), time);
             File reportJson = new File(here, fileName + INPROGRESS_SUFFIX);
-            if (!reportJson.exists()) {
-                throw new StorageException("Can't finish report in progress because it doesn't exist");
+            if (isCancel) {
+                reportJson.delete();
+            } else {
+                if (!reportJson.exists()) {
+                    throw new StorageException("Can't finish report in progress because it doesn't exist");
+                }
+                reportJson.renameTo(new File(here, fileName));
             }
-            reportJson.renameTo(new File(here, fileName));
+        }
+
+        @Override
+        public void cancelReportWriter(String prefix, Date time) throws StorageException {
+            finishReportWriter(prefix, time, true);
         }
 
         @Override
@@ -473,12 +491,25 @@ public class StorageImpl implements Storage {
 
         @Override
         public void finishProcessedOutput(String prefix, Date time) throws StorageException {
+            finishProcessedOutput(prefix, time, false);
+        }
+
+        public void finishProcessedOutput(String prefix, Date time, boolean isCancel) throws StorageException {
             String fileName = Hasher.prefixFileName(FileType.PROCESSED.getName(prefix), time);
             File processedFile = new File(here, fileName + INPROGRESS_SUFFIX);
-            if (!processedFile.exists()) {
-                throw new StorageException("Can't finish processed output in progress because it doesn't exist");
+            if (isCancel) {
+                processedFile.delete();
+            } else {
+                if (!processedFile.exists()) {
+                    throw new StorageException("Can't finish processed output in progress because it doesn't exist");
+                }
+                processedFile.renameTo(new File(here, fileName));
             }
-            processedFile.renameTo(new File(here, fileName));
+        }
+
+        @Override
+        public void cancelProcessedOutput(String prefix, Date time) throws StorageException {
+            finishProcessedOutput(prefix, time, true);
         }
 
         @Override

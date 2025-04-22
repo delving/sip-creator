@@ -273,18 +273,6 @@ public class StorageHelper {
         return getRecent(files, which, fileType);
     }
 
-    static File findLatestFile(File dir, FileType fileType, String prefix) {
-        File latestFile = null;
-        for (File file : findLatestPrefixFiles(dir, fileType)) {
-            String filePrefix = extractName(file, fileType);
-            if (filePrefix.equals(prefix))
-                latestFile = file;
-        }
-        if (latestFile == null)
-            latestFile = new File(dir, fileType.getName(prefix));
-        return latestFile;
-    }
-
     static File findNonHashedPrefixFile(File dir, FileType fileType, String prefix) {
         // Return the file for the type and prefix which is not timestamped ("hashed")
         return new File(dir, fileType.getName(prefix));
@@ -292,63 +280,12 @@ public class StorageHelper {
 
     static List<File> findHashedPrefixFiles(File dir, FileType fileType, String prefix) {
         File[] files = dir.listFiles(new HashedPrefixFileFilter(fileType, prefix));
-        List<File> sorted = new ArrayList<File>(Arrays.asList(files));
-        Collections.sort(sorted, new LastModifiedComparator());
-        return sorted;
+        return Arrays.asList(getAllRecent(files, fileType));
     }
 
     static Collection<File> findSourceFiles(File dir) {
         File[] files = dir.listFiles(new NameFileFilter(SOURCE.getName()));
         return Arrays.asList(files);
-    }
-
-    static Collection<File> findLatestPrefixFiles(File dir, Storage.FileType fileType) {
-        File[] files = dir.listFiles(new PrefixFileFilter(fileType));
-        Map<String, List<File>> map = new TreeMap<String, List<File>>();
-        for (File file : files) {
-            String prefix = extractName(file, fileType);
-            if (prefix == null)
-                continue;
-            List<File> list = map.get(prefix);
-            if (list == null) {
-                map.put(prefix, list = new ArrayList<File>());
-            }
-            list.add(file);
-        }
-        List<File> latestFiles = new ArrayList<File>();
-        for (Map.Entry<String, List<File>> entry : map.entrySet()) {
-            if (entry.getValue().size() == 1) {
-                latestFiles.add(entry.getValue().get(0));
-            } else {
-                latestFiles.add(getRecent(entry.getValue().toArray(new File[entry.getValue().size()]), 0, fileType));
-            }
-        }
-        return latestFiles;
-    }
-
-    static class PrefixFileFilter implements FileFilter {
-        private Storage.FileType fileType;
-
-        PrefixFileFilter(Storage.FileType fileType) {
-            this.fileType = fileType;
-        }
-
-        @Override
-        public boolean accept(File file) {
-            String name = Hasher.extractFileName(file);
-            return file.isFile() && name.startsWith(fileType.getPrefix());
-        }
-    }
-
-    static String extractName(File file, Storage.FileType fileType) {
-        String name = Hasher.extractFileName(file);
-        if (name.startsWith(fileType.getPrefix()) && name.endsWith(fileType.getSuffix())) {
-            name = name.substring(fileType.getPrefix().length());
-            name = name.substring(0, name.length() - fileType.getSuffix().length());
-            return name;
-        } else {
-            return null;
-        }
     }
 
     static void delete(File file) {
@@ -371,14 +308,25 @@ public class StorageHelper {
         if (files == null || files.length <= which || which > maxHistory) {
             return null;
         }
+        File[] recent = getAllRecent(files, maxHistory);
+        if (recent == null) {
+            return null;
+        }
+        return which < files.length ? files[which] : null;
+    }
+
+    static File[] getAllRecent(File[] files, Storage.FileType fileType) {
+        return getAllRecent(files, fileType.getHistorySize());
+    }
+
+    static File[] getAllRecent(File[] files, int maxHistory) {
         Arrays.sort(files, new LastModifiedComparator());
         if (files.length > maxHistory) {
             for (int walk = maxHistory; walk < files.length; walk++) {
-                // noinspection ResultOfMethodCallIgnored
                 files[walk].delete();
             }
         }
-        return which < maxHistory ? files[which] : null;
+        return files;
     }
 
     static class HashedPrefixFileFilter implements FileFilter {
@@ -446,19 +394,5 @@ public class StorageHelper {
             }
         }
     }
-
-    static final FileFilter FILE_FILTER = new FileFilter() {
-        @Override
-        public boolean accept(File file) {
-            return file.isFile();
-        }
-    };
-
-    static final FileFilter ATTIC_FILTER = new FileFilter() {
-        @Override
-        public boolean accept(File file) {
-            return file.isDirectory() && file.getName().matches("\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}");
-        }
-    };
 
 }

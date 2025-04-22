@@ -24,6 +24,7 @@
     <protobuf.version>3.25.1</protobuf.version>
     <buf.version>1.28.1</buf.version>
     <os.maven.plugin.version>1.7.1</os.maven.plugin.version>
+    <geotools.version>28.1</geotools.version>
     <jacoco.skip>true</jacoco.skip>
   </properties>
   <repositories>
@@ -41,6 +42,13 @@
       <id>jitpack.io</id>
       <url>https://jitpack.io</url>
     </repository>
+    <repository>
+      <id>osgeo</id>
+      <name>OSGeo Release Repository</name>
+      <url>https://repo.osgeo.org/repository/release/</url>
+      <snapshots><enabled>false</enabled></snapshots>
+      <releases><enabled>true</enabled></releases>
+    </repository>
   </repositories>
   <distributionManagement>
     <repository>
@@ -49,6 +57,12 @@
       <url>https://maven.pkg.github.com/delving/sip-creator</url>
     </repository>
   </distributionManagement>
+  <licenses>
+    <license>
+      <name>European Union Public Licence (EUPL)</name>
+      <url>https://interoperable-europe.ec.europa.eu/sites/default/files/custom-page/attachment/2020-03/EUPL-1.2%20EN.txt</url>
+    </license>
+  </licenses>
   <build>
     <plugins>
       <!-- Release Plugin -->
@@ -137,7 +151,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.11.0</version>
         <configuration>
-          <release>17</release>
+          <release>21</release>
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
@@ -420,6 +434,17 @@
         <version>8.3.0</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <!-- GeoTools -->
+      <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-shapefile</artifactId>
+        <version>${geotools.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-epsg-hsql</artifactId>
+        <version>${geotools.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
