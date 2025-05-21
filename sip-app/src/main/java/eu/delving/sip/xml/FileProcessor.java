@@ -22,6 +22,7 @@ import eu.delving.metadata.*;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
+import eu.delving.sip.cli.CLIProgressListener;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.ReportWriter;
 import eu.delving.sip.files.StorageException;
@@ -419,6 +420,48 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
             int recordCount = 0;
             int processedCount = 0;
+            
+            // Monitor progress and update error counts periodically
+            boolean allEnginesDone = false;
+            while (!allEnginesDone) {
+                allEnginesDone = true;
+                recordCount = 0;
+                processedCount = 0;
+                
+                for (MappingEngine engine : engines) {
+                    if (!engine.isDone) {
+                        allEnginesDone = false;
+                    }
+                    recordCount += engine.recordCount;
+                    processedCount += engine.processedCount;
+                }
+                
+                // Update progress with current error counts
+                if (progressListener != null && progressListener instanceof CLIProgressListener) {
+                    try {
+                        progressListener.setProgress(recordCount);
+                        if (reportWriter != null) {
+                            ((CLIProgressListener) progressListener).updateErrorCounts(
+                                reportWriter.getTotalErrorCount(), 
+                                reportWriter.getWarningCount());
+                        }
+                    } catch (CancelException e) {
+                        termination.dueToCancellation();
+                        break;
+                    }
+                }
+                
+                if (!allEnginesDone) {
+                    try {
+                        Thread.sleep(1000); // Update every second
+                    } catch (InterruptedException e) {
+                        termination.dueToException(e);
+                        break;
+                    }
+                }
+            }
+            
+            // Final join to ensure all engines are complete
             for (MappingEngine engine : engines) {
                 try {
                     engine.thread.join();
@@ -429,10 +472,15 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 }
             }
 
-            // Send final progress update before completion
+            // Send final progress update with error counts before completion
             if (progressListener != null) {
                 try {
                     progressListener.setProgress(recordCount);
+                    if (progressListener instanceof CLIProgressListener && reportWriter != null) {
+                        ((CLIProgressListener) progressListener).updateErrorCounts(
+                            reportWriter.getTotalErrorCount(), 
+                            reportWriter.getWarningCount());
+                    }
                 } catch (CancelException e) {
                     termination.dueToCancellation();
                 }

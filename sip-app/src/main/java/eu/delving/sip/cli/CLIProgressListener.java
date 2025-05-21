@@ -26,6 +26,17 @@ public class CLIProgressListener implements ProgressListener {
     private Long startTime = null;
     private int totalSteps;
     private int currentStep;
+    private String datasetName;
+    int errorCount = 0;
+    int warningCount = 0;
+
+    public CLIProgressListener() {
+        this.datasetName = "";
+    }
+
+    public CLIProgressListener(String datasetName) {
+        this.datasetName = datasetName != null ? datasetName : "";
+    }
 
     @Override
     public void prepareFor(int steps) {
@@ -46,7 +57,7 @@ public class CLIProgressListener implements ProgressListener {
 
         if (percentage != lastPrintedPercentage) {
             this.currentStep = percentage;
-            if (percentage % 1000 == 0) {
+            if (percentage % 1000 == 0 || errorCount > 0 || warningCount > 0) {
                 printProgress();
             }
             lastPrintedPercentage = percentage;
@@ -65,18 +76,49 @@ public class CLIProgressListener implements ProgressListener {
         double elapsedTimeSeconds = elapsedTimeMs / 1000.0;
 
         // Calculate records per second
-        double recordsPerSecond = currentStep / elapsedTimeSeconds;
+        double recordsPerSecond = elapsedTimeSeconds > 0 ? currentStep / elapsedTimeSeconds : 0;
 
         // Format elapsed time into hours:minutes:seconds
         long hours = elapsedTimeMs / (3600 * 1000);
         long minutes = (elapsedTimeMs % (3600 * 1000)) / (60 * 1000);
         long seconds = (elapsedTimeMs % (60 * 1000)) / 1000;
 
-        System.out.printf("\rProgress: %d | Time: %02d:%02d:%02d | Avg: %.2f records/sec%n",
-                currentStep,
+        // Calculate percentage if we know total steps
+        String progressInfo = totalSteps > 0 ? 
+            String.format(" %d/%d (%.1f%%)", currentStep, totalSteps, (currentStep * 100.0) / totalSteps) :
+            String.format(" %d", currentStep);
+
+        String datasetPrefix = !datasetName.isEmpty() ? "[" + datasetName + "] " : "";
+        
+        // Add error/warning counts if any exist
+        String errorInfo = "";
+        if (errorCount > 0 || warningCount > 0) {
+            errorInfo = String.format(" | Errors: %d | Warnings: %d", errorCount, warningCount);
+        }
+
+        System.out.printf("\r%sProgress:%s | Time: %02d:%02d:%02d | Avg: %.2f records/sec%s",
+                datasetPrefix,
+                progressInfo,
                 hours,
                 minutes,
                 seconds,
-                recordsPerSecond);
+                recordsPerSecond,
+                errorInfo);
+        System.out.flush();
+    }
+
+    public void updateErrorCounts(int errors, int warnings) {
+        boolean changed = this.errorCount != errors || this.warningCount != warnings;
+        this.errorCount = errors;
+        this.warningCount = warnings;
+        
+        // Force update if error counts changed
+        if (changed && (errors > 0 || warnings > 0)) {
+            printProgress();
+        }
+    }
+
+    public void finalizeLine() {
+        System.out.println(); // Print newline to finalize the progress line
     }
 }

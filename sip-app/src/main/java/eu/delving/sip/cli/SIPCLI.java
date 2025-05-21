@@ -123,6 +123,9 @@ class ProcessCommand implements Callable<Integer> {
     @Option(names = { "-d", "--dataset" }, description = "Specific dataset to process")
     private String datasetName;
 
+    @Option(names = { "-a", "--all" }, description = "Process all datasets in the SIP directory")
+    private boolean processAll = false;
+
     @Override
     public Integer call() {
         try {
@@ -132,7 +135,9 @@ class ProcessCommand implements Callable<Integer> {
 
             validateDirectory(sipDir);
 
-            if (datasetName != null) {
+            if (processAll) {
+                processAllDatasets(sipDir);
+            } else if (datasetName != null) {
                 processSpecificDataset(sipDir, datasetName);
             } else {
                 processDirectory(sipDir);
@@ -161,7 +166,13 @@ class ProcessCommand implements Callable<Integer> {
             throw new IllegalArgumentException("Dataset not found: " + datasetName);
         }
 
-        processDataset(sipFiles, dataset);
+        ProcessingResult result = processDataset(sipFiles, dataset);
+        
+        if (result.hasErrors()) {
+            System.err.printf("Processing completed with issues: %s%n", result.getSummary());
+        } else {
+            System.out.printf("Processing completed successfully: %s%n", result.getSummary());
+        }
     }
 
     private void processDirectory(Path sipDir) throws IOException, StorageException {
@@ -172,21 +183,181 @@ class ProcessCommand implements Callable<Integer> {
         SIPCLI.logFoundFiles(sipFiles);
 
         DataSet sourceXML = sipFiles.getStorage().createDataSet(sipFiles.getSipDir().getFileName().toString());
-        processDataset(sipFiles, sourceXML);
+        ProcessingResult result = processDataset(sipFiles, sourceXML);
+        
+        if (result.hasErrors()) {
+            System.err.printf("Processing completed with issues: %s%n", result.getSummary());
+        } else {
+            System.out.printf("Processing completed successfully: %s%n", result.getSummary());
+        }
 
         SIPCLI.logTimingResults(startTime, System.currentTimeMillis());
     }
 
-    private void processDataset(SIPFiles sipFiles, DataSet sourceXML) throws IOException {
+    private void processAllDatasets(Path baseDir) throws IOException, StorageException {
+        System.out.println("Starting processing of all datasets...");
+        long startTime = System.currentTimeMillis();
+
+        // First, check if this is a SIP directory itself
+        if (isSipDirectory(baseDir)) {
+            // Process as single SIP directory with multiple datasets
+            processSingleSipDirectoryAllDatasets(baseDir);
+        } else {
+            // Process as parent directory containing multiple SIP subdirectories
+            processMultipleSipDirectories(baseDir);
+        }
+
+        SIPCLI.logTimingResults(startTime, System.currentTimeMillis());
+    }
+
+    private boolean isSipDirectory(Path dir) {
+        try {
+            SIPFilesFinder.findRequiredFiles(dir);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    private void processSingleSipDirectoryAllDatasets(Path sipDir) throws IOException, StorageException {
+        SIPFiles sipFiles = SIPFilesFinder.findRequiredFiles(sipDir);
+        SIPCLI.logFoundFiles(sipFiles);
+
+        Map<String, DataSet> datasets = sipFiles.getStorage().getDataSets();
+        System.out.printf("Found %d datasets to process in SIP directory: %s%n", datasets.size(), sipDir);
+
+        int processed = 0;
+        int successful = 0;
+        int failed = 0;
+
+        for (Map.Entry<String, DataSet> entry : datasets.entrySet()) {
+            String datasetName = entry.getKey();
+            DataSet dataset = entry.getValue();
+            processed++;
+
+            System.out.printf("[%d/%d] Processing dataset: %s%n", processed, datasets.size(), datasetName);
+
+            try {
+                ProcessingResult result = processDataset(sipFiles, dataset);
+                if (result.hasErrors()) {
+                    failed++;
+                    System.err.printf("✗ Completed with errors: %s (%s)%n", datasetName, result.getSummary());
+                } else {
+                    successful++;
+                    System.out.printf("✓ Successfully processed: %s (%s)%n", datasetName, result.getSummary());
+                }
+            } catch (Exception e) {
+                failed++;
+                System.err.printf("✗ Failed to process: %s - %s%n", datasetName, e.getMessage());
+                logger.warn("Failed to process dataset: " + datasetName, e);
+            }
+        }
+
+        System.out.printf("%nProcessing completed: %d total, %d successful, %d failed%n", 
+                processed, successful, failed);
+    }
+
+    private void processMultipleSipDirectories(Path baseDir) throws IOException {
+        System.out.printf("Scanning for SIP directories in: %s%n", baseDir);
+
+        try (var stream = Files.list(baseDir)) {
+            var sipDirectories = stream
+                    .filter(Files::isDirectory)
+                    .filter(this::isSipDirectory)
+                    .toList();
+
+            if (sipDirectories.isEmpty()) {
+                System.err.println("No SIP directories found in: " + baseDir);
+                printSipDirectoryRequirements(baseDir);
+                return;
+            }
+
+            System.out.printf("Found %d SIP directories to process%n", sipDirectories.size());
+
+            int processed = 0;
+            int successful = 0;
+            int failed = 0;
+
+            for (Path sipDir : sipDirectories) {
+                processed++;
+                System.out.printf("%n[%d/%d] Processing SIP directory: %s%n", processed, sipDirectories.size(), sipDir.getFileName());
+
+                try {
+                    processDirectory(sipDir);
+                    successful++;
+                    System.out.printf("✓ Successfully processed SIP directory: %s%n", sipDir.getFileName());
+                } catch (Exception e) {
+                    failed++;
+                    System.err.printf("✗ Failed to process SIP directory: %s - %s%n", sipDir.getFileName(), e.getMessage());
+                    logger.warn("Failed to process SIP directory: " + sipDir.getFileName(), e);
+                }
+            }
+
+            System.out.printf("%nProcessing completed: %d SIP directories total, %d successful, %d failed%n", 
+                    processed, successful, failed);
+        }
+    }
+
+    private void printSipDirectoryRequirements(Path baseDir) {
+        System.err.println();
+        System.err.println("Each SIP directory must contain these required files:");
+        System.err.println("  - *record-definition.xml  (e.g., lido_1.0.0_record-definition.xml)");
+        System.err.println("  - *validation.xsd         (e.g., lido_1.0.0_validation.xsd)");
+        System.err.println("  - mapping_*.xml           (e.g., mapping_lido.xml)");
+        System.err.println("  - source.xml.gz or source.xml.zst");
+        System.err.println();
+        
+        // Check for properties file
+        Path propertiesFile = baseDir.getParent().getParent().resolve("sip-creator.properties");
+        if (!Files.exists(propertiesFile)) {
+            System.err.println("⚠️  IMPORTANT: Missing required properties file!");
+            System.err.printf("   Expected location: %s%n", propertiesFile);
+            System.err.println("   Create this file (can be empty) for processing to work:");
+            System.err.printf("   touch %s%n", propertiesFile);
+            System.err.println();
+        }
+    }
+
+    private ProcessingResult processDataset(SIPFiles sipFiles, DataSet sourceXML) throws IOException {
         String mappingFileName = sipFiles.getMappingFile().getFileName().toString();
         String[] parts = mappingFileName.split("__");
         String prefix = (parts.length > 1 ? parts[1] : parts[0]).replace(".xml", "");
 
         RecMapping recMapping = getRecMapping(sipFiles.getMappingFile(), sipFiles.getRecordDefinition());
         FileProcessor processor = createFileProcessor(sourceXML, recMapping, prefix);
-        processor.setProgressListener(new CLIProgressListener());
+        CLIProgressListener progressListener = new CLIProgressListener(sourceXML.getSpec());
+        processor.setProgressListener(progressListener);
 
         processor.run();
+        progressListener.finalizeLine(); // Ensure progress line ends with newline
+        
+        // Get final error counts from the progress listener
+        return new ProcessingResult(
+            progressListener.errorCount, 
+            progressListener.warningCount
+        );
+    }
+
+    private static class ProcessingResult {
+        final int errorCount;
+        final int warningCount;
+        
+        ProcessingResult(int errorCount, int warningCount) {
+            this.errorCount = errorCount;
+            this.warningCount = warningCount;
+        }
+        
+        boolean hasErrors() {
+            return errorCount > 0;
+        }
+        
+        String getSummary() {
+            if (errorCount == 0 && warningCount == 0) {
+                return "no issues";
+            } else {
+                return String.format("%d errors, %d warnings", errorCount, warningCount);
+            }
+        }
     }
 
     private FileProcessor createFileProcessor(DataSet sourceXML, RecMapping recMapping, String prefix) {
@@ -306,9 +477,11 @@ class AnalyzeCommand implements Callable<Integer> {
             public void failure(String message, Exception exception) {
             }
         });
-        processor.setProgressListener(new CLIProgressListener());
+        CLIProgressListener progressListener = new CLIProgressListener(sourceXML.getSpec());
+        processor.setProgressListener(progressListener);
 
         processor.run();
+        progressListener.finalizeLine(); // Ensure progress line ends with newline
     }
 }
 

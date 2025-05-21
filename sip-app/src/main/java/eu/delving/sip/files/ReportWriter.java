@@ -193,4 +193,18 @@ public class ReportWriter {
         return XmlNodePrinter.toXml(inputRecord.getRootNode());
     }
 
+    public int getErrorCount(ReportType reportType) {
+        return counters.get(reportType).get();
+    }
+
+    public int getTotalErrorCount() {
+        return counters.get(ReportType.INVALID).get() + 
+               counters.get(ReportType.DISCARDED).get() + 
+               counters.get(ReportType.UNEXPECTED).get();
+    }
+
+    public int getWarningCount() {
+        return counters.get(ReportType.WARNING).get();
+    }
+
 }

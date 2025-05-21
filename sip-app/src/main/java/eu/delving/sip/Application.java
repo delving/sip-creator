@@ -894,6 +894,11 @@ public class Application {
 
     public static void init(String runMode) {
         readArtifact();
+        
+        // Initialize Jena subsystems to prevent RIOT.getContext() being null
+        JenaSystem.init();
+        ARQ.init();
+        
         initSentry(runMode);
     }
 
