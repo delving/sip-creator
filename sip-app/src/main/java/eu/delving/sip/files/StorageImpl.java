@@ -119,7 +119,7 @@ public class StorageImpl implements Storage {
                     if (!hasFiles)
                         continue;
                     DataSetImpl impl = new DataSetImpl(directory, schemaRepository);
-                    map.put(directory.getName(), impl);
+                    map.put(StorageHelper.datasetNameFromSipZip(directory), impl);
                 }
             }
         }
