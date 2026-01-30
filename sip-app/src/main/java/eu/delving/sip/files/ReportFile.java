@@ -52,6 +52,8 @@ public class ReportFile {
     private RandomAccessFile reportAccess;
     private List<Rec> reportedRecs;
     private ReportedRecListModel reportedRecListModel = new ReportedRecListModel();
+    private int totalCount;
+    private int processedCount;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -128,18 +130,21 @@ public class ReportFile {
         if (conclusions != null) {
             JsonNode report = conclusions.getNode();
             reportConclusions = new ArrayList<>();
-            int total = report.get("total").asInt();
+            this.totalCount = report.has("total") ? report.get("total").asInt() : 0;
+            this.processedCount = report.has("processed") ? report.get("processed").asInt() : 0;
             for (Iterator<Map.Entry<String, JsonNode>> it = report.fields(); it.hasNext(); ) {
                 Map.Entry<String, JsonNode> i = it.next();
                 int value = i.getValue().asInt();
                 reportConclusions.add(String.format("<center><b>%s:</b><br>%s<br>(%.1f%%)</center>",
                     StringEscapeUtils.escapeHtml(StringUtils.capitalize(i.getKey().toLowerCase())),
-                    value,  total > 0 ? (((double) value) / total * 100) : 0f));
+                    value,  totalCount > 0 ? (((double) value) / totalCount * 100) : 0f));
             }
         }  else {
             List<String> apology = new ArrayList<>();
             apology.add("No conclusions. They should appear after next validation");
             this.reportConclusions = apology;
+            this.totalCount = 0;
+            this.processedCount = 0;
         }
     }
 
@@ -178,6 +183,14 @@ public class ReportFile {
 
     public String getPrefix() {
         return prefix;
+    }
+
+    public int getValidCount() {
+        return processedCount;
+    }
+
+    public int getInvalidCount() {
+        return totalCount - processedCount;
     }
 
     public Work fetchRecords(final Feedback feedback) {

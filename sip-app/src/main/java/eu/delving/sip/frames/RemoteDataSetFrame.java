@@ -23,6 +23,7 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.HomeDirectory;
+import eu.delving.sip.files.ReportFile;
 import eu.delving.sip.files.StorageException;
 import eu.delving.sip.files.StorageHelper;
 import eu.delving.sip.model.SipModel;
@@ -66,6 +67,7 @@ public class RemoteDataSetFrame extends FrameBase {
     private final NetworkClient networkClient;
     private final JTextField filterField = new JTextField(16);
     private final JButton workItemSortModeButton = new JButton();
+    private final JCheckBox uploadProcessedCheckbox = new JCheckBox("Also upload processed file", true);
     private NetworkClient.SipZips sipZips;
     private DownloadItem selectedDownload;
     private List<WorkItem> selectedWorkItems;
@@ -221,8 +223,12 @@ public class RemoteDataSetFrame extends FrameBase {
     private JPanel createUploadSouth() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder("Actions"));
-        p.add(button(UPLOAD_ACTION), BorderLayout.CENTER);
-        p.add(button(DELETE_UPLOAD_ACTION), BorderLayout.EAST);
+        JPanel buttonPanel = new JPanel(new BorderLayout());
+        buttonPanel.add(button(UPLOAD_ACTION), BorderLayout.CENTER);
+        buttonPanel.add(button(DELETE_UPLOAD_ACTION), BorderLayout.EAST);
+        p.add(buttonPanel, BorderLayout.NORTH);
+        uploadProcessedCheckbox.setToolTipText("Upload processed RDF output to Narthex (skips server-side processing)");
+        p.add(uploadProcessedCheckbox, BorderLayout.SOUTH);
         return p;
     }
 
@@ -742,11 +748,19 @@ public class RemoteDataSetFrame extends FrameBase {
             if (selectedUpload == null)
                 return;
             setEnabled(false);
+            final String datasetName = selectedUpload.getDatasetName();
+            final boolean shouldUploadProcessed = uploadProcessedCheckbox.isSelected();
             try {
-                networkClient.uploadNarthex(selectedUpload.file, selectedUpload.getDatasetName(), new Swing() {
+                networkClient.uploadNarthex(selectedUpload.file, datasetName, new Swing() {
                     @Override
                     public void run() {
                         sipModel.getFeedback().alert("Uploaded " + selectedUpload.file.getName() + " to Narthex");
+
+                        // If checkbox is selected, also upload the processed file
+                        if (shouldUploadProcessed) {
+                            uploadProcessedFile(datasetName);
+                        }
+
                         setEnabled(true);
                         uploadModel.refreshUploads();
                     }
@@ -754,6 +768,50 @@ public class RemoteDataSetFrame extends FrameBase {
             } catch (StorageException e) {
                 sipModel.getFeedback().alert("Unable to upload to Narthex", e);
             }
+        }
+
+        private void uploadProcessedFile(String datasetName) {
+            // Find the dataset by name
+            Map<String, DataSet> datasets = sipModel.getStorage().getDataSets();
+            DataSet dataSet = datasets.get(datasetName);
+
+            if (dataSet == null) {
+                sipModel.getFeedback().info("No local dataset found for " + datasetName + ", skipping processed file upload");
+                return;
+            }
+
+            File processedFile = dataSet.getLatestProcessedFile();
+            if (processedFile == null || !processedFile.exists()) {
+                sipModel.getFeedback().info("No processed file found for " + datasetName + ", skipping processed file upload");
+                return;
+            }
+
+            // Get record counts from the report
+            int validCount = 0;
+            int invalidCount = 0;
+            try {
+                ReportFile report = dataSet.getReport();
+                if (report != null) {
+                    validCount = report.getValidCount();
+                    invalidCount = report.getInvalidCount();
+                }
+            } catch (StorageException e) {
+                sipModel.getFeedback().alert("Unable to read report file for counts", e);
+            }
+
+            final int finalValidCount = validCount;
+            final int finalInvalidCount = invalidCount;
+
+            networkClient.uploadProcessedToNarthex(
+                    processedFile,
+                    dataSet.getSpec(),
+                    finalValidCount,
+                    finalInvalidCount,
+                    () -> sipModel.getFeedback().info(String.format(
+                            "Uploaded processed file to Narthex: %d valid, %d invalid records",
+                            finalValidCount, finalInvalidCount
+                    ))
+            );
         }
     }
 

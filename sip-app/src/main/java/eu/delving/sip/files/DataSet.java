@@ -98,6 +98,12 @@ public interface DataSet extends Comparable<DataSet> {
 
     void cancelProcessedOutput(String prefix, Date time) throws StorageException;
 
+    /**
+     * Get the latest processed output file (ZSTD compressed RDF/XML).
+     * Returns null if no processed file exists.
+     */
+    File getLatestProcessedFile();
+
     void deleteSource();
 
     void fromSipZip(File sipZipFile, ProgressListener progressListener) throws IOException, StorageException;

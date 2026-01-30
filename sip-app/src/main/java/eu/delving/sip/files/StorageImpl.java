@@ -513,6 +513,12 @@ public class StorageImpl implements Storage {
         }
 
         @Override
+        public File getLatestProcessedFile() {
+            String prefix = getSchemaVersion().getPrefix();
+            return findOrNull(here, 0, new NameFileFilter(FileType.PROCESSED.getName(prefix)), FileType.PROCESSED);
+        }
+
+        @Override
         public void deleteSource() {
             for (File file : findSourceFiles(here))
                 delete(file);

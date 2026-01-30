@@ -39,6 +39,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.entity.ContentType;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -174,6 +178,23 @@ public class NetworkClient {
 
     public void uploadNarthex(File sipZipFile, String datasetName, Swing finished) throws StorageException {
         afterLogin(new NarthexUploader(sipZipFile, datasetName, finished), reason -> {
+        });
+    }
+
+    /**
+     * Upload a processed file to Narthex.
+     * This uploads the ZSTD-compressed RDF/XML file along with record counts,
+     * allowing Narthex to skip its processing step.
+     *
+     * @param processedFile The processed RDF/XML file (ZSTD compressed)
+     * @param datasetSpec The dataset spec (name)
+     * @param validCount Number of valid records
+     * @param invalidCount Number of invalid records
+     * @param finished Callback when upload completes
+     */
+    public void uploadProcessedToNarthex(File processedFile, String datasetSpec, int validCount, int invalidCount, Swing finished) {
+        afterLogin(new NarthexProcessedUploader(processedFile, datasetSpec, validCount, invalidCount, finished), reason -> {
+            feedback().alert("Login failed for processed upload: " + reason);
         });
     }
 
@@ -455,6 +476,100 @@ public class NetworkClient {
             return post;
         }
 
+    }
+
+    /**
+     * Uploader that sends processed RDF/XML file to Narthex's upload-processed endpoint.
+     * This allows bypassing Narthex's processing step when the same processing has been done locally.
+     */
+    private class NarthexProcessedUploader implements Work.LongTermWork {
+        private final File processedFile;
+        private final String datasetSpec;
+        private final int validCount;
+        private final int invalidCount;
+        private ProgressListener progressListener;
+        private Swing finished;
+
+        NarthexProcessedUploader(File processedFile, String datasetSpec, int validCount, int invalidCount, Swing finished) {
+            this.processedFile = processedFile;
+            this.datasetSpec = datasetSpec;
+            this.validCount = validCount;
+            this.invalidCount = invalidCount;
+            this.finished = finished;
+        }
+
+        @Override
+        public void run() {
+            boolean success = false;
+            try {
+                String requestUrl = String.format(
+                        "%s/app/dataset/%s/upload-processed",
+                        narthexCredentials.narthexUrl(),
+                        datasetSpec.trim()
+                );
+                feedback().info("Uploading processed file to Narthex: " + requestUrl);
+
+                HttpPost post = new HttpPost(requestUrl);
+
+                // Build multipart request with file and counts
+                MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+                builder.addPart("file", new FileBody(processedFile, ContentType.APPLICATION_OCTET_STREAM));
+                builder.addPart("validCount", new StringBody(String.valueOf(validCount), ContentType.TEXT_PLAIN));
+                builder.addPart("invalidCount", new StringBody(String.valueOf(invalidCount), ContentType.TEXT_PLAIN));
+                builder.addPart("source", new StringBody("sip-creator", ContentType.TEXT_PLAIN));
+
+                post.setEntity(builder.build());
+
+                HttpResponse response = httpClient.execute(post, httpClientContext);
+                Code code = Code.from(response);
+
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    switch (code) {
+                        case OK:
+                            feedback().info(String.format(
+                                    "Successfully uploaded processed file to Narthex: %d valid, %d invalid",
+                                    validCount, invalidCount
+                            ));
+                            success = true;
+                            break;
+                        case UNAUTHORIZED:
+                            loggedIn = false;
+                            feedback().alert("Unauthorized: Please check your Narthex credentials");
+                            break;
+                        default:
+                            String responseBody = EntityUtils.toString(entity);
+                            feedback().alert(String.format(
+                                    "Failed to upload processed file. Status: %d. Response: %s",
+                                    response.getStatusLine().getStatusCode(),
+                                    responseBody
+                            ));
+                            break;
+                    }
+                    EntityUtils.consume(entity);
+                } else {
+                    feedback().alert("Empty response from Narthex");
+                }
+            } catch (Exception e) {
+                feedback().alert("Error uploading processed file to Narthex", e);
+            } finally {
+                if (finished != null) {
+                    final boolean finalSuccess = success;
+                    Swing.Exec.later(finished);
+                }
+            }
+        }
+
+        @Override
+        public Job getJob() {
+            return Job.UPLOAD;
+        }
+
+        @Override
+        public void setProgressListener(ProgressListener progressListener) {
+            this.progressListener = progressListener;
+            progressListener.setProgressMessage("Uploading processed file to Narthex");
+        }
     }
 
     private static String deriveContentType(File file) {
