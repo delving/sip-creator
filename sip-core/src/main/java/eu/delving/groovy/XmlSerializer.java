@@ -86,6 +86,11 @@ public class XmlSerializer {
             if (localName == null) {
                 localName = node.getNodeName();
             }
+            // Use rdf:RDF as root element for RDF/XML compatibility with Narthex
+            if ("RDF".equals(localName)) {
+                prefix = "rdf";
+                uri = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+            }
             out.add(eventFactory.createStartElement(prefix, uri, localName, attributes.iterator(), nslist.iterator()));
             if (fromMapping) out.add(eventFactory.createCharacters("\n"));
             NodeList kids = node.getChildNodes();
