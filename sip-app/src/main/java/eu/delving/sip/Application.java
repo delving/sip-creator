@@ -845,10 +845,9 @@ public class Application {
             if (sipModel.getDataSetModel().isEmpty())
                 return;
             try {
-                String sourceIncludedString = sipModel.getStatsModel().getHintsModel().get("sourceIncluded");
-                if (sourceIncludedString == null)
-                    sourceIncludedString = "false";
-                boolean sourceIncluded = Boolean.parseBoolean(sourceIncludedString);
+                SipProperties sipProperties = new SipProperties();
+                boolean sourceIncluded = Boolean.parseBoolean(
+                    sipProperties.getProp().getProperty(SOURCE_INCLUDED, "false"));
                 sipModel.getDataSetModel().createSipZip(sourceIncluded);
                 sipModel.getFeedback().alert("A new SIP file has been created and is ready for upload.");
                 allFrames.initiate();

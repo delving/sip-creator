@@ -102,6 +102,7 @@ public interface Storage {
     String NARTHEX_URL = "narthexUrl";
     String NARTHEX_USERNAME = "narthexUsername";
     String NARTHEX_PASSWORD = "narthexPassword";
+    String SOURCE_INCLUDED = "sourceIncluded";
     String NARTHEX_DATASET_NAME = "narthexDatasetName";
     String NARTHEX_PREFIX = "narthexPrefix";
     String CACHE_DIR = "__cache__";

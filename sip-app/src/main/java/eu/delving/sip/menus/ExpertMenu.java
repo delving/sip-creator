@@ -41,7 +41,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import static eu.delving.sip.files.Storage.SHACL_VALIDATION;
+import static eu.delving.sip.files.Storage.SOURCE_INCLUDED;
 import static eu.delving.sip.files.Storage.XSD_VALIDATION;
+
+import eu.delving.sip.model.SipProperties;
 
 /**
  * Special functions for experts, not to be spoken of in mixed company, or among
@@ -99,20 +102,16 @@ public class ExpertMenu extends JMenu {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            String sourceIncludedString = sipModel.getStatsModel().getHintsModel().get("sourceIncluded");
-            if (sourceIncludedString == null)
-                sourceIncludedString = "false";
+            SipProperties sipProperties = new SipProperties();
+            String sourceIncludedString = sipProperties.getProp().getProperty(SOURCE_INCLUDED, "false");
             String answer = sipModel.getFeedback().ask(
-                    "Type 'true' if you want to have source included in the upload",
+                    "Type 'true' if you want to have source included in the upload (global setting)",
                     sourceIncludedString);
             if (answer != null) {
                 answer = answer.trim();
-                try {
-                    boolean sourceIncluded = Boolean.parseBoolean(answer);
-                    sipModel.getStatsModel().getHintsModel().set("sourceIncluded", String.valueOf(sourceIncluded));
-                } catch (NumberFormatException e) {
-                    sipModel.getFeedback().alert("Must be 'true' or 'false': " + answer);
-                }
+                boolean sourceIncluded = Boolean.parseBoolean(answer);
+                sipProperties.getProp().setProperty(SOURCE_INCLUDED, String.valueOf(sourceIncluded));
+                sipProperties.saveProperties();
             }
         }
     }
