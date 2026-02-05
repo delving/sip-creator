@@ -27,6 +27,7 @@ import org.w3c.dom.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -42,6 +43,16 @@ public class DOMBuilder extends BuilderSupport {
     public static final String CDATA_AFTER = "]]>";
     private static final String SCHEMA_LOCATION_ATTR = "xsi:schemaLocation";
     private static final String DEPTH = "depth";
+
+    /**
+     * BCP 47 language tag pattern.
+     * Matches patterns like: en, nl, en-US, zh-Hans, de-AT, pt-BR, sr-Latn-RS
+     * Based on RFC 5646: primary language (2-3 chars), optional script (4 chars),
+     * optional region (2 chars or 3 digits), and optional variants/extensions.
+     */
+    private static final Pattern BCP47_PATTERN = Pattern.compile(
+        "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-[a-zA-Z]{2}|-[0-9]{3})?(-[a-zA-Z0-9]{2,8})*$"
+    );
     private Document document;
     private DocumentBuilder documentBuilder;
     private Map<String, RecDef.Namespace> namespaces;
@@ -180,6 +191,36 @@ public class DOMBuilder extends BuilderSupport {
             if (attrName.startsWith("xmlns:")) throw new RuntimeException("Can't handle attribute xmlns:*");
         }
 
+        /**
+         * Validates xml:lang attribute values against BCP 47 format.
+         * @param attrName the attribute name
+         * @param attrValue the attribute value to validate
+         * @throws LanguageTagException if xml:lang value is invalid
+         */
+        private void validateXmlLang(String attrName, String attrValue) {
+            if ("xml:lang".equals(attrName)) {
+                if (attrValue == null || attrValue.isEmpty()) {
+                    throw new LanguageTagException(
+                        LanguageTagException.Type.INVALID_FORMAT,
+                        name,
+                        attrValue,
+                        "Invalid xml:lang value: empty or null - must be a valid BCP 47 language tag (e.g., 'en', 'nl', 'en-US')"
+                    );
+                }
+                if (!BCP47_PATTERN.matcher(attrValue).matches()) {
+                    throw new LanguageTagException(
+                        LanguageTagException.Type.INVALID_FORMAT,
+                        name,
+                        attrValue,
+                        String.format(
+                            "Invalid xml:lang value '%s' - must be a valid BCP 47 language tag (e.g., 'en', 'nl', 'en-US')",
+                            attrValue.length() > 50 ? attrValue.substring(0, 50) + "..." : attrValue
+                        )
+                    );
+                }
+            }
+        }
+
         private Object extractValue(Object value, int index) {
             if (value == null) return null;
             if (value instanceof List) {
@@ -195,15 +236,27 @@ public class DOMBuilder extends BuilderSupport {
             List<Element> elements = new ArrayList<>(elementsRequired);
             for (int i = 0; i < elementsRequired; i++) {
                 Element element = (Element) createNode(name);
+                String xmlLangValue = null;
+
                 for (String attributeName : attributes.keySet()) {
                     Object attributeValue = extractValue(attributes.get(attributeName), i);
                     if (attributeValue == null) continue;
+
+                    String attrValueStr = attributeValue.toString();
+
+                    // Validate xml:lang attribute values
+                    validateXmlLang(attributeName, attrValueStr);
+
+                    // Track xml:lang for empty content validation
+                    if ("xml:lang".equals(attributeName)) {
+                        xmlLangValue = attrValueStr;
+                    }
 
                     TagValue tagValue = new TagValue(attributeName, true);
                     element.setAttributeNS(
                         tagValue.isNamespaceAdded() ? tagValue.uri : null,
                         tagValue.isNamespaceAdded() ? tagValue.toString() : tagValue.localPart,
-                        attributeValue.toString()
+                        attrValueStr
                     );
                 }
 
@@ -213,6 +266,26 @@ public class DOMBuilder extends BuilderSupport {
                         toTextNodes(contentValue.toString(), element);
                     }
                 }
+
+                // Validate that elements with xml:lang have non-empty content
+                if (xmlLangValue != null) {
+                    boolean hasContent = contentValue != null &&
+                        (contentValue instanceof String || contentValue instanceof GString) &&
+                        !contentValue.toString().trim().isEmpty();
+
+                    if (!hasContent) {
+                        throw new LanguageTagException(
+                            LanguageTagException.Type.EMPTY_CONTENT,
+                            name,
+                            xmlLangValue,
+                            String.format(
+                                "Element '%s' has xml:lang='%s' but no content - either add content or remove the language tag",
+                                name, xmlLangValue
+                            )
+                        );
+                    }
+                }
+
                 elements.add(element);
             }
 

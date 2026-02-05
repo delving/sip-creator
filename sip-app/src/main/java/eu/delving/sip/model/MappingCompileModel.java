@@ -19,6 +19,7 @@ package eu.delving.sip.model;
 
 import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.GroovyCodeResource;
+import eu.delving.groovy.LanguageTagException;
 import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.AppMappingRunner;
 import eu.delving.groovy.MetadataRecord;
@@ -407,6 +408,10 @@ public class MappingCompileModel {
                 } catch (DiscardRecordException e) {
                     compilationComplete(Completion.DISCARDED_RECORD, null, e.getMessage());
                     setMappingCode();
+                } catch (LanguageTagException e) {
+                    // Show user-friendly message for xml:lang validation errors
+                    compilationComplete(Completion.CONTENT_VIOLATION, null, e.getUserFriendlyMessage());
+                    notifyStateChange(CompileState.ERROR);
                 }
             } catch (Exception e) {
                 compilationComplete(Completion.UNEXPECTED, null, e.getMessage());
