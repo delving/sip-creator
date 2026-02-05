@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>eu.delving</groupId>
   <artifactId>sip-creator</artifactId>
-  <version>1.4.0-SNAPSHOT</version>
+  <version>1.4.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>SIP-Creator</name>
   <description>This parent project defines the version management, repositories, etc for all the other modules.</description>
@@ -312,7 +312,7 @@
       <dependency>
         <groupId>org.apache.groovy</groupId>
         <artifactId>groovy-all</artifactId>
-        <version>4.0.13</version>
+        <version>4.0.27</version>
         <type>pom</type>
       </dependency>
       <dependency>
