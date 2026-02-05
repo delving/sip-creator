@@ -403,7 +403,7 @@
       <dependency>
         <groupId>com.formdev</groupId>
         <artifactId>flatlaf</artifactId>
-        <version>3.5.4</version>
+        <version>3.6</version>
       </dependency>
       <!-- gRPC dependencies -->
       <dependency>
