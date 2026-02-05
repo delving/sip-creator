@@ -51,6 +51,7 @@ public class BulkMappingRunner implements MappingRunner {
 
         try {
             this.compiledScript = EngineHolder.getInstance().compile(generatedCode);
+            EngineHolder.notifyCompilation();
         } catch (ScriptException e) {
             LOG.error("Failed to compile mapping script: {}", e.getMessage());
             throw new MappingException(
