@@ -88,7 +88,7 @@ jobs:
       # If one OS build fails continue building others
       fail-fast: false
       matrix:
-        os: [macos-13, macos-15, windows-2025, windows-11-arm, ubuntu-24.04, ubuntu-24.04-arm]
+        os: [macos-15-intel, macos-15, windows-2025, windows-11-arm, ubuntu-24.04, ubuntu-24.04-arm]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
@@ -98,14 +98,14 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: maven
+          # Note: no cache here - this job only runs jpackage, not Maven
       - name: Download universal artifacts
         uses: actions/download-artifact@v4
         with:
           name: universal
           path: sip-app/target
       - name: Package for macOS
-        if: startsWith(matrix.os, 'macOS-')
+        if: startsWith(matrix.os, 'macos-')
         run: bash _scripts/jpackage_macos.sh
       - name: Package for Windows
         if: startsWith(matrix.os, 'windows-')
@@ -142,7 +142,7 @@ jobs:
           nativeext_alt=""
           nativepath_alt=""
           case "${{ matrix.os }}" in
-            "macos-13")
+            "macos-15-intel")
               nativetype="macos-x86_64"
               nativeext="dmg"
               nativepath=$(ls -1 sip-app/target/*.dmg | head -n 1)
