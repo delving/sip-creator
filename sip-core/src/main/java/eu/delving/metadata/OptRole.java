@@ -17,7 +17,7 @@
 
 package eu.delving.metadata;
 
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.text.WordUtils;
 
 /**
  * What roles can an opt play in the tree of RecDefNodes

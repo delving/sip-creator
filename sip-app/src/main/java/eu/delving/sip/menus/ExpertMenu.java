@@ -28,7 +28,7 @@ import eu.delving.sip.model.MappingModel;
 import eu.delving.sip.model.SipModel;
 import eu.delving.sip.model.StatsModel;
 import eu.delving.stats.Stats;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -271,8 +271,8 @@ public class ExpertMenu extends JMenu {
                     "in the folder that can be opened using the button, or reinstall the application.<br>" +
                     "Changes take effect when the application is restarted.";
                 introText = String.format(introText,
-                    StringEscapeUtils.escapeHtml(cfgFile.getName()),
-                    StringEscapeUtils.escapeHtml(cfgFileBackup.getName())
+                    StringEscapeUtils.escapeHtml4(cfgFile.getName()),
+                    StringEscapeUtils.escapeHtml4(cfgFileBackup.getName())
                 );
             } else {
                 isEditable = false;
@@ -280,7 +280,7 @@ public class ExpertMenu extends JMenu {
                     "Changes take effect when the application is restarted.<br>" +
                     "Please make a backup of the file, or reinstall the application in case of mistakes.";
                 introText = String.format(introText,
-                    StringEscapeUtils.escapeHtml(cfgFile.getName()));
+                    StringEscapeUtils.escapeHtml4(cfgFile.getName()));
                 if (cfgContents == null) {
                     introText += "<br><br>If you are running the application using <code>java -jar</code> " +
                         "then add options to the command line instead.";

@@ -20,7 +20,7 @@ package eu.delving.sip.menus;
 import eu.delving.sip.Application;
 import eu.delving.sip.frames.AllFrames;
 import eu.delving.sip.model.SipModel;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -142,11 +142,11 @@ public class HelpMenu extends JMenu {
                             props.put(child.getNodeName(), child.getTextContent());
                         }
                         html.append("<b>");
-                        html.append(StringEscapeUtils.escapeHtml(props.getOrDefault("name", "(name)")));
+                        html.append(StringEscapeUtils.escapeHtml4(props.getOrDefault("name", "(name)")));
                         html.append("</b><br>");
                         String url = props.get("url");
                         if (url != null) {
-                            String escaped = StringEscapeUtils.escapeHtml(url);
+                            String escaped = StringEscapeUtils.escapeHtml4(url);
                             html.append("<a href=\"");
                             html.append(escaped);
                             html.append("\">");
@@ -270,8 +270,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<br>
 See the Licence for the specific language governing permissions and<br>
 limitations under the Licence.""";
             text = String.format(text,
-                StringEscapeUtils.escapeHtml(Application.titleString()),
-                StringEscapeUtils.escapeHtml(Application.buildString())
+                StringEscapeUtils.escapeHtml4(Application.titleString()),
+                StringEscapeUtils.escapeHtml4(Application.buildString())
             );
             ImageIcon logo = new ImageIcon(getClass().getResource("/sip-creator-logo.png"));
 

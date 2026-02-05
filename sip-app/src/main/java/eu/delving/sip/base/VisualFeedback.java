@@ -42,8 +42,8 @@ import static eu.delving.sip.files.Storage.NARTHEX_PREFIX;
 import static eu.delving.sip.files.Storage.NARTHEX_URL;
 import static eu.delving.sip.files.Storage.NARTHEX_USERNAME;
 import static javax.swing.JOptionPane.*;
-import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.apache.commons.lang.StringUtils.isWhitespace;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isWhitespace;
 
 /**
  * Give the user feedback in different ways, with pop-up alerts and various kinds of question dialogs.

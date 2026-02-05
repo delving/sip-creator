@@ -27,7 +27,7 @@ import eu.delving.sip.base.Work;
 import eu.delving.sip.files.Storage;
 import eu.delving.sip.model.SipModel;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.text.WordUtils;
 
 import javax.swing.*;
 import java.awt.BorderLayout;

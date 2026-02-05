@@ -26,8 +26,8 @@ import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.model.Feedback;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import javax.swing.*;
 import java.awt.Component;
@@ -136,7 +136,7 @@ public class ReportFile {
                 Map.Entry<String, JsonNode> i = it.next();
                 int value = i.getValue().asInt();
                 reportConclusions.add(String.format("<center><b>%s:</b><br>%s<br>(%.1f%%)</center>",
-                    StringEscapeUtils.escapeHtml(StringUtils.capitalize(i.getKey().toLowerCase())),
+                    StringEscapeUtils.escapeHtml4(StringUtils.capitalize(i.getKey().toLowerCase())),
                     value,  totalCount > 0 ? (((double) value) / totalCount * 100) : 0f));
             }
         }  else {
@@ -339,13 +339,13 @@ public class ReportFile {
         out.append("<tr><td>\n");
         out.append("<b>").append(rec.error).append("</b><br>\n");
         for (String line : rec.lines) {
-            out.append("<br>\n").append(StringEscapeUtils.escapeHtml(line));
+            out.append("<br>\n").append(StringEscapeUtils.escapeHtml4(line));
         }
         out.append("</td></tr>\n");
         if (rec.code != null) {
             out.append("</table><table cellpadding=6>\n");
             out.append("<tr><td><pre>");
-            out.append(StringEscapeUtils.escapeHtml(rec.code));
+            out.append(StringEscapeUtils.escapeHtml4(rec.code));
             out.append("</pre></td></tr>\n");
         }
         out.append("</table>");
