@@ -96,7 +96,11 @@ jobs:
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          # Pin macOS to 21.0.7 to avoid font rendering bug in 21.0.8+
+          # (missing glyphs in Swing). Fix is backported to 21.0.11 (April 2026).
+          # See: https://github.com/adoptium/adoptium-support/issues/1393
+          # See: https://github.com/openjdk/jdk21u-dev/pull/2565
+          java-version: ${{ startsWith(matrix.os, 'macos-') && '21.0.7' || '21' }}
           distribution: 'temurin'
           # Note: no cache here - this job only runs jpackage, not Maven
       - name: Download universal artifacts
