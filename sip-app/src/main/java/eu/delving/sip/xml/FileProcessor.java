@@ -213,7 +213,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     @Override
     public void run() {
-        groovyCodeResource.clearMappingScripts();
+        groovyCodeResource.resetClassLoader();
         OutputStream outputStream = null;
         MetadataParser parser = null;
         try {

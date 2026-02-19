@@ -94,8 +94,10 @@ public class EngineHolder {
             LOG.info("Resetting GroovyScriptEngine to free Metaspace");
             INSTANCE = null;
             compilationCount.set(0);
-            // Suggest GC to reclaim the old classloader and its classes
-            System.gc();
+            // Let JVM handle GC timing naturally. Explicit System.gc() can evict
+            // font glyph caches held by SoftReferences, which combined with the
+            // Metal pipeline bug (JDK-8349701) causes progressive font rendering
+            // corruption on macOS Apple Silicon.
         }
     }
 

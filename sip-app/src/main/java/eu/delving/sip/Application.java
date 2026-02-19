@@ -925,6 +925,12 @@ public class Application {
             System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
             System.setProperty("apple.awt.application.name", "SIP-Creator");
             System.setProperty("com.apple.mrj.application.apple.menu.about.name", "SIP-Creator");
+            // Workaround for JDK-8349701: Metal pipeline causes progressive font
+            // rendering corruption on Apple Silicon (VolatileImage glyph cache bug).
+            // Fall back to OpenGL which does not have this issue.
+            if ("aarch64".equals(System.getProperty("os.arch"))) {
+                System.setProperty("sun.java2d.metal", "false");
+            }
         }
 
         // In (at least) the GTK system look and feel, for JDesktopPane there is a task

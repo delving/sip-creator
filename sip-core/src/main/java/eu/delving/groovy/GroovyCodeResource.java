@@ -42,6 +42,7 @@ public class GroovyCodeResource {
     private static final URL MAPPING_CATEGORY = GroovyCodeResource.class.getResource("/MappingCategory.groovy");
     private final ClassLoader classLoader;
     private GroovyClassLoader categoryClassLoader;
+    private GroovyClassLoader childClassLoader;
     private Map<Long, Script> mappingScriptsByCode = Collections.synchronizedMap(new HashMap<>());
 
     public GroovyCodeResource(ClassLoader classLoader) {
@@ -86,6 +87,15 @@ public class GroovyCodeResource {
         mappingScriptsByCode.clear();
     }
 
+    /**
+     * Reset the child classloader, forcing a fresh one on next compilation.
+     * Call this when the mapping context changes (e.g., new mapping loaded).
+     */
+    public synchronized void resetClassLoader() {
+        childClassLoader = null;
+        mappingScriptsByCode.clear();
+    }
+
     private synchronized GroovyClassLoader getGroovyClassLoader() {
         if (categoryClassLoader == null) {
             try {
@@ -97,7 +107,13 @@ public class GroovyCodeResource {
                 throw new RuntimeException("Cannot initialize Groovy Code Resource", e);
             }
         }
-        return new GroovyClassLoader(categoryClassLoader);
+        // Reuse the child classloader to avoid excessive classloader churn.
+        // Creating a new GroovyClassLoader on every compilation causes Metaspace
+        // pressure that triggers GC, which evicts font glyph caches.
+        if (childClassLoader == null) {
+            childClassLoader = new GroovyClassLoader(categoryClassLoader);
+        }
+        return childClassLoader;
     }
 
     private String readResourceCode(URL resource) throws IOException {

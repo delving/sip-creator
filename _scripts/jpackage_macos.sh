@@ -58,6 +58,7 @@ jpackage \
 --description "Delving SIP-Creator" \
 --copyright "Copyright 2011-$yearnow Delving BV" \
 --java-options "-Dapple.awt.application.appearance=system" \
+--java-options "-Dsun.java2d.metal=false" \
 --java-options '-splash:$APPDIR/sip-creator-logo.png' \
 --mac-package-identifier eu.delving.sip \
 --mac-package-name "SIP-Creator" \

@@ -258,6 +258,7 @@ public class MappingCompileModel {
         @Override
         public void recMappingSet(MappingModel mappingModel) {
             recMapping = mappingModel.getRecMapping();
+            groovyCodeResource.resetClassLoader();
             setNodeMapping(null);
             triggerCompile();
         }
