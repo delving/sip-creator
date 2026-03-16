@@ -489,6 +489,9 @@ public class SipModel {
         if ("JSONLD".equals(rdfFormat)) {
             return RDFFormat.JSONLD_COMPACT_PRETTY;
         }
+        if ("JSONLD_FRAMED".equals(rdfFormat)) {
+            return RDFFormat.JSONLD_FRAME_PRETTY;
+        }
         if ("NQUADS".equals(rdfFormat)) {
             return RDFFormat.NQUADS;
         }
