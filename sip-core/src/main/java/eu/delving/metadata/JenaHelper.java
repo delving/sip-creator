@@ -63,18 +63,14 @@ public class JenaHelper {
     }
 
     public static String convertRDF(String defaultPrefix, String rdf, RDFFormat outputFormat, Map<String, Object> frame) {
-        if (outputFormat == RDFFormat.RDFXML)
-            return rdf;
-
         if (outputFormat == RDFFormat.JSONLD_FRAME_PRETTY) {
+            if (frame == null) {
+                throw new IllegalArgumentException("frame cannot be null for JSONLD_FRAME_PRETTY format");
+            }
             return convertRDFWithFrame(defaultPrefix, rdf, outputFormat, frame);
         }
 
-        byte[] out = convertRDFTo(defaultPrefix, rdf, outputFormat);
-        if (outputFormat == RDFFormat.JSONLD_COMPACT_PRETTY) {
-            return formatJSON(out);
-        }
-        throw new UnsupportedOperationException("Conversion to " + outputFormat + " is not supported");
+        return convertRDF(defaultPrefix, rdf, outputFormat);
     }
 
     private static String convertRDFWithFrame(String defaultPrefix, String rdf, RDFFormat outputFormat, Map<String, Object> frame) {
@@ -125,6 +121,9 @@ public class JenaHelper {
 
     public static String getExtension(RDFFormat outputFormat) {
         if (outputFormat == RDFFormat.JSONLD_COMPACT_PRETTY) {
+            return ".json";
+        }
+        if (outputFormat == RDFFormat.JSONLD_FRAME_PRETTY) {
             return ".json";
         }
         if (outputFormat == RDFFormat.NTRIPLES) {
