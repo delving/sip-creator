@@ -120,6 +120,9 @@ public class JenaHelper {
     }
 
     public static String getExtension(RDFFormat outputFormat) {
+        if (outputFormat == null) {
+            throw new IllegalArgumentException("outputFormat cannot be null");
+        }
         if (outputFormat == RDFFormat.JSONLD_COMPACT_PRETTY) {
             return ".json";
         }
