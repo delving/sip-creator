@@ -146,7 +146,8 @@ public class DOMBuilder extends BuilderSupport {
             if (value instanceof Closure) {
                 Closure closure = (Closure) value;
                 closure.setDelegate(instance);
-                return closure.call();
+                Object result = closure.call();
+                return suppressIfAllVariablesEmpty(result);
             } else if (value instanceof List) {
                 List values = (List) value;
                 List resolvedValues = new ArrayList(values.size());
@@ -156,6 +157,32 @@ public class DOMBuilder extends BuilderSupport {
                 return resolvedValues;
             }
             return value;
+        }
+
+        /**
+         * Returns null if the value is a GString whose interpolated variables
+         * are ALL null or empty — i.e. only the literal template skeleton remains.
+         * Returns the value unchanged in all other cases:
+         * <ul>
+         *   <li>Plain String (no variables to check)</li>
+         *   <li>GString with at least one non-empty variable</li>
+         *   <li>null or any other type</li>
+         * </ul>
+         * This prevents partially-rendered URI templates like
+         * {@code "https://example.com/"} from being emitted when the
+         * mapping expression was {@code "https://example.com/${slug}"}
+         * and the source data had no value for slug.
+         */
+        private Object suppressIfAllVariablesEmpty(Object value) {
+            if (!(value instanceof GString)) return value;
+            GString gstring = (GString) value;
+            Object[] values = gstring.getValues();
+            if (values == null || values.length == 0) return value;
+            for (Object v : values) {
+                String s = v == null ? "" : v.toString().trim();
+                if (!s.isEmpty()) return value;
+            }
+            return null;
         }
 
         private int calcElementsRequired(Map<String, Object> attributes, Object contents) {
@@ -244,12 +271,11 @@ public class DOMBuilder extends BuilderSupport {
 
                     String attrValueStr = attributeValue.toString();
 
-                    // Validate xml:lang attribute values
-                    validateXmlLang(attributeName, attrValueStr);
-
-                    // Track xml:lang for empty content validation
                     if ("xml:lang".equals(attributeName)) {
+                        // Validate format but defer setting — only add if content is non-empty
+                        validateXmlLang(attributeName, attrValueStr);
                         xmlLangValue = attrValueStr;
+                        continue;
                     }
 
                     TagValue tagValue = new TagValue(attributeName, true);
@@ -261,29 +287,26 @@ public class DOMBuilder extends BuilderSupport {
                 }
 
                 Object contentValue = extractValue(contents, i);
-                if(contentValue instanceof String || contentValue instanceof GString) {
-                    if(contentValue != null) {
+                if (contentValue instanceof String || contentValue instanceof GString) {
+                    if (contentValue != null) {
                         toTextNodes(contentValue.toString(), element);
                     }
                 }
 
-                // Validate that elements with xml:lang have non-empty content
+                // Only set xml:lang when there is non-empty text content
                 if (xmlLangValue != null) {
-                    boolean hasContent = contentValue != null &&
-                        (contentValue instanceof String || contentValue instanceof GString) &&
-                        !contentValue.toString().trim().isEmpty();
-
-                    if (!hasContent) {
-                        throw new LanguageTagException(
-                            LanguageTagException.Type.EMPTY_CONTENT,
-                            name,
-                            xmlLangValue,
-                            String.format(
-                                "Element '%s' has xml:lang='%s' but no content - either add content or remove the language tag",
-                                name, xmlLangValue
-                            )
+                    boolean hasContent = contentValue != null
+                        && (contentValue instanceof String || contentValue instanceof GString)
+                        && !contentValue.toString().trim().isEmpty();
+                    if (hasContent) {
+                        TagValue tagValue = new TagValue("xml:lang", true);
+                        element.setAttributeNS(
+                            tagValue.isNamespaceAdded() ? tagValue.uri : null,
+                            tagValue.isNamespaceAdded() ? tagValue.toString() : tagValue.localPart,
+                            xmlLangValue
                         );
                     }
+                    // else: silently drop xml:lang — a language tag on empty content is meaningless
                 }
 
                 elements.add(element);

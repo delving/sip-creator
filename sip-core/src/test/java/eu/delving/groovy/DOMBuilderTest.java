@@ -19,8 +19,10 @@ package eu.delving.groovy;
 
 import eu.delving.metadata.RecDef;
 import groovy.lang.Closure;
+import groovy.lang.GString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.io.InputStream;
@@ -51,6 +53,18 @@ class DOMBuilderTest {
         return new Closure<String>(this) {
             @Override
             public String call() {
+                return value;
+            }
+        };
+    }
+
+    /**
+     * Helper to create a Groovy Closure that returns an Object (e.g. GString).
+     */
+    private Closure<Object> closureReturningObject(final Object value) {
+        return new Closure<Object>(this) {
+            @Override
+            public Object call() {
                 return value;
             }
         };
@@ -213,44 +227,36 @@ class DOMBuilderTest {
     // ========== Empty content with xml:lang ==========
 
     @Test
-    void testEmptyContentWithXmlLang() {
+    void testEmptyContentWithXmlLang_dropsLangTag() {
         Map<String, Object> attrs = new HashMap<>();
         attrs.put("xml:lang", "en");
-
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            builder.invokeMethod("test:element", new Object[]{attrs, closureReturning("")});
-        });
-
-        assertTrue(exception.getMessage().contains("no content"),
-            "Error message should mention 'no content'");
-        assertTrue(exception.getMessage().contains("en"),
-            "Error message should show the lang tag");
+        Node result = (Node) builder.invokeMethod("test:element",
+                new Object[]{attrs, closureReturning("")});
+        assertNotNull(result);
+        assertFalse(((Element) result).hasAttribute("xml:lang"),
+                "xml:lang should be dropped when content is empty");
     }
 
     @Test
-    void testWhitespaceOnlyContentWithXmlLang() {
+    void testWhitespaceOnlyContentWithXmlLang_dropsLangTag() {
         Map<String, Object> attrs = new HashMap<>();
         attrs.put("xml:lang", "nl");
-
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            builder.invokeMethod("test:element", new Object[]{attrs, closureReturning("   ")});
-        });
-
-        assertTrue(exception.getMessage().contains("no content"),
-            "Error message should mention 'no content'");
+        Node result = (Node) builder.invokeMethod("test:element",
+                new Object[]{attrs, closureReturning("   ")});
+        assertNotNull(result);
+        assertFalse(((Element) result).hasAttribute("xml:lang"),
+                "xml:lang should be dropped when content is whitespace-only");
     }
 
     @Test
-    void testNullContentWithXmlLang() {
+    void testNullContentWithXmlLang_dropsLangTag() {
         Map<String, Object> attrs = new HashMap<>();
         attrs.put("xml:lang", "de");
-
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            builder.invokeMethod("test:element", new Object[]{attrs, closureReturning(null)});
-        });
-
-        assertTrue(exception.getMessage().contains("no content"),
-            "Error message should mention 'no content'");
+        Node result = (Node) builder.invokeMethod("test:element",
+                new Object[]{attrs, closureReturning(null)});
+        assertNotNull(result);
+        assertFalse(((Element) result).hasAttribute("xml:lang"),
+                "xml:lang should be dropped when content is null");
     }
 
     // ========== Elements without xml:lang should work fine ==========
@@ -283,14 +289,14 @@ class DOMBuilderTest {
     @Test
     void testErrorMessageContainsElementName() {
         Map<String, Object> attrs = new HashMap<>();
-        attrs.put("xml:lang", "en");
+        attrs.put("xml:lang", "not a valid tag");
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            builder.invokeMethod("test:myElement", new Object[]{attrs, closureReturning("")});
+        LanguageTagException exception = assertThrows(LanguageTagException.class, () -> {
+            builder.invokeMethod("test:myElement", new Object[]{attrs, closureReturning("Content")});
         });
 
-        assertTrue(exception.getMessage().contains("myElement"),
-            "Error message should contain element name");
+        assertTrue(exception.getElementName().contains("myElement"),
+            "Exception should contain element name");
     }
 
     @Test
@@ -306,5 +312,106 @@ class DOMBuilderTest {
             exception.getMessage().contains("'nl'") ||
             exception.getMessage().contains("en-US"),
             "Error message should suggest valid examples");
+    }
+
+    // ========== GString template suppression ==========
+
+    /**
+     * Creates a GString with the given string parts and interpolated values.
+     * For "prefix${var}suffix", strings={"prefix","suffix"}, values={var}.
+     */
+    private GString gstring(String[] strings, Object[] values) {
+        return new GString(values) {
+            @Override
+            public String[] getStrings() {
+                return strings;
+            }
+        };
+    }
+
+    @Test
+    void gstringContentWithAllEmptyVars_suppressesContent() {
+        // "https://example.com/${slug}" where slug=""
+        GString template = gstring(new String[]{"https://example.com/", ""}, new Object[]{""});
+        Node result = (Node) builder.invokeMethod("test:element",
+                new Object[]{closureReturningObject(template)});
+        // When all GString vars are empty, content should be suppressed
+        if (result != null) {
+            assertEquals("", result.getTextContent(),
+                    "Element with all-empty GString vars should have no content");
+        }
+    }
+
+    @Test
+    void gstringContentWithAllNullVars_suppressesContent() {
+        GString template = gstring(new String[]{"https://example.com/", ""}, new Object[]{null});
+        Node result = (Node) builder.invokeMethod("test:element",
+                new Object[]{closureReturningObject(template)});
+        if (result != null) {
+            assertEquals("", result.getTextContent(),
+                    "Element with all-null GString vars should have no content");
+        }
+    }
+
+    @Test
+    void gstringContentWithSomeNonEmptyVar_keepsContent() {
+        // "https://example.com/${type}/${slug}" where type="paintings", slug=""
+        GString template = gstring(
+                new String[]{"https://example.com/", "/", ""},
+                new Object[]{"paintings", ""});
+        Node result = (Node) builder.invokeMethod("test:element",
+                new Object[]{closureReturningObject(template)});
+        assertNotNull(result);
+        assertEquals("https://example.com/paintings/", result.getTextContent());
+    }
+
+    @Test
+    void gstringContentWithAllNonEmptyVars_keepsContent() {
+        GString template = gstring(
+                new String[]{"https://example.com/", "/", ""},
+                new Object[]{"paintings", "123"});
+        Node result = (Node) builder.invokeMethod("test:element",
+                new Object[]{closureReturningObject(template)});
+        assertNotNull(result);
+        assertEquals("https://example.com/paintings/123", result.getTextContent());
+    }
+
+    @Test
+    void plainStringContent_neverSuppressed() {
+        Node result = (Node) builder.invokeMethod("test:element",
+                new Object[]{closureReturning("https://example.com/static")});
+        assertNotNull(result);
+        assertEquals("https://example.com/static", result.getTextContent());
+    }
+
+    @Test
+    void gstringAttributeWithAllEmptyVars_suppressesAttribute() {
+        Map<String, Object> attrs = new HashMap<>();
+        GString template = gstring(new String[]{"https://example.com/", ""}, new Object[]{""});
+        Closure<Object> attrClosure = new Closure<Object>(this) {
+            public Object call() { return template; }
+        };
+        attrs.put("test:about", attrClosure);
+        Node result = (Node) builder.invokeMethod("test:element",
+                new Object[]{attrs, closureReturning("content")});
+        assertNotNull(result);
+        assertFalse(((Element) result).hasAttribute("test:about"),
+                "attribute should be suppressed when GString vars all empty");
+    }
+
+    @Test
+    void gstringAttributeWithNonEmptyVar_keepsAttribute() {
+        Map<String, Object> attrs = new HashMap<>();
+        GString template = gstring(new String[]{"https://example.com/", ""}, new Object[]{"abc"});
+        Closure<Object> attrClosure = new Closure<Object>(this) {
+            public Object call() { return template; }
+        };
+        attrs.put("test:about", attrClosure);
+        Node result = (Node) builder.invokeMethod("test:element",
+                new Object[]{attrs, closureReturning("content")});
+        assertNotNull(result);
+        Element element = (Element) result;
+        String aboutValue = element.getAttribute("test:about");
+        assertEquals("https://example.com/abc", aboutValue);
     }
 }
