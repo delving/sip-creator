@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<record-definition prefix="test" version="0.0.0">
+    <namespaces>
+        <namespace prefix="test" uri="http://test.example.org/" schema="http://test.example.org/test.xsd"/>
+        <namespace prefix="skos" uri="http://www.w3.org/2004/02/skos/core#"/>
+        <namespace prefix="crm" uri="http://www.cidoc-crm.org/cidoc-crm/"/>
+    </namespaces>
+
+    <attrs>
+        <attr tag="id"/>
+        <attr tag="xml:lang"/>
+        <attr tag="ref"/>
+    </attrs>
+
+    <!-- ============================================================
+         Templates: reusable subtrees injected via target="..."
+         ============================================================ -->
+    <templates>
+        <elem tag="identifier" attrs="id">
+            <elem tag="value" attrs="xml:lang"/>
+            <elem tag="type"/>
+        </elem>
+    </templates>
+
+    <!-- ============================================================
+         Elem-groups: named bundles of elements injected via elemGroups="..."
+         ============================================================ -->
+    <elem-groups>
+        <!-- Group with simple leaf elements -->
+        <elem-group name="labels">
+            <elem tag="skos:prefLabel" attrs="xml:lang"/>
+            <elem tag="skos:altLabel" attrs="xml:lang"/>
+        </elem-group>
+
+        <!-- Group whose members reference templates via target -->
+        <elem-group name="core-entity">
+            <elem tag="has-id" attrs="ref" target="identifier"/>
+            <elem tag="has-type" attrs="ref"/>
+        </elem-group>
+
+        <!-- Group combining labels + a note -->
+        <elem-group name="labeled-entity">
+            <elem tag="has-id" attrs="ref" target="identifier"/>
+            <elem tag="skos:prefLabel" attrs="xml:lang"/>
+            <elem tag="skos:altLabel" attrs="xml:lang"/>
+            <elem tag="has-type" attrs="ref"/>
+        </elem-group>
+    </elem-groups>
+
+    <root tag="root">
+        <!-- Uses the simple labels group -->
+        <elem tag="concept" attrs="id" elemGroups="labels"/>
+
+        <!-- Uses the core-entity group (which references a template) -->
+        <elem tag="thing" attrs="id" elemGroups="core-entity"/>
+
+        <!-- Uses the labeled-entity group -->
+        <elem tag="agent" attrs="id" elemGroups="labeled-entity"/>
+
+        <!-- Combines elem-group with inline children -->
+        <elem tag="place" attrs="id" elemGroups="labels">
+            <elem tag="lat"/>
+            <elem tag="lon"/>
+        </elem>
+
+        <!-- No elem-group, just inline — for comparison -->
+        <elem tag="plain" attrs="id">
+            <elem tag="name"/>
+        </elem>
+    </root>
+
+    <field-markers/>
+    <opts/>
+</record-definition>
