@@ -20,6 +20,7 @@ package eu.delving.sip.frames;
 import eu.delving.metadata.*;
 import eu.delving.sip.base.FrameBase;
 import eu.delving.sip.base.Swing;
+import eu.delving.sip.base.SwingHelper;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.model.*;
 
@@ -29,11 +30,9 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.GridLayout;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 
 import static eu.delving.sip.base.KeystrokeHelper.*;
 import static eu.delving.sip.base.SwingHelper.scrollVH;
@@ -51,8 +50,11 @@ public class TargetFrame extends FrameBase {
     private final static String REMOVE_DUPLICATE_ELEMENT = "Remove duplicate element";
     public static final FilterNode EMPTY_NODE = FilterNode.createMessageNode("No record definition");
     private JTree recDefTree;
+    private JTree templatesTree;
     private JTextField filterField = new JTextField();
+    private JTabbedPane tabbedPane;
     private JPanel treePanel;
+    private JPanel templatesPanel;
     private JCheckBoxMenuItem hideAttributes = new JCheckBoxMenuItem("Hide Attributes");
     private JCheckBoxMenuItem autoFold = new JCheckBoxMenuItem("Auto-Fold");
     private Timer timer = new Timer(300, new ActionListener() {
@@ -77,6 +79,13 @@ public class TargetFrame extends FrameBase {
         recDefTree.setDropMode(DropMode.ON);
         treePanel = new JPanel(new BorderLayout());
         treePanel.add(scrollVH("Record Definition", recDefTree));
+        templatesTree = new JTree(new DefaultTreeModel(new DefaultMutableTreeNode("No templates")));
+        templatesTree.setCellRenderer(new TemplateTreeRenderer());
+        templatesPanel = new JPanel(new BorderLayout());
+        templatesPanel.add(scrollVH("Templates", templatesTree));
+        tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Elements", treePanel);
+        tabbedPane.addTab("Templates", templatesPanel);
         JMenu view = new JMenu("View");
         view.add(new ExpandRootAction());
         view.add(hideAttributes);
@@ -90,7 +99,7 @@ public class TargetFrame extends FrameBase {
     @Override
     protected void buildContent(Container content) {
         content.add(createNorthPanel(), BorderLayout.NORTH);
-        content.add(treePanel, BorderLayout.CENTER);
+        content.add(tabbedPane, BorderLayout.CENTER);
     }
 
     private JPanel createNorthPanel() {
@@ -403,6 +412,93 @@ public class TargetFrame extends FrameBase {
             treePanel.removeAll();
             treePanel.add(scrollVH(String.format("Record Definition for \"%s\"", prefix.toUpperCase()), recDefTree));
             treePanel.validate();
+            updateTemplatesTree(prefix);
+        }
+    }
+
+    private void updateTemplatesTree(String prefix) {
+        MappingModel mappingModel = sipModel.getMappingModel();
+        if (!mappingModel.hasRecMapping()) {
+            templatesTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("No templates")));
+            return;
+        }
+        RecDef recDef = mappingModel.getRecMapping().getRecDefTree().getRecDef();
+        List<RecDef.Elem> templates = recDef.templates;
+        if (templates == null || templates.isEmpty()) {
+            templatesTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("No templates defined")));
+            return;
+        }
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(
+                String.format("Templates (%s) — %d", prefix.toUpperCase(), templates.size()));
+        for (RecDef.Elem template : templates) {
+            root.add(buildTemplateNode(template));
+        }
+        templatesTree.setModel(new DefaultTreeModel(root));
+        templatesPanel.removeAll();
+        templatesPanel.add(scrollVH(String.format("Templates for \"%s\"", prefix.toUpperCase()), templatesTree));
+        templatesPanel.validate();
+    }
+
+    private DefaultMutableTreeNode buildTemplateNode(RecDef.Elem elem) {
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(elem);
+        // Use subattrs (raw XStream data) since templates are not resolved
+        if (elem.subattrs != null) {
+            for (RecDef.Attr attr : elem.subattrs) {
+                node.add(new DefaultMutableTreeNode(attr));
+            }
+        }
+        // Also show resolved attrs if available (for templates that were resolved)
+        if (elem.attrList != null && !elem.attrList.isEmpty() && (elem.subattrs == null || elem.subattrs.isEmpty())) {
+            for (RecDef.Attr attr : elem.attrList) {
+                node.add(new DefaultMutableTreeNode(attr));
+            }
+        }
+        // Use subelements (raw XStream data) since templates are not resolved via resolve()
+        if (elem.subelements != null) {
+            for (RecDef.Elem child : elem.subelements) {
+                node.add(buildTemplateNode(child));
+            }
+        }
+        // Fallback to resolved elemList if subelements is empty
+        if (elem.elemList != null && !elem.elemList.isEmpty() && (elem.subelements == null || elem.subelements.isEmpty())) {
+            for (RecDef.Elem child : elem.elemList) {
+                node.add(buildTemplateNode(child));
+            }
+        }
+        return node;
+    }
+
+    private static class TemplateTreeRenderer extends DefaultTreeCellRenderer {
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            Component component = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
+            if (value instanceof DefaultMutableTreeNode) {
+                Object userObject = ((DefaultMutableTreeNode) value).getUserObject();
+                if (userObject instanceof RecDef.Elem) {
+                    RecDef.Elem elem = (RecDef.Elem) userObject;
+                    String text = elem.tag.toString();
+                    if (elem.label != null && !elem.label.isEmpty()) {
+                        text += "  —  " + elem.label;
+                    }
+                    if (elem.attrs != null && !elem.attrs.isEmpty()) {
+                        text += "  [@" + elem.attrs + "]";
+                    }
+                    if (elem.target != null && !elem.target.isEmpty()) {
+                        text += "  → " + elem.target;
+                    }
+                    setText(text);
+                    boolean hasChildren = !elem.elemList.isEmpty() || !elem.attrList.isEmpty()
+                            || (elem.subelements != null && !elem.subelements.isEmpty())
+                            || (elem.subattrs != null && !elem.subattrs.isEmpty())
+                            || (elem.target != null && !elem.target.isEmpty());
+                    setIcon(hasChildren ? SwingHelper.ICON_COMPOSITE : SwingHelper.ICON_VALUE);
+                } else if (userObject instanceof RecDef.Attr) {
+                    RecDef.Attr attr = (RecDef.Attr) userObject;
+                    setText("@" + attr.tag.toString());
+                    setIcon(SwingHelper.ICON_ATTRIBUTE);
+                }
+            }
+            return component;
         }
     }
 
