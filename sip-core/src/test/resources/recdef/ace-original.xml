@@ -1,0 +1,234 @@
+<?xml version="1.0"?>
+<record-definition prefix="ace" version="0.2.3" flat="false">
+  <namespaces>
+    <namespace prefix="rdf" uri="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <namespace prefix="rdfs" uri="http://www.w3.org/2000/01/rdf-schema#"/>
+    <namespace prefix="xsd" uri="http://www.w3.org/2001/XMLSchema#"/>
+    <namespace prefix="owl" uri="http://www.w3.org/2002/07/owl#"/>
+    <namespace prefix="ace" uri="https://data.antwerp.be/ns/cultureel-erfgoed#"/>
+    <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/"/>
+    <namespace prefix="dcterms" uri="http://purl.org/dc/terms/"/>
+    <namespace prefix="crm" uri="http://www.cidoc-crm.org/cidoc-crm/"/>
+    <namespace prefix="lrm" uri="https://www.iflastandards.info/ns/lrm/lrmoo/"/>
+    <namespace prefix="rico" uri="https://www.ica.org/standards/RiC/ontology#"/>
+    <namespace prefix="skos" uri="http://www.w3.org/2004/02/skos/core#"/>
+  </namespaces>
+  <attrs>
+    <attr tag="rdf:about" uriCheck="true"/>
+    <attr tag="rdf:resource"/>
+    <attr tag="rdf:datatype"/>
+    <attr tag="rdf:type"/>
+    <attr tag="rdf:parseType"/>
+    <attr tag="xml:lang"/>
+  </attrs>
+  <!-- ============================================================
+       Reusable element templates (generieke modellen)
+       These are expanded inline wherever target="..." references them.
+       ============================================================ -->
+  <templates>
+    <!-- Identifier: E42 with symbolic content, type, and note -->
+    <elem attrs="rdf:about" label="Identifier" tag="crm:E42_Identifier">
+      <elem attrs="rdf:datatype, xml:lang" label="has symbolic content" path="" tag="crm:P190_has_symbolic_content" xsd_type="string"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id">
+        <elem attrs="rdf:about" label="Type" rangenode_id="" tag="crm:E55_Type">
+          <elem attrs="rdf:datatype, xml:lang" label="label" path="" tag="rdfs:label" xsd_type="string"/>
+          <elem attrs="rdf:resource" label="has_type" path="" tag="rdf:type" xsd_type="@id"/>
+        </elem>
+      </elem>
+      <elem attrs="rdf:datatype, xml:lang" label="has note" path="" tag="crm:P3_has_note" xsd_type="string"/>
+    </elem>
+    <!-- Title: E35 with symbolic content, type, and note -->
+    <elem attrs="rdf:about" label="Title" tag="crm:E35_Title">
+      <elem attrs="rdf:datatype, xml:lang" label="has symbolic content" path="" tag="crm:P190_has_symbolic_content" xsd_type="string"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id">
+        <elem attrs="rdf:about" label="Title Type" rangenode_id="" tag="crm:E55_Type">
+          <elem attrs="rdf:datatype, xml:lang" label="prefLabel" path="" tag="skos:prefLabel" xsd_type="string"/>
+          <elem attrs="rdf:resource" label="type" path="" tag="crm:E55_Type" xsd_type="@id"/>
+        </elem>
+      </elem>
+      <elem attrs="rdf:datatype, xml:lang" label="has note" path="" tag="crm:P3_has_note" xsd_type="string"/>
+    </elem>
+    <!-- Linguistic Object: E33 with symbolic content, type, and note -->
+    <elem attrs="rdf:about" label="Linguistic Object" tag="crm:E33_Linguistic_Object">
+      <elem attrs="rdf:datatype, xml:lang" label="has symbolic content" path="" tag="crm:P190_has_symbolic_content" xsd_type="string"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id">
+        <elem attrs="rdf:about" label="Type" rangenode_id="" tag="crm:E55_Type"/>
+      </elem>
+      <elem attrs="rdf:datatype, xml:lang" label="has note" path="" tag="crm:P3_has_note" xsd_type="string"/>
+    </elem>
+    <!-- Type (inline): E55 with labels and note -->
+    <elem attrs="rdf:about" label="Type" tag="crm:E55_Type">
+      <elem attrs="rdf:datatype, xml:lang" label="prefLabel" path="" tag="skos:prefLabel" xsd_type="string"/>
+      <elem attrs="rdf:datatype, xml:lang" label="altLabel" path="" tag="skos:altLabel" xsd_type="string"/>
+      <elem attrs="rdf:datatype, xml:lang" label="has note" path="" tag="crm:P3_has_note" xsd_type="string"/>
+    </elem>
+    <!-- Agent -->
+    <elem attrs="rdf:about" label="Agent" tag="rico:Agent">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <elem attrs="rdf:datatype, xml:lang" label="prefLabel" path="" tag="skos:prefLabel" xsd_type="string"/>
+      <elem attrs="rdf:datatype, xml:lang" label="altLabel" path="" tag="skos:altLabel" xsd_type="string"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+    </elem>
+    <!-- Place -->
+    <elem attrs="rdf:about" label="Place" tag="crm:E53_Place">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <elem attrs="rdf:datatype, xml:lang" label="prefLabel" path="" tag="skos:prefLabel" xsd_type="string"/>
+      <elem attrs="rdf:datatype, xml:lang" label="altLabel" path="" tag="skos:altLabel" xsd_type="string"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+    </elem>
+    <!-- Temporal entities -->
+    <elem attrs="rdf:about" label="Event" tag="crm:E5_Event">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+    </elem>
+    <elem attrs="rdf:about" label="BeginningOfExistence" tag="crm:E63_Beginning_of_Existence">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+    </elem>
+    <elem attrs="rdf:about" label="Production" tag="crm:E12_Production">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+    </elem>
+    <elem attrs="rdf:about" label="Creation" tag="crm:E65_Creation">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+    </elem>
+    <elem attrs="rdf:about" label="Birth" tag="crm:E67_Birth">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+    </elem>
+    <elem attrs="rdf:about" label="EndOfExistence" tag="crm:E64_End_of_Existence">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+    </elem>
+    <elem attrs="rdf:about" label="Destruction" tag="crm:E6_Destruction">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+    </elem>
+    <elem attrs="rdf:about" label="Death" tag="crm:E69_Death">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+    </elem>
+    <elem attrs="rdf:about" label="Activity" tag="crm:E7_Activity">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+    </elem>
+    <elem attrs="rdf:about" label="Acquisition" tag="crm:E8_Acquisition">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+    </elem>
+    <elem attrs="rdf:about" label="TransferOfCustody" tag="crm:E10_Transfer_of_Custody">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+    </elem>
+    <elem attrs="rdf:about" label="AttributeAssignment" tag="crm:E13_Attribute_Assignment">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+    </elem>
+    <elem attrs="rdf:about" label="TypeAssignment" tag="crm:E17_Type_Assignment">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+    </elem>
+    <!-- Concept Scheme -->
+    <elem attrs="rdf:about" label="Concept Scheme" tag="skos:ConceptScheme">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <elem attrs="rdf:datatype, xml:lang" label="prefLabel" path="" tag="skos:prefLabel" xsd_type="string"/>
+      <elem attrs="rdf:datatype, xml:lang" label="altLabel" path="" tag="skos:altLabel" xsd_type="string"/>
+      <elem attrs="rdf:datatype, xml:lang" label="has note" path="" tag="crm:P3_has_note" xsd_type="string"/>
+    </elem>
+    <!-- Concept -->
+    <elem attrs="rdf:about" label="Concept" tag="skos:Concept">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <elem attrs="rdf:datatype, xml:lang" label="prefLabel" path="" tag="skos:prefLabel" xsd_type="string"/>
+      <elem attrs="rdf:datatype, xml:lang" label="altLabel" path="" tag="skos:altLabel" xsd_type="string"/>
+      <elem attrs="rdf:datatype, xml:lang" label="has note" path="" tag="crm:P3_has_note" xsd_type="string"/>
+    </elem>
+  </templates>
+  <root tag="rdf:RDF">
+    <!-- ============================================================
+         Things
+         ============================================================ -->
+    <elem attrs="rdf:about" label="HumanMadeObject" nodeid="" tag="crm:E22_Human-Made_Object">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+      <!-- Beschrijving -->
+      <elem attrs="rdf:resource" label="is subject of" path="" tag="crm:P129i_is_subject_of" xsd_type="@id" target="crm:E33_Linguistic_Object"/>
+      <!-- Representations -->
+      <elem attrs="rdf:resource" label="has representation" path="" tag="crm:P138i_has_representation" xsd_type="@id">
+        <elem attrs="rdf:about" label="Document" rangenode_id="" tag="crm:E31_Document"/>
+      </elem>
+      <!-- Components -->
+      <elem attrs="rdf:resource" label="forms part of" path="" tag="crm:P46i_forms_part_of" xsd_type="@id">
+        <elem attrs="rdf:about" label="Human-Made Object" rangenode_id="" tag="crm:E22_Human-Made_Object"/>
+      </elem>
+      <!-- Beheerder -->
+      <elem attrs="rdf:resource" label="has current keeper" path="" tag="crm:P50_has_current_keeper" xsd_type="@id" target="rico:Agent"/>
+      <!-- Huidige Eigenaar > P52 has current owner - E39 Actor -->
+      <elem attrs="rdf:resource" label="has current owner" path="" tag="crm:P52_has_current_owner" xsd_type="@id" target="rico:Agent"/>
+      <!-- Collecties > P46i forms part of - E78 Curated Holding -->
+      <elem attrs="rdf:resource" label="forms part of collection" path="" tag="crm:P46i_forms_part_of" xsd_type="@id">
+        <elem attrs="rdf:about" label="Curated Holding" rangenode_id="" tag="crm:E78_Curated_Holding"/>
+      </elem>
+      <!--  Data eigenaars
+            (crm:Human-Made Object)-[dcterms:creator]-(rico:Agent)
+            (crm:Human-Made Object)-[ace:has_data_owner]-(rico:Agent)
+      -->
+      <!--  Data verantwoordelijke
+            (crm:Human-Made Object)-[dcterms:publisher]-(rico:Agent)
+            (crm:Human-Made Object)-[ace:has_data_stewart]-(rico:Agent)
+      -->
+      <!--  Data bron (systeem
+            (crm:Human-Made Object)-[dcterms:source]-(rico:Agent)
+            (crm:Human-Made Object)-[ace:has_source_system]-(rico:Agent)
+      -->
+    </elem>
+    <elem attrs="rdf:about" label="CuratedHolding" rangenode_id="" tag="crm:E78_Curated_Holding">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+    </elem>
+    <elem attrs="rdf:about" label="Collection" rangenode_id="" tag="rico:Collection">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+    </elem>
+    <!-- ============================================================
+         Propositional Objects
+         ============================================================ -->
+    <elem attrs="rdf:about" label="Work" nodeid="" tag="lrm:F1_Work">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+    </elem>
+    <elem attrs="rdf:about" label="ProductType" nodeid="" tag="crm:E99_Product_Type">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+    </elem>
+    <!-- ============================================================
+         Information Objects
+         ============================================================ -->
+    <elem attrs="rdf:about" label="Manifestation" nodeid="" tag="lrm:F3_Manifestation">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+    </elem>
+    <elem attrs="rdf:about" label="Expression" nodeid="" tag="lrm:F2_Expression">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+    </elem>
+    <elem attrs="rdf:about" label="Visual Item" nodeid="" tag="crm:E36_Visual_Item">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+    </elem>
+    <elem attrs="rdf:about" label="Document" nodeid="" tag="crm:E31_Document">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+    </elem>
+    <elem attrs="rdf:about" label="RecordSet" nodeid="" tag="rico:RecordSet">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+    </elem>
+    <elem attrs="rdf:about" label="Record" nodeid="" tag="rico:Record">
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+    </elem>
+  </root>
+  <field-markers/>
+  <opts/>
+  <docs>
+  </docs>
+</record-definition>
