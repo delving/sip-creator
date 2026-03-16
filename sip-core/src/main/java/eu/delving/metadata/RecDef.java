@@ -585,7 +585,7 @@ public class RecDef {
                 for (String name : elemGroups.split(DELIM)) {
                     elemList.addAll(recDef.elemGroup(name, path.toString()).deepCopy().elems);
                 }
-                attrGroups = null;
+                elemGroups = null;
             }
             if (!subelementsAdded) {
                 elemList.addAll(subelements);
