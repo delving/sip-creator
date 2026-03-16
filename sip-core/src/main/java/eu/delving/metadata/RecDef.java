@@ -506,7 +506,6 @@ public class RecDef {
         @XStreamAlias("node-mapping")
         public NodeMapping nodeMapping;
 
-        @XStreamOmitField
         public Doc doc;
 
         @XStreamOmitField

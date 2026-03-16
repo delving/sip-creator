@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<record-definition prefix="test" version="0.0.0">
+    <namespaces>
+        <namespace prefix="test" uri="http://test.example.org/" schema="http://test.example.org/test.xsd"/>
+        <namespace prefix="skos" uri="http://www.w3.org/2004/02/skos/core#"/>
+    </namespaces>
+
+    <attrs>
+        <attr tag="id"/>
+        <attr tag="xml:lang"/>
+        <attr tag="ref"/>
+    </attrs>
+
+    <templates>
+        <!-- Template with inline doc on itself and on a child -->
+        <elem tag="identifier" attrs="id">
+            <doc>
+                <para name="Definition">A unique identifier for this entity</para>
+            </doc>
+            <elem tag="value" attrs="xml:lang">
+                <doc>
+                    <para name="Definition">The string value of the identifier</para>
+                </doc>
+            </elem>
+            <elem tag="type"/>
+        </elem>
+    </templates>
+
+    <elem-groups>
+        <!-- Group with inline docs on its members -->
+        <elem-group name="labels">
+            <elem tag="skos:prefLabel" attrs="xml:lang">
+                <doc>
+                    <para name="Definition">The preferred label</para>
+                </doc>
+            </elem>
+            <elem tag="skos:altLabel" attrs="xml:lang">
+                <doc>
+                    <para name="Definition">An alternative label</para>
+                </doc>
+            </elem>
+        </elem-group>
+    </elem-groups>
+
+    <root tag="root">
+        <!-- Plain elem with inline doc -->
+        <elem tag="name" attrs="xml:lang">
+            <doc>
+                <para name="Definition">The name of this thing</para>
+            </doc>
+        </elem>
+
+        <!-- Uses template with inline docs -->
+        <elem tag="has-id" attrs="ref" target="identifier"/>
+
+        <!-- Uses elem-group with inline docs -->
+        <elem tag="concept" attrs="id" elemGroups="labels"/>
+
+        <!-- Two consumers of the same template — docs should be independent copies -->
+        <elem tag="also-has-id" attrs="ref" target="identifier"/>
+
+        <!-- Elem with inline doc that should be overridden by path-based doc -->
+        <elem tag="overridden" attrs="id">
+            <doc>
+                <para name="Definition">This will be overridden</para>
+            </doc>
+        </elem>
+
+        <!-- Elem with inline doc that should be overridden by tag-based doc -->
+        <elem tag="tagged" attrs="id">
+            <doc>
+                <para name="Definition">This will also be overridden</para>
+            </doc>
+        </elem>
+    </root>
+
+    <field-markers/>
+    <opts/>
+    <docs>
+        <!-- Path-based doc overrides the inline doc on "overridden" -->
+        <doc path="/root/overridden">
+            <para name="Definition">Path-based override</para>
+        </doc>
+        <!-- Tag-based doc overrides the inline doc on "tagged" -->
+        <doc tag="tagged">
+            <para name="Definition">Tag-based override</para>
+        </doc>
+    </docs>
+</record-definition>
