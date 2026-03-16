@@ -56,3 +56,6 @@ runner
 # SipCreator files
 SipCreatorGUI.xml
 ._git
+
+# Git worktrees
+.worktrees
