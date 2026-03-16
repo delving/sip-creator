@@ -45,14 +45,14 @@ class AceElemGroupRefactoringTest {
 
     /**
      * Serialises a RecDefNode tree into a human-readable, diff-friendly
-     * canonical form.  Each node is one line:
+     * canonical form.  Each node is one line with optional doc content:
      * <pre>
-     *   ELEM test:root
+     *   ELEM test:root [doc: Label=Root Definition=A root element]
      *     ATTR @test:id
      *     ELEM test:child
      * </pre>
-     * Two trees are structurally identical iff their serialisations are
-     * equal as strings.
+     * Two trees are identical (structure + documentation) iff their
+     * serialisations are equal as strings.
      */
     private String serialise(RecDefNode node) {
         StringBuilder sb = new StringBuilder();
@@ -63,7 +63,28 @@ class AceElemGroupRefactoringTest {
     private void serialise(RecDefNode node, int depth, StringBuilder sb) {
         String indent = "  ".repeat(depth);
         String kind = node.isAttr() ? "ATTR" : "ELEM";
-        sb.append(indent).append(kind).append(' ').append(node.getTag()).append('\n');
+        sb.append(indent).append(kind).append(' ').append(node.getTag());
+        RecDef.Doc doc = node.getDoc();
+        if (doc != null) {
+            sb.append(" [doc:");
+            if (doc.paraList != null) {
+                for (RecDef.DocParagraph para : doc.paraList) {
+                    sb.append(' ').append(para.name).append('=').append(para.content);
+                }
+            }
+            if (doc.paras != null) {
+                for (RecDef.DocParagraph para : doc.paras) {
+                    sb.append(' ').append(para.name).append('=').append(para.content);
+                }
+            }
+            if (doc.lines != null) {
+                for (String line : doc.lines) {
+                    sb.append(' ').append(line);
+                }
+            }
+            sb.append(']');
+        }
+        sb.append('\n');
         for (RecDefNode child : node.getChildren()) {
             serialise(child, depth + 1, sb);
         }

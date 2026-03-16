@@ -21,110 +21,143 @@
     <attr tag="rdf:parseType"/>
     <attr tag="xml:lang"/>
   </attrs>
-  <!-- ============================================================
-       Reusable element templates (generieke modellen)
-       These are expanded inline wherever target="..." references them.
-       ============================================================ -->
   <templates>
-    <!-- Identifier: E42 with symbolic content, type, and note -->
     <elem attrs="rdf:about" label="Identifier" tag="crm:E42_Identifier">
-      <elem attrs="rdf:datatype, xml:lang" label="has symbolic content" path="" tag="crm:P190_has_symbolic_content" xsd_type="string"/>
+      <doc><para name="Label">Identifier</para><para name="Definition">This class comprises strings or codes assigned to instances of E1 CRM Entity in order to identify them uniquely and permanently within the context of one or more organisations.</para></doc>
+      <elem attrs="rdf:datatype, xml:lang" label="has symbolic content" path="" tag="crm:P190_has_symbolic_content" xsd_type="string">
+        <doc><para name="Label">has symbolic content</para><para name="Definition">This property associates an instance of E90 Symbolic Object with a complete, identifying representation of its content in the form of a string of text.</para></doc>
+      </elem>
       <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id">
+        <doc><para name="Label">has type</para><para name="Definition">This property allows sub typing of CRM entities - Loss of the documenting character of the respective description.</para></doc>
         <elem attrs="rdf:about" label="Type" rangenode_id="" tag="crm:E55_Type">
           <elem attrs="rdf:datatype, xml:lang" label="label" path="" tag="rdfs:label" xsd_type="string"/>
           <elem attrs="rdf:resource" label="has_type" path="" tag="rdf:type" xsd_type="@id"/>
         </elem>
       </elem>
-      <elem attrs="rdf:datatype, xml:lang" label="has note" path="" tag="crm:P3_has_note" xsd_type="string"/>
+      <elem attrs="rdf:datatype, xml:lang" label="has note" path="" tag="crm:P3_has_note" xsd_type="string">
+        <doc><para name="Label">has note</para><para name="Definition">This property is a container for all informal descriptions about an object that have not been expressed in terms of CRM constructs.</para></doc>
+      </elem>
     </elem>
-    <!-- Title: E35 with symbolic content, type, and note -->
     <elem attrs="rdf:about" label="Title" tag="crm:E35_Title">
-      <elem attrs="rdf:datatype, xml:lang" label="has symbolic content" path="" tag="crm:P190_has_symbolic_content" xsd_type="string"/>
+      <doc><para name="Label">Title</para><para name="Definition">This class comprises the textual strings that within a cultural context can be clearly identified as titles due to their form.</para></doc>
+      <elem attrs="rdf:datatype, xml:lang" label="has symbolic content" path="" tag="crm:P190_has_symbolic_content" xsd_type="string">
+        <doc><para name="Label">has symbolic content</para><para name="Definition">This property associates an instance of E90 Symbolic Object with a complete, identifying representation of its content in the form of a string of text.</para></doc>
+      </elem>
       <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id">
+        <doc><para name="Label">has type</para><para name="Definition">This property allows sub typing of CRM entities - Loss of the documenting character of the respective description.</para></doc>
         <elem attrs="rdf:about" label="Title Type" rangenode_id="" tag="crm:E55_Type">
           <elem attrs="rdf:datatype, xml:lang" label="prefLabel" path="" tag="skos:prefLabel" xsd_type="string"/>
           <elem attrs="rdf:resource" label="type" path="" tag="crm:E55_Type" xsd_type="@id"/>
         </elem>
       </elem>
-      <elem attrs="rdf:datatype, xml:lang" label="has note" path="" tag="crm:P3_has_note" xsd_type="string"/>
+      <elem attrs="rdf:datatype, xml:lang" label="has note" path="" tag="crm:P3_has_note" xsd_type="string">
+        <doc><para name="Label">has note</para><para name="Definition">This property is a container for all informal descriptions about an object that have not been expressed in terms of CRM constructs.</para></doc>
+      </elem>
     </elem>
-    <!-- Linguistic Object: E33 with symbolic content, type, and note -->
     <elem attrs="rdf:about" label="Linguistic Object" tag="crm:E33_Linguistic_Object">
-      <elem attrs="rdf:datatype, xml:lang" label="has symbolic content" path="" tag="crm:P190_has_symbolic_content" xsd_type="string"/>
+      <doc><para name="Label">Linguistic Object</para><para name="Definition">This class comprises arbitrary content carried by linguistic expressions such as texts, notations, or symbol codes.</para></doc>
+      <elem attrs="rdf:datatype, xml:lang" label="has symbolic content" path="" tag="crm:P190_has_symbolic_content" xsd_type="string">
+        <doc><para name="Label">has symbolic content</para><para name="Definition">This property associates an instance of E90 Symbolic Object with a complete, identifying representation of its content in the form of a string of text.</para></doc>
+      </elem>
       <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id">
+        <doc><para name="Label">has type</para><para name="Definition">This property allows sub typing of CRM entities - Loss of the documenting character of the respective description.</para></doc>
         <elem attrs="rdf:about" label="Type" rangenode_id="" tag="crm:E55_Type"/>
       </elem>
-      <elem attrs="rdf:datatype, xml:lang" label="has note" path="" tag="crm:P3_has_note" xsd_type="string"/>
+      <elem attrs="rdf:datatype, xml:lang" label="has note" path="" tag="crm:P3_has_note" xsd_type="string">
+        <doc><para name="Label">has note</para><para name="Definition">This property is a container for all informal descriptions about an object that have not been expressed in terms of CRM constructs.</para></doc>
+      </elem>
     </elem>
-    <!-- Type (inline): E55 with labels and note -->
     <elem attrs="rdf:about" label="Type" tag="crm:E55_Type">
+      <doc><para name="Label">Type</para><para name="Definition">This class comprises concepts denoted by terms from thesauri and controlled vocabularies used to characterize and classify instances of ACE classes.</para></doc>
       <elem attrs="rdf:datatype, xml:lang" label="prefLabel" path="" tag="skos:prefLabel" xsd_type="string"/>
       <elem attrs="rdf:datatype, xml:lang" label="altLabel" path="" tag="skos:altLabel" xsd_type="string"/>
-      <elem attrs="rdf:datatype, xml:lang" label="has note" path="" tag="crm:P3_has_note" xsd_type="string"/>
+      <elem attrs="rdf:datatype, xml:lang" label="has note" path="" tag="crm:P3_has_note" xsd_type="string">
+        <doc><para name="Label">has note</para><para name="Definition">This property is a container for all informal descriptions about an object that have not been expressed in terms of CRM constructs.</para></doc>
+      </elem>
     </elem>
-    <!-- Agent -->
     <elem attrs="rdf:about" label="Agent" tag="rico:Agent">
-      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <doc><para name="Label">Agent</para><para name="Definition">A Person, or Group, or an entity created by a Person or Group (Mechanism), or a Position, that acts in the world.</para></doc>
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier">
+        <doc><para name="Label">is identified by</para><para name="Definition">This property describes the naming or identification of any real-world item by a name or any other identifier.</para></doc>
+      </elem>
       <elem attrs="rdf:datatype, xml:lang" label="prefLabel" path="" tag="skos:prefLabel" xsd_type="string"/>
       <elem attrs="rdf:datatype, xml:lang" label="altLabel" path="" tag="skos:altLabel" xsd_type="string"/>
-      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type">
+        <doc><para name="Label">has type</para><para name="Definition">This property allows sub typing of CRM entities - Loss of the documenting character of the respective description.</para></doc>
+      </elem>
     </elem>
-    <!-- Place -->
     <elem attrs="rdf:about" label="Place" tag="crm:E53_Place">
-      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
+      <doc><para name="Label">Place</para><para name="Definition">This class comprises portions of space of fixed shape that are continuous and have a direct connection to the Earth.</para></doc>
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier">
+        <doc><para name="Label">is identified by</para><para name="Definition">This property describes the naming or identification of any real-world item by a name or any other identifier.</para></doc>
+      </elem>
       <elem attrs="rdf:datatype, xml:lang" label="prefLabel" path="" tag="skos:prefLabel" xsd_type="string"/>
       <elem attrs="rdf:datatype, xml:lang" label="altLabel" path="" tag="skos:altLabel" xsd_type="string"/>
-      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type">
+        <doc><para name="Label">has type</para><para name="Definition">This property allows sub typing of CRM entities - Loss of the documenting character of the respective description.</para></doc>
+      </elem>
     </elem>
-    <!-- Temporal entities -->
     <elem attrs="rdf:about" label="Event" tag="crm:E5_Event">
+      <doc><para name="Label">Event</para><para name="Definition">This class comprises identifiable changes in states or conditions of persistent items.</para></doc>
       <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
     </elem>
     <elem attrs="rdf:about" label="BeginningOfExistence" tag="crm:E63_Beginning_of_Existence">
+      <doc><para name="Label">Beginning of Existence</para><para name="Definition">This class comprises events that result in the existence of an instance of E77 Persistent Item.</para></doc>
       <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
     </elem>
     <elem attrs="rdf:about" label="Production" tag="crm:E12_Production">
+      <doc><para name="Label">Production</para><para name="Definition">This class comprises activities that result in the creation of material or immaterial items.</para></doc>
       <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
     </elem>
     <elem attrs="rdf:about" label="Creation" tag="crm:E65_Creation">
+      <doc><para name="Label">Creation</para><para name="Definition">This class comprises actions intentionally carried out by a human or group that result in the creation of a new immaterial or material item.</para></doc>
       <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
     </elem>
     <elem attrs="rdf:about" label="Birth" tag="crm:E67_Birth">
+      <doc><para name="Label">Birth</para><para name="Definition">This class comprises events that result in the birth of an instance of E21 Person.</para></doc>
       <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
     </elem>
     <elem attrs="rdf:about" label="EndOfExistence" tag="crm:E64_End_of_Existence">
+      <doc><para name="Label">End of Existence</para><para name="Definition">This class comprises events that result in the final destruction of an instance of E77 Persistent Item.</para></doc>
       <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
     </elem>
     <elem attrs="rdf:about" label="Destruction" tag="crm:E6_Destruction">
+      <doc><para name="Label">Destruction</para><para name="Definition">This class comprises intentional destructions of instances of E18 Physical Thing.</para></doc>
       <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
     </elem>
     <elem attrs="rdf:about" label="Death" tag="crm:E69_Death">
+      <doc><para name="Label">Death</para><para name="Definition">This class comprises events that result in the end of life of an instance of E21 Person.</para></doc>
       <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
     </elem>
     <elem attrs="rdf:about" label="Activity" tag="crm:E7_Activity">
+      <doc><para name="Label">Activity</para><para name="Definition">This class comprises actions intentionally carried out by a human or group that result in changes of state in the cultural, social or physical systems documented.</para></doc>
       <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
     </elem>
     <elem attrs="rdf:about" label="Acquisition" tag="crm:E8_Acquisition">
+      <doc><para name="Label">Acquisition</para><para name="Definition">This class comprises transfers of legal ownership from one or more instances of E39 Actor to another.</para></doc>
       <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
     </elem>
     <elem attrs="rdf:about" label="TransferOfCustody" tag="crm:E10_Transfer_of_Custody">
+      <doc><para name="Label">Transfer of Custody</para><para name="Definition">This class comprises transfers of physical custody of an object from one or more instances of E39 Actor to another.</para></doc>
       <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
     </elem>
     <elem attrs="rdf:about" label="AttributeAssignment" tag="crm:E13_Attribute_Assignment">
+      <doc><para name="Label">Attribute Assignment</para><para name="Definition">This class comprises the actions of assigning a value or quality to an instance of E1 CRM Entity.</para></doc>
       <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
     </elem>
     <elem attrs="rdf:about" label="TypeAssignment" tag="crm:E17_Type_Assignment">
+      <doc><para name="Label">Type Assignment</para><para name="Definition">This class comprises activities formally assigning an instance of E55 Type to an instance of E1 CRM Entity.</para></doc>
       <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
     </elem>
-    <!-- Concept Scheme -->
     <elem attrs="rdf:about" label="Concept Scheme" tag="skos:ConceptScheme">
+      <doc><para name="Label">Concept Scheme</para><para name="Definition">A SKOS concept scheme can be viewed as an aggregation of one or more SKOS concepts.</para></doc>
       <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
       <elem attrs="rdf:datatype, xml:lang" label="prefLabel" path="" tag="skos:prefLabel" xsd_type="string"/>
       <elem attrs="rdf:datatype, xml:lang" label="altLabel" path="" tag="skos:altLabel" xsd_type="string"/>
       <elem attrs="rdf:datatype, xml:lang" label="has note" path="" tag="crm:P3_has_note" xsd_type="string"/>
     </elem>
-    <!-- Concept -->
     <elem attrs="rdf:about" label="Concept" tag="skos:Concept">
+      <doc><para name="Label">Concept</para><para name="Definition">This class comprises non-material products of our minds and other human produced data that have become objects of a discourse about their identity, circumstances of creation, or historical implication.</para></doc>
       <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
       <elem attrs="rdf:datatype, xml:lang" label="prefLabel" path="" tag="skos:prefLabel" xsd_type="string"/>
       <elem attrs="rdf:datatype, xml:lang" label="altLabel" path="" tag="skos:altLabel" xsd_type="string"/>
@@ -132,99 +165,98 @@
     </elem>
   </templates>
   <root tag="rdf:RDF">
-    <!-- ============================================================
-         Things
-         ============================================================ -->
     <elem attrs="rdf:about" label="HumanMadeObject" nodeid="" tag="crm:E22_Human-Made_Object">
-      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
-      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
-      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
-      <!-- Beschrijving -->
-      <elem attrs="rdf:resource" label="is subject of" path="" tag="crm:P129i_is_subject_of" xsd_type="@id" target="crm:E33_Linguistic_Object"/>
-      <!-- Representations -->
+      <doc><para name="Label">Human Made Object</para><para name="Definition">This class comprises all persistent physical objects of any size that are purposely created by human activity and have physical boundaries that separate them completely in an objective way from other objects.</para></doc>
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier">
+        <doc><para name="Label">is identified by</para><para name="Definition">This property describes the naming or identification of any real-world item by a name or any other identifier.</para></doc>
+      </elem>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title">
+        <doc><para name="Label">has title</para><para name="Definition">This property associates an instance of E71 Human-Made Thing with an instance of E35 Title that has been applied to it.</para></doc>
+      </elem>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type">
+        <doc><para name="Label">has type</para><para name="Definition">This property allows sub typing of CRM entities - Loss of the documenting character of the respective description.</para></doc>
+      </elem>
+      <elem attrs="rdf:resource" label="is subject of" path="" tag="crm:P129i_is_subject_of" xsd_type="@id" target="crm:E33_Linguistic_Object">
+        <doc><para name="Label">is subject of</para><para name="Definition">This property relates an instance of E1 CRM Entity to an instance of E89 Propositional Object that is about the former.</para></doc>
+      </elem>
       <elem attrs="rdf:resource" label="has representation" path="" tag="crm:P138i_has_representation" xsd_type="@id">
+        <doc><para name="Label">has representation</para><para name="Definition">This property establishes the relationship between an instance of E36 Visual Item and the instance of E1 CRM Entity that it visually represents.</para></doc>
         <elem attrs="rdf:about" label="Document" rangenode_id="" tag="crm:E31_Document"/>
       </elem>
-      <!-- Components -->
       <elem attrs="rdf:resource" label="forms part of" path="" tag="crm:P46i_forms_part_of" xsd_type="@id">
+        <doc><para name="Label">forms part of</para><para name="Definition">This property allows the decomposition of instances of E18 Physical Thing into component elements.</para></doc>
         <elem attrs="rdf:about" label="Human-Made Object" rangenode_id="" tag="crm:E22_Human-Made_Object"/>
       </elem>
-      <!-- Beheerder -->
-      <elem attrs="rdf:resource" label="has current keeper" path="" tag="crm:P50_has_current_keeper" xsd_type="@id" target="rico:Agent"/>
-      <!-- Huidige Eigenaar > P52 has current owner - E39 Actor -->
-      <elem attrs="rdf:resource" label="has current owner" path="" tag="crm:P52_has_current_owner" xsd_type="@id" target="rico:Agent"/>
-      <!-- Collecties > P46i forms part of - E78 Curated Holding -->
+      <elem attrs="rdf:resource" label="has current keeper" path="" tag="crm:P50_has_current_keeper" xsd_type="@id" target="rico:Agent">
+        <doc><para name="Label">has current keeper</para><para name="Definition">This property identifies the instance of E39 Actor who has custody of an instance of E18 Physical Thing at the time of validity of the record.</para></doc>
+      </elem>
+      <elem attrs="rdf:resource" label="has current owner" path="" tag="crm:P52_has_current_owner" xsd_type="@id" target="rico:Agent">
+        <doc><para name="Label">has current owner</para><para name="Definition">This property identifies the instance of E21 Person or E74 Group that was the owner of an instance of E18 Physical Thing at the time of validity of the record.</para></doc>
+      </elem>
       <elem attrs="rdf:resource" label="forms part of collection" path="" tag="crm:P46i_forms_part_of" xsd_type="@id">
+        <doc><para name="Label">forms part of</para><para name="Definition">This property allows the decomposition of instances of E18 Physical Thing into component elements.</para></doc>
         <elem attrs="rdf:about" label="Curated Holding" rangenode_id="" tag="crm:E78_Curated_Holding"/>
       </elem>
-      <!--  Data eigenaars
-            (crm:Human-Made Object)-[dcterms:creator]-(rico:Agent)
-            (crm:Human-Made Object)-[ace:has_data_owner]-(rico:Agent)
-      -->
-      <!--  Data verantwoordelijke
-            (crm:Human-Made Object)-[dcterms:publisher]-(rico:Agent)
-            (crm:Human-Made Object)-[ace:has_data_stewart]-(rico:Agent)
-      -->
-      <!--  Data bron (systeem
-            (crm:Human-Made Object)-[dcterms:source]-(rico:Agent)
-            (crm:Human-Made Object)-[ace:has_source_system]-(rico:Agent)
-      -->
     </elem>
     <elem attrs="rdf:about" label="CuratedHolding" rangenode_id="" tag="crm:E78_Curated_Holding">
-      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
-      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
-      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+      <doc><para name="Label">Curated Holding</para><para name="Definition">This class comprises aggregations of items from multiple sources brought together by an agent intending to preserve the identity and integrity of those items.</para></doc>
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"><doc><para name="Label">is identified by</para><para name="Definition">This property describes the naming or identification of any real-world item by a name or any other identifier.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"><doc><para name="Label">has title</para><para name="Definition">This property associates an instance of E71 Human-Made Thing with an instance of E35 Title that has been applied to it.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"><doc><para name="Label">has type</para><para name="Definition">This property allows sub typing of CRM entities - Loss of the documenting character of the respective description.</para></doc></elem>
     </elem>
     <elem attrs="rdf:about" label="Collection" rangenode_id="" tag="rico:Collection">
-      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
-      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
-      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+      <doc><para name="Label">Collection</para><para name="Definition">An artificial assemblage of documents accumulated on the basis of some common characteristic without regard to the provenance of those documents.</para></doc>
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"><doc><para name="Label">is identified by</para><para name="Definition">This property describes the naming or identification of any real-world item by a name or any other identifier.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"><doc><para name="Label">has title</para><para name="Definition">This property associates an instance of E71 Human-Made Thing with an instance of E35 Title that has been applied to it.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"><doc><para name="Label">has type</para><para name="Definition">This property allows sub typing of CRM entities - Loss of the documenting character of the respective description.</para></doc></elem>
     </elem>
-    <!-- ============================================================
-         Propositional Objects
-         ============================================================ -->
     <elem attrs="rdf:about" label="Work" nodeid="" tag="lrm:F1_Work">
-      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
-      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
-      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+      <doc><para name="Label">Work</para><para name="Definition">A Work is the outcome of an intellectual process of one or more persons. Inherent to the notion of work is the existence of recognisable realizations of the work in the form of one or more expressions.</para></doc>
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"><doc><para name="Label">is identified by</para><para name="Definition">This property describes the naming or identification of any real-world item by a name or any other identifier.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"><doc><para name="Label">has title</para><para name="Definition">This property associates an instance of E71 Human-Made Thing with an instance of E35 Title that has been applied to it.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"><doc><para name="Label">has type</para><para name="Definition">This property allows sub typing of CRM entities - Loss of the documenting character of the respective description.</para></doc></elem>
     </elem>
     <elem attrs="rdf:about" label="ProductType" nodeid="" tag="crm:E99_Product_Type">
-      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
-      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
-      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+      <doc><para name="Label">Product Type</para><para name="Definition">This class comprises arbitrary concepts or human-made conventions about the defining characteristics of products.</para></doc>
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"><doc><para name="Label">is identified by</para><para name="Definition">This property describes the naming or identification of any real-world item by a name or any other identifier.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"><doc><para name="Label">has title</para><para name="Definition">This property associates an instance of E71 Human-Made Thing with an instance of E35 Title that has been applied to it.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"><doc><para name="Label">has type</para><para name="Definition">This property allows sub typing of CRM entities - Loss of the documenting character of the respective description.</para></doc></elem>
     </elem>
-    <!-- ============================================================
-         Information Objects
-         ============================================================ -->
     <elem attrs="rdf:about" label="Manifestation" nodeid="" tag="lrm:F3_Manifestation">
-      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
-      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
-      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+      <doc><para name="Label">Manifestation</para><para name="Definition">A Manifestation is the outcome of a publication process where one or more Expressions are prepared for public dissemination, but it may also be a unique form created directly on some material carrier without the intent of being formally published.</para></doc>
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"><doc><para name="Label">is identified by</para><para name="Definition">This property describes the naming or identification of any real-world item by a name or any other identifier.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"><doc><para name="Label">has title</para><para name="Definition">This property associates an instance of E71 Human-Made Thing with an instance of E35 Title that has been applied to it.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"><doc><para name="Label">has type</para><para name="Definition">This property allows sub typing of CRM entities - Loss of the documenting character of the respective description.</para></doc></elem>
     </elem>
     <elem attrs="rdf:about" label="Expression" nodeid="" tag="lrm:F2_Expression">
-      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
-      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
-      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+      <doc><para name="Label">Expression</para><para name="Definition">An Expression is the outcome of the intellectual or creative process of realizing a Work. Subsequent expressions conveying the same work may be created over time.</para></doc>
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"><doc><para name="Label">is identified by</para><para name="Definition">This property describes the naming or identification of any real-world item by a name or any other identifier.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"><doc><para name="Label">has title</para><para name="Definition">This property associates an instance of E71 Human-Made Thing with an instance of E35 Title that has been applied to it.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"><doc><para name="Label">has type</para><para name="Definition">This property allows sub typing of CRM entities - Loss of the documenting character of the respective description.</para></doc></elem>
     </elem>
     <elem attrs="rdf:about" label="Visual Item" nodeid="" tag="crm:E36_Visual_Item">
-      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
-      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
-      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+      <doc><para name="Label">Visual Item</para><para name="Definition">This class comprises the intellectual or conceptual aspects of recognisable marks and images.</para></doc>
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"><doc><para name="Label">is identified by</para><para name="Definition">This property describes the naming or identification of any real-world item by a name or any other identifier.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"><doc><para name="Label">has title</para><para name="Definition">This property associates an instance of E71 Human-Made Thing with an instance of E35 Title that has been applied to it.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"><doc><para name="Label">has type</para><para name="Definition">This property allows sub typing of CRM entities - Loss of the documenting character of the respective description.</para></doc></elem>
     </elem>
     <elem attrs="rdf:about" label="Document" nodeid="" tag="crm:E31_Document">
-      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
-      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
-      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+      <doc><para name="Label">Document</para><para name="Definition">This class comprises identifiable immaterial items that make propositions about reality.</para></doc>
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"><doc><para name="Label">is identified by</para><para name="Definition">This property describes the naming or identification of any real-world item by a name or any other identifier.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"><doc><para name="Label">has title</para><para name="Definition">This property associates an instance of E71 Human-Made Thing with an instance of E35 Title that has been applied to it.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"><doc><para name="Label">has type</para><para name="Definition">This property allows sub typing of CRM entities - Loss of the documenting character of the respective description.</para></doc></elem>
     </elem>
     <elem attrs="rdf:about" label="RecordSet" nodeid="" tag="rico:RecordSet">
-      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
-      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
-      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+      <doc><para name="Label">Record Set</para><para name="Definition">An aggregation of Record Resources and/or other Record Sets created or received and maintained as a coherent whole by an Agent for a specific purpose.</para></doc>
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"><doc><para name="Label">is identified by</para><para name="Definition">This property describes the naming or identification of any real-world item by a name or any other identifier.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"><doc><para name="Label">has title</para><para name="Definition">This property associates an instance of E71 Human-Made Thing with an instance of E35 Title that has been applied to it.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"><doc><para name="Label">has type</para><para name="Definition">This property allows sub typing of CRM entities - Loss of the documenting character of the respective description.</para></doc></elem>
     </elem>
     <elem attrs="rdf:about" label="Record" nodeid="" tag="rico:Record">
-      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"/>
-      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"/>
-      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"/>
+      <doc><para name="Label">Record</para><para name="Definition">An information object intentionally created, received, or maintained by an Agent for the purpose of documenting information about an event or other phenomena.</para></doc>
+      <elem attrs="rdf:resource" label="is identified by" path="" tag="crm:P1_is_identified_by" xsd_type="@id" target="crm:E42_Identifier"><doc><para name="Label">is identified by</para><para name="Definition">This property describes the naming or identification of any real-world item by a name or any other identifier.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has title" path="" tag="crm:P102_has_title" xsd_type="@id" target="crm:E35_Title"><doc><para name="Label">has title</para><para name="Definition">This property associates an instance of E71 Human-Made Thing with an instance of E35 Title that has been applied to it.</para></doc></elem>
+      <elem attrs="rdf:resource" label="has type" path="" tag="crm:P2_has_type" xsd_type="@id" target="crm:E55_Type"><doc><para name="Label">has type</para><para name="Definition">This property allows sub typing of CRM entities - Loss of the documenting character of the respective description.</para></doc></elem>
     </elem>
   </root>
   <field-markers/>
