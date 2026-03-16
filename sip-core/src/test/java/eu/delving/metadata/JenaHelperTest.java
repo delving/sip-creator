@@ -17,9 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class JenaHelperTest {
 
-    @Test
-    void shouldProduceFramedJsonLd() {
-        String rdf = """
+    private static final String SAMPLE_RDF = """
             <?xml version="1.0" encoding="UTF-8"?>
             <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                      xmlns:ex="http://example.org/">
@@ -29,36 +27,36 @@ public class JenaHelperTest {
                 </rdf:Description>
             </rdf:RDF>
             """;
-        
+
+    private static Map<String, Object> createThingFrame() {
         Map<String, Object> frame = new HashMap<>();
         frame.put("@type", "Thing");
-        
-        String framed = JenaHelper.convertRDF("ex", rdf, RDFFormat.JSONLD_FRAME_PRETTY, frame);
-        
+        Map<String, Object> ctx = new HashMap<>();
+        ctx.put("@base", "http://example.org/");
+        frame.put("@context", ctx);
+        return frame;
+    }
+
+    @Test
+    void shouldProduceFramedJsonLd() {
+        Map<String, Object> frame = createThingFrame();
+
+        String framed = JenaHelper.convertRDF("ex", SAMPLE_RDF, RDFFormat.JSONLD_FRAME_PRETTY, frame);
+
         assertNotNull(framed);
         assertTrue(framed.contains("@graph"));
         assertTrue(framed.contains("Test Item"));
+        assertTrue(framed.contains("@type"));
+        assertTrue(framed.contains("Thing"));
     }
 
     @Test
     void framedDiffersFromCompact() {
-        String rdf = """
-            <?xml version="1.0" encoding="UTF-8"?>
-            <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                     xmlns:ex="http://example.org/">
-                <rdf:Description rdf:about="http://example.org/item1">
-                    <ex:name>Test Item</ex:name>
-                    <rdf:type rdf:resource="http://example.org/Thing"/>
-                </rdf:Description>
-            </rdf:RDF>
-            """;
-        
-        Map<String, Object> frame = new HashMap<>();
-        frame.put("@type", "Thing");
-        
-        String compact = JenaHelper.convertRDF("ex", rdf, RDFFormat.JSONLD_COMPACT_PRETTY);
-        String framed = JenaHelper.convertRDF("ex", rdf, RDFFormat.JSONLD_FRAME_PRETTY, frame);
-        
+        Map<String, Object> frame = createThingFrame();
+
+        String compact = JenaHelper.convertRDF("ex", SAMPLE_RDF, RDFFormat.JSONLD_COMPACT_PRETTY);
+        String framed = JenaHelper.convertRDF("ex", SAMPLE_RDF, RDFFormat.JSONLD_FRAME_PRETTY, frame);
+
         assertNotEquals(compact, framed);
     }
 
