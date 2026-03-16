@@ -77,6 +77,7 @@ public class OutputFrame extends FrameBase {
 
         outputTypes.addElement("RDF/XML");
         outputTypes.addElement("JSONLD,COMPACT/PRETTY");
+        outputTypes.addElement("JSONLD,FRAMED");
         outputTypes.addElement("NQUADS");
         outputTypes.addElement("NTRIPLES");
         outputTypes.addElement("TURTLE");
@@ -101,7 +102,10 @@ public class OutputFrame extends FrameBase {
 
             final MappingCompileModel mappingModel = sipModel.getRecordCompileModel();
             Document document;
-            if (selection.contains("JSONLD")) {
+            if (selection.contains("JSONLD") && selection.contains("FRAMED")) {
+                document = mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_JSON, outputArea,
+                        RDFFormat.JSONLD_FRAME_PRETTY);
+            } else if (selection.contains("JSONLD")) {
                 document = mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_JSON, outputArea,
                         RDFFormat.JSONLD_COMPACT_PRETTY);
             } else if (selection.contains("NQUADS")) {
