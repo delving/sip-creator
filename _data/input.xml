@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<pocket id="p0016V1962">
+  <lido:lido xmlns:lido="http://www.lido-schema.org">
+    <lido:lidoRecID lido:type="local" lido:source="Van Gogh Museum, Amsterdam">vgm/collect-2177</lido:lidoRecID>
+    <lido:category>
+      <lido:conceptID lido:type="URI">http://www.cidoc-crm.org/crm-concepts/E22</lido:conceptID>
+      <lido:term xml:lang="en">Human-Made Object</lido:term>
+    </lido:category>
+    <lido:descriptiveMetadata xml:lang="nl">
+      <lido:objectClassificationWrap>
+        <lido:objectWorkTypeWrap>
+          <lido:objectWorkType>
+            <lido:conceptID lido:type="URI" lido:source="AAT">http://vocab.getty.edu/aat/300041273</lido:conceptID>
+            <lido:term>prent</lido:term>
+          </lido:objectWorkType>
+        </lido:objectWorkTypeWrap>
+      </lido:objectClassificationWrap>
+      <lido:objectIdentificationWrap>
+        <lido:titleWrap>
+          <lido:titleSet>
+            <lido:appellationValue lido:pref="preferred">De aardappeleters</lido:appellationValue>
+          </lido:titleSet>
+        </lido:titleWrap>
+        <lido:repositoryWrap>
+          <lido:repositorySet lido:type="current">
+            <lido:workID lido:type="object number">p0016V1962</lido:workID>
+          </lido:repositorySet>
+        </lido:repositoryWrap>
+        <lido:objectMeasurementsWrap>
+          <lido:objectMeasurementsSet>
+            <lido:displayObjectMeasurements>31.2 x 39.6 cm</lido:displayObjectMeasurements>
+          </lido:objectMeasurementsSet>
+        </lido:objectMeasurementsWrap>
+      </lido:objectIdentificationWrap>
+      <lido:eventWrap>
+        <lido:eventSet>
+          <lido:event>
+            <lido:eventType>
+              <lido:term>Production</lido:term>
+            </lido:eventType>
+            <lido:eventActor>
+              <lido:displayActorInRole>Gogh, Vincent van (1853-1890) [ontwerper]</lido:displayActorInRole>
+              <lido:actorInRole>
+                <lido:actor lido:type="person">
+                  <lido:actorID lido:type="URI">https://data.rkd.nl/artists/32439</lido:actorID>
+                  <lido:actorID lido:type="URI">http://vocab.getty.edu/ulan/500115588</lido:actorID>
+                  <lido:nameActorSet>
+                    <lido:appellationValue lido:pref="preferred">Gogh, Vincent van</lido:appellationValue>
+                  </lido:nameActorSet>
+                  <lido:vitalDatesActor>
+                    <lido:earliestDate lido:type="date">1853-03-30</lido:earliestDate>
+                    <lido:latestDate lido:type="date">1890-07-29</lido:latestDate>
+                  </lido:vitalDatesActor>
+                </lido:actor>
+                <lido:roleActor>
+                  <lido:conceptID lido:type="URI">http://vocab.getty.edu/aat/300025190</lido:conceptID>
+                  <lido:term>ontwerper</lido:term>
+                </lido:roleActor>
+              </lido:actorInRole>
+            </lido:eventActor>
+            <lido:eventActor>
+              <lido:displayActorInRole>Gogh, Vincent van (1853-1890) [prentmaker]</lido:displayActorInRole>
+              <lido:actorInRole>
+                <lido:actor lido:type="person">
+                  <lido:actorID lido:type="URI">https://data.rkd.nl/artists/32439</lido:actorID>
+                  <lido:actorID lido:type="URI">http://vocab.getty.edu/ulan/500115588</lido:actorID>
+                  <lido:nameActorSet>
+                    <lido:appellationValue lido:pref="preferred">Gogh, Vincent van</lido:appellationValue>
+                  </lido:nameActorSet>
+                  <lido:vitalDatesActor>
+                    <lido:earliestDate lido:type="date">1853-03-30</lido:earliestDate>
+                    <lido:latestDate lido:type="date">1890-07-29</lido:latestDate>
+                  </lido:vitalDatesActor>
+                </lido:actor>
+                <lido:roleActor>
+                  <lido:conceptID lido:type="URI">http://vocab.getty.edu/aat/300025164</lido:conceptID>
+                  <lido:term>prentmaker</lido:term>
+                </lido:roleActor>
+              </lido:actorInRole>
+            </lido:eventActor>
+            <lido:eventActor>
+              <lido:displayActorInRole>Gestel, Dirk (1858-1938) [drukker]</lido:displayActorInRole>
+              <lido:actorInRole>
+                <lido:actor lido:type="person">
+                  <lido:nameActorSet>
+                    <lido:appellationValue lido:pref="preferred">Gestel, Dirk</lido:appellationValue>
+                  </lido:nameActorSet>
+                  <lido:vitalDatesActor>
+                    <lido:earliestDate lido:type="date">1858-10-15</lido:earliestDate>
+                    <lido:latestDate lido:type="date">1938-12-17</lido:latestDate>
+                  </lido:vitalDatesActor>
+                </lido:actor>
+                <lido:roleActor>
+                  <lido:conceptID lido:type="URI">http://vocab.getty.edu/aat/300025731</lido:conceptID>
+                  <lido:term>drukker</lido:term>
+                </lido:roleActor>
+              </lido:actorInRole>
+            </lido:eventActor>
+            <lido:eventDate>
+              <lido:displayDate>april 1885</lido:displayDate>
+            </lido:eventDate>
+            <lido:eventMaterialsTech>
+              <lido:displayMaterialsTech>lithografie op papier</lido:displayMaterialsTech>
+              <lido:termMaterialsTech lido:type="material">
+                <lido:term>drukinkt</lido:term>
+                <lido:conceptID lido:type="URI">http://vocab.getty.edu/aat/300187371</lido:conceptID>
+              </lido:termMaterialsTech>
+              <lido:termMaterialsTech lido:type="material">
+                <lido:term>velijnpapier</lido:term>
+                <lido:conceptID lido:type="URI">http://vocab.getty.edu/aat/300014187</lido:conceptID>
+              </lido:termMaterialsTech>
+              <lido:termMaterialsTech lido:type="technique">
+                <lido:term>lithografie</lido:term>
+                <lido:conceptID lido:type="URI">http://vocab.getty.edu/aat/300053271</lido:conceptID>
+              </lido:termMaterialsTech>
+            </lido:eventMaterialsTech>
+          </lido:event>
+        </lido:eventSet>
+      </lido:eventWrap>
+    </lido:descriptiveMetadata>
+    <lido:administrativeMetadata xml:lang="nl">
+      <lido:rightsWorkWrap>
+        <lido:rightsWorkSet>
+          <lido:rightsType>
+            <lido:conceptID lido:type="URI" lido:source="rightsstatements.org">http://rightsstatements.org/vocab/InC/1.0/</lido:conceptID>
+            <lido:term>RightsStatements.org IN COPYRIGHT statement</lido:term>
+          </lido:rightsType>
+          <lido:creditLine>Van Gogh Museum, Amsterdam (Vincent van Gogh Stichting)</lido:creditLine>
+        </lido:rightsWorkSet>
+      </lido:rightsWorkWrap>
+      <lido:recordWrap>
+        <lido:recordID lido:type="record number">collect_2177</lido:recordID>
+        <lido:recordType>
+          <lido:term>single object</lido:term>
+        </lido:recordType>
+        <lido:recordSource>
+          <lido:legalBodyName>
+            <lido:appellationValue>Van Gogh Museum, Amsterdam</lido:appellationValue>
+          </lido:legalBodyName>
+          <lido:legalBodyWeblink>https://vangoghmuseum.nl</lido:legalBodyWeblink>
+        </lido:recordSource>
+      </lido:recordWrap>
+      <lido:resourceWrap>
+        <lido:resourceSet>
+          <lido:resourceRepresentation lido:type="image">
+            <lido:linkResource lido:formatResource="jpg">p0016V1962_gb.jpg</lido:linkResource>
+          </lido:resourceRepresentation>
+          <lido:resourceType>
+            <lido:term>digital image</lido:term>
+          </lido:resourceType>
+        </lido:resourceSet>
+      </lido:resourceWrap>
+    </lido:administrativeMetadata>
+  </lido:lido>
+</pocket>

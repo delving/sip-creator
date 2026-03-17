@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LIDO to EDM Transformation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section h2 {
+            color: #007bff;
+            margin-top: 0;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .xml-panel {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+        .xml-panel h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 12px;
+            margin: 0;
+        }
+        .test-result {
+            padding: 5px 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .test-pass {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .test-info {
+            background: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+        .missing-feature {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .summary {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 4px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>LIDO to EDM Transformation Test</h1>
+    <p style="text-align: center;">Testing the WASM mapping engine against the real Van Gogh Museum data</p>
+    
+    <div style="text-align: center; margin: 20px 0;">
+        <button onclick="runTest()">Run Transformation Test</button>
+    </div>
+    
+    <div id="path-extraction" class="test-section">
+        <h2>1. Path Extraction Tests</h2>
+        <div id="extraction-results"></div>
+    </div>
+    
+    <div id="mapping-test" class="test-section">
+        <h2>2. Mapping Transformation</h2>
+        <div class="comparison-grid">
+            <div class="xml-panel">
+                <h3>Generated Output</h3>
+                <pre id="actual-output">Waiting for test...</pre>
+            </div>
+            <div class="xml-panel">
+                <h3>Expected Output (Key Elements)</h3>
+                <pre id="expected-elements">Waiting for test...</pre>
+            </div>
+        </div>
+    </div>
+    
+    <div id="comparison" class="test-section">
+        <h2>3. Comparison Results</h2>
+        <div id="comparison-results"></div>
+        <div id="test-summary" class="summary"></div>
+    </div>
+    
+    <div id="missing-features" class="test-section">
+        <h2>4. Missing Features Analysis</h2>
+        <div id="missing-list"></div>
+    </div>
+    
+    <script>
+        let wasmModule;
+        let memory;
+        
+        // Expected values from output.xml
+        const expectedValues = {
+            title: "De aardappeleters",
+            date: "april 1885",
+            identifier: "p0016V1962",
+            extent: "31.2 x 39.6 cm",
+            dataProvider: "Van Gogh Museum",
+            provider: "Rijksdienst voor het Cultureel Erfgoed",
+            aggregationUri: "http://data.collectienederland.nl/resource/aggregation/van-gogh-museum/p0016V1962",
+            choUri: "http://data.collectienederland.nl/resource/document/van-gogh-museum/p0016V1962",
+            isShownAt: "https://www.vangoghmuseum.nl/nl/collectie/p0016V1962"
+        };
+        
+        // Initialize WASM
+        async function init() {
+            try {
+                const response = await fetch('zig-out/wasm/mapping-engine.wasm');
+                const bytes = await response.arrayBuffer();
+                const module = await WebAssembly.instantiate(bytes, {});
+                
+                wasmModule = module.instance.exports;
+                memory = wasmModule.memory;
+                
+                console.log('WASM module loaded successfully');
+            } catch (error) {
+                console.error('Failed to load WASM:', error);
+                alert('Failed to load WASM module');
+            }
+        }
+        
+        // Helper functions
+        function stringToWasm(str, offset = 0) {
+            const encoder = new TextEncoder();
+            const encoded = encoder.encode(str);
+            const ptr = wasmModule.wasmGetTempBuffer();
+            const buffer = new Uint8Array(memory.buffer, ptr + offset, encoded.length);
+            buffer.set(encoded);
+            return { ptr: ptr + offset, len: encoded.length };
+        }
+        
+        function wasmToString(ptr, len) {
+            const buffer = new Uint8Array(memory.buffer, ptr, len);
+            const decoder = new TextDecoder();
+            return decoder.decode(buffer);
+        }
+        
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+        
+        async function runTest() {
+            // Load input XML
+            const inputXmlResponse = await fetch('../_data/input.xml');
+            const inputXml = await inputXmlResponse.text();
+            
+            // Test 1: Path Extraction
+            testPathExtraction(inputXml);
+            
+            // Test 2: Full Transformation
+            testTransformation(inputXml);
+        }
+        
+        function testPathExtraction(inputXml) {
+            const results = document.getElementById('extraction-results');
+            results.innerHTML = '';
+            
+            const testPaths = [
+                { path: '@id', expected: 'p0016V1962', name: 'Record ID' },
+                { path: 'lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:titleWrap/lido:titleSet/lido:appellationValue', expected: 'De aardappeleters', name: 'Title' },
+                { path: 'lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventDate/lido:displayDate', expected: 'april 1885', name: 'Date' },
+                { path: 'lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:repositoryWrap/lido:repositorySet/lido:workID', expected: 'p0016V1962', name: 'Work ID' },
+                { path: 'lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:objectMeasurementsWrap/lido:objectMeasurementsSet/lido:displayObjectMeasurements', expected: '31.2 x 39.6 cm', name: 'Measurements' },
+                { path: 'lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventActor/lido:actorInRole/lido:actor/lido:nameActorSet/lido:appellationValue', expected: 'Gogh, Vincent van', name: 'Creator' }
+            ];
+            
+            const xmlData = stringToWasm(inputXml, 0);
+            
+            for (const test of testPaths) {
+                try {
+                    const pathData = stringToWasm(test.path, 10000);
+                    const resultLen = wasmModule.wasmXmlGet(
+                        xmlData.ptr, xmlData.len,
+                        pathData.ptr, pathData.len
+                    );
+                    const result = wasmToString(wasmModule.wasmGetResultBuffer(), resultLen);
+                    
+                    const passed = result === test.expected;
+                    const div = document.createElement('div');
+                    div.className = passed ? 'test-result test-pass' : 'test-result test-fail';
+                    div.innerHTML = `${passed ? '✓' : '✗'} ${test.name}: "${escapeHtml(result)}" ${passed ? '' : `(expected: "${test.expected}")`}`;
+                    results.appendChild(div);
+                } catch (error) {
+                    const div = document.createElement('div');
+                    div.className = 'test-result test-fail';
+                    div.innerHTML = `✗ ${test.name}: Error - ${error.message}`;
+                    results.appendChild(div);
+                }
+            }
+        }
+        
+        function testTransformation(inputXml) {
+            try {
+                // Initialize processor
+                wasmModule.wasmInitProcessor();
+                
+                // Add facts
+                const facts = {
+                    baseUrl: 'http://data.collectienederland.nl',
+                    spec: 'van-gogh-museum',
+                    dataProvider: 'Van Gogh Museum',
+                    provider: 'Rijksdienst voor het Cultureel Erfgoed',
+                    language: 'nl',
+                    _uniqueIdentifier: 'p0016V1962'
+                };
+                
+                for (const [key, value] of Object.entries(facts)) {
+                    const keyData = stringToWasm(key, 0);
+                    const valueData = stringToWasm(value, 1000);
+                    wasmModule.wasmAddFact(keyData.ptr, keyData.len, valueData.ptr, valueData.len);
+                }
+                
+                // Add simplified mapping rules
+                const rules = [
+                    {
+                        input: 'lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:titleWrap/lido:titleSet/lido:appellationValue',
+                        output: '/edm:RDF/edm:ProvidedCHO/dc:title',
+                        type: 0
+                    },
+                    {
+                        input: 'lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventDate/lido:displayDate',
+                        output: '/edm:RDF/edm:ProvidedCHO/dc:date',
+                        type: 0
+                    },
+                    {
+                        input: 'lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:repositoryWrap/lido:repositorySet/lido:workID',
+                        output: '/edm:RDF/edm:ProvidedCHO/dc:identifier',
+                        type: 0
+                    },
+                    {
+                        input: 'lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:objectMeasurementsWrap/lido:objectMeasurementsSet/lido:displayObjectMeasurements',
+                        output: '/edm:RDF/edm:ProvidedCHO/dcterms:extent',
+                        type: 0
+                    }
+                ];
+                
+                for (const rule of rules) {
+                    const inputData = stringToWasm(rule.input, 0);
+                    const outputData = stringToWasm(rule.output, 2000);
+                    wasmModule.wasmAddMappingRule(
+                        inputData.ptr, inputData.len,
+                        outputData.ptr, outputData.len,
+                        rule.type,
+                        0, 0
+                    );
+                }
+                
+                // Process mapping
+                const xmlData = stringToWasm(inputXml, 0);
+                const resultLen = wasmModule.wasmProcessMapping(xmlData.ptr, xmlData.len);
+                const output = wasmToString(wasmModule.wasmGetResultBuffer(), resultLen);
+                
+                // Display output
+                document.getElementById('actual-output').textContent = output;
+                
+                // Display expected elements
+                const expectedElements = `Key elements from expected output.xml:
+- Title: ${expectedValues.title}
+- Date: ${expectedValues.date}
+- Identifier: ${expectedValues.identifier}
+- Extent: ${expectedValues.extent}
+- Data Provider: ${expectedValues.dataProvider}
+- Provider: ${expectedValues.provider}
+- Aggregation URI: ${expectedValues.aggregationUri}
+- CHO URI: ${expectedValues.choUri}`;
+                document.getElementById('expected-elements').textContent = expectedElements;
+                
+                // Compare results
+                compareResults(output);
+                
+                // Show missing features
+                showMissingFeatures();
+                
+            } catch (error) {
+                document.getElementById('actual-output').textContent = `Error: ${error.message}`;
+            }
+        }
+        
+        function compareResults(output) {
+            const results = document.getElementById('comparison-results');
+            results.innerHTML = '';
+            
+            let passed = 0;
+            let failed = 0;
+            
+            // Check for key values in output
+            const checks = [
+                { value: expectedValues.title, name: 'Title' },
+                { value: expectedValues.date, name: 'Date' },
+                { value: expectedValues.identifier, name: 'Identifier' },
+                { value: expectedValues.extent, name: 'Extent' },
+                { value: expectedValues.dataProvider, name: 'Data Provider' },
+                { value: expectedValues.choUri, name: 'CHO URI' }
+            ];
+            
+            for (const check of checks) {
+                const found = output.includes(check.value);
+                const div = document.createElement('div');
+                div.className = found ? 'test-result test-pass' : 'test-result test-fail';
+                div.innerHTML = `${found ? '✓' : '✗'} ${check.name}: "${escapeHtml(check.value)}"`;
+                results.appendChild(div);
+                
+                if (found) passed++; else failed++;
+            }
+            
+            // Update summary
+            const summary = document.getElementById('test-summary');
+            const percentage = Math.round((passed / (passed + failed)) * 100);
+            summary.innerHTML = `Test Results: ${passed} passed, ${failed} failed (${percentage}% success rate)`;
+            summary.style.background = percentage >= 50 ? '#d4edda' : '#f8d7da';
+            summary.style.color = percentage >= 50 ? '#155724' : '#721c24';
+        }
+        
+        function showMissingFeatures() {
+            const missingList = document.getElementById('missing-list');
+            
+            const missingFeatures = [
+                {
+                    feature: 'Collection Operations (* operator)',
+                    description: 'The mapping uses * to iterate over multiple actors/events. This creates multiple output nodes.',
+                    example: '_input.lidolido * { _lidolido -> ... }'
+                },
+                {
+                    feature: 'Complex Groovy Code',
+                    description: 'The mapping contains complex Groovy scripts with conditionals and method calls.',
+                    example: 'if (_lidoactor.lidoactorID) { ... } else { createEDMAgentUri(name) }'
+                },
+                {
+                    feature: 'Dynamic URI Generation',
+                    description: 'URIs are generated using string interpolation with variables.',
+                    example: '"${baseUrl}/resource/aggregation/${spec}/${_uniqueIdentifier.sanitizeURI()}"'
+                },
+                {
+                    feature: 'Method Calls on Nodes',
+                    description: 'Methods like getValueNodes() are called on XML nodes.',
+                    example: '_lidoactor.getValueNodes("lidoappellationValue").first()'
+                },
+                {
+                    feature: 'Multiple Output Nodes',
+                    description: 'Single input creates multiple edm:Agent nodes for each actor.',
+                    example: 'Multiple dc:creator elements from multiple event actors'
+                },
+                {
+                    feature: 'Conditional URI Selection',
+                    description: 'Different URIs based on content (e.g., prefer RKD over ULAN).',
+                    example: 'if (!_lidoactorID.contains("ulan")) { use RKD } else { use ULAN }'
+                }
+            ];
+            
+            missingList.innerHTML = '';
+            for (const item of missingFeatures) {
+                const div = document.createElement('div');
+                div.className = 'missing-feature';
+                div.innerHTML = `
+                    <strong>${item.feature}</strong><br>
+                    ${item.description}<br>
+                    <code>${escapeHtml(item.example)}</code>
+                `;
+                missingList.appendChild(div);
+            }
+        }
+        
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

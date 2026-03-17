@@ -1,0 +1,311 @@
+{
+  "summary": {
+    "total_files_analyzed": 521,
+    "total_groovy_snippets": 51846,
+    "unique_field_paths": 150
+  },
+  "function_calls": {
+    "replaceAll": 13606,
+    "replace": 12628,
+    "sanitizeURI": 4468,
+    "toString": 2954,
+    "capitalize": 2278,
+    "sanitize": 2234,
+    "matches": 2140,
+    "split": 1707,
+    "unique": 1537,
+    "matcher": 1420,
+    "size": 1226,
+    "getValueNodes": 1051,
+    "toInteger": 1006,
+    "append": 735,
+    "first": 619,
+    "isEmpty": 519,
+    "indexOf": 264,
+    "last": 254,
+    "push": 244,
+    "JsonSlurper": 208,
+    "parse": 208,
+    "get": 76,
+    "text": 60,
+    "contains": 55,
+    "toLowerCase": 48,
+    "trim": 35,
+    "pow": 22,
+    "getBytes": 6,
+    "getInstance": 5,
+    "digest": 5,
+    "startsWith": 4,
+    "endsWith": 3,
+    "toUpperCase": 3,
+    "length": 3,
+    "substring": 3,
+    "drop": 3,
+    "join": 2,
+    "padLeft": 2,
+    "flatten": 2,
+    "lookup": 2,
+    "toArray": 1,
+    "collect": 1
+  },
+  "operators": {
+    "+ (addition/concat)": 1522,
+    "?: (elvis)": 2
+  },
+  "loop_operators": {
+    "* (map/transform)": 3047,
+    "| (tuple/zip)": 2,
+    ">> (process list)": 5
+  },
+  "string_patterns": {
+    "${...} interpolation": 26916
+  },
+  "groovy_patterns": {
+    "string_interpolation": [
+      "_oaidcdc.europeanaisShownAt[0]",
+      "_enbdcgeslacht",
+      "_M3['afmetingeniii']",
+      "_metadata.object[0]",
+      "_arnofields.arnoUR_",
+      "_Filename",
+      "_M3['periodevan']",
+      "_yearofpublication",
+      "_dctitle",
+      "_dimension.dimensionvalue_",
+      "_M6['arnoDT']",
+      "reverseNamesCorrected(_arnoTW)",
+      "extractYear(end)",
+      "_locationdefaultnamelref",
+      "_enbdcorganisator.enbdcsurnameprefix_",
+      "_priref",
+      "_M5['dctermslicense']",
+      "start.replaceAll('^0','')",
+      "deepZoomProfnieuw(_reproduction.reproductionidentifierURL_)",
+      "_metdankaan"
+    ],
+    "property_access": [
+      "creatorlref",
+      "europeanaisShownBy",
+      "museumoudeslot",
+      "fotonummer4_",
+      "shiptype",
+      "textielmuseum",
+      "rubenshuis",
+      "musip",
+      "labeltext",
+      "object_number",
+      "edmobject",
+      "guid",
+      "edmProvidedCHO",
+      "extenttype",
+      "thumbnaillarge",
+      "bestand_",
+      "annefrank",
+      "productiondateend_",
+      "content",
+      "associationperiodassoclref"
+    ],
+    "closures": [
+      "_input.record[0].metadata[0].record[0].reproduction.collect{thumb -> return thumb.reproductionidentifierURLFull_",
+      "it.replaceAll('^.*[\\\\/|\\\\\\\\]','').replaceAll('(?i)\\\\.jpg|\\\\.jpeg|\\\\.tif|\\\\.tiff|\\\\.png|\\\\.gif', '')",
+      "it.replaceAll(\"/\", \"-\").replaceAll(\"\\\\|\", \"-\")",
+      "it.replaceAll('oai:','').replaceAll(':e','/media/e')",
+      "it.replaceAll(' ','_').replaceAll('^.*[\\\\/|\\\\\\\\]','').replaceAll('(?i)\\\\.jpg|\\\\.jpeg|\\\\.tif|\\\\.tiff|\\\\.png|\\\\.gif', '')",
+      "it.toString() =~ \"^[A-Z]\"",
+      "it.toLowerCase().replaceAll(\"[ _]\", \"-\").replaceAll(\"[\\\\.\\\\|\\\\[\\\\]\\\\(\\\\)]\", \"\")",
+      "it.replaceAll(\"^ \",\"\").capitalize()",
+      "return it.reproductionreference_",
+      "it.replaceAll(\"^ \",\"\")capitalize().replaceAll('^Ij','IJ')"
+    ],
+    "array_access": [
+      "'associationsubjectlatitude'",
+      "3",
+      "'documentationtitleleadword'",
+      "'dctermsextentUnit'",
+      "'dimensionunit'",
+      "'sourcetitle'",
+      "Uitgever niet vastgesteld",
+      "VM${it}",
+      "1",
+      "'associationsubjectlongitude'"
+    ],
+    "conditionals": [
+      "\"${smallThumbnailPloeg(_reproduction.reproductionidentifierURL_)}\".sanitizeURI()",
+      "if (v != null) { \"https://data.antwerp.be/id/term/adlib-collect/content-subject-type/${cleanType(v)}\" }",
+      "if (parts[0].size() == 1) {",
+      "\"https://heemkundekringzeeland.nl/collectie/schup-en-schoefel/?diw-id=brabantcloud_${spec}_${_id}\"",
+      "\"https://media.delving.org/thumbnail/brabantcloud/textielmuseum-objecten/TMTploeg/${it.replaceAll('^.*[\\\\/|\\\\\\\\]','').replaceAll('(?i)\\\\.jpg|\\\\.jpeg|\\\\.tif|\\\\.tiff|\\\\.png|\\\\.gif', '')}/500\"",
+      "if (isGroup(_record)) {\"${_lang}\"}",
+      "if (_record.objectnumber[0]) {",
+      "else if (items.size() == 0) {\"${items[0]}\"}",
+      "if (items.size() == 6) {\"${items[4]}${items[5]}\".replaceAll(\"^ \", \"\").replaceAll('onbekend','')}",
+      "if (items.size() == 3) {\"${items[2]}-${items[1]}-${items[0]}\".replace(\"00-\", \"\")}"
+    ],
+    "regex": [
+      ".*2011",
+      "([0-9]{4})-[0-9]{2}-[0-9]{2}",
+      ".*2010",
+      ".*2015",
+      ".*2014",
+      "([0-9]{4})-[0-9]{2}",
+      ".*2012",
+      "([0-9]{4})",
+      ".*2013"
+    ]
+  },
+  "field_paths_sample": [
+    "record.fotobestandnamen",
+    "record.europeanauserTag",
+    "record.Filename",
+    "record.slug",
+    "it.startsWith",
+    "record.unieknummer",
+    "record.acquisitionplacelref",
+    "record.fotonummer1",
+    "record.description",
+    "record.biography",
+    "record.audiofile",
+    "record.Media",
+    "record.referencenumber_.replaceAll",
+    "record.europeanaisShownBy_",
+    "record.reproduction",
+    "record.Reproduction.collect",
+    "record.europeanaobject_",
+    "record.dcdescription",
+    "record.fotonummer5_",
+    "record.reproductionidentifierURL_",
+    "record.isShownAt",
+    "record.fotonummer6_",
+    "record.fotonaami",
+    "record.priref",
+    "record.Paginacode",
+    "record.header",
+    "record.dcidentifier_.replaceAll",
+    "record.rkduri",
+    "record.edmrights",
+    "it.enbdcsurname_"
+  ],
+  "sample_snippets": [
+    {
+      "code": "5.2.6",
+      "tag": "rec-mapping",
+      "attr": "schemaVersion",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "attribute"
+    },
+    {
+      "code": "http://data.brabantcloud.nl",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "edm_5.2.6",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "http://rightsstatements.org/vocab/InC/1.0/",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "Stichting Erfgoed Goirle \u201cDe Vyer Heertganghen\u201d - Bidprentjes",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "\"https://sws.geonames.org/${it}/\"",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "year = ~/([0-9]{4})/",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "year_month = ~/([0-9]{4})-[0-9]{2}/",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "year_month_day = ~/([0-9]{4})-[0-9]{2}-[0-9]{2}/",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "itt = it.toString()",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "if (year.matcher(itt).matches()) {",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "itt.replaceAll(year, '$1')",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "}",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "else if (year_month.matcher(itt).matches()) {",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "itt.replaceAll(year_month, '$1')",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "}",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "else if (year_month_day.matcher(itt).matches()) {",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "itt.replaceAll(year_month_day, '$1')",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "}",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    },
+    {
+      "code": "else {",
+      "tag": "string",
+      "file": "/home/kiivihal/PocketMapper/lila/brabantcloud/PocketMapper/work/enb-323-bidprentje/mapping_edm.xml",
+      "type": "text"
+    }
+  ]
+}

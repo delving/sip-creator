@@ -1,0 +1,230 @@
+{
+    "@graph": [
+        {
+            "@id": "_:b0",
+            "@type": "nave:DelvingResource",
+            "allowDeepZoom": "true",
+            "allowLinkedOpenData": "true",
+            "allowSourceDownload": "false",
+            "featured": "false",
+            "public": "true"
+        },
+        {
+            "@id": "_:b1",
+            "@type": "nave:BrabantCloudResource",
+            "collection": "Heemkundekring Loon op t Sandt",
+            "collectionPart": [
+                "Historische geografie",
+                "Geschiedenis van het bestuur/politiek"
+            ],
+            "collectionType": "Bibliotheek",
+            "date": "2020  2030",
+            "numberOfPages": "1",
+            "place": "Baarle-Nassau",
+            "subjectAatLabel": "Bouwterreinen"
+        },
+        {
+            "@id": "http://data.brabantcloud.nl/resource/aggregation/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f",
+            "@type": "ore:Aggregation",
+            "aggregatedCHO": "http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f",
+            "dataProvider": "Heemkundekring Loon op t Sandt",
+            "hasView": "httpss://images.memorix.nl/enb_304/thumb/500x500/4dbab527-501c-9960-c88e-1c0fe05dd746.jpg",
+            "isShownAt": "https://heemkundekringloonoptsandt.nl/collectie/algemeen/?diw-id\u003dbrabantcloud_enb-304-titels_enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f",
+            "isShownBy": "httpss://images.memorix.nl/enb_304/thumb/500x500/4dbab527-501c-9960-c88e-1c0fe05dd746.jpg",
+            "object": "httpss://images.memorix.nl/enb_304/thumb/220x220/4dbab527-501c-9960-c88e-1c0fe05dd746.jpg",
+            "provider": "Erfgoed Brabant",
+            "rights": "https://rightsstatements.org/vocab/InC/1.0/"
+        },
+        {
+            "@id": "http://data.brabantcloud.nl/resource/document/enb-304-titels/enb-304.titels-60f0409c-0cf6-eed5-bd2b-e855224909fb-00d19e5e-92b1-b4fa-113d-a732cdd6f95f",
+            "@type": "edm:ProvidedCHO",
+            "description": "Omgevingsvergunningen:\u003cp\u003eKasteellaan 19A 5175 BC\u003c/p\u003e\u003cp\u003eBaan achter de Plakken 1 5175 NP\u003c/p\u003e\u003cp\u003eKerkstraat 2 5175 BB\u003c/p\u003e\u003cp\u003ePastoor Kampstraat 2 5176 NP\u003c/p\u003e",
+            "identifier": "041999",
+            "publisher": "https://data.brabantcloud.nl/resource/agent/enb-304-titels/0e47e03b-d96d-5eb6-6b8a-7423d434ec04",
+            "subject": [
+                "Gemeente en politiek",
+                "Bouwterreinen",
+                "Dorpsgezichten en straatnamen"
+            ],
+            "title": {
+                "@language": "sjoerd",
+                "@value": "Bekendmakingen gemeente Loon op Zand week 38 2023"
+            },
+            "type": "Artikel uit tijdschrift",
+            "issued": "20-09-2023",
+            "spatial": "https://sws.geonames.org/2759554",
+            "currentLocation": "Digitaal archief",
+            "edm:type": "TEXT"
+        },
+        {
+            "@id": "https://data.brabantcloud.nl/api/memorix/download/?uuid\u003d4dbab527-501c-9960-c88e-1c0fe05dd746\u0026subtenant\u003denb_304",
+            "@type": "edm:WebResource",
+            "allowDeepZoom": "true",
+            "allowPublicWebView": "true",
+            "allowSourceDownload": "true",
+            "fullText": "null",
+            "fullTextObjectUrl": "https://images.memorix.nl/enb_304/download/download/4dbab527-501c-9960-c88e-1c0fe05dd746",
+            "resourceSortOrder": "1",
+            "sourceDownload": "https://data.brabantcloud.nl/api/memorix/download/?uuid\u003d4dbab527-501c-9960-c88e-1c0fe05dd746\u0026subtenant\u003denb_304",
+            "thumbLarge": "httpss://images.memorix.nl/enb_304/thumb/500x500/4dbab527-501c-9960-c88e-1c0fe05dd746.jpg",
+            "thumbSmall": "httpss://images.memorix.nl/enb_304/thumb/220x220/4dbab527-501c-9960-c88e-1c0fe05dd746.jpg",
+            "hasMimeType": "application/pdf"
+        },
+        {
+            "@id": "https://data.brabantcloud.nl/resource/agent/enb-304-titels/0e47e03b-d96d-5eb6-6b8a-7423d434ec04",
+            "@type": "edm:Agent",
+            "placeOfPublication": "Baarle-Nassau",
+            "publisherLabel": [
+                "De Duinkoerier",
+                "E.M. de Jong"
+            ],
+            "prefLabel": [
+                "De Duinkoerier",
+                "E.M. de Jong"
+            ]
+        },
+        {
+            "@id": "https://sws.geonames.org/2759554",
+            "@type": "edm:Place",
+            "prefLabel": "Baarle-Nassau"
+        }
+    ],
+    "@context": {
+        "public": {
+            "@id": "http://schemas.delving.eu/nave/terms/public"
+        },
+        "allowSourceDownload": {
+            "@id": "http://schemas.delving.eu/nave/terms/allowSourceDownload"
+        },
+        "allowLinkedOpenData": {
+            "@id": "http://schemas.delving.eu/nave/terms/allowLinkedOpenData"
+        },
+        "allowDeepZoom": {
+            "@id": "http://schemas.delving.eu/nave/terms/allowDeepZoom"
+        },
+        "featured": {
+            "@id": "http://schemas.delving.eu/nave/terms/featured"
+        },
+        "rights": {
+            "@id": "http://www.europeana.eu/schemas/edm/rights",
+            "@type": "@id"
+        },
+        "provider": {
+            "@id": "http://www.europeana.eu/schemas/edm/provider"
+        },
+        "object": {
+            "@id": "http://www.europeana.eu/schemas/edm/object",
+            "@type": "@id"
+        },
+        "isShownBy": {
+            "@id": "http://www.europeana.eu/schemas/edm/isShownBy",
+            "@type": "@id"
+        },
+        "isShownAt": {
+            "@id": "http://www.europeana.eu/schemas/edm/isShownAt",
+            "@type": "@id"
+        },
+        "hasView": {
+            "@id": "http://www.europeana.eu/schemas/edm/hasView",
+            "@type": "@id"
+        },
+        "dataProvider": {
+            "@id": "http://www.europeana.eu/schemas/edm/dataProvider"
+        },
+        "aggregatedCHO": {
+            "@id": "http://www.europeana.eu/schemas/edm/aggregatedCHO",
+            "@type": "@id"
+        },
+        "subjectAatLabel": {
+            "@id": "http://schemas.delving.eu/nave/terms/subjectAatLabel"
+        },
+        "place": {
+            "@id": "http://schemas.delving.eu/nave/terms/place"
+        },
+        "numberOfPages": {
+            "@id": "http://schemas.delving.eu/nave/terms/numberOfPages"
+        },
+        "date": {
+            "@id": "http://schemas.delving.eu/nave/terms/date"
+        },
+        "collectionPart": {
+            "@id": "http://schemas.delving.eu/nave/terms/collectionPart"
+        },
+        "collectionType": {
+            "@id": "http://schemas.delving.eu/nave/terms/collectionType"
+        },
+        "collection": {
+            "@id": "http://schemas.delving.eu/nave/terms/collection"
+        },
+        "description": {
+            "@id": "http://purl.org/dc/elements/1.1/description"
+        },
+        "spatial": {
+            "@id": "http://purl.org/dc/terms/spatial",
+            "@type": "@id"
+        },
+        "subject": {
+            "@id": "http://purl.org/dc/elements/1.1/subject"
+        },
+        "type": {
+            "@id": "http://purl.org/dc/elements/1.1/type"
+        },
+        "issued": {
+            "@id": "http://purl.org/dc/terms/issued"
+        },
+        "title": {
+            "@id": "http://purl.org/dc/elements/1.1/title"
+        },
+        "publisher": {
+            "@id": "http://purl.org/dc/elements/1.1/publisher",
+            "@type": "@id"
+        },
+        "currentLocation": {
+            "@id": "http://www.europeana.eu/schemas/edm/currentLocation"
+        },
+        "identifier": {
+            "@id": "http://purl.org/dc/elements/1.1/identifier"
+        },
+        "resourceSortOrder": {
+            "@id": "http://schemas.delving.eu/nave/terms/resourceSortOrder"
+        },
+        "sourceDownload": {
+            "@id": "http://schemas.delving.eu/nave/terms/sourceDownload"
+        },
+        "hasMimeType": {
+            "@id": "http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#hasMimeType"
+        },
+        "thumbLarge": {
+            "@id": "http://schemas.delving.eu/nave/terms/thumbLarge"
+        },
+        "allowPublicWebView": {
+            "@id": "http://schemas.delving.eu/nave/terms/allowPublicWebView"
+        },
+        "fullTextObjectUrl": {
+            "@id": "http://schemas.delving.eu/nave/terms/fullTextObjectUrl"
+        },
+        "thumbSmall": {
+            "@id": "http://schemas.delving.eu/nave/terms/thumbSmall"
+        },
+        "fullText": {
+            "@id": "http://schemas.delving.eu/nave/terms/fullText"
+        },
+        "publisherLabel": {
+            "@id": "http://schemas.delving.eu/nave/terms/publisherLabel"
+        },
+        "placeOfPublication": {
+            "@id": "http://schemas.delving.eu/nave/terms/placeOfPublication"
+        },
+        "prefLabel": {
+            "@id": "http://www.w3.org/2004/02/skos/core#prefLabel"
+        },
+        "nave": "http://schemas.delving.eu/nave/terms/",
+        "ore": "http://www.openarchives.org/ore/terms/",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "ebucore": "http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#",
+        "dcterms": "http://purl.org/dc/terms/",
+        "skos": "http://www.w3.org/2004/02/skos/core#",
+        "dc": "http://purl.org/dc/elements/1.1/",
+        "edm": "http://www.europeana.eu/schemas/edm/"
+    }
+}

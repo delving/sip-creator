@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SIP-Creator Mapping Engine WASM Demo</title>
+</head>
+<body>
+    <h1>SIP-Creator Mapping Engine in Browser</h1>
+    
+    <div>
+        <h2>String Sanitization</h2>
+        <input type="text" id="sanitizeInput" value="  Hello   World  " />
+        <button onclick="testSanitize()">Sanitize</button>
+        <div id="sanitizeResult"></div>
+    </div>
+    
+    <div>
+        <h2>URI Encoding</h2>
+        <input type="text" id="uriInput" value="hello [world] test" />
+        <button onclick="testURI()">Encode URI</button>
+        <div id="uriResult"></div>
+    </div>
+    
+    <div>
+        <h2>Template Interpolation</h2>
+        <input type="text" id="templateInput" value="${baseUrl}/resource/${spec}/${_uniqueIdentifier}" />
+        <br>
+        Base URL: <input type="text" id="baseUrl" value="http://example.com" />
+        <br>
+        Spec: <input type="text" id="spec" value="test-collection" />
+        <br>
+        ID: <input type="text" id="uniqueId" value="12345" />
+        <br>
+        <button onclick="testInterpolation()">Interpolate</button>
+        <div id="interpolateResult"></div>
+    </div>
+
+    <script>
+        let wasmInstance = null;
+        let memory = null;
+        
+        // Helper functions for string conversion
+        function stringToWasm(str) {
+            const encoder = new TextEncoder();
+            const bytes = encoder.encode(str);
+            const ptr = wasmInstance.exports.allocateMemory(bytes.length + 1);
+            const mem = new Uint8Array(memory.buffer, ptr, bytes.length + 1);
+            mem.set(bytes);
+            mem[bytes.length] = 0; // null terminator
+            return { ptr, len: bytes.length };
+        }
+        
+        function wasmToString(ptr) {
+            const len = wasmInstance.exports.getStringLength(ptr);
+            const mem = new Uint8Array(memory.buffer, ptr, len);
+            const decoder = new TextDecoder();
+            const result = decoder.decode(mem);
+            wasmInstance.exports.freeMemory(ptr);
+            return result;
+        }
+        
+        async function loadWasm() {
+            const response = await fetch('wasm/mapping-engine.wasm');
+            const bytes = await response.arrayBuffer();
+            
+            const wasmModule = await WebAssembly.compile(bytes);
+            wasmInstance = await WebAssembly.instantiate(wasmModule, {
+                env: {
+                    // Add any required imports here
+                }
+            });
+            
+            memory = wasmInstance.exports.memory;
+            console.log('WASM module loaded successfully');
+        }
+        
+        function testSanitize() {
+            const input = document.getElementById('sanitizeInput').value;
+            const { ptr, len } = stringToWasm(input);
+            const resultPtr = wasmInstance.exports.sanitizeString(ptr, len);
+            const result = wasmToString(resultPtr);
+            document.getElementById('sanitizeResult').textContent = `Result: "${result}"`;
+            wasmInstance.exports.freeMemory(ptr);
+        }
+        
+        function testURI() {
+            const input = document.getElementById('uriInput').value;
+            const { ptr, len } = stringToWasm(input);
+            const resultPtr = wasmInstance.exports.sanitizeURI(ptr, len);
+            const result = wasmToString(resultPtr);
+            document.getElementById('uriResult').textContent = `Result: "${result}"`;
+            wasmInstance.exports.freeMemory(ptr);
+        }
+        
+        function testInterpolation() {
+            const template = document.getElementById('templateInput').value;
+            const baseUrl = document.getElementById('baseUrl').value;
+            const spec = document.getElementById('spec').value;
+            const uniqueId = document.getElementById('uniqueId').value;
+            
+            const templateWasm = stringToWasm(template);
+            const baseUrlWasm = stringToWasm(baseUrl);
+            const specWasm = stringToWasm(spec);
+            const uniqueIdWasm = stringToWasm(uniqueId);
+            
+            const resultPtr = wasmInstance.exports.executeExpression(
+                templateWasm.ptr, templateWasm.len,
+                uniqueIdWasm.ptr, uniqueIdWasm.len,
+                baseUrlWasm.ptr, baseUrlWasm.len,
+                specWasm.ptr, specWasm.len
+            );
+            
+            const result = wasmToString(resultPtr);
+            document.getElementById('interpolateResult').textContent = `Result: "${result}"`;
+            
+            // Clean up
+            wasmInstance.exports.freeMemory(templateWasm.ptr);
+            wasmInstance.exports.freeMemory(baseUrlWasm.ptr);
+            wasmInstance.exports.freeMemory(specWasm.ptr);
+            wasmInstance.exports.freeMemory(uniqueIdWasm.ptr);
+        }
+        
+        // Load WASM on page load
+        loadWasm();
+    </script>
+</body>
+</html>

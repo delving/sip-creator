@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Van Gogh Museum XML Processing Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-result {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success {
+            color: #28a745;
+        }
+        .error {
+            color: #dc3545;
+        }
+        pre {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Van Gogh Museum LIDO to EDM Transformation Test</h1>
+    
+    <div id="test-results"></div>
+    
+    <script>
+        const vanGoghLidoXml = `<?xml version="1.0"?>
+<pocket id="p0016V1962">
+  <lido:lido xmlns:lido="http://www.lido-schema.org">
+    <lido:titleWrap>
+      <lido:titleSet>
+        <lido:appellationValue lido:pref="preferred">De aardappeleters</lido:appellationValue>
+      </lido:titleSet>
+    </lido:titleWrap>
+    <lido:eventWrap>
+      <lido:eventSet>
+        <lido:event>
+          <lido:eventActor>
+            <lido:actorInRole>
+              <lido:actor>
+                <lido:nameActorSet>
+                  <lido:appellationValue>Gogh, Vincent van</lido:appellationValue>
+                </lido:nameActorSet>
+              </lido:actor>
+            </lido:actorInRole>
+          </lido:eventActor>
+          <lido:eventDate>
+            <lido:displayDate>april 1885</lido:displayDate>
+          </lido:eventDate>
+        </lido:event>
+      </lido:eventSet>
+    </lido:eventWrap>
+  </lido:lido>
+</pocket>`;
+
+        let wasmModule;
+        let memory;
+        
+        async function runTests() {
+            const results = document.getElementById('test-results');
+            
+            try {
+                // Load WASM
+                const response = await fetch('zig-out/wasm/mapping-engine.wasm');
+                const bytes = await response.arrayBuffer();
+                const module = await WebAssembly.instantiate(bytes, {});
+                
+                wasmModule = module.instance.exports;
+                memory = wasmModule.memory;
+                
+                addResult('WASM Module Load', 'Module loaded successfully', true);
+                
+                // Test 1: XML Parsing
+                testXmlParsing();
+                
+                // Test 2: SIP-Creator Path Navigation
+                testPathNavigation();
+                
+                // Test 3: Full Mapping Processor
+                testFullMapping();
+                
+            } catch (error) {
+                addResult('Initialization', error.message, false);
+            }
+        }
+        
+        function testXmlParsing() {
+            try {
+                const xmlData = stringToWasm(vanGoghLidoXml);
+                const resultLen = wasmModule.wasmParseXml(xmlData.ptr, xmlData.len);
+                const result = wasmToString(wasmModule.wasmGetResultBuffer(), resultLen);
+                
+                if (result.includes('parsed successfully')) {
+                    addResult('XML Parsing', 'Successfully parsed Van Gogh Museum LIDO XML', true);
+                } else {
+                    addResult('XML Parsing', result, false);
+                }
+            } catch (error) {
+                addResult('XML Parsing', error.message, false);
+            }
+        }
+        
+        function testPathNavigation() {
+            const tests = [
+                { path: '@id', expected: 'p0016V1962' },
+                { path: 'lido:lido/lido:titleWrap/lido:titleSet/lido:appellationValue', expected: 'De aardappeleters' },
+                { path: 'lido:appellationValue_', expected: 'De aardappeleters' },
+                { path: 'lido:lido/lido:eventWrap/lido:eventSet/lido:event/lido:eventActor/lido:actorInRole/lido:actor/lido:nameActorSet/lido:appellationValue', expected: 'Gogh, Vincent van' },
+                { path: 'lido:lido/lido:eventWrap/lido:eventSet/lido:event/lido:eventDate/lido:displayDate', expected: 'april 1885' }
+            ];
+            
+            let allPassed = true;
+            const details = [];
+            
+            for (const test of tests) {
+                try {
+                    const xmlData = stringToWasm(vanGoghLidoXml, 0);
+                    const pathData = stringToWasm(test.path, 10000);
+                    
+                    const resultLen = wasmModule.wasmXmlGet(
+                        xmlData.ptr, xmlData.len,
+                        pathData.ptr, pathData.len
+                    );
+                    
+                    const result = wasmToString(wasmModule.wasmGetResultBuffer(), resultLen);
+                    
+                    if (result === test.expected) {
+                        details.push(`✓ ${test.path} → "${result}"`);
+                    } else {
+                        details.push(`✗ ${test.path} → "${result}" (expected: "${test.expected}")`);
+                        allPassed = false;
+                    }
+                } catch (error) {
+                    details.push(`✗ ${test.path} → Error: ${error.message}`);
+                    allPassed = false;
+                }
+            }
+            
+            addResult('Path Navigation', details.join('\n'), allPassed);
+        }
+        
+        function testFullMapping() {
+            try {
+                // Initialize processor
+                wasmModule.wasmInitProcessor();
+                
+                // Add facts
+                addFact('baseUrl', 'http://data.vangoghmuseum.nl');
+                addFact('spec', 'van-gogh-museum');
+                addFact('dataProvider', 'Van Gogh Museum');
+                addFact('_uniqueIdentifier', 'p0016V1962');
+                
+                // Add mapping rules
+                // Title
+                addMappingRule(
+                    'lido:lido/lido:titleWrap/lido:titleSet/lido:appellationValue',
+                    '/edm:RDF/edm:ProvidedCHO/dc:title',
+                    0
+                );
+                
+                // Creator
+                addMappingRule(
+                    'lido:lido/lido:eventWrap/lido:eventSet/lido:event/lido:eventActor/lido:actorInRole/lido:actor/lido:nameActorSet/lido:appellationValue',
+                    '/edm:RDF/edm:ProvidedCHO/dc:creator',
+                    0
+                );
+                
+                // Date
+                addMappingRule(
+                    'lido:lido/lido:eventWrap/lido:eventSet/lido:event/lido:eventDate/lido:displayDate',
+                    '/edm:RDF/edm:ProvidedCHO/dc:date',
+                    0
+                );
+                
+                // Type (constant)
+                addMappingRule(
+                    '',
+                    '/edm:RDF/edm:ProvidedCHO/edm:type',
+                    2
+                );
+                
+                // Process
+                const xmlData = stringToWasm(vanGoghLidoXml);
+                const resultLen = wasmModule.wasmProcessMapping(xmlData.ptr, xmlData.len);
+                const result = wasmToString(wasmModule.wasmGetResultBuffer(), resultLen);
+                
+                // Check for expected EDM elements
+                const checks = [
+                    result.includes('edm:ProvidedCHO'),
+                    result.includes('<dc:title>De aardappeleters</dc:title>'),
+                    result.includes('<dc:creator>Gogh, Vincent van</dc:creator>'),
+                    result.includes('<dc:date>april 1885</dc:date>'),
+                    result.includes('<edm:type>IMAGE</edm:type>'),
+                    result.includes('rdf:about="http://data.vangoghmuseum.nl/resource/document/van-gogh-museum/p0016V1962"')
+                ];
+                
+                const allChecks = checks.every(c => c);
+                
+                if (allChecks) {
+                    addResult('Full Mapping', 'EDM output generated successfully:\n' + result, true);
+                } else {
+                    addResult('Full Mapping', 'Some expected elements missing:\n' + result, false);
+                }
+                
+            } catch (error) {
+                addResult('Full Mapping', error.message, false);
+            }
+        }
+        
+        // Helper functions
+        function stringToWasm(str, offset = 0) {
+            const encoder = new TextEncoder();
+            const encoded = encoder.encode(str);
+            const ptr = wasmModule.wasmGetTempBuffer();
+            const buffer = new Uint8Array(memory.buffer, ptr + offset, encoded.length);
+            buffer.set(encoded);
+            return { ptr: ptr + offset, len: encoded.length };
+        }
+        
+        function wasmToString(ptr, len) {
+            const buffer = new Uint8Array(memory.buffer, ptr, len);
+            const decoder = new TextDecoder();
+            return decoder.decode(buffer);
+        }
+        
+        function addFact(key, value) {
+            const keyData = stringToWasm(key, 0);
+            const valueData = stringToWasm(value, 1000);
+            
+            const result = wasmModule.wasmAddFact(
+                keyData.ptr, keyData.len,
+                valueData.ptr, valueData.len
+            );
+            
+            if (!result) {
+                throw new Error(`Failed to add fact: ${key}`);
+            }
+        }
+        
+        function addMappingRule(inputPath, outputPath, ruleType) {
+            const inputData = inputPath ? stringToWasm(inputPath, 0) : { ptr: 0, len: 0 };
+            const outputData = stringToWasm(outputPath, 2000);
+            const constantData = ruleType === 2 ? stringToWasm('IMAGE', 3000) : { ptr: 0, len: 0 };
+            
+            const result = wasmModule.wasmAddMappingRule(
+                inputData.ptr, inputData.len,
+                outputData.ptr, outputData.len,
+                ruleType,
+                constantData.ptr, constantData.len
+            );
+            
+            if (!result) {
+                throw new Error(`Failed to add mapping rule: ${outputPath}`);
+            }
+        }
+        
+        function addResult(test, message, success) {
+            const results = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = 'test-result';
+            div.innerHTML = `
+                <h3 class="${success ? 'success' : 'error'}">${test}: ${success ? 'PASSED' : 'FAILED'}</h3>
+                <pre>${escapeHtml(message)}</pre>
+            `;
+            results.appendChild(div);
+        }
+        
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+        
+        // Run tests on load
+        runTests();
+    </script>
+</body>
+</html>

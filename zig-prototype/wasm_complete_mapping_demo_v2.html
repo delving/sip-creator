@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SIP-Creator Complete Mapping Workflow (Real WASM Processing)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .workflow-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .panel h2 {
+            margin-top: 0;
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .controls {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+        button:hover {
+            background: #218838;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status.info {
+            background: #cce5ff;
+            color: #004085;
+        }
+        textarea {
+            width: 100%;
+            height: 400px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        pre {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .config-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .config-item label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .config-item input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .mapping-rule {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 3px solid #007bff;
+        }
+        .debug-log {
+            background: #263238;
+            color: #aed581;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .arrow {
+            text-align: center;
+            font-size: 24px;
+            color: #007bff;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>SIP-Creator Complete Mapping Workflow</h1>
+    <p class="subtitle">Real WASM XML Processing - Van Gogh Museum LIDO to EDM Transformation</p>
+    
+    <div class="controls">
+        <button onclick="runTransformation()" id="transformBtn">Run Full Transformation</button>
+        <button onclick="resetDemo()">Reset</button>
+        <div id="status" class="status" style="display: none;"></div>
+    </div>
+    
+    <div class="workflow-container">
+        <!-- Input Panel -->
+        <div class="panel">
+            <h2>1. Source XML (LIDO)</h2>
+            <textarea id="sourceXml"><?xml version="1.0"?>
+<pocket id="p0016V1962">
+  <lido:lido xmlns:lido="http://www.lido-schema.org">
+    <lido:lidoRecID lido:type="local" lido:source="Van Gogh Museum">vgm/collect-2177</lido:lidoRecID>
+    <lido:descriptiveMetadata xml:lang="nl">
+      <lido:objectIdentificationWrap>
+        <lido:titleWrap>
+          <lido:titleSet>
+            <lido:appellationValue lido:pref="preferred">De aardappeleters</lido:appellationValue>
+          </lido:titleSet>
+        </lido:titleWrap>
+        <lido:repositoryWrap>
+          <lido:repositorySet lido:type="current">
+            <lido:workID lido:type="object number">p0016V1962</lido:workID>
+          </lido:repositorySet>
+        </lido:repositoryWrap>
+        <lido:objectMeasurementsWrap>
+          <lido:objectMeasurementsSet>
+            <lido:displayObjectMeasurements>31.2 x 39.6 cm</lido:displayObjectMeasurements>
+          </lido:objectMeasurementsSet>
+        </lido:objectMeasurementsWrap>
+      </lido:objectIdentificationWrap>
+      <lido:eventWrap>
+        <lido:eventSet>
+          <lido:event>
+            <lido:eventType>
+              <lido:term>Production</lido:term>
+            </lido:eventType>
+            <lido:eventActor>
+              <lido:actorInRole>
+                <lido:actor lido:type="person">
+                  <lido:actorID lido:type="URI">http://vocab.getty.edu/ulan/500115588</lido:actorID>
+                  <lido:nameActorSet>
+                    <lido:appellationValue lido:pref="preferred">Gogh, Vincent van</lido:appellationValue>
+                  </lido:nameActorSet>
+                </lido:actor>
+              </lido:actorInRole>
+            </lido:eventActor>
+            <lido:eventDate>
+              <lido:displayDate>april 1885</lido:displayDate>
+            </lido:eventDate>
+            <lido:eventMaterialsTech>
+              <lido:displayMaterialsTech>lithografie op papier</lido:displayMaterialsTech>
+            </lido:eventMaterialsTech>
+          </lido:event>
+        </lido:eventSet>
+      </lido:eventWrap>
+    </lido:descriptiveMetadata>
+  </lido:lido>
+</pocket></textarea>
+        </div>
+        
+        <!-- Configuration Panel -->
+        <div class="panel">
+            <h2>2. Configuration & Mapping Rules</h2>
+            
+            <h3>Facts/Variables</h3>
+            <div class="config-grid">
+                <div class="config-item">
+                    <label>Base URL:</label>
+                    <input id="baseUrl" value="http://data.collectienederland.nl">
+                </div>
+                <div class="config-item">
+                    <label>Spec:</label>
+                    <input id="spec" value="van-gogh-museum">
+                </div>
+                <div class="config-item">
+                    <label>Data Provider:</label>
+                    <input id="dataProvider" value="Van Gogh Museum">
+                </div>
+                <div class="config-item">
+                    <label>Language:</label>
+                    <input id="language" value="nl">
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 20px;">Active Mapping Rules</h3>
+            <div id="mappingRules">
+                <div class="mapping-rule">
+                    <strong>Title:</strong> lido:titleWrap/lido:titleSet/lido:appellationValue → dc:title
+                </div>
+                <div class="mapping-rule">
+                    <strong>Creator:</strong> lido:eventActor/lido:actorInRole/lido:actor/lido:nameActorSet/lido:appellationValue → dc:creator
+                </div>
+                <div class="mapping-rule">
+                    <strong>Date:</strong> lido:eventDate/lido:displayDate → dc:date
+                </div>
+                <div class="mapping-rule">
+                    <strong>Type:</strong> constant("IMAGE") → edm:type
+                </div>
+                <div class="mapping-rule">
+                    <strong>Identifier:</strong> @id → dc:identifier
+                </div>
+            </div>
+        </div>
+        
+        <!-- Output Panel -->
+        <div class="panel">
+            <h2>3. Output XML (EDM)</h2>
+            <pre id="outputXml">Output will appear here after transformation...</pre>
+        </div>
+    </div>
+    
+    <!-- Debug Log -->
+    <div class="panel">
+        <h2>Debug Log</h2>
+        <div id="debugLog" class="debug-log">Waiting for transformation...</div>
+    </div>
+    
+    <script>
+        let wasmModule;
+        let memory;
+        let debugMessages = [];
+        
+        // Initialize WASM
+        async function init() {
+            try {
+                const response = await fetch('zig-out/wasm/mapping-engine.wasm');
+                const bytes = await response.arrayBuffer();
+                const module = await WebAssembly.instantiate(bytes, {});
+                
+                wasmModule = module.instance.exports;
+                memory = wasmModule.memory;
+                
+                log('WASM module loaded successfully');
+                log('Version: ' + getVersion());
+                showStatus('WASM module ready', 'success');
+            } catch (error) {
+                log('ERROR: Failed to load WASM - ' + error.message);
+                showStatus('Failed to load WASM module', 'error');
+                document.getElementById('transformBtn').disabled = true;
+            }
+        }
+        
+        // Helper functions
+        function stringToWasm(str, offset = 0) {
+            const encoder = new TextEncoder();
+            const encoded = encoder.encode(str);
+            const ptr = wasmModule.wasmGetTempBuffer();
+            const buffer = new Uint8Array(memory.buffer, ptr + offset, encoded.length);
+            buffer.set(encoded);
+            return { ptr: ptr + offset, len: encoded.length };
+        }
+        
+        function wasmToString(ptr, len) {
+            const buffer = new Uint8Array(memory.buffer, ptr, len);
+            const decoder = new TextDecoder();
+            return decoder.decode(buffer);
+        }
+        
+        function getVersion() {
+            const len = wasmModule.wasmGetVersion();
+            return wasmToString(wasmModule.wasmGetResultBuffer(), len);
+        }
+        
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.className = 'status ' + type;
+            statusEl.textContent = message;
+            statusEl.style.display = 'block';
+        }
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            debugMessages.push(`[${timestamp}] ${message}`);
+            document.getElementById('debugLog').textContent = debugMessages.join('\n');
+            document.getElementById('debugLog').scrollTop = document.getElementById('debugLog').scrollHeight;
+        }
+        
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+        
+        // Main transformation function using real WASM processing
+        async function runTransformation() {
+            debugMessages = [];
+            log('Starting transformation...');
+            showStatus('Running transformation...', 'info');
+            
+            try {
+                // Get input XML
+                const inputXml = document.getElementById('sourceXml').value;
+                log('Input XML length: ' + inputXml.length + ' characters');
+                
+                // Initialize mapping processor
+                wasmModule.wasmInitProcessor();
+                log('Initialized mapping processor');
+                
+                // Add facts from configuration
+                const facts = {
+                    baseUrl: document.getElementById('baseUrl').value,
+                    spec: document.getElementById('spec').value,
+                    dataProvider: document.getElementById('dataProvider').value,
+                    language: document.getElementById('language').value,
+                    _uniqueIdentifier: 'p0016V1962' // Will be extracted from XML
+                };
+                
+                // Add each fact to the processor
+                for (const [key, value] of Object.entries(facts)) {
+                    const keyData = stringToWasm(key, 0);
+                    const valueData = stringToWasm(value, 1000);
+                    
+                    const result = wasmModule.wasmAddFact(
+                        keyData.ptr, keyData.len,
+                        valueData.ptr, valueData.len
+                    );
+                    
+                    if (result) {
+                        log(`Added fact: ${key} = ${value}`);
+                    } else {
+                        throw new Error(`Failed to add fact: ${key}`);
+                    }
+                }
+                
+                // First, let's extract the ID from the XML
+                const xmlData = stringToWasm(inputXml, 0);
+                const idPath = stringToWasm("@id", 10000);
+                const idLen = wasmModule.wasmXmlGet(
+                    xmlData.ptr, xmlData.len,
+                    idPath.ptr, idPath.len
+                );
+                const recordId = wasmToString(wasmModule.wasmGetResultBuffer(), idLen);
+                log(`Extracted record ID: ${recordId}`);
+                
+                // Update unique identifier fact
+                const idKeyData = stringToWasm("_uniqueIdentifier", 0);
+                const idValueData = stringToWasm(recordId, 1000);
+                wasmModule.wasmAddFact(
+                    idKeyData.ptr, idKeyData.len,
+                    idValueData.ptr, idValueData.len
+                );
+                
+                // Add mapping rules
+                const mappingRules = [
+                    {
+                        input: 'lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:titleWrap/lido:titleSet/lido:appellationValue',
+                        output: '/edm:RDF/edm:ProvidedCHO/dc:title',
+                        type: 0 // direct
+                    },
+                    {
+                        input: 'lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventActor/lido:actorInRole/lido:actor/lido:nameActorSet/lido:appellationValue',
+                        output: '/edm:RDF/edm:ProvidedCHO/dc:creator',
+                        type: 0 // direct
+                    },
+                    {
+                        input: 'lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventDate/lido:displayDate',
+                        output: '/edm:RDF/edm:ProvidedCHO/dc:date',
+                        type: 0 // direct
+                    },
+                    {
+                        input: '@id',
+                        output: '/edm:RDF/edm:ProvidedCHO/dc:identifier',
+                        type: 0 // direct
+                    },
+                    {
+                        input: '',
+                        output: '/edm:RDF/edm:ProvidedCHO/edm:type',
+                        type: 2, // constant
+                        constant: 'IMAGE'
+                    }
+                ];
+                
+                // Add each mapping rule
+                for (const rule of mappingRules) {
+                    const inputData = rule.input ? stringToWasm(rule.input, 0) : { ptr: 0, len: 0 };
+                    const outputData = stringToWasm(rule.output, 2000);
+                    const constantData = rule.constant ? stringToWasm(rule.constant, 3000) : { ptr: 0, len: 0 };
+                    
+                    const result = wasmModule.wasmAddMappingRule(
+                        inputData.ptr, inputData.len,
+                        outputData.ptr, outputData.len,
+                        rule.type,
+                        constantData.ptr, constantData.len
+                    );
+                    
+                    if (result) {
+                        log(`Added mapping: ${rule.input || '[constant]'} → ${rule.output}`);
+                    } else {
+                        throw new Error(`Failed to add mapping rule: ${rule.output}`);
+                    }
+                }
+                
+                // Process the XML through the mapping processor
+                log('Processing XML through mapping engine...');
+                const processData = stringToWasm(inputXml, 0);
+                const resultLen = wasmModule.wasmProcessMapping(processData.ptr, processData.len);
+                
+                if (resultLen === 0) {
+                    throw new Error('Mapping processor returned empty result');
+                }
+                
+                const outputXml = wasmToString(wasmModule.wasmGetResultBuffer(), resultLen);
+                log('Generated output XML: ' + outputXml.length + ' characters');
+                
+                // Display the output
+                document.getElementById('outputXml').textContent = outputXml;
+                
+                showStatus('Transformation completed successfully!', 'success');
+                log('Transformation completed successfully');
+                
+                // Also test individual path extractions for verification
+                log('\n--- Path extraction verification ---');
+                const testPaths = [
+                    { path: 'lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:titleWrap/lido:titleSet/lido:appellationValue', name: 'Title' },
+                    { path: '@id', name: 'ID' }
+                ];
+                
+                for (const test of testPaths) {
+                    const pathData = stringToWasm(test.path, 15000);
+                    const valueLen = wasmModule.wasmXmlGet(
+                        xmlData.ptr, xmlData.len,
+                        pathData.ptr, pathData.len
+                    );
+                    const value = wasmToString(wasmModule.wasmGetResultBuffer(), valueLen);
+                    log(`${test.name}: "${value}"`);
+                }
+                
+            } catch (error) {
+                console.error('Transformation error:', error);
+                showStatus('Transformation failed: ' + error.message, 'error');
+                log('ERROR: ' + error.message);
+            }
+        }
+        
+        function resetDemo() {
+            document.getElementById('outputXml').textContent = 'Output will appear here after transformation...';
+            debugMessages = [];
+            document.getElementById('debugLog').textContent = 'Waiting for transformation...';
+            showStatus('Demo reset', 'info');
+        }
+        
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

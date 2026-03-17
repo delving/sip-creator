@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edm:RDF xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:owl="http://www.w3.org/2002/07/owl#">
+  <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/van-gogh-museum/s-gravenhage-kb-1">
+    <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/van-gogh-museum/s-gravenhage-kb-1"/>
+    <edm:dataProvider>Van Gogh Museum</edm:dataProvider>
+    <edm:isShownAt rdf:resource="https://www.vangoghmuseum.nl/nl/collectie/F474"/>
+    <edm:isShownBy rdf:resource="urn:van-gogh-museum/F474"/>
+    <edm:object rdf:resource="urn:van-gogh-museum/F474"/>
+    <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+  </ore:Aggregation>
+  <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/van-gogh-museum/s-gravenhage-kb-1">
+    <dc:creator rdf:resource="http://vocab.getty.edu/ulan/500115588"/>
+    <dc:date>1888</dc:date>
+    <dc:identifier>F474</dc:identifier>
+    <dc:title>Starry Night Over the Rhône</dc:title>
+    <dc:type rdf:resource="http://vocab.getty.edu/aat/300033618"/>
+    <dcterms:extent>72.5 cm × 92 cm (28.5 in × 36.2 in)</dcterms:extent>
+    <dcterms:medium rdf:resource="http://vocab.getty.edu/aat/300015050"/>
+  </edm:ProvidedCHO>
+  <edm:WebResource rdf:about="urn:van-gogh-museum/F474">
+    <nave:thumbSmall>urn:van-gogh-museum/F474</nave:thumbSmall>
+    <nave:thumbMedium>urn:van-gogh-museum/F474</nave:thumbMedium>
+    <nave:thumbLarge>urn:van-gogh-museum/F474</nave:thumbLarge>
+  </edm:WebResource>
+  <edm:Agent rdf:about="http://vocab.getty.edu/ulan/500115588">
+    <skos:prefLabel>Vincent van Gogh</skos:prefLabel>
+    <rdaGr2:professionOrOccupation>painter</rdaGr2:professionOrOccupation>
+    <owl:sameAs rdf:resource="http://vocab.getty.edu/ulan/500115588"/>
+    <nave:resourceSortOrder>1</nave:resourceSortOrder>
+  </edm:Agent>
+  <skos:Concept rdf:about="http://vocab.getty.edu/aat/300033618">
+    <skos:prefLabel>paintings</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://vocab.getty.edu/aat/300015050">
+    <skos:prefLabel>oil on canvas</skos:prefLabel>
+  </skos:Concept>
+  <nave:DelvingResource>
+    <nave:featured>false</nave:featured>
+    <nave:allowDeepZoom>true</nave:allowDeepZoom>
+    <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+    <nave:allowSourceDownload>false</nave:allowSourceDownload>
+    <nave:public>true</nave:public>
+  </nave:DelvingResource>
+</edm:RDF>

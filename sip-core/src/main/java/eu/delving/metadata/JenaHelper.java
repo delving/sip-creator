@@ -23,12 +23,18 @@ import com.google.gson.JsonParser;
 import eu.delving.groovy.XmlSerializer;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.JsonLDWriteContext;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.riot.WriterGraphRIOT;
+import org.apache.jena.riot.system.PrefixMap;
+import org.apache.jena.riot.system.RiotLib;
 import org.w3c.dom.Node;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class JenaHelper {
 
@@ -40,6 +46,12 @@ public class JenaHelper {
     public static String convertRDF(String defaultPrefix, String rdf, RDFFormat outputFormat) {
         if (outputFormat == RDFFormat.RDFXML)
             return rdf;
+
+        if (outputFormat == RDFFormat.JSONLD_FRAME_PRETTY) {
+            Map<String, Object> defaultFrame = new HashMap<>();
+            defaultFrame.put("@type", "Thing");
+            return convertRDF(defaultPrefix, rdf, outputFormat, defaultFrame);
+        }
 
         byte[] out = convertRDFTo(defaultPrefix, rdf, outputFormat);
         if (outputFormat == RDFFormat.JSONLD_COMPACT_PRETTY) {
@@ -57,6 +69,34 @@ public class JenaHelper {
         throw new UnsupportedOperationException("Conversion to " + outputFormat + " is not supported");
     }
 
+    public static String convertRDF(String defaultPrefix, String rdf, RDFFormat outputFormat, Map<String, Object> frame) {
+        if (outputFormat == RDFFormat.JSONLD_FRAME_PRETTY) {
+            if (frame == null) {
+                throw new IllegalArgumentException("frame cannot be null for JSONLD_FRAME_PRETTY format");
+            }
+            return convertRDFWithFrame(defaultPrefix, rdf, outputFormat, frame);
+        }
+
+        return convertRDF(defaultPrefix, rdf, outputFormat);
+    }
+
+    private static String convertRDFWithFrame(String defaultPrefix, String rdf, RDFFormat outputFormat, Map<String, Object> frame) {
+        String compliantRDF = toJenaCompliantRDFIfNeeded(defaultPrefix, rdf);
+        InputStream in = new ByteArrayInputStream(compliantRDF.getBytes(StandardCharsets.UTF_8));
+        Model model = ModelFactory.createDefaultModel().read(in, "", "RDF/XML");
+        
+        ByteArrayOutputStream out = new ByteArrayOutputStream(2048);
+        
+        JsonLDWriteContext ctx = new JsonLDWriteContext();
+        ctx.setFrame(frame);
+        
+        WriterGraphRIOT writer = RDFDataMgr.createGraphWriter(outputFormat);
+        PrefixMap prefixes = RiotLib.prefixMap(model.getGraph());
+        writer.write(out, model.getGraph(), prefixes, null, ctx);
+        
+        return formatJSON(out.toByteArray());
+    }
+
     private static String formatXML(byte[] out) {
         return new String(out, StandardCharsets.UTF_8);
     }
@@ -71,16 +111,29 @@ public class JenaHelper {
     }
 
     private static byte[] convertRDFTo(String defaultPrefix, String rdf, RDFFormat outputFormat) {
-        String compliantRDF = MappingResult.toJenaCompliantRDF(defaultPrefix, rdf);
+        String compliantRDF = toJenaCompliantRDFIfNeeded(defaultPrefix, rdf);
         InputStream in = new ByteArrayInputStream(compliantRDF.getBytes(StandardCharsets.UTF_8));
-        Model model = ModelFactory.createDefaultModel().read(in, null, "RDF/XML");
+        Model model = ModelFactory.createDefaultModel().read(in, "", "RDF/XML");
         ByteArrayOutputStream out = new ByteArrayOutputStream(2048);
         RDFDataMgr.write(out, model, outputFormat);
         return out.toByteArray();
     }
 
+    private static String toJenaCompliantRDFIfNeeded(String defaultPrefix, String rdf) {
+        if (rdf.contains("<rdf:RDF") && rdf.contains("xmlns:rdf=")) {
+            return rdf;
+        }
+        return MappingResult.toJenaCompliantRDF(defaultPrefix, rdf);
+    }
+
     public static String getExtension(RDFFormat outputFormat) {
+        if (outputFormat == null) {
+            throw new IllegalArgumentException("outputFormat cannot be null");
+        }
         if (outputFormat == RDFFormat.JSONLD_COMPACT_PRETTY) {
+            return ".json";
+        }
+        if (outputFormat == RDFFormat.JSONLD_FRAME_PRETTY) {
             return ".json";
         }
         if (outputFormat == RDFFormat.NTRIPLES) {

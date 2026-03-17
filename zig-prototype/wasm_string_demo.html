@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SIP-Creator WASM String Functions Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .function-test {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e8f5e9;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .usage-count {
+            float: right;
+            color: #666;
+            font-size: 0.9em;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>SIP-Creator WASM String Functions Demo</h1>
+    <p>Based on analysis of 521 mapping files with 51,846 Groovy snippets</p>
+    
+    <div class="container">
+        <div class="section">
+            <h2>Most Used String Functions</h2>
+            
+            <div class="function-test">
+                <h3>replaceAll <span class="usage-count">13,606 uses</span></h3>
+                <input id="replaceAll-input" type="text" value="C:\\path\\to\\file.txt" placeholder="Input string">
+                <input id="replaceAll-search" type="text" value="\\\" placeholder="Search pattern">
+                <input id="replaceAll-replace" type="text" value="/" placeholder="Replacement">
+                <button onclick="testReplaceAll()">Test replaceAll</button>
+                <div id="replaceAll-result" class="result"></div>
+            </div>
+            
+            <div class="function-test">
+                <h3>replace <span class="usage-count">12,628 uses</span></h3>
+                <input id="replace-input" type="text" value="hello world world" placeholder="Input string">
+                <input id="replace-search" type="text" value="world" placeholder="Search">
+                <input id="replace-replace" type="text" value="universe" placeholder="Replacement">
+                <button onclick="testReplace()">Test replace</button>
+                <div id="replace-result" class="result"></div>
+            </div>
+            
+            <div class="function-test">
+                <h3>capitalize <span class="usage-count">2,278 uses</span></h3>
+                <input id="capitalize-input" type="text" value="van gogh" placeholder="Input string">
+                <button onclick="testCapitalize()">Test capitalize</button>
+                <div id="capitalize-result" class="result"></div>
+            </div>
+            
+            <div class="function-test">
+                <h3>split <span class="usage-count">1,707 uses</span></h3>
+                <input id="split-input" type="text" value="2023-11-25" placeholder="Input string">
+                <input id="split-delimiter" type="text" value="-" placeholder="Delimiter">
+                <button onclick="testSplit()">Test split</button>
+                <div id="split-result" class="result"></div>
+            </div>
+            
+            <div class="function-test">
+                <h3>trim <span class="usage-count">35 uses (likely underreported)</span></h3>
+                <input id="trim-input" type="text" value="  hello world  " placeholder="Input string">
+                <button onclick="testTrim()">Test trim</button>
+                <div id="trim-result" class="result"></div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Case Conversion & Original Functions</h2>
+            
+            <div class="function-test">
+                <h3>toLowerCase <span class="usage-count">48 uses</span></h3>
+                <input id="lower-input" type="text" value="Hello WORLD" placeholder="Input string">
+                <button onclick="testToLowerCase()">Test toLowerCase</button>
+                <div id="lower-result" class="result"></div>
+            </div>
+            
+            <div class="function-test">
+                <h3>toUpperCase <span class="usage-count">3 uses</span></h3>
+                <input id="upper-input" type="text" value="hello world" placeholder="Input string">
+                <button onclick="testToUpperCase()">Test toUpperCase</button>
+                <div id="upper-result" class="result"></div>
+            </div>
+            
+            <div class="function-test">
+                <h3>sanitize (Original SIP-Creator)</h3>
+                <input id="sanitize-input" type="text" value="  Multiple   spaces   here  " placeholder="Input string">
+                <button onclick="testSanitize()">Test sanitize</button>
+                <div id="sanitize-result" class="result"></div>
+            </div>
+            
+            <div class="function-test">
+                <h3>sanitizeURI (Original SIP-Creator)</h3>
+                <input id="uri-input" type="text" value="test with spaces[brackets]" placeholder="Input string">
+                <button onclick="testSanitizeURI()">Test sanitizeURI</button>
+                <div id="uri-result" class="result"></div>
+            </div>
+            
+            <div class="function-test">
+                <h3>String Interpolation <span class="usage-count">26,916 uses</span></h3>
+                <textarea id="interpolate-template" rows="2" placeholder="Template">${name} was born in ${year}</textarea>
+                <textarea id="interpolate-vars" rows="3" placeholder="Variables (JSON)">{"name": "Van Gogh", "year": "1853"}</textarea>
+                <button onclick="testInterpolation()">Test Interpolation</button>
+                <div id="interpolate-result" class="result"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section" style="margin-top: 20px;">
+        <h2>Memory Info & Version</h2>
+        <button onclick="getVersion()">Get Version</button>
+        <button onclick="getMemoryInfo()">Get Memory Info</button>
+        <div id="info-result" class="result"></div>
+    </div>
+
+    <script>
+        let wasmModule;
+        let memory;
+        
+        // Initialize WASM
+        async function init() {
+            try {
+                const response = await fetch('zig-out/wasm/mapping-engine.wasm');
+                const bytes = await response.arrayBuffer();
+                const module = await WebAssembly.instantiate(bytes, {
+                    env: {
+                        // Add any imports if needed
+                    }
+                });
+                
+                wasmModule = module.instance.exports;
+                memory = wasmModule.memory;
+                
+                console.log('WASM module loaded successfully');
+                console.log('Available exports:', Object.keys(wasmModule));
+                
+                // Show version on load
+                getVersion();
+            } catch (error) {
+                console.error('Failed to load WASM:', error);
+                alert('Failed to load WASM module. Make sure to run a local server.');
+            }
+        }
+        
+        // Helper functions
+        function stringToWasm(str, offset = 0) {
+            const encoder = new TextEncoder();
+            const encoded = encoder.encode(str);
+            const ptr = wasmModule.wasmGetTempBuffer();
+            const buffer = new Uint8Array(memory.buffer, ptr + offset, encoded.length);
+            buffer.set(encoded);
+            return { ptr: ptr + offset, len: encoded.length };
+        }
+        
+        function wasmToString(ptr, len) {
+            const buffer = new Uint8Array(memory.buffer, ptr, len);
+            const decoder = new TextDecoder();
+            return decoder.decode(buffer);
+        }
+        
+        function getResult() {
+            const ptr = wasmModule.wasmGetResultBuffer();
+            // Find the actual length by looking for null terminator or using returned length
+            const view = new Uint8Array(memory.buffer, ptr, 65536);
+            let len = 0;
+            while (len < 65536 && view[len] !== 0) len++;
+            return wasmToString(ptr, len);
+        }
+        
+        // Test functions
+        function testReplaceAll() {
+            try {
+                const input = document.getElementById('replaceAll-input').value;
+                const search = document.getElementById('replaceAll-search').value;
+                const replace = document.getElementById('replaceAll-replace').value;
+                
+                const inputData = stringToWasm(input, 0);
+                const searchData = stringToWasm(search, 1000);
+                const replaceData = stringToWasm(replace, 2000);
+                
+                const resultLen = wasmModule.wasmReplaceAll(
+                    inputData.ptr, inputData.len,
+                    searchData.ptr, searchData.len,
+                    replaceData.ptr, replaceData.len
+                );
+                
+                const result = wasmToString(wasmModule.wasmGetResultBuffer(), resultLen);
+                document.getElementById('replaceAll-result').textContent = `Result: "${result}"`;
+            } catch (error) {
+                document.getElementById('replaceAll-result').innerHTML = 
+                    `<span class="error">Error: ${error.message}</span>`;
+            }
+        }
+        
+        function testReplace() {
+            try {
+                const input = document.getElementById('replace-input').value;
+                const search = document.getElementById('replace-search').value;
+                const replace = document.getElementById('replace-replace').value;
+                
+                const inputData = stringToWasm(input, 0);
+                const searchData = stringToWasm(search, 1000);
+                const replaceData = stringToWasm(replace, 2000);
+                
+                const resultLen = wasmModule.wasmReplace(
+                    inputData.ptr, inputData.len,
+                    searchData.ptr, searchData.len,
+                    replaceData.ptr, replaceData.len
+                );
+                
+                const result = wasmToString(wasmModule.wasmGetResultBuffer(), resultLen);
+                document.getElementById('replace-result').textContent = `Result: "${result}"`;
+            } catch (error) {
+                document.getElementById('replace-result').innerHTML = 
+                    `<span class="error">Error: ${error.message}</span>`;
+            }
+        }
+        
+        function testCapitalize() {
+            try {
+                const input = document.getElementById('capitalize-input').value;
+                const inputData = stringToWasm(input);
+                
+                const resultLen = wasmModule.wasmCapitalize(inputData.ptr, inputData.len);
+                const result = wasmToString(wasmModule.wasmGetResultBuffer(), resultLen);
+                
+                document.getElementById('capitalize-result').textContent = `Result: "${result}"`;
+            } catch (error) {
+                document.getElementById('capitalize-result').innerHTML = 
+                    `<span class="error">Error: ${error.message}</span>`;
+            }
+        }
+        
+        function testSplit() {
+            try {
+                const input = document.getElementById('split-input').value;
+                const delimiter = document.getElementById('split-delimiter').value;
+                
+                const inputData = stringToWasm(input);
+                const delimiterData = stringToWasm(delimiter);
+                
+                const resultLen = wasmModule.wasmSplit(
+                    inputData.ptr, inputData.len,
+                    delimiterData.ptr, delimiterData.len
+                );
+                
+                // Parse null-separated results
+                const buffer = new Uint8Array(memory.buffer, wasmModule.wasmGetResultBuffer(), resultLen);
+                const parts = [];
+                let start = 0;
+                
+                for (let i = 0; i <= resultLen; i++) {
+                    if (i === resultLen || buffer[i] === 0) {
+                        if (i > start) {
+                            const part = wasmToString(
+                                wasmModule.wasmGetResultBuffer() + start, 
+                                i - start
+                            );
+                            parts.push(part);
+                        }
+                        start = i + 1;
+                    }
+                }
+                
+                document.getElementById('split-result').textContent = 
+                    `Result: [${parts.map(p => `"${p}"`).join(', ')}]`;
+            } catch (error) {
+                document.getElementById('split-result').innerHTML = 
+                    `<span class="error">Error: ${error.message}</span>`;
+            }
+        }
+        
+        function testTrim() {
+            try {
+                const input = document.getElementById('trim-input').value;
+                const inputData = stringToWasm(input);
+                
+                const resultLen = wasmModule.wasmTrim(inputData.ptr, inputData.len);
+                const result = wasmToString(wasmModule.wasmGetResultBuffer(), resultLen);
+                
+                document.getElementById('trim-result').textContent = `Result: "${result}"`;
+            } catch (error) {
+                document.getElementById('trim-result').innerHTML = 
+                    `<span class="error">Error: ${error.message}</span>`;
+            }
+        }
+        
+        function testToLowerCase() {
+            try {
+                const input = document.getElementById('lower-input').value;
+                const inputData = stringToWasm(input);
+                
+                const resultLen = wasmModule.wasmToLowerCase(inputData.ptr, inputData.len);
+                const result = wasmToString(wasmModule.wasmGetResultBuffer(), resultLen);
+                
+                document.getElementById('lower-result').textContent = `Result: "${result}"`;
+            } catch (error) {
+                document.getElementById('lower-result').innerHTML = 
+                    `<span class="error">Error: ${error.message}</span>`;
+            }
+        }
+        
+        function testToUpperCase() {
+            try {
+                const input = document.getElementById('upper-input').value;
+                const inputData = stringToWasm(input);
+                
+                const resultLen = wasmModule.wasmToUpperCase(inputData.ptr, inputData.len);
+                const result = wasmToString(wasmModule.wasmGetResultBuffer(), resultLen);
+                
+                document.getElementById('upper-result').textContent = `Result: "${result}"`;
+            } catch (error) {
+                document.getElementById('upper-result').innerHTML = 
+                    `<span class="error">Error: ${error.message}</span>`;
+            }
+        }
+        
+        function testSanitize() {
+            try {
+                const input = document.getElementById('sanitize-input').value;
+                const inputData = stringToWasm(input);
+                
+                const resultLen = wasmModule.wasmSanitize(inputData.ptr, inputData.len);
+                const result = wasmToString(wasmModule.wasmGetResultBuffer(), resultLen);
+                
+                document.getElementById('sanitize-result').textContent = `Result: "${result}"`;
+            } catch (error) {
+                document.getElementById('sanitize-result').innerHTML = 
+                    `<span class="error">Error: ${error.message}</span>`;
+            }
+        }
+        
+        function testSanitizeURI() {
+            try {
+                const input = document.getElementById('uri-input').value;
+                const inputData = stringToWasm(input);
+                
+                const resultLen = wasmModule.wasmSanitizeURI(inputData.ptr, inputData.len);
+                const result = wasmToString(wasmModule.wasmGetResultBuffer(), resultLen);
+                
+                document.getElementById('uri-result').textContent = `Result: "${result}"`;
+            } catch (error) {
+                document.getElementById('uri-result').innerHTML = 
+                    `<span class="error">Error: ${error.message}</span>`;
+            }
+        }
+        
+        function testInterpolation() {
+            try {
+                const template = document.getElementById('interpolate-template').value;
+                const varsJson = document.getElementById('interpolate-vars').value;
+                const vars = JSON.parse(varsJson);
+                
+                // Write template at offset 5000
+                const templateData = stringToWasm(template, 5000);
+                
+                // Write variables to temp buffer starting at offset 0
+                let offset = 0;
+                const tempBuffer = wasmModule.wasmGetTempBuffer();
+                const view = new DataView(memory.buffer);
+                
+                Object.entries(vars).forEach(([key, value]) => {
+                    const keyBytes = new TextEncoder().encode(key);
+                    const valueBytes = new TextEncoder().encode(String(value));
+                    
+                    // Write key length (4 bytes)
+                    view.setUint32(tempBuffer + offset, keyBytes.length, true);
+                    offset += 4;
+                    
+                    // Write key
+                    new Uint8Array(memory.buffer, tempBuffer + offset, keyBytes.length).set(keyBytes);
+                    offset += keyBytes.length;
+                    
+                    // Write value length (4 bytes)
+                    view.setUint32(tempBuffer + offset, valueBytes.length, true);
+                    offset += 4;
+                    
+                    // Write value
+                    new Uint8Array(memory.buffer, tempBuffer + offset, valueBytes.length).set(valueBytes);
+                    offset += valueBytes.length;
+                });
+                
+                const resultLen = wasmModule.wasmInterpolate(
+                    templateData.ptr, templateData.len,
+                    0, // vars start at beginning of temp buffer
+                    Object.keys(vars).length
+                );
+                
+                const result = wasmToString(wasmModule.wasmGetResultBuffer(), resultLen);
+                document.getElementById('interpolate-result').textContent = `Result: "${result}"`;
+            } catch (error) {
+                document.getElementById('interpolate-result').innerHTML = 
+                    `<span class="error">Error: ${error.message}</span>`;
+            }
+        }
+        
+        function getVersion() {
+            try {
+                const len = wasmModule.wasmGetVersion();
+                const result = wasmToString(wasmModule.wasmGetResultBuffer(), len);
+                document.getElementById('info-result').textContent = `Version: ${result}`;
+            } catch (error) {
+                document.getElementById('info-result').innerHTML = 
+                    `<span class="error">Error: ${error.message}</span>`;
+            }
+        }
+        
+        function getMemoryInfo() {
+            try {
+                const len = wasmModule.wasmGetMemoryInfo();
+                const result = wasmToString(wasmModule.wasmGetResultBuffer(), len);
+                document.getElementById('info-result').textContent = `Memory: ${result}`;
+            } catch (error) {
+                document.getElementById('info-result').innerHTML = 
+                    `<span class="error">Error: ${error.message}</span>`;
+            }
+        }
+        
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

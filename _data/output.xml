@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edm:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:skos="http://www.w3.org/2004/02/skos/core#">
+  <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/van-gogh-museum/p0016V1962">
+    <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/van-gogh-museum/p0016V1962"/>
+    <edm:dataProvider>Van Gogh Museum</edm:dataProvider>
+    <edm:isShownAt rdf:resource="https://www.vangoghmuseum.nl/nl/collectie/p0016V1962"/>
+    <edm:isShownBy rdf:resource="urn:van-gogh-museum/p0016V1962"/>
+    <edm:object rdf:resource="urn:van-gogh-museum/p0016V1962"/>
+    <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+  </ore:Aggregation>
+  <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/van-gogh-museum/p0016V1962">
+    <dc:creator rdf:resource="https://data.rkd.nl/artists/32439"/>
+    <dc:creator rdf:resource="https://data.rkd.nl/artists/32439"/>
+    <dc:creator rdf:resource="http://data.collectienederland.nl/resource/agent/van-gogh-museum/Gestel,%20Dirk"/>
+    <dc:date>april 1885</dc:date>
+    <dc:identifier>p0016V1962</dc:identifier>
+    <dc:title>De aardappeleters</dc:title>
+    <dc:type rdf:resource="http://vocab.getty.edu/aat/300041273"/>
+    <dcterms:extent>31.2 x 39.6 cm</dcterms:extent>
+    <dcterms:medium rdf:resource="http://vocab.getty.edu/aat/300187371"/>
+    <dcterms:medium rdf:resource="http://vocab.getty.edu/aat/300014187"/>
+    <dcterms:medium rdf:resource="http://vocab.getty.edu/aat/300053271"/>
+  </edm:ProvidedCHO>
+  <edm:WebResource rdf:about="urn:van-gogh-museum/p0016V1962"/>
+  <edm:Agent rdf:about="https://data.rkd.nl/artists/32439">
+    <skos:prefLabel>Gogh, Vincent van</skos:prefLabel>
+    <rdaGr2:professionOrOccupation>ontwerper</rdaGr2:professionOrOccupation>
+    <owl:sameAs rdf:resource="http://vocab.getty.edu/ulan/500115588"/>
+    <nave:resourceSortOrder>1</nave:resourceSortOrder>
+  </edm:Agent>
+  <edm:Agent rdf:about="https://data.rkd.nl/artists/32439">
+    <skos:prefLabel>Gogh, Vincent van</skos:prefLabel>
+    <rdaGr2:professionOrOccupation>prentmaker</rdaGr2:professionOrOccupation>
+    <owl:sameAs rdf:resource="http://vocab.getty.edu/ulan/500115588"/>
+    <nave:resourceSortOrder>1</nave:resourceSortOrder>
+  </edm:Agent>
+  <edm:Agent rdf:about="http://data.collectienederland.nl/resource/agent/van-gogh-museum/Gestel,%20Dirk">
+    <skos:prefLabel>Gestel, Dirk</skos:prefLabel>
+    <rdaGr2:professionOrOccupation>drukker</rdaGr2:professionOrOccupation>
+    <nave:resourceSortOrder>3</nave:resourceSortOrder>
+  </edm:Agent>
+  <skos:Concept rdf:about="http://vocab.getty.edu/aat/300041273">
+    <skos:prefLabel>prent</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://vocab.getty.edu/aat/300187371">
+    <skos:prefLabel>drukinkt</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://vocab.getty.edu/aat/300014187">
+    <skos:prefLabel>velijnpapier</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://vocab.getty.edu/aat/300053271">
+    <skos:prefLabel>lithografie</skos:prefLabel>
+  </skos:Concept>
+  <nave:DelvingResource>
+    <nave:featured>false</nave:featured>
+    <nave:allowDeepZoom>true</nave:allowDeepZoom>
+    <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+    <nave:allowSourceDownload>false</nave:allowSourceDownload>
+    <nave:public>true</nave:public>
+  </nave:DelvingResource>
+</edm:RDF>
+<!--<urn:dcn_van-gogh-museum_p0016V1962/graph__56214fc697ea70ef31efacfb13d477b16f884914>-->

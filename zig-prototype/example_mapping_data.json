@@ -1,0 +1,75 @@
+{
+  "source_record": {
+    "description": "Van Gogh Museum LIDO record",
+    "format": "LIDO XML",
+    "example_values": {
+      "title": "Starry Night Over the Rhône",
+      "creator": "Vincent van Gogh",
+      "workId": "F474",
+      "date": "1888",
+      "recordId": "s-gravenhage-kb-1"
+    }
+  },
+  
+  "mapping_rules": [
+    {
+      "name": "Title mapping",
+      "source_path": "/input/lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:titleWrap/lido:titleSet/lido:appellationValue",
+      "target_path": "/edm:RDF/edm:ProvidedCHO/dc:title",
+      "type": "direct"
+    },
+    {
+      "name": "Creator mapping",
+      "source_path": "/input/lido:lido/.../lido:actor/lido:nameActorSet/lido:appellationValue",
+      "target_path": "/edm:RDF/edm:ProvidedCHO/dc:creator",
+      "type": "direct"
+    },
+    {
+      "name": "Aggregation URI",
+      "target_path": "/edm:RDF/ore:Aggregation/@rdf:about",
+      "type": "groovy",
+      "code": "${baseUrl}/resource/aggregation/${spec}/${_uniqueIdentifier.sanitizeURI()}",
+      "functions_used": ["sanitizeURI", "string_interpolation"]
+    },
+    {
+      "name": "Show At URL",
+      "source_path": "/input/lido:lido/.../lido:repositorySet/lido:workID",
+      "target_path": "/edm:RDF/ore:Aggregation/edm:isShownAt/@rdf:resource",
+      "type": "groovy",
+      "code": "https://www.vangoghmuseum.nl/nl/collectie/${_lidoworkID}",
+      "functions_used": ["string_interpolation"]
+    },
+    {
+      "name": "Rights processing",
+      "target_path": "/edm:RDF/ore:Aggregation/edm:rights/@rdf:resource",
+      "type": "groovy",
+      "code": "_rights.replace('InC', 'InCopyright')",
+      "functions_used": ["replace"]
+    }
+  ],
+  
+  "facts": {
+    "baseUrl": "http://data.collectienederland.nl",
+    "spec": "van-gogh-museum",
+    "dataProvider": "Van Gogh Museum",
+    "provider": "Rijksdienst voor het Cultureel Erfgoed",
+    "rights": "http://rightsstatements.org/vocab/InC/1.0/",
+    "language": "nl"
+  },
+  
+  "expected_output": {
+    "format": "EDM XML",
+    "namespaces": {
+      "dc": "http://purl.org/dc/elements/1.1/",
+      "dcterms": "http://purl.org/dc/terms/",
+      "edm": "http://www.europeana.eu/schemas/edm/",
+      "ore": "http://www.openarchives.org/ore/terms/"
+    },
+    "key_elements": [
+      "edm:ProvidedCHO - The cultural heritage object",
+      "ore:Aggregation - Metadata about the digital representation",
+      "dc:title - Required field",
+      "edm:isShownAt - Link to view the object"
+    ]
+  }
+}

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WASM String Debug</title>
+</head>
+<body>
+    <h1>WASM String Function Debug</h1>
+    <div id="output"></div>
+    
+    <script>
+        let wasmModule;
+        let memory;
+        
+        async function init() {
+            const response = await fetch('zig-out/wasm/mapping-engine.wasm');
+            const bytes = await response.arrayBuffer();
+            const module = await WebAssembly.instantiate(bytes, {});
+            
+            wasmModule = module.instance.exports;
+            memory = wasmModule.memory;
+            
+            console.log('WASM exports:', Object.keys(wasmModule));
+            
+            runTests();
+        }
+        
+        function stringToWasm(str) {
+            const encoder = new TextEncoder();
+            const encoded = encoder.encode(str);
+            const tempBuffer = wasmModule.wasmGetTempBuffer();
+            
+            // Write at specific offset
+            const offset = wasmModule.wasmWriteString(encoded, encoded.length, 0);
+            
+            return { ptr: tempBuffer, len: encoded.length };
+        }
+        
+        function stringToWasmDirect(str, offset = 0) {
+            const encoder = new TextEncoder();
+            const encoded = encoder.encode(str);
+            const tempBuffer = wasmModule.wasmGetTempBuffer();
+            const view = new Uint8Array(memory.buffer, tempBuffer + offset, encoded.length);
+            view.set(encoded);
+            return { ptr: tempBuffer + offset, len: encoded.length };
+        }
+        
+        function wasmToString(ptr, len) {
+            const buffer = new Uint8Array(memory.buffer, ptr, len);
+            const decoder = new TextDecoder();
+            return decoder.decode(buffer);
+        }
+        
+        function runTests() {
+            const output = document.getElementById('output');
+            
+            // Test 1: Simple replace
+            try {
+                const input = stringToWasmDirect("hello world world", 0);
+                const search = stringToWasmDirect("world", 100);
+                const replace = stringToWasmDirect("universe", 200);
+                
+                console.log('Input:', wasmToString(input.ptr, input.len));
+                console.log('Search:', wasmToString(search.ptr, search.len));
+                console.log('Replace:', wasmToString(replace.ptr, replace.len));
+                
+                const resultLen = wasmModule.wasmReplace(
+                    input.ptr, input.len,
+                    search.ptr, search.len,
+                    replace.ptr, replace.len
+                );
+                
+                const resultPtr = wasmModule.wasmGetResultBuffer();
+                const result = wasmToString(resultPtr, resultLen);
+                
+                output.innerHTML += `<p>Replace test: "${result}" (length: ${resultLen})</p>`;
+            } catch (e) {
+                output.innerHTML += `<p>Replace error: ${e}</p>`;
+                console.error(e);
+            }
+            
+            // Test 2: ReplaceAll
+            try {
+                const input = stringToWasmDirect("hello world world", 0);
+                const search = stringToWasmDirect("world", 100);
+                const replace = stringToWasmDirect("universe", 200);
+                
+                const resultLen = wasmModule.wasmReplaceAll(
+                    input.ptr, input.len,
+                    search.ptr, search.len,
+                    replace.ptr, replace.len
+                );
+                
+                const resultPtr = wasmModule.wasmGetResultBuffer();
+                const result = wasmToString(resultPtr, resultLen);
+                
+                output.innerHTML += `<p>ReplaceAll test: "${result}" (length: ${resultLen})</p>`;
+            } catch (e) {
+                output.innerHTML += `<p>ReplaceAll error: ${e}</p>`;
+                console.error(e);
+            }
+            
+            // Test 3: Capitalize
+            try {
+                const input = stringToWasmDirect("van gogh", 0);
+                
+                const resultLen = wasmModule.wasmCapitalize(input.ptr, input.len);
+                const resultPtr = wasmModule.wasmGetResultBuffer();
+                const result = wasmToString(resultPtr, resultLen);
+                
+                output.innerHTML += `<p>Capitalize test: "${result}" (length: ${resultLen})</p>`;
+            } catch (e) {
+                output.innerHTML += `<p>Capitalize error: ${e}</p>`;
+                console.error(e);
+            }
+            
+            // Test 4: Version
+            try {
+                const versionLen = wasmModule.wasmGetVersion();
+                const versionPtr = wasmModule.wasmGetResultBuffer();
+                const version = wasmToString(versionPtr, versionLen);
+                
+                output.innerHTML += `<p>Version: "${version}"</p>`;
+            } catch (e) {
+                output.innerHTML += `<p>Version error: ${e}</p>`;
+                console.error(e);
+            }
+        }
+        
+        init();
+    </script>
+</body>
+</html>

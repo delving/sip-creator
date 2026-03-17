@@ -1,0 +1,207 @@
+{
+  "phase1_critical": {
+    "description": "Core features needed for basic functionality",
+    "features": [
+      {
+        "name": "property_access",
+        "examples": [
+          "www.mauritshuis.nl",
+          "_id.sanitizeURI",
+          "_rdfDescription.edmhasView",
+          "_Reproduction.reproductionoriginalfilename_",
+          "field_coll.place"
+        ],
+        "sample_code": [
+          "5.2.6",
+          "http://data.brabantcloud.nl"
+        ]
+      },
+      {
+        "name": "operators",
+        "examples": [
+          "arithmetic/comparison"
+        ],
+        "sample_code": []
+      },
+      {
+        "name": "string_literals",
+        "examples": [
+          "basic strings"
+        ],
+        "sample_code": [
+          "\"https://sws.geonames.org/${it}/\"",
+          "itt.replaceAll(year, '$1')"
+        ]
+      },
+      {
+        "name": "string_interpolation",
+        "examples": [
+          "createEDMAgentUri(_enbdcorganisator.enbdcpersonuuid_)",
+          "_externaldocument.replaceAll(\".*\\\\\\\\\", \"\")",
+          "_Reproduction.reproductionoriginalfilename_",
+          "_massa",
+          "_enbdcorganisator.enbdcname_"
+        ],
+        "sample_code": [
+          "\"https://sws.geonames.org/${it}/\"",
+          "URL apiUrl = new URL(\"${it}\")"
+        ]
+      },
+      {
+        "name": "method_calls",
+        "examples": [
+          "getBytes",
+          "split",
+          "capitalize",
+          "replace",
+          "length"
+        ],
+        "sample_code": [
+          "itt = it.toString()",
+          "if (year.matcher(itt).matches()) {"
+        ]
+      }
+    ]
+  },
+  "phase2_common": {
+    "description": "Commonly used patterns in mappings",
+    "features": [
+      {
+        "name": "array_access",
+        "examples": [
+          "\"http://vocab.getty.edu/aat/300033973\", \"tekeningen\"",
+          "|",
+          "2",
+          "'materialpart'",
+          "'diameter1'"
+        ],
+        "sample_code": [
+          "year = ~/([0-9]{4})/",
+          "year_month = ~/([0-9]{4})-[0-9]{2}/"
+        ]
+      },
+      {
+        "name": "it_variable",
+        "examples": [
+          "it usage"
+        ],
+        "sample_code": [
+          "itt = it.toString()",
+          "def items = it.split(\"-\")"
+        ]
+      },
+      {
+        "name": "common_methods",
+        "examples": [
+          "split",
+          "size",
+          "endsWith",
+          "contains",
+          "replace"
+        ],
+        "sample_code": []
+      },
+      {
+        "name": "loop_operators",
+        "examples": [
+          "* (map)",
+          ">> (flatten)"
+        ],
+        "sample_code": [
+          "_image.thumbnaillarge * { _thumbnaillarge ->",
+          "_input['@id'] * { _id ->"
+        ]
+      },
+      {
+        "name": "closures",
+        "examples": [
+          "closure usage"
+        ],
+        "sample_code": [
+          "\"${_input.record[0].about[0].mmmmemorix[0].image.collect{thumb -> return thumb.thumbnailsmall[0]}.in",
+          "def URI = \"http://data.brabantcloud.nl/resource/agent/${spec}/${it.enbdcpersonuuid_}\""
+        ]
+      },
+      {
+        "name": "elvis_operator",
+        "examples": [
+          "?:"
+        ],
+        "sample_code": [
+          "\"https://dams.antwerpen.be/asset/${_id.replaceAll(\".*?:\", \"\").replaceAll(\"oai-dams-\", \"\")}\"",
+          "\"${_id.replaceAll(\".*?:\", \"\")}\""
+        ]
+      }
+    ]
+  },
+  "phase3_advanced": {
+    "description": "Advanced features for full compatibility",
+    "features": [
+      {
+        "name": "regex",
+        "examples": [
+          ".*2013",
+          "([0-9]{4})-[0-9]{2}-[0-9]{2}",
+          ".*2011",
+          "([0-9]{4})",
+          "([0-9]{4})-[0-9]{2}"
+        ],
+        "sample_code": [
+          "year = ~/([0-9]{4})/",
+          "year_month = ~/([0-9]{4})-[0-9]{2}/"
+        ]
+      },
+      {
+        "name": "conditionals",
+        "examples": [
+          "if/ternary"
+        ],
+        "sample_code": [
+          "if (year.matcher(itt).matches()) {",
+          "else if (year_month.matcher(itt).matches()) {"
+        ]
+      },
+      {
+        "name": "collection_methods",
+        "examples": [
+          "find",
+          "collect",
+          "findAll"
+        ],
+        "sample_code": []
+      },
+      {
+        "name": "loop_operators",
+        "examples": [
+          "| (zip/tuple)"
+        ],
+        "sample_code": [
+          "_image.thumbnaillarge * { _thumbnaillarge ->",
+          "_input['@id'] * { _id ->"
+        ]
+      },
+      {
+        "name": "type_casting",
+        "examples": [
+          "as operator"
+        ],
+        "sample_code": [
+          "// The city \"Amsterfoort\" is used as reference \"WGS84\" coordinate.",
+          "// The city \"Amsterfoort\" is used as reference \"WGS84\" coordinate."
+        ]
+      }
+    ]
+  },
+  "phase4_optional": {
+    "description": "Rarely used features - implement as needed",
+    "features": [
+      {
+        "name": "range_operator",
+        "examples": [
+          ".."
+        ],
+        "sample_code": []
+      }
+    ]
+  }
+}

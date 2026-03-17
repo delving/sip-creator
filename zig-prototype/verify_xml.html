@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick XML Test</title>
+</head>
+<body>
+    <h1>Testing XML Processing</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function test() {
+            const results = document.getElementById('results');
+            
+            try {
+                const response = await fetch('zig-out/wasm/mapping-engine.wasm');
+                const bytes = await response.arrayBuffer();
+                const module = await WebAssembly.instantiate(bytes, {});
+                const wasm = module.instance.exports;
+                const memory = wasm.memory;
+                
+                // Test 1: Simple XML parsing
+                const xml = `<?xml version="1.0"?>
+<pocket id="p0016V1962">
+  <title>De aardappeleters</title>
+</pocket>`;
+                
+                const encoder = new TextEncoder();
+                const encoded = encoder.encode(xml);
+                const ptr = wasm.wasmGetTempBuffer();
+                const buffer = new Uint8Array(memory.buffer, ptr, encoded.length);
+                buffer.set(encoded);
+                
+                const resultLen = wasm.wasmParseXml(ptr, encoded.length);
+                const resultBuffer = new Uint8Array(memory.buffer, wasm.wasmGetResultBuffer(), resultLen);
+                const decoder = new TextDecoder();
+                const result = decoder.decode(resultBuffer);
+                
+                results.innerHTML += `<p>Parse result: ${result}</p>`;
+                
+                // Test 2: Get title
+                const pathEnc = encoder.encode("title");
+                const pathBuffer = new Uint8Array(memory.buffer, ptr + 10000, pathEnc.length);
+                pathBuffer.set(pathEnc);
+                
+                const titleLen = wasm.wasmXmlGet(ptr, encoded.length, ptr + 10000, pathEnc.length);
+                const titleBuffer = new Uint8Array(memory.buffer, wasm.wasmGetResultBuffer(), titleLen);
+                const title = decoder.decode(titleBuffer);
+                
+                results.innerHTML += `<p>Title: "${title}"</p>`;
+                
+                // Test 3: Get ID attribute
+                const idPathEnc = encoder.encode("@id");
+                const idPathBuffer = new Uint8Array(memory.buffer, ptr + 20000, idPathEnc.length);
+                idPathBuffer.set(idPathEnc);
+                
+                const idLen = wasm.wasmXmlGet(ptr, encoded.length, ptr + 20000, idPathEnc.length);
+                const idBuffer = new Uint8Array(memory.buffer, wasm.wasmGetResultBuffer(), idLen);
+                const id = decoder.decode(idBuffer);
+                
+                results.innerHTML += `<p>ID: "${id}"</p>`;
+                
+            } catch (error) {
+                results.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+        
+        test();
+    </script>
+</body>
+</html>

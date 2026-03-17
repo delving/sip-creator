@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<input id="s-gravenhage-kb-1">
+  <lido:lido>
+    <lido:descriptiveMetadata>
+      <lido:objectIdentificationWrap>
+        <lido:titleWrap>
+          <lido:titleSet>
+            <lido:appellationValue>Starry Night Over the Rhône</lido:appellationValue>
+          </lido:titleSet>
+        </lido:titleWrap>
+        <lido:repositoryWrap>
+          <lido:repositorySet>
+            <lido:workID>F474</lido:workID>
+          </lido:repositorySet>
+        </lido:repositoryWrap>
+        <lido:objectMeasurementsWrap>
+          <lido:objectMeasurementsSet>
+            <lido:displayObjectMeasurements>72.5 cm × 92 cm (28.5 in × 36.2 in)</lido:displayObjectMeasurements>
+          </lido:objectMeasurementsSet>
+        </lido:objectMeasurementsWrap>
+      </lido:objectIdentificationWrap>
+      <lido:eventWrap>
+        <lido:eventSet>
+          <lido:event>
+            <lido:eventActor>
+              <lido:actorInRole>
+                <lido:actor>
+                  <lido:nameActorSet>
+                    <lido:appellationValue>Vincent van Gogh</lido:appellationValue>
+                  </lido:nameActorSet>
+                  <lido:actorID>http://vocab.getty.edu/ulan/500115588</lido:actorID>
+                </lido:actor>
+                <lido:roleActor>
+                  <lido:term>painter</lido:term>
+                </lido:roleActor>
+              </lido:actorInRole>
+            </lido:eventActor>
+            <lido:eventDate>
+              <lido:displayDate>1888</lido:displayDate>
+            </lido:eventDate>
+            <lido:eventMaterialsTech>
+              <lido:termMaterialsTech>
+                <lido:conceptID>http://vocab.getty.edu/aat/300015050</lido:conceptID>
+                <lido:term>oil on canvas</lido:term>
+              </lido:termMaterialsTech>
+            </lido:eventMaterialsTech>
+          </lido:event>
+        </lido:eventSet>
+      </lido:eventWrap>
+      <lido:objectClassificationWrap>
+        <lido:objectWorkTypeWrap>
+          <lido:objectWorkType>
+            <lido:conceptID>http://vocab.getty.edu/aat/300033618</lido:conceptID>
+            <lido:term>paintings</lido:term>
+          </lido:objectWorkType>
+        </lido:objectWorkTypeWrap>
+      </lido:objectClassificationWrap>
+    </lido:descriptiveMetadata>
+    <lido:administrativeMetadata>
+      <lido:resourceWrap>
+        <lido:resourceSet>
+          <lido:resourceRepresentation>
+            <lido:linkResource>F474.jpg</lido:linkResource>
+          </lido:resourceRepresentation>
+        </lido:resourceSet>
+      </lido:resourceWrap>
+    </lido:administrativeMetadata>
+  </lido:lido>
+</input>

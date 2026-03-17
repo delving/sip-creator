@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIP-Creator Mapping Engine WASM Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+        .unicode-test {
+            background-color: #e8f4f8;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>SIP-Creator Mapping Engine WASM Demo</h1>
+    
+    <div class="section">
+        <h2>Status</h2>
+        <div id="status">Loading WASM module...</div>
+        <div id="memoryInfo" style="margin-top: 10px;"></div>
+    </div>
+
+    <div class="section">
+        <h2>1. String Sanitization</h2>
+        <p>Removes extra whitespace and newlines - now with proper UTF-8 support</p>
+        <input type="text" id="sanitizeInput" value="  Hello   World  " placeholder="Enter text to sanitize">
+        <button onclick="testSanitize()">Sanitize</button>
+        <div class="unicode-test">
+            <strong>Unicode Test Cases:</strong>
+            <button onclick="testSanitizeUnicode('  Café   Münchën  ')">Test German/French</button>
+            <button onclick="testSanitizeUnicode('  你好   世界  ')">Test Chinese</button>
+            <button onclick="testSanitizeUnicode('  مرحبا   بالعالم  ')">Test Arabic</button>
+            <button onclick="testSanitizeUnicode('  🎨 Van   Gogh 🌻  ')">Test Emoji</button>
+            <button onclick="testSanitizeUnicode('  Starry  Night   Over the   Rhône  ')">Test Rhône</button>
+        </div>
+        <div id="sanitizeResult" class="result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>2. URI Encoding</h2>
+        <p>Encodes special characters for URIs - with UTF-8 safety</p>
+        <input type="text" id="uriInput" value="hello [world] test" placeholder="Enter text to encode">
+        <button onclick="testURI()">Encode URI</button>
+        <div class="unicode-test">
+            <strong>Unicode Test Cases:</strong>
+            <button onclick="testURIUnicode('Van Gogh [Museum]')">Test Basic</button>
+            <button onclick="testURIUnicode('Musée d\'Orsay')">Test French</button>
+            <button onclick="testURIUnicode('文化博物館')">Test CJK</button>
+        </div>
+        <div id="uriResult" class="result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>3. Template Interpolation</h2>
+        <p>Variable substitution in templates with proper memory management</p>
+        <textarea id="templateInput" rows="2">${baseUrl}/resource/${spec}/${_uniqueIdentifier}</textarea>
+        <input type="text" id="var1Key" value="baseUrl" placeholder="Variable 1 name">
+        <input type="text" id="var1Val" value="http://example.com" placeholder="Variable 1 value">
+        <input type="text" id="var2Key" value="spec" placeholder="Variable 2 name">
+        <input type="text" id="var2Val" value="test-collection" placeholder="Variable 2 value">
+        <input type="text" id="var3Key" value="_uniqueIdentifier" placeholder="Variable 3 name">
+        <input type="text" id="var3Val" value="12345" placeholder="Variable 3 value">
+        <button onclick="testInterpolation()">Interpolate</button>
+        <div class="unicode-test">
+            <strong>Test Cases:</strong>
+            <button onclick="testInterpolationCase1()">Test Case 1: Basic</button>
+            <button onclick="testInterpolationCase2()">Test Case 2: Unicode Values</button>
+            <button onclick="testInterpolationCase3()">Test Case 3: Missing Variable</button>
+        </div>
+        <div id="interpolateResult" class="result"></div>
+    </div>
+
+    <div class="section">
+        <h2>4. XML Attribute Extraction</h2>
+        <p>Extract attribute value from XML (simple demo)</p>
+        <textarea id="xmlInput" rows="3"><input id="s-gravenhage-kb-1" type="record">
+  <title>Starry Night</title>
+</input></textarea>
+        <input type="text" id="attrName" value="id" placeholder="Attribute name">
+        <button onclick="testXmlAttribute()">Extract Attribute</button>
+        <div id="xmlResult" class="result"></div>
+    </div>
+
+    <div class="section">
+        <h2>5. Real Mapping Example</h2>
+        <p>Simulate a real EDM mapping transformation</p>
+        <button onclick="testRealMapping()">Run EDM Mapping</button>
+        <div id="mappingResult" class="result"></div>
+    </div>
+
+    <script>
+        let wasmInstance = null;
+        let memory = null;
+        
+        // Helper function to write variables in new format
+        function writeVariables(vars) {
+            const encoder = new TextEncoder();
+            const tempBuffer = new Uint8Array(memory.buffer, wasmInstance.exports.wasmGetTempBuffer(), 65536);
+            let offset = 0;
+            
+            // Write each key-value pair
+            for (const [key, value] of Object.entries(vars)) {
+                const keyBytes = encoder.encode(key);
+                const valBytes = encoder.encode(value);
+                
+                // Write key length (4 bytes, little endian)
+                new DataView(tempBuffer.buffer, tempBuffer.byteOffset + offset, 4).setUint32(0, keyBytes.length, true);
+                offset += 4;
+                
+                // Write key
+                tempBuffer.set(keyBytes, offset);
+                offset += keyBytes.length;
+                
+                // Write value length (4 bytes, little endian)
+                new DataView(tempBuffer.buffer, tempBuffer.byteOffset + offset, 4).setUint32(0, valBytes.length, true);
+                offset += 4;
+                
+                // Write value
+                tempBuffer.set(valBytes, offset);
+                offset += valBytes.length;
+            }
+            
+            return { offset: 0, count: Object.keys(vars).length };
+        }
+        
+        // Helper functions
+        function stringToWasm(str) {
+            const encoder = new TextEncoder();
+            const bytes = encoder.encode(str);
+            
+            // Allocate temporary space for the string
+            const tempPtr = wasmInstance.exports.wasmGetTempBuffer();
+            const tempBuffer = new Uint8Array(memory.buffer, tempPtr, 65536);
+            
+            // Find a safe offset (after variables if any)
+            const offset = 32768; // Use second half of temp buffer for strings
+            tempBuffer.set(bytes, offset);
+            
+            return { ptr: tempPtr + offset, len: bytes.length };
+        }
+        
+        function wasmToString(ptr, len) {
+            const bytes = new Uint8Array(memory.buffer, ptr, len);
+            const decoder = new TextDecoder('utf-8', { fatal: false });
+            return decoder.decode(bytes);
+        }
+        
+        async function loadWasm() {
+            try {
+                const response = await fetch('zig-out/wasm/mapping-engine.wasm');
+                const bytes = await response.arrayBuffer();
+                
+                const wasmModule = await WebAssembly.compile(bytes);
+                wasmInstance = await WebAssembly.instantiate(wasmModule, {
+                    env: {}
+                });
+                
+                memory = wasmInstance.exports.memory;
+                
+                // Get version
+                const versionLen = wasmInstance.exports.wasmGetVersion();
+                const resultPtr = wasmInstance.exports.wasmGetResultBuffer();
+                const version = wasmToString(resultPtr, versionLen);
+                
+                // Get memory info
+                const memInfoLen = wasmInstance.exports.wasmGetMemoryInfo();
+                const memInfo = wasmToString(resultPtr, memInfoLen);
+                
+                document.getElementById('status').innerHTML = 
+                    `<span class="success">✓ WASM module loaded successfully (version ${version})</span>`;
+                document.getElementById('memoryInfo').innerHTML = 
+                    `<span class="success">Memory: ${memInfo}</span>`;
+                console.log('WASM module loaded, exports:', Object.keys(wasmInstance.exports));
+            } catch (e) {
+                document.getElementById('status').innerHTML = 
+                    `<span class="error">✗ Failed to load WASM: ${e.message}</span>`;
+                console.error('Failed to load WASM:', e);
+            }
+        }
+        
+        function testSanitize() {
+            if (!wasmInstance) return;
+            
+            const input = document.getElementById('sanitizeInput').value;
+            const { ptr, len } = stringToWasm(input);
+            
+            const resultLen = wasmInstance.exports.wasmSanitize(ptr, len);
+            const resultPtr = wasmInstance.exports.wasmGetResultBuffer();
+            const result = wasmToString(resultPtr, resultLen);
+            
+            document.getElementById('sanitizeResult').textContent = 
+                `Input: "${input}"\nOutput: "${result}"\nLength: ${input.length} → ${result.length}`;
+        }
+        
+        function testSanitizeUnicode(text) {
+            document.getElementById('sanitizeInput').value = text;
+            testSanitize();
+        }
+        
+        function testURI() {
+            if (!wasmInstance) return;
+            
+            const input = document.getElementById('uriInput').value;
+            const { ptr, len } = stringToWasm(input);
+            
+            const resultLen = wasmInstance.exports.wasmSanitizeURI(ptr, len);
+            const resultPtr = wasmInstance.exports.wasmGetResultBuffer();
+            const result = wasmToString(resultPtr, resultLen);
+            
+            document.getElementById('uriResult').textContent = 
+                `Input: "${input}"\nOutput: "${result}"`;
+        }
+        
+        function testURIUnicode(text) {
+            document.getElementById('uriInput').value = text;
+            testURI();
+        }
+        
+        function testInterpolation() {
+            if (!wasmInstance) return;
+            
+            const template = document.getElementById('templateInput').value;
+            const vars = {};
+            
+            const key1 = document.getElementById('var1Key').value;
+            const val1 = document.getElementById('var1Val').value;
+            if (key1) vars[key1] = val1;
+            
+            const key2 = document.getElementById('var2Key').value;
+            const val2 = document.getElementById('var2Val').value;
+            if (key2) vars[key2] = val2;
+            
+            const key3 = document.getElementById('var3Key').value;
+            const val3 = document.getElementById('var3Val').value;
+            if (key3) vars[key3] = val3;
+            
+            // Write variables to temp buffer
+            const { offset, count } = writeVariables(vars);
+            
+            // Write template
+            const templateData = stringToWasm(template);
+            
+            const resultLen = wasmInstance.exports.wasmInterpolate(
+                templateData.ptr, templateData.len,
+                offset, count
+            );
+            
+            const resultPtr = wasmInstance.exports.wasmGetResultBuffer();
+            const result = wasmToString(resultPtr, resultLen);
+            
+            const varList = Object.entries(vars).map(([k, v]) => `${k}="${v}"`).join(', ');
+            
+            document.getElementById('interpolateResult').textContent = 
+                `Template: ${template}\nVariables: ${varList}\nResult: ${result}`;
+        }
+        
+        function testInterpolationCase1() {
+            document.getElementById('templateInput').value = '${baseUrl}/resource/${spec}/${id}';
+            document.getElementById('var1Key').value = 'baseUrl';
+            document.getElementById('var1Val').value = 'http://example.com';
+            document.getElementById('var2Key').value = 'spec';
+            document.getElementById('var2Val').value = 'collection';
+            document.getElementById('var3Key').value = 'id';
+            document.getElementById('var3Val').value = '12345';
+            testInterpolation();
+        }
+        
+        function testInterpolationCase2() {
+            document.getElementById('templateInput').value = 'Museum: ${name} - Location: ${city}';
+            document.getElementById('var1Key').value = 'name';
+            document.getElementById('var1Val').value = 'Musée d\'Orsay';
+            document.getElementById('var2Key').value = 'city';
+            document.getElementById('var2Val').value = 'München';
+            document.getElementById('var3Key').value = '';
+            document.getElementById('var3Val').value = '';
+            testInterpolation();
+        }
+        
+        function testInterpolationCase3() {
+            document.getElementById('templateInput').value = '${found} and ${notfound} and ${alsonotfound}';
+            document.getElementById('var1Key').value = 'found';
+            document.getElementById('var1Val').value = 'FOUND_VALUE';
+            document.getElementById('var2Key').value = '';
+            document.getElementById('var2Val').value = '';
+            document.getElementById('var3Key').value = '';
+            document.getElementById('var3Val').value = '';
+            testInterpolation();
+        }
+        
+        function testXmlAttribute() {
+            if (!wasmInstance) return;
+            
+            const xml = document.getElementById('xmlInput').value;
+            const attrName = document.getElementById('attrName').value;
+            
+            const xmlData = stringToWasm(xml);
+            const attrData = stringToWasm(attrName);
+            
+            const resultLen = wasmInstance.exports.wasmExtractAttribute(
+                xmlData.ptr, xmlData.len,
+                attrData.ptr, attrData.len
+            );
+            
+            const resultPtr = wasmInstance.exports.wasmGetResultBuffer();
+            const result = wasmToString(resultPtr, resultLen);
+            
+            document.getElementById('xmlResult').textContent = 
+                `Attribute "${attrName}" = "${result}"`;
+        }
+        
+        function testRealMapping() {
+            if (!wasmInstance) return;
+            
+            // Simulate a real mapping transformation
+            const results = [];
+            
+            // 1. Extract ID from XML
+            const xml = '<input id="F474"><title>Starry Night Over the Rhône</title></input>';
+            const xmlData = stringToWasm(xml);
+            const idAttr = stringToWasm('id');
+            
+            const idLen = wasmInstance.exports.wasmExtractAttribute(
+                xmlData.ptr, xmlData.len,
+                idAttr.ptr, idAttr.len
+            );
+            const resultPtr = wasmInstance.exports.wasmGetResultBuffer();
+            const uniqueId = wasmToString(resultPtr, idLen);
+            results.push(`Extracted ID: ${uniqueId}`);
+            
+            // 2. Build aggregation URI with proper 3-variable interpolation
+            const template = '${baseUrl}/resource/aggregation/${spec}/${uniqueId}';
+            const vars = {
+                'baseUrl': 'http://data.collectienederland.nl',
+                'spec': 'van-gogh-museum',
+                'uniqueId': uniqueId
+            };
+            
+            // Write variables to temp buffer
+            const { offset, count } = writeVariables(vars);
+            
+            // Write template
+            const templateData = stringToWasm(template);
+            
+            const uriLen = wasmInstance.exports.wasmInterpolate(
+                templateData.ptr, templateData.len,
+                offset, count
+            );
+            
+            const aggregationUri = wasmToString(resultPtr, uriLen);
+            results.push(`\nAggregation URI: ${aggregationUri}`);
+            
+            // 3. Sanitize a title with Unicode
+            const messyTitle = '  Starry  Night   Over the   Rhône  ';
+            const titleData = stringToWasm(messyTitle);
+            const titleLen = wasmInstance.exports.wasmSanitize(titleData.ptr, titleData.len);
+            const cleanTitle = wasmToString(resultPtr, titleLen);
+            results.push(`\nCleaned title: "${cleanTitle}"`);
+            
+            // 4. Test Unicode museum name
+            const unicodeMuseum = '  Van   Gogh   Museum   🎨  ';
+            const museumData = stringToWasm(unicodeMuseum);
+            const museumLen = wasmInstance.exports.wasmSanitize(museumData.ptr, museumData.len);
+            const cleanMuseum = wasmToString(resultPtr, museumLen);
+            results.push(`\nCleaned museum: "${cleanMuseum}"`);
+            
+            // 5. Create EDM output structure (simulated)
+            results.push('\nGenerated EDM structure:');
+            results.push('<edm:RDF>');
+            results.push(`  <ore:Aggregation rdf:about="${aggregationUri}">`);
+            results.push(`    <edm:dataProvider>${cleanMuseum}</edm:dataProvider>`);
+            results.push('    <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>');
+            results.push('  </ore:Aggregation>');
+            results.push('  <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/van-gogh-museum/F474">');
+            results.push(`    <dc:title>${cleanTitle}</dc:title>`);
+            results.push('    <dc:identifier>F474</dc:identifier>');
+            results.push('  </edm:ProvidedCHO>');
+            results.push('</edm:RDF>');
+            
+            document.getElementById('mappingResult').textContent = results.join('\n');
+        }
+        
+        // Load WASM on page load
+        loadWasm();
+    </script>
+</body>
+</html>

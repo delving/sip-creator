@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<input id="nl-amsterdam-vgm-1853-starry-night">
+  <lido:lido xmlns:lido="http://www.lido-schema.org">
+    <lido:lidoRecID lido:type="local">VGM-F474-1888</lido:lidoRecID>
+    <lido:descriptiveMetadata xml:lang="en">
+      
+      <!-- Object Classification -->
+      <lido:objectClassificationWrap>
+        <lido:objectWorkTypeWrap>
+          <lido:objectWorkType>
+            <lido:conceptID lido:type="AAT">http://vocab.getty.edu/aat/300033618</lido:conceptID>
+            <lido:term xml:lang="en">paintings (visual works)</lido:term>
+            <lido:term xml:lang="nl">schilderijen</lido:term>
+          </lido:objectWorkType>
+        </lido:objectWorkTypeWrap>
+        <lido:classificationWrap>
+          <lido:classification lido:type="europeana:type">
+            <lido:term>IMAGE</lido:term>
+          </lido:classification>
+          <lido:classification lido:type="object-category">
+            <lido:term>oil paintings</lido:term>
+          </lido:classification>
+        </lido:classificationWrap>
+      </lido:objectClassificationWrap>
+      
+      <!-- Object Identification -->
+      <lido:objectIdentificationWrap>
+        <lido:titleWrap>
+          <lido:titleSet lido:type="main">
+            <lido:appellationValue xml:lang="en">Starry Night Over the Rhône</lido:appellationValue>
+            <lido:appellationValue xml:lang="fr">La Nuit étoilée</lido:appellationValue>
+            <lido:appellationValue xml:lang="nl">Sterrennacht boven de Rhône</lido:appellationValue>
+          </lido:titleSet>
+          <lido:titleSet lido:type="former">
+            <lido:appellationValue>Night with Stars</lido:appellationValue>
+          </lido:titleSet>
+        </lido:titleWrap>
+        
+        <lido:inscriptionsWrap>
+          <lido:inscriptions>
+            <lido:inscriptionDescription>
+              <lido:descriptiveNoteValue>Signed lower left: Vincent</lido:descriptiveNoteValue>
+            </lido:inscriptionDescription>
+          </lido:inscriptions>
+        </lido:inscriptionsWrap>
+        
+        <lido:repositoryWrap>
+          <lido:repositorySet lido:type="current">
+            <lido:repositoryName>
+              <lido:legalBodyName>
+                <lido:appellationValue>Van Gogh Museum</lido:appellationValue>
+              </lido:legalBodyName>
+              <lido:legalBodyWeblink>https://www.vangoghmuseum.nl</lido:legalBodyWeblink>
+            </lido:repositoryName>
+            <lido:workID lido:type="inventory">F474</lido:workID>
+            <lido:workID lido:type="former">JH 1592</lido:workID>
+            <lido:repositoryLocation>
+              <lido:namePlaceSet>
+                <lido:appellationValue>Amsterdam</lido:appellationValue>
+              </lido:namePlaceSet>
+              <lido:gml>
+                <gml:Point srsName="WGS84">
+                  <gml:pos>52.3667 4.9000</gml:pos>
+                </gml:Point>
+              </lido:gml>
+            </lido:repositoryLocation>
+          </lido:repositorySet>
+        </lido:repositoryWrap>
+        
+        <lido:objectDescriptionWrap>
+          <lido:objectDescriptionSet lido:type="general">
+            <lido:descriptiveNoteValue xml:lang="en">
+              This painting captures the Rhône River at night, under a swirling sky filled with stars. 
+              Van Gogh was particularly fascinated by night scenes and the challenge of painting in the dark.
+              The work shows the artist's distinctive style with bold colors and dynamic brushstrokes.
+            </lido:descriptiveNoteValue>
+          </lido:objectDescriptionSet>
+          <lido:objectDescriptionSet lido:type="provenance">
+            <lido:descriptiveNoteValue>
+              1889: Theo van Gogh, Paris; 
+              1891: Johanna van Gogh-Bonger, Bussum; 
+              1925: V.W. van Gogh, Laren; 
+              1962: Vincent van Gogh Foundation; 
+              1973: on permanent loan to Van Gogh Museum
+            </lido:descriptiveNoteValue>
+          </lido:objectDescriptionSet>
+        </lido:objectDescriptionWrap>
+        
+        <lido:objectMeasurementsWrap>
+          <lido:objectMeasurementsSet>
+            <lido:displayObjectMeasurements>72.5 cm × 92 cm (28.5 in × 36.2 in)</lido:displayObjectMeasurements>
+            <lido:objectMeasurements>
+              <lido:measurementsSet>
+                <lido:measurementType>height</lido:measurementType>
+                <lido:measurementUnit>cm</lido:measurementUnit>
+                <lido:measurementValue>72.5</lido:measurementValue>
+              </lido:measurementsSet>
+              <lido:measurementsSet>
+                <lido:measurementType>width</lido:measurementType>
+                <lido:measurementUnit>cm</lido:measurementUnit>
+                <lido:measurementValue>92</lido:measurementValue>
+              </lido:measurementsSet>
+            </lido:objectMeasurements>
+          </lido:objectMeasurementsSet>
+        </lido:objectMeasurementsWrap>
+      </lido:objectIdentificationWrap>
+      
+      <!-- Events (Creation, Exhibition, etc.) -->
+      <lido:eventWrap>
+        <!-- Creation Event -->
+        <lido:eventSet>
+          <lido:displayEvent>Painted by Vincent van Gogh in Arles, September 1888</lido:displayEvent>
+          <lido:event lido:type="creation">
+            <lido:eventType>
+              <lido:conceptID lido:type="AAT">http://vocab.getty.edu/aat/300077435</lido:conceptID>
+              <lido:term>production</lido:term>
+            </lido:eventType>
+            
+            <lido:eventActor>
+              <lido:displayActorInRole>Vincent van Gogh (Dutch, 1853-1890)</lido:displayActorInRole>
+              <lido:actorInRole>
+                <lido:actor>
+                  <lido:actorID lido:type="ULAN">http://vocab.getty.edu/ulan/500115588</lido:actorID>
+                  <lido:actorID lido:type="VIAF">http://viaf.org/viaf/9854560</lido:actorID>
+                  <lido:nameActorSet>
+                    <lido:appellationValue lido:pref="preferred">Vincent van Gogh</lido:appellationValue>
+                    <lido:appellationValue lido:pref="alternate">Vincent Willem van Gogh</lido:appellationValue>
+                  </lido:nameActorSet>
+                  <lido:nationalityActor>
+                    <lido:term>Dutch</lido:term>
+                  </lido:nationalityActor>
+                  <lido:vitalDatesActor>
+                    <lido:earliestDate>1853-03-30</lido:earliestDate>
+                    <lido:latestDate>1890-07-29</lido:latestDate>
+                  </lido:vitalDatesActor>
+                </lido:actor>
+                <lido:roleActor>
+                  <lido:term>painter</lido:term>
+                  <lido:term>artist</lido:term>
+                </lido:roleActor>
+              </lido:actorInRole>
+            </lido:eventActor>
+            
+            <lido:eventDate>
+              <lido:displayDate>September 1888</lido:displayDate>
+              <lido:date>
+                <lido:earliestDate>1888-09-01</lido:earliestDate>
+                <lido:latestDate>1888-09-30</lido:latestDate>
+              </lido:date>
+            </lido:eventDate>
+            
+            <lido:eventPlace>
+              <lido:displayPlace>Arles, France</lido:displayPlace>
+              <lido:place>
+                <lido:placeID lido:type="TGN">http://vocab.getty.edu/tgn/7008775</lido:placeID>
+                <lido:namePlaceSet>
+                  <lido:appellationValue>Arles</lido:appellationValue>
+                </lido:namePlaceSet>
+                <lido:partOfPlace>
+                  <lido:namePlaceSet>
+                    <lido:appellationValue>Provence-Alpes-Côte d'Azur</lido:appellationValue>
+                  </lido:namePlaceSet>
+                  <lido:partOfPlace>
+                    <lido:namePlaceSet>
+                      <lido:appellationValue>France</lido:appellationValue>
+                    </lido:namePlaceSet>
+                  </lido:partOfPlace>
+                </lido:partOfPlace>
+              </lido:place>
+            </lido:eventPlace>
+            
+            <lido:eventMaterialsTech>
+              <lido:displayMaterialsTech>Oil on canvas</lido:displayMaterialsTech>
+              <lido:materialsTech>
+                <lido:termMaterialsTech lido:type="material">
+                  <lido:conceptID lido:type="AAT">http://vocab.getty.edu/aat/300015050</lido:conceptID>
+                  <lido:term>oil paint</lido:term>
+                </lido:termMaterialsTech>
+                <lido:termMaterialsTech lido:type="support">
+                  <lido:conceptID lido:type="AAT">http://vocab.getty.edu/aat/300014078</lido:conceptID>
+                  <lido:term>canvas</lido:term>
+                </lido:termMaterialsTech>
+                <lido:termMaterialsTech lido:type="technique">
+                  <lido:conceptID lido:type="AAT">http://vocab.getty.edu/aat/300054216</lido:conceptID>
+                  <lido:term>impasto</lido:term>
+                </lido:termMaterialsTech>
+              </lido:materialsTech>
+            </lido:eventMaterialsTech>
+          </lido:event>
+        </lido:eventSet>
+        
+        <!-- Exhibition Event -->
+        <lido:eventSet>
+          <lido:event lido:type="exhibition">
+            <lido:eventType>
+              <lido:term>exhibition</lido:term>
+            </lido:eventType>
+            <lido:eventName>
+              <lido:appellationValue>Van Gogh and the Colors of the Night</lido:appellationValue>
+            </lido:eventName>
+            <lido:eventDate>
+              <lido:displayDate>2008-2009</lido:displayDate>
+              <lido:date>
+                <lido:earliestDate>2008-09-13</lido:earliestDate>
+                <lido:latestDate>2009-01-05</lido:latestDate>
+              </lido:date>
+            </lido:eventDate>
+            <lido:eventPlace>
+              <lido:displayPlace>MoMA, New York</lido:displayPlace>
+            </lido:eventPlace>
+          </lido:event>
+        </lido:eventSet>
+      </lido:eventWrap>
+      
+      <!-- Relations -->
+      <lido:objectRelationWrap>
+        <lido:subjectWrap>
+          <lido:subjectSet>
+            <lido:subject lido:type="iconography">
+              <lido:subjectConcept>
+                <lido:conceptID lido:type="AAT">http://vocab.getty.edu/aat/300008624</lido:conceptID>
+                <lido:term>night scenes</lido:term>
+              </lido:subjectConcept>
+            </lido:subject>
+          </lido:subjectSet>
+          <lido:subjectSet>
+            <lido:subject lido:type="depicted">
+              <lido:subjectPlace>
+                <lido:displayPlace>Rhône River</lido:displayPlace>
+                <lido:place>
+                  <lido:namePlaceSet>
+                    <lido:appellationValue>Rhône</lido:appellationValue>
+                  </lido:namePlaceSet>
+                </lido:place>
+              </lido:subjectPlace>
+            </lido:subject>
+          </lido:subjectSet>
+        </lido:subjectWrap>
+        
+        <lido:relatedWorksWrap>
+          <lido:relatedWorkSet>
+            <lido:relatedWork>
+              <lido:displayObject>The Starry Night (1889)</lido:displayObject>
+              <lido:object>
+                <lido:objectID lido:type="MoMA">79802</lido:objectID>
+                <lido:objectNote>Later, more famous work with similar night sky theme</lido:objectNote>
+              </lido:object>
+            </lido:relatedWork>
+            <lido:relatedWorkRelType>
+              <lido:term>related to</lido:term>
+            </lido:relatedWorkRelType>
+          </lido:relatedWorkSet>
+        </lido:relatedWorksWrap>
+      </lido:objectRelationWrap>
+    </lido:descriptiveMetadata>
+    
+    <!-- Administrative Metadata -->
+    <lido:administrativeMetadata>
+      <lido:rightsWorkWrap>
+        <lido:rightsWorkSet>
+          <lido:rightsType>
+            <lido:term>copyright</lido:term>
+          </lido:rightsType>
+          <lido:rightsHolder>
+            <lido:legalBodyName>
+              <lido:appellationValue>Public Domain</lido:appellationValue>
+            </lido:legalBodyName>
+          </lido:rightsHolder>
+          <lido:creditLine>Van Gogh Museum, Amsterdam (Vincent van Gogh Foundation)</lido:creditLine>
+        </lido:rightsWorkSet>
+      </lido:rightsWorkWrap>
+      
+      <lido:recordWrap>
+        <lido:recordID lido:type="local">VGM-DB-F474</lido:recordID>
+        <lido:recordType>
+          <lido:term>item</lido:term>
+        </lido:recordType>
+        <lido:recordSource>
+          <lido:legalBodyName>
+            <lido:appellationValue>Van Gogh Museum</lido:appellationValue>
+          </lido:legalBodyName>
+          <lido:legalBodyWeblink>https://www.vangoghmuseum.nl/en/api/collection</lido:legalBodyWeblink>
+        </lido:recordSource>
+        <lido:recordInfoSet>
+          <lido:recordInfoLink>https://www.vangoghmuseum.nl/en/collection/s0106V1962</lido:recordInfoLink>
+          <lido:recordMetadataDate>2024-01-15</lido:recordMetadataDate>
+        </lido:recordInfoSet>
+      </lido:recordWrap>
+      
+      <lido:resourceWrap>
+        <lido:resourceSet>
+          <lido:resourceRepresentation>
+            <lido:linkResource lido:formatResource="image/jpeg">
+              https://www.vangoghmuseum.nl/data/artwork/s0106V1962/web_F474.jpg
+            </lido:linkResource>
+            <lido:resourceDescription>Main image - full view</lido:resourceDescription>
+            <lido:resourceType>
+              <lido:term>digital image</lido:term>
+            </lido:resourceType>
+            <lido:rightsResource>
+              <lido:rightsType>
+                <lido:term>CC0</lido:term>
+              </lido:rightsType>
+            </lido:rightsResource>
+          </lido:resourceRepresentation>
+        </lido:resourceSet>
+        
+        <lido:resourceSet>
+          <lido:resourceRepresentation>
+            <lido:linkResource lido:formatResource="image/jpeg">
+              https://www.vangoghmuseum.nl/data/artwork/s0106V1962/thumbnail_F474.jpg
+            </lido:linkResource>
+            <lido:resourceDescription>Thumbnail</lido:resourceDescription>
+            <lido:resourceType>
+              <lido:term>thumbnail</lido:term>
+            </lido:resourceType>
+          </lido:resourceRepresentation>
+        </lido:resourceSet>
+      </lido:resourceWrap>
+    </lido:administrativeMetadata>
+  </lido:lido>
+</input>

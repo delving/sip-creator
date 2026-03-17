@@ -1,0 +1,272 @@
+<rec-mapping prefix="edm" schemaVersion="5.2.6" locked="false">
+  <facts>
+    <entry>
+      <string>baseUrl</string>
+      <string>http://data.collectienederland.nl</string>
+    </entry>
+    <entry>
+      <string>schemaVersions</string>
+      <string>edm_5.2.6</string>
+    </entry>
+    <entry>
+      <string>dataProviderURL</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>provider</string>
+      <string>Rijksdienst voor het Cultureel Erfgoed</string>
+    </entry>
+    <entry>
+      <string>dataType</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>rights</string>
+      <string>http://rightsstatements.org/vocab/InC/1.0/</string>
+    </entry>
+    <entry>
+      <string>name</string>
+      <string>Van Gogh Museum</string>
+    </entry>
+    <entry>
+      <string>language</string>
+      <string>nl</string>
+    </entry>
+    <entry>
+      <string>dataProvider</string>
+      <string>Van Gogh Museum</string>
+    </entry>
+    <entry>
+      <string>type</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>orgId</string>
+      <string>dcn</string>
+    </entry>
+    <entry>
+      <string>spec</string>
+      <string>van-gogh-museum</string>
+    </entry>
+  </facts>
+  <functions/>
+  <dyn-opts>
+    <dyn-opt path="/edm:RDF/skos:Concept" value="Type"/>
+    <dyn-opt path="/edm:RDF/skos:Concept" value="lido:eventMateralsTech"/>
+  </dyn-opts>
+  <node-mappings>
+    <node-mapping inputPath="/input" outputPath="/edm:RDF"/>
+    <node-mapping inputPath="/input" outputPath="/edm:RDF/ore:Aggregation/@rdf:about">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/aggregation/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/edm:RDF/ore:Aggregation/edm:aggregatedCHO/@rdf:resource">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/dataProvider" outputPath="/edm:RDF/ore:Aggregation/edm:dataProvider"/>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:repositoryWrap/lido:repositorySet/lido:workID" outputPath="/edm:RDF/ore:Aggregation/edm:isShownAt/@rdf:resource">
+      <groovy-code>
+        <string>_input.lidolido * { _lidolido -&gt;</string>
+        <string>_lidolido.lidodescriptiveMetadata * { _lidodescriptiveMetadata -&gt;</string>
+        <string>_lidodescriptiveMetadata.lidoobjectIdentificationWrap * { _lidoobjectIdentificationWrap -&gt;</string>
+        <string>_lidoobjectIdentificationWrap.lidorepositoryWrap * { _lidorepositoryWrap -&gt;</string>
+        <string>_lidorepositoryWrap.lidorepositorySet * { _lidorepositorySet -&gt;</string>
+        <string>_lidorepositorySet.lidoworkID * { _lidoworkID -&gt;</string>
+        <string>&quot;https://www.vangoghmuseum.nl/nl/collectie/${_lidoworkID}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/lido:lido/lido:administrativeMetadata/lido:resourceWrap/lido:resourceSet/lido:resourceRepresentation/lido:linkResource" outputPath="/edm:RDF/ore:Aggregation/edm:isShownBy/@rdf:resource">
+      <groovy-code>
+        <string>_input.lidolido * { _lidolido -&gt;</string>
+        <string>_lidolido.lidodescriptiveMetadata * { _lidodescriptiveMetadata -&gt;</string>
+        <string>_lidodescriptiveMetadata.lidoobjectIdentificationWrap * { _lidoobjectIdentificationWrap -&gt;</string>
+        <string>_lidoobjectIdentificationWrap.lidorepositoryWrap * { _lidorepositoryWrap -&gt;</string>
+        <string>_lidorepositoryWrap.lidorepositorySet * { _lidorepositorySet -&gt;</string>
+        <string>_lidorepositorySet.lidoworkID * { _lidoworkID -&gt;</string>
+        <string>&quot;urn:van-gogh-museum/${_lidoworkID}&quot;.replaceAll(&quot;.jpg&quot;, &quot;&quot;).sanitizeURI()</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/lido:lido/lido:administrativeMetadata/lido:resourceWrap/lido:resourceSet/lido:resourceRepresentation/lido:linkResource" outputPath="/edm:RDF/ore:Aggregation/edm:object/@rdf:resource">
+      <groovy-code>
+        <string>_input.lidolido * { _lidolido -&gt;</string>
+        <string>_lidolido.lidodescriptiveMetadata * { _lidodescriptiveMetadata -&gt;</string>
+        <string>_lidodescriptiveMetadata.lidoobjectIdentificationWrap * { _lidoobjectIdentificationWrap -&gt;</string>
+        <string>_lidoobjectIdentificationWrap.lidorepositoryWrap * { _lidorepositoryWrap -&gt;</string>
+        <string>_lidorepositoryWrap.lidorepositorySet * { _lidorepositorySet -&gt;</string>
+        <string>_lidorepositorySet.lidoworkID * { _lidoworkID -&gt;</string>
+        <string>&quot;urn:van-gogh-museum/${_lidoworkID}&quot;.replaceAll(&quot;.jpg&quot;, &quot;&quot;).sanitizeURI()</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/provider" outputPath="/edm:RDF/ore:Aggregation/edm:provider"/>
+    <node-mapping inputPath="/input" outputPath="/edm:RDF/edm:ProvidedCHO/@rdf:about">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventActor/lido:actorInRole/lido:actor/lido:actorID" outputPath="/edm:RDF/edm:ProvidedCHO/dc:creator/@rdf:resource">
+      <groovy-code>
+        <string>_input.lidolido * { _lidolido -&gt;</string>
+        <string>_lidolido.lidodescriptiveMetadata * { _lidodescriptiveMetadata -&gt;</string>
+        <string>_lidodescriptiveMetadata.lidoeventWrap * { _lidoeventWrap -&gt;</string>
+        <string>_lidoeventWrap.lidoeventSet * { _lidoeventSet -&gt;</string>
+        <string>_lidoeventSet.lidoevent * { _lidoevent -&gt;</string>
+        <string>_lidoevent.lidoeventActor * { _lidoeventActor -&gt;</string>
+        <string>_lidoeventActor.lidoactorInRole * { _lidoactorInRole -&gt;</string>
+        <string>_lidoactorInRole.lidoactor * { _lidoactor -&gt;</string>
+        <string>if (_lidoactor.lidoactorID) {</string>
+        <string>_lidoactor.lidoactorID * { _lidoactorID -&gt;</string>
+        <string>if (!&quot;${_lidoactorID}&quot;.contains(&quot;ulan&quot;)) {</string>
+        <string>&quot;${_lidoactorID}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}else {</string>
+        <string>name = _lidoactor.getValueNodes(&quot;lidoappellationValue&quot;).first()</string>
+        <string>createEDMAgentUri(name).sanitizeURI()</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventDate/lido:displayDate" outputPath="/edm:RDF/edm:ProvidedCHO/dc:date"/>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:repositoryWrap/lido:repositorySet/lido:workID" outputPath="/edm:RDF/edm:ProvidedCHO/dc:identifier"/>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:titleWrap/lido:titleSet/lido:appellationValue" outputPath="/edm:RDF/edm:ProvidedCHO/dc:title"/>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:objectClassificationWrap/lido:objectWorkTypeWrap/lido:objectWorkType/lido:conceptID" outputPath="/edm:RDF/edm:ProvidedCHO/dc:type/@rdf:resource"/>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:objectIdentificationWrap/lido:objectMeasurementsWrap/lido:objectMeasurementsSet/lido:displayObjectMeasurements" outputPath="/edm:RDF/edm:ProvidedCHO/dcterms:extent"/>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventMaterialsTech/lido:termMaterialsTech/lido:conceptID" outputPath="/edm:RDF/edm:ProvidedCHO/dcterms:medium/@rdf:resource"/>
+    <node-mapping inputPath="/input/lido:lido/lido:administrativeMetadata/lido:resourceWrap/lido:resourceSet/lido:resourceRepresentation/lido:linkResource" outputPath="/edm:RDF/edm:WebResource/@rdf:about">
+      <groovy-code>
+        <string>_input.lidolido * { _lidolido -&gt;</string>
+        <string>_lidolido.lidodescriptiveMetadata * { _lidodescriptiveMetadata -&gt;</string>
+        <string>_lidodescriptiveMetadata.lidoobjectIdentificationWrap * { _lidoobjectIdentificationWrap -&gt;</string>
+        <string>_lidoobjectIdentificationWrap.lidorepositoryWrap * { _lidorepositoryWrap -&gt;</string>
+        <string>_lidorepositoryWrap.lidorepositorySet * { _lidorepositorySet -&gt;</string>
+        <string>_lidorepositorySet.lidoworkID * { _lidoworkID -&gt;</string>
+        <string>&quot;urn:van-gogh-museum/${_lidoworkID}&quot;.replaceAll(&quot;.jpg&quot;, &quot;&quot;).sanitizeURI()</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/lido:lido/lido:administrativeMetadata/lido:resourceWrap/lido:resourceSet/lido:resourceRepresentation/lido:linkResource" outputPath="/edm:RDF/edm:WebResource/nave:thumbSmall">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>&quot;urn:van-gogh-museum/${_lidolinkResource.replaceAll(&quot;.jpg&quot;, &quot;&quot;).sanitizeURI()}&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/lido:lido/lido:administrativeMetadata/lido:resourceWrap/lido:resourceSet/lido:resourceRepresentation/lido:linkResource" outputPath="/edm:RDF/edm:WebResource/nave:thumbMedium">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>&quot;urn:van-gogh-museum/${_lidolinkResource.replaceAll(&quot;.jpg&quot;, &quot;&quot;).sanitizeURI()}&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/lido:lido/lido:administrativeMetadata/lido:resourceWrap/lido:resourceSet/lido:resourceRepresentation/lido:linkResource" outputPath="/edm:RDF/edm:WebResource/nave:thumbLarge">
+      <groovy-code>
+        <string>_input.record * { _record -&gt;</string>
+        <string>&quot;urn:van-gogh-museum/${_lidolinkResource.replaceAll(&quot;.jpg&quot;, &quot;&quot;).sanitizeURI()}&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventActor" outputPath="/edm:RDF/edm:Agent"/>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventActor/lido:actorInRole/lido:actor/lido:actorID" outputPath="/edm:RDF/edm:Agent/@rdf:about">
+      <groovy-code>
+        <string>_lidoeventActor.lidoactorInRole * { _lidoactorInRole -&gt;</string>
+        <string>_lidoactorInRole.lidoactor * { _lidoactor -&gt;</string>
+        <string>if (_lidoactor.lidoactorID) {</string>
+        <string>_lidoactor.lidoactorID * { _lidoactorID -&gt;</string>
+        <string>if (!&quot;${_lidoactorID}&quot;.contains(&quot;ulan&quot;)) {</string>
+        <string>&quot;${_lidoactorID}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+        <string>} else {</string>
+        <string>name = _lidoactor.getValueNodes(&quot;lidoappellationValue&quot;).first()</string>
+        <string>createEDMAgentUri(name).sanitizeURI()</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventActor/lido:actorInRole/lido:actor/lido:nameActorSet/lido:appellationValue" outputPath="/edm:RDF/edm:Agent/skos:prefLabel"/>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventActor/lido:actorInRole/lido:roleActor/lido:term" outputPath="/edm:RDF/edm:Agent/rdaGr2:professionOrOccupation"/>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventActor/lido:actorInRole/lido:actor/lido:actorID" outputPath="/edm:RDF/edm:Agent/owl:sameAs/@rdf:resource">
+      <groovy-code>
+        <string>_lidoeventActor.lidoactorInRole * { _lidoactorInRole -&gt;</string>
+        <string>_lidoactorInRole.lidoactor * { _lidoactor -&gt;</string>
+        <string>_lidoactor.lidoactorID * { _lidoactorID -&gt;</string>
+        <string>if (&quot;${_lidoactorID}&quot;.contains(&quot;edu/ulan/&quot;)) {</string>
+        <string>&quot;${_lidoactorID}&quot;</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventActor/lido:actorInRole/lido:actor/lido:nameActorSet/lido:appellationValue" outputPath="/edm:RDF/edm:Agent/nave:resourceSortOrder">
+      <groovy-code>
+        <string>&quot;${_lidoeventSet.getValueNodes(&quot;lidoappellationValue&quot;).indexOf(_lidoappellationValue) + 1}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:objectClassificationWrap/lido:objectWorkTypeWrap/lido:objectWorkType/lido:conceptID" outputPath="/edm:RDF/skos:Concept[Type]"/>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:objectClassificationWrap/lido:objectWorkTypeWrap/lido:objectWorkType/lido:conceptID" outputPath="/edm:RDF/skos:Concept[Type]/@rdf:about"/>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:objectClassificationWrap/lido:objectWorkTypeWrap/lido:objectWorkType/lido:term" outputPath="/edm:RDF/skos:Concept[Type]/skos:prefLabel"/>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventMaterialsTech/lido:termMaterialsTech/lido:conceptID" outputPath="/edm:RDF/skos:Concept[lido:eventMateralsTech]"/>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventMaterialsTech/lido:termMaterialsTech/lido:conceptID" outputPath="/edm:RDF/skos:Concept[lido:eventMateralsTech]/@rdf:about"/>
+    <node-mapping inputPath="/input/lido:lido/lido:descriptiveMetadata/lido:eventWrap/lido:eventSet/lido:event/lido:eventMaterialsTech/lido:termMaterialsTech/lido:term" outputPath="/edm:RDF/skos:Concept[lido:eventMateralsTech]/skos:prefLabel"/>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:DelvingResource/nave:featured">
+      <groovy-code>
+        <string>false</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:DelvingResource/nave:allowDeepZoom">
+      <groovy-code>
+        <string>true</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:DelvingResource/nave:allowLinkedOpenData">
+      <groovy-code>
+        <string>true</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:DelvingResource/nave:allowSourceDownload">
+      <groovy-code>
+        <string>false</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/edm:RDF/nave:DelvingResource/nave:public">
+      <groovy-code>
+        <string>true</string>
+      </groovy-code>
+    </node-mapping>
+  </node-mappings>
+</rec-mapping>

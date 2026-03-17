@@ -102,7 +102,7 @@ public class OutputFrame extends FrameBase {
 
             final MappingCompileModel mappingModel = sipModel.getRecordCompileModel();
             Document document;
-            if (selection.contains("JSONLD") && selection.contains("FRAMED")) {
+            if (selection.contains("FRAMED")) {
                 document = mappingModel.setOutputDocument(SyntaxConstants.SYNTAX_STYLE_JSON, outputArea,
                         RDFFormat.JSONLD_FRAME_PRETTY);
             } else if (selection.contains("JSONLD")) {
