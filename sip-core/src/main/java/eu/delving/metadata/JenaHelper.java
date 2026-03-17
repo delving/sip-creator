@@ -33,6 +33,7 @@ import org.w3c.dom.Node;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 
 public class JenaHelper {
@@ -45,6 +46,12 @@ public class JenaHelper {
     public static String convertRDF(String defaultPrefix, String rdf, RDFFormat outputFormat) {
         if (outputFormat == RDFFormat.RDFXML)
             return rdf;
+
+        if (outputFormat == RDFFormat.JSONLD_FRAME_PRETTY) {
+            Map<String, Object> defaultFrame = new HashMap<>();
+            defaultFrame.put("@type", "Thing");
+            return convertRDF(defaultPrefix, rdf, outputFormat, defaultFrame);
+        }
 
         byte[] out = convertRDFTo(defaultPrefix, rdf, outputFormat);
         if (outputFormat == RDFFormat.JSONLD_COMPACT_PRETTY) {
