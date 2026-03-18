@@ -350,7 +350,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     synchronized (lock) {
                         reportWriter.unexpected(metadataRecord, mappingResult, exception, recMapping.getFacts());
                     }
-                    termination.dueToException(metadataRecord, exception);
+                    // Note: termination.dueToException() is called by the caller
+                    // after accept() returns, so that allowInvalid can be checked
                 } else {
                     synchronized (lock) {
                         reportWriter.invalid(metadataRecord, mappingResult, exception, recMapping.getFacts());
