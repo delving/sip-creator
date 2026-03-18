@@ -21,6 +21,9 @@ import eu.delving.XMLToolFactory;
 import eu.delving.groovy.Utils;
 import eu.delving.groovy.XmlSerializer;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -174,11 +177,48 @@ public class MappingResult {
     public static String hasRDFError(String rdf) {
         try {
             InputStream in = new ByteArrayInputStream(rdf.getBytes("UTF-8"));
-            Model mm = ModelFactory.createDefaultModel().read(in, null, "RDF/XML");
+            // Use RDFDataMgr (RIOT) instead of Model.read() because the legacy
+            // ARP parser logs E201 (multiple children of property element) but
+            // does not throw, silently producing invalid RDF models.
+            Model model = ModelFactory.createDefaultModel();
+            RDFDataMgr.read(model, in, Lang.RDFXML);
         } catch (Exception e) {
-            return e.toString();
+            return formatRDFError(e, rdf);
         }
         return "";
+    }
+
+    private static String formatRDFError(Exception e, String rdf) {
+        String message = e.getMessage();
+        int errorLine = extractLineNumber(message);
+        if (errorLine < 0) {
+            return e.toString();
+        }
+        String[] lines = rdf.split("\n");
+        int contextRadius = 10;
+        int start = Math.max(0, errorLine - 1 - contextRadius);
+        int end = Math.min(lines.length, errorLine - 1 + contextRadius + 1);
+        StringBuilder context = new StringBuilder();
+        context.append("RDF parsing error at line ").append(errorLine).append(":\n");
+        context.append(message).append("\n\n");
+        context.append("Context:\n");
+        for (int i = start; i < end; i++) {
+            String marker = (i == errorLine - 1) ? ">>> " : "    ";
+            context.append(String.format("%s%4d: %s\n", marker, i + 1, lines[i]));
+        }
+        return context.toString();
+    }
+
+    private static int extractLineNumber(String message) {
+        if (message == null) return -1;
+        // Matches patterns like "[line: 67, col: 26]" or "(line 67 column 26)"
+        java.util.regex.Matcher m = java.util.regex.Pattern
+                .compile("line[: ]+([0-9]+)")
+                .matcher(message);
+        if (m.find()) {
+            return Integer.parseInt(m.group(1));
+        }
+        return -1;
     }
 
 }

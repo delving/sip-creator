@@ -19,6 +19,8 @@ package eu.delving.sip.model;
 
 import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.GroovyCodeResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import eu.delving.groovy.LanguageTagException;
 import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.AppMappingRunner;
@@ -81,6 +83,7 @@ import static eu.delving.sip.model.MappingCompileModel.Type.RECORD;
  */
 
 public class MappingCompileModel {
+    private static final Logger LOG = LoggerFactory.getLogger(MappingCompileModel.class);
     public final static int RUN_DELAY = 100;
     public final static int COMPILE_DELAY = 500;
     private XmlSerializer serializer = new XmlSerializer();
@@ -342,16 +345,52 @@ public class MappingCompileModel {
                     Node node = MappingRunner.runMapping(metadataRecord);
                     if (node == null)
                         return;
-                    boolean enableXSDValidation = sipModel.getPreferences().getProperty(XSD_VALIDATION, "false")
-                            .contentEquals("true");
-                    if (validator != null && enableXSDValidation) {
-                        ForgivingErrorHandler handler = new ForgivingErrorHandler();
-                        validator.setErrorHandler(handler);
-                        try {
-                            validator.validate(new DOMSource(node));
-                            handler.checkErrors();
-                            MappingResult result = new MappingResult(serializer, metadataRecord.getId(), node,
-                                    recMapping.getRecDefTree());
+                    // RDF validation always runs first, regardless of XSD validation setting
+                    MappingResult result = new MappingResult(serializer, metadataRecord.getId(), node,
+                            recMapping.getRecDefTree());
+                    List<String> rdfErrors = result.getRDFErrors();
+                    if (!rdfErrors.isEmpty()) {
+                        StringBuilder out = new StringBuilder();
+                        for (String rdfError : rdfErrors) {
+                            out.append(rdfError).append("\n");
+                        }
+                        compilationComplete(Completion.RDF_VIOLATION, node, out.toString());
+                    } else {
+                        boolean enableXSDValidation = sipModel.getPreferences().getProperty(XSD_VALIDATION, "false")
+                                .contentEquals("true");
+                        if (validator != null && enableXSDValidation) {
+                            ForgivingErrorHandler handler = new ForgivingErrorHandler();
+                            validator.setErrorHandler(handler);
+                            try {
+                                validator.validate(new DOMSource(node));
+                                handler.checkErrors();
+                                List<String> uriErrors = result.getUriErrors();
+                                if (!uriErrors.isEmpty()) {
+                                    StringBuilder out = new StringBuilder();
+                                    for (String uriError : uriErrors) {
+                                        out.append(uriError).append("\n");
+                                    }
+                                    compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
+                                } else {
+                                    StringBuilder out = new StringBuilder();
+                                    for (AssertionTest test : assertions) {
+                                        String violation = test.getViolation(node);
+                                        if (violation != null)
+                                            out.append(test).append(" : ").append(violation).append('\n');
+                                    }
+                                    if (out.length() > 0) {
+                                        compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
+                                    } else {
+                                        notifyMappingComplete(result);
+                                        compilationComplete(Completion.JUST_FINE, node, null, result);
+                                    }
+                                }
+                            } catch (SAXException e) {
+                                structureViolation(node, handler.getError());
+                            } finally {
+                                handler.reset();
+                            }
+                        } else {
                             List<String> uriErrors = result.getUriErrors();
                             if (!uriErrors.isEmpty()) {
                                 StringBuilder out = new StringBuilder();
@@ -360,51 +399,11 @@ public class MappingCompileModel {
                                 }
                                 compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
                             } else {
-                                StringBuilder out = new StringBuilder();
-                                for (AssertionTest test : assertions) {
-                                    String violation = test.getViolation(node);
-                                    if (violation != null)
-                                        out.append(test).append(" : ").append(violation).append('\n');
-                                }
-                                if (out.length() > 0) {
-                                    compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
-                                } else {
-                                    notifyMappingComplete(result);
-                                    compilationComplete(Completion.JUST_FINE, node, null, result);
-                                }
+                                notifyMappingComplete(result);
+                                compilationComplete(Completion.JUST_FINE, node, null, result);
                             }
-                        } catch (SAXException e) {
-                            structureViolation(node, handler.getError());
-                        } finally {
-                            handler.reset();
-                        }
-                    } else {
-                        MappingResult result = new MappingResult(serializer, metadataRecord.getId(), node,
-                                recMapping.getRecDefTree());
-                        List<String> uriErrors = result.getUriErrors();
-                        List<String> rdfErrors = result.getRDFErrors();
-                        if (!rdfErrors.isEmpty()) {
-                            StringBuilder out = new StringBuilder();
-                            // TODO we can probably reuse uriErrors instead of doing result.getUriErrors()
-                            for (String rdfError : result.getRDFErrors()) {
-                                out.append(rdfError).append("\n");
-                            }
-                            compilationComplete(Completion.RDF_VIOLATION, node, out.toString());
-
-                        } else if (!uriErrors.isEmpty()) {
-                            StringBuilder out = new StringBuilder();
-                            for (String uriError : uriErrors) {
-                                out.append(uriError).append("\n");
-                            }
-                            compilationComplete(Completion.CONTENT_VIOLATION, node, out.toString());
-                        } else {
-                            notifyMappingComplete(result);
-                            compilationComplete(Completion.JUST_FINE, node, null, result);
                         }
                     }
-                    // else {
-                    // compilationComplete(Completion.UNVALIDATED, node, null);
-                    // }
                     setMappingCode();
                 } catch (DiscardRecordException e) {
                     compilationComplete(Completion.DISCARDED_RECORD, null, e.getMessage());

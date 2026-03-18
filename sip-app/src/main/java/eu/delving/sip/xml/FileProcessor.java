@@ -19,6 +19,8 @@ package eu.delving.sip.xml;
 
 import eu.delving.groovy.*;
 import eu.delving.metadata.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import eu.delving.sip.base.CancelException;
 import eu.delving.sip.base.ProgressListener;
 import eu.delving.sip.base.Work;
@@ -31,6 +33,8 @@ import io.sentry.*;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RDFParser;
@@ -62,6 +66,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  */
 
 public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork {
+    private static final Logger LOG = LoggerFactory.getLogger(FileProcessor.class);
     private final Feedback feedback;
     private final boolean enableXSDValidation;
     private final boolean enableSHACLValidation;
@@ -345,7 +350,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     synchronized (lock) {
                         reportWriter.unexpected(metadataRecord, mappingResult, exception, recMapping.getFacts());
                     }
-                    termination.dueToException(exception);
+                    termination.dueToException(metadataRecord, exception);
                 } else {
                     synchronized (lock) {
                         reportWriter.invalid(metadataRecord, mappingResult, exception, recMapping.getFacts());
@@ -500,6 +505,9 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     transaction.setStatus(SpanStatus.ABORTED);
                     transaction.finish();
                 }
+                // Notify listener after FileProcessor is fully done, so that
+                // seekRecordNumber won't be queued behind this job
+                termination.notifyFailure();
             } else {
                 info(String.format("Finish report writer records=%d", recordCount));
                 if (reportWriter != null) {
@@ -660,7 +668,9 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         accept(record, result, e, events);
                     } catch (MappingException e) {
                         accept(record, result, e, events);
-                        termination.dueToException(record, e);
+                        if (!allowInvalid) {
+                            termination.dueToException(record, e);
+                        }
                     } catch (RuntimeException e) {
                         accept(record, result, e, events);
                         if (!allowInvalid) {
@@ -676,36 +686,24 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
     }
 
-    private void validateRDF(MappingResult result, Graph shape, List<String> events) {
-        String output = MappingResult.toJenaCompliantRDF(result.getRecDefTree().getRoot().getDefaultPrefix(),
-                result.toRDF());
-        InputStream in = new ByteArrayInputStream(output.getBytes(StandardCharsets.UTF_8));
-        Model model = ModelFactory.createDefaultModel();
-        ErrorHandler eh = new ErrorHandler() {
-            @Override
-            public void warning(String message, long line, long col) {
-                events.add(message);
+    private void validateRDF(MappingResult result, Graph shape, List<String> events) throws MappingException {
+        List<String> rdfErrors = result.getRDFErrors();
+        if (!rdfErrors.isEmpty()) {
+            for (String rdfError : rdfErrors) {
+                events.add(rdfError);
             }
-
-            @Override
-            public void error(String message, long line, long col) {
-                events.add(message);
-            }
-
-            @Override
-            public void fatal(String message, long line, long col) {
-                events.add(message);
-            }
-        };
-
-        RDFParser.create()
-            .errorHandler(eh)
-            .source(in)
-            .base(null)
-            .lang(RDFLanguages.RDFXML)
-            .parse(model);
+            throw new MappingException(
+                    MappingException.ErrorType.RDF,
+                    "RDF validation errors:\n" + String.join("\n", rdfErrors));
+        }
 
         if (shape != null) {
+            String output = MappingResult.toJenaCompliantRDF(result.getRecDefTree().getRoot().getDefaultPrefix(),
+                    result.toRDF());
+            InputStream in = new ByteArrayInputStream(output.getBytes(StandardCharsets.UTF_8));
+            Model model = ModelFactory.createDefaultModel();
+            RDFDataMgr.read(model, in, Lang.RDFXML);
+
             ValidationReport shaclReport = ShaclValidator.get().validate(shape, model.getGraph());
             if (!shaclReport.conforms()) {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -724,9 +722,9 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     }
 
     private class Termination {
-        private MetadataRecord failedRecord;
-        private Exception exception;
-        private boolean cancelled, completed;
+        private volatile MetadataRecord failedRecord;
+        private volatile Exception exception;
+        private volatile boolean cancelled, completed;
         private NextStep nextStep = NextStep.CONTINUE;
 
         boolean notYet() {
@@ -758,16 +756,26 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
 
         synchronized void dueToException(MetadataRecord failedRecord, Exception exception) {
-            if (this.exception == null) { // only show one of them
-                if (feedback != null) {
-                    feedback.alert("Problem processing", exception);
-                } else {
-                    System.out.println("Problem processing: ");
-                    exception.printStackTrace();
-                }
+            if (this.exception != null) {
+                return; // already reported — stop all subsequent threads from notifying
             }
             this.failedRecord = failedRecord;
             this.exception = exception;
+            LOG.warn("Termination: record={}, recordNumber={}", 
+                    failedRecord != null ? failedRecord.getId() : "null",
+                    failedRecord != null ? failedRecord.getRecordNumber() : -1);
+            if (feedback != null) {
+                feedback.alert("Problem processing", exception);
+            } else {
+                System.out.println("Problem processing: ");
+                exception.printStackTrace();
+            }
+            // Note: listener.failed() is NOT called here — it is called from
+            // Consumer.run() after the FileProcessor finishes, so that
+            // seekRecordNumber can be queued without being blocked behind this job.
+        }
+
+        void notifyFailure() {
             if (listener != null) {
                 listener.failed(FileProcessor.this);
             }

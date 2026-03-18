@@ -7,9 +7,14 @@
 
 package eu.delving.metadata;
 
+import eu.delving.groovy.XmlSerializer;
 import org.apache.jena.riot.RDFFormat;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,5 +81,256 @@ public class JenaHelperTest {
         
         assertNotNull(result);
         assertTrue(result.contains("Test Item"));
+    }
+
+    @Nested
+    class RdfXmlValidation {
+
+        @Test
+        void validTypedChildElementShouldParseWithoutError() {
+            String rdf = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                         xmlns:nkc="http://example.org/nkc/"
+                         xmlns:dc="http://purl.org/dc/elements/1.1/">
+                    <rdf:Description rdf:about="http://example.org/cho/1">
+                        <nkc:creator>
+                            <nkc:Creator>
+                                <nkc:creatorName xml:lang="nl">Bruyn (2), N. De</nkc:creatorName>
+                                <nkc:dateOfBirth>1570</nkc:dateOfBirth>
+                                <nkc:dateOfDeath>1656</nkc:dateOfDeath>
+                            </nkc:Creator>
+                        </nkc:creator>
+                        <nkc:creator>
+                            <nkc:Creator>
+                                <nkc:creatorName xml:lang="nl">Vinckboons (I), David</nkc:creatorName>
+                                <nkc:dateOfBirth>1576-08</nkc:dateOfBirth>
+                                <nkc:dateOfDeath>1633</nkc:dateOfDeath>
+                            </nkc:Creator>
+                        </nkc:creator>
+                        <dc:title xml:lang="nl">Some artwork</dc:title>
+                    </rdf:Description>
+                </rdf:RDF>
+                """;
+
+            String error = MappingResult.hasRDFError(rdf);
+
+            assertEquals("", error, "Valid RDF/XML with typed child elements should parse without errors");
+        }
+
+        @Test
+        void multipleTypedChildrenInOnePropertyShouldBeDetectedAsError() {
+            String rdf = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                         xmlns:nkc="http://example.org/nkc/"
+                         xmlns:dc="http://purl.org/dc/elements/1.1/">
+                    <rdf:Description rdf:about="http://example.org/cho/1">
+                        <nkc:creator>
+                            <nkc:Creator>
+                                <nkc:creatorName xml:lang="nl">Bruyn (2), N. De</nkc:creatorName>
+                                <nkc:dateOfBirth>1570</nkc:dateOfBirth>
+                                <nkc:dateOfDeath>1656</nkc:dateOfDeath>
+                            </nkc:Creator>
+                            <nkc:Creator>
+                                <nkc:creatorName xml:lang="nl">Vinckboons (I), David</nkc:creatorName>
+                                <nkc:dateOfBirth>1576-08</nkc:dateOfBirth>
+                                <nkc:dateOfDeath>1633</nkc:dateOfDeath>
+                            </nkc:Creator>
+                        </nkc:creator>
+                        <dc:title xml:lang="nl">Kermis</dc:title>
+                    </rdf:Description>
+                </rdf:RDF>
+                """;
+
+            String error = MappingResult.hasRDFError(rdf);
+
+            assertFalse(error.isEmpty(),
+                    "Multiple typed child elements in one property should be detected as invalid RDF/XML");
+        }
+
+        @Test
+        void multipleTypedChildrenWithRdfRootShouldBeDetectedAsError() {
+            // XmlSerializer already rewrites root to rdf:RDF (line 90-93 of XmlSerializer.java)
+            // So the XML that toRDF() produces has rdf:RDF as root
+            String rdf = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                         xmlns:nkc="https://wo2.collectienederland.nl/nk/terms/"
+                         xmlns:dc="http://purl.org/dc/elements/1.1/">
+                    <nkc:CHO rdf:about="https://wo2.collectienederland.nl/id/cho/snk-12673">
+                        <nkc:creator>
+                            <nkc:Creator>
+                                <nkc:creatorName xml:lang="nl">Bruyn (2), N. De</nkc:creatorName>
+                                <nkc:dateOfBirth>1570</nkc:dateOfBirth>
+                                <nkc:dateOfDeath>1656</nkc:dateOfDeath>
+                            </nkc:Creator>
+                            <nkc:Creator>
+                                <nkc:creatorName xml:lang="nl">Vinckboons (I), David</nkc:creatorName>
+                                <nkc:dateOfBirth>1576-08</nkc:dateOfBirth>
+                                <nkc:dateOfDeath>1633</nkc:dateOfDeath>
+                            </nkc:Creator>
+                        </nkc:creator>
+                        <dc:title xml:lang="nl">Kermis</dc:title>
+                    </nkc:CHO>
+                </rdf:RDF>
+                """;
+
+            // XmlSerializer already rewrites root to rdf:RDF.
+            // toJenaCompliantRDF then tries to re-add xmlns:rdf but may fail
+            // depending on whitespace in the serialized output.
+            // Test the direct case (without toJenaCompliantRDF):
+            String directError = MappingResult.hasRDFError(rdf);
+
+            assertFalse(directError.isEmpty(),
+                    "Multiple typed children should be detected as invalid RDF/XML");
+        }
+
+        @Test
+        void shouldShowContextInErrorMessage() {
+            String rdf = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                         xmlns:nkc="https://wo2.collectienederland.nl/nk/terms/"
+                         xmlns:dc="http://purl.org/dc/elements/1.1/">
+                    <nkc:CHO rdf:about="https://wo2.collectienederland.nl/id/cho/snk-12673">
+                        <nkc:creator>
+                            <nkc:Creator>
+                                <nkc:creatorName xml:lang="nl">Bruyn (2), N. De</nkc:creatorName>
+                            </nkc:Creator>
+                            <nkc:Creator>
+                                <nkc:creatorName xml:lang="nl">Vinckboons (I), David</nkc:creatorName>
+                            </nkc:Creator>
+                        </nkc:creator>
+                    </nkc:CHO>
+                </rdf:RDF>
+                """;
+
+            String error = MappingResult.hasRDFError(rdf);
+
+            assertFalse(error.isEmpty(), "Should detect E201");
+            assertTrue(error.contains(">>>"), "Should contain context marker");
+            assertTrue(error.contains("nkc:Creator"), "Should show the offending element in context");
+            assertTrue(error.contains("Context:"), "Should contain Context section");
+        }
+
+        @Test
+        void multipleTypedChildrenViaDomSerializerShouldBeDetectedAsError() throws Exception {
+            // Build a DOM that mimics what DOMBuilder produces
+            String NKC = "https://wo2.collectienederland.nl/nk/terms/";
+            String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+            String DC = "http://purl.org/dc/elements/1.1/";
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            Document doc = dbf.newDocumentBuilder().newDocument();
+
+            Element root = doc.createElementNS(NKC, "nkc:RDF");
+            doc.appendChild(root);
+
+            Element cho = doc.createElementNS(NKC, "nkc:CHO");
+            cho.setAttributeNS(RDF, "rdf:about", "http://example.org/cho/1");
+            root.appendChild(cho);
+
+            Element creator = doc.createElementNS(NKC, "nkc:creator");
+            cho.appendChild(creator);
+
+            // First Creator child
+            Element creator1 = doc.createElementNS(NKC, "nkc:Creator");
+            creator.appendChild(creator1);
+            Element name1 = doc.createElementNS(NKC, "nkc:creatorName");
+            name1.setAttributeNS("http://www.w3.org/XML/1998/namespace", "xml:lang", "nl");
+            name1.setTextContent("Bruyn (2), N. De");
+            creator1.appendChild(name1);
+
+            // Second Creator child — this makes it invalid RDF/XML
+            Element creator2 = doc.createElementNS(NKC, "nkc:Creator");
+            creator.appendChild(creator2);
+            Element name2 = doc.createElementNS(NKC, "nkc:creatorName");
+            name2.setAttributeNS("http://www.w3.org/XML/1998/namespace", "xml:lang", "nl");
+            name2.setTextContent("Vinckboons (I), David");
+            creator2.appendChild(name2);
+
+            Element title = doc.createElementNS(DC, "dc:title");
+            title.setTextContent("Kermis");
+            cho.appendChild(title);
+
+            // Serialize via XmlSerializer (same as MappingResult.toXml())
+            XmlSerializer serializer = new XmlSerializer();
+            String xml = serializer.toXml(root, true);
+
+            // This is what toRDF() does
+            String rdf = MappingResult.toJenaCompliantRDF("nkc", xml);
+
+            String error = MappingResult.hasRDFError(rdf);
+
+            assertFalse(error.isEmpty(),
+                    "Multiple typed children via DOM+XmlSerializer should be detected as invalid RDF/XML");
+        }
+
+        @Test
+        void multipleTypedChildrenViaToJenaCompliantRDFShouldBeDetectedAsError() {
+            // Simulate what toRDF() produces: root is nkc:RDF, then
+            // toJenaCompliantRDF rewrites it to rdf:RDF
+            String rawXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <nkc:RDF xmlns:nkc="https://wo2.collectienederland.nl/nk/terms/"
+                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                         xmlns:dc="http://purl.org/dc/elements/1.1/"
+                         xmlns:edm="http://www.europeana.eu/schemas/edm/">
+                    <nkc:CHO rdf:about="https://wo2.collectienederland.nl/id/cho/snk-12673">
+                        <nkc:creator>
+                            <nkc:Creator>
+                                <nkc:creatorName xml:lang="nl">Bruyn (2), N. De</nkc:creatorName>
+                                <nkc:dateOfBirth>1570</nkc:dateOfBirth>
+                                <nkc:dateOfDeath>1656</nkc:dateOfDeath>
+                            </nkc:Creator>
+                            <nkc:Creator>
+                                <nkc:creatorName xml:lang="nl">Vinckboons (I), David</nkc:creatorName>
+                                <nkc:dateOfBirth>1576-08</nkc:dateOfBirth>
+                                <nkc:dateOfDeath>1633</nkc:dateOfDeath>
+                            </nkc:Creator>
+                        </nkc:creator>
+                        <dc:title xml:lang="nl">Kermis</dc:title>
+                    </nkc:CHO>
+                </nkc:RDF>
+                """;
+
+            // This is what toRDF() does
+            String rdf = MappingResult.toJenaCompliantRDF("nkc", rawXml);
+
+            String error = MappingResult.hasRDFError(rdf);
+
+            assertFalse(error.isEmpty(),
+                    "Multiple typed children should be detected even after toJenaCompliantRDF transformation");
+        }
+
+        @Test
+        void parseTypeResourceWithTypedChildShouldBeDetectedAsError() {
+            String rdf = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                         xmlns:nkc="http://example.org/nkc/"
+                         xmlns:dc="http://purl.org/dc/elements/1.1/">
+                    <rdf:Description rdf:about="http://example.org/cho/1">
+                        <nkc:creator rdf:parseType="Resource">
+                            <nkc:Creator>
+                                <nkc:creatorName xml:lang="nl">Achenbach, A.</nkc:creatorName>
+                                <nkc:dateOfBirth>1815-09-29</nkc:dateOfBirth>
+                                <nkc:dateOfDeath>1910</nkc:dateOfDeath>
+                            </nkc:Creator>
+                        </nkc:creator>
+                        <dc:title xml:lang="nl">Zeegezicht</dc:title>
+                    </rdf:Description>
+                </rdf:RDF>
+                """;
+
+            String error = MappingResult.hasRDFError(rdf);
+
+            assertFalse(error.isEmpty(),
+                    "rdf:parseType='Resource' with typed child element should be detected as invalid RDF/XML");
+            assertTrue(error.contains("E202") || error.contains("parseType") || error.contains("not allowed"),
+                    "Error should mention the RDF parsing problem, got: " + error);
+        }
     }
 }
