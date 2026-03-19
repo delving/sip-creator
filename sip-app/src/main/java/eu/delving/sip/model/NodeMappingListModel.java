@@ -57,7 +57,8 @@ public class NodeMappingListModel extends AbstractListModel<NodeMappingEntry> {
     }
 
     public NodeMappingEntry getEntry(NodeMapping nodeMapping) {
-        return entries.get(indexOf(nodeMapping));
+        int index = indexOf(nodeMapping);
+        return index >= 0 ? entries.get(index) : null;
     }
 
     public void clearHighlighted() {
@@ -80,7 +81,10 @@ public class NodeMappingListModel extends AbstractListModel<NodeMappingEntry> {
 
             @Override
             public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, final NodeMapping nodeMapping, NodeMappingChange change) {
-                sipModel.exec(() -> fireContentsChanged(indexOf(nodeMapping)));
+                int index = indexOf(nodeMapping);
+                if (index >= 0) {
+                    sipModel.exec(() -> fireContentsChanged(index));
+                }
             }
 
             @Override
@@ -101,8 +105,10 @@ public class NodeMappingListModel extends AbstractListModel<NodeMappingEntry> {
                     @Override
                     public void run() {
                         int index = indexOf(nodeMapping);
-                        entries.remove(index);
-                        fireIntervalRemoved(this, index, index);
+                        if (index >= 0) {
+                            entries.remove(index);
+                            fireIntervalRemoved(this, index, index);
+                        }
                     }
                 });
             }
@@ -148,7 +154,7 @@ public class NodeMappingListModel extends AbstractListModel<NodeMappingEntry> {
             if (entry.getNodeMapping().equals(nodeMapping)) return index;
             index++;
         }
-        throw new RuntimeException("Node mapping not found: " + nodeMapping);
+        return -1; // Not found - may have been removed during drag & drop
     }
 
     private int sortEntries() {

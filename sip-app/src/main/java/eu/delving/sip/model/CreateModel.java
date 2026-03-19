@@ -221,7 +221,8 @@ public class CreateModel {
                             if (sourceTreeNodes == null) return;
                             for (SourceTreeNode node : sourceTreeNodes) {
                                 for (NodeMapping nodeMapping : node.getNodeMappings()) {
-                                    sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping).setHighlighted();
+                                    NodeMappingEntry entry = sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping);
+                                    if (entry != null) entry.setHighlighted();
                                     RecDefTreeNode treeNode = sipModel.getMappingModel().getRecDefTreeRoot().getRecDefTreeNode(nodeMapping.recDefNode);
                                     if (treeNode != null) treeNode.setHighlighted();
                                 }
@@ -231,9 +232,11 @@ public class CreateModel {
                             if (recDefTreeNode == null) return;
                             for (NodeMapping nodeMapping : recDefTreeNode.getRecDefNode().getNodeMappings().values()) {
                                 NodeMappingEntry entry = sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping);
-                                entry.setHighlighted();
-                                for (Object sourceTreeNodeObject : nodeMapping.getSourceTreeNodes()) {
-                                    ((SourceTreeNode) sourceTreeNodeObject).setHighlighted();
+                                if (entry != null) {
+                                    entry.setHighlighted();
+                                    for (Object sourceTreeNodeObject : nodeMapping.getSourceTreeNodes()) {
+                                        ((SourceTreeNode) sourceTreeNodeObject).setHighlighted();
+                                    }
                                 }
                             }
                             break;
