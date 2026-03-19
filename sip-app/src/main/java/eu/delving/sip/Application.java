@@ -138,13 +138,16 @@ public class Application {
                 }
             }
         }
-
         // Initialize a temporary frame for use with any modal dialogs
         // (e.g., to make sure that there is a taskbar icon)
         JFrame startupFrame = new JFrame();
         startupFrame.setTitle(titleString());
         startupFrame.setUndecorated(true);
-        startupFrame.setLocationRelativeTo(null);
+        startupFrame.pack(); // Size the frame first
+        // Center the window on screen (more reliable on Wayland/Hyprland)
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        startupFrame.setLocation((screenSize.width - startupFrame.getWidth()) / 2,
+                                 (screenSize.height - startupFrame.getHeight()) / 2);
         startupFrame.setVisible(true);
 
         // Initialize telemetry
