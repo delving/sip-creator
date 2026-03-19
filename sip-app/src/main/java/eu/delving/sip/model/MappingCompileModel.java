@@ -38,6 +38,9 @@ import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.metadata.StructureTest;
 import eu.delving.sip.Application;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import eu.delving.sip.base.CompileState;
 import eu.delving.sip.base.Swing;
 import eu.delving.sip.base.Work;
@@ -486,12 +489,46 @@ public class MappingCompileModel {
                     }
                 }
             }
-            if (error != null)
-                output = String.format("## %s ##\n\n%s\n## OUTPUT ##\n%s", completion, error, output);
+            if (error != null) {
+                String formattedError = formatErrorWithLineNumbers(error);
+                output = String.format("## %s ##\n\n%s\n## OUTPUT ##\n%s", completion, formattedError, output);
+            }
             if (error == null && outputArea != null) {
                 outputArea.setDocument(outputDocument);
             }
             sipModel.exec(new DocumentSetter(outputDocument, output, false));
+        }
+
+        private String formatErrorWithLineNumbers(String error) {
+            StringBuilder result = new StringBuilder();
+            Pattern pattern = Pattern.compile("Script1\\.groovy:(\\d+):");
+            Matcher matcher = pattern.matcher(error);
+            if (matcher.find()) {
+                int errorLine = Integer.parseInt(matcher.group(1));
+                String unescaped = error.replace("\\n", "\n").replace("\\'", "'").replace("\\\"", "\"");
+                String[] lines = unescaped.split("\n");
+                int lineNumWidth = String.valueOf(errorLine + 5).length();
+                result.append("=".repeat(60)).append("\n");
+                result.append("GROOVY ERROR at line ").append(errorLine).append("\n");
+                result.append("=".repeat(60)).append("\n\n");
+                result.append("Context (lines ").append(Math.max(1, errorLine - 3)).append(" to ").append(errorLine + 2).append("):\n\n");
+                for (int i = 0; i < lines.length; i++) {
+                    int lineNum = i + 1;
+                    String prefix = String.format("%" + lineNumWidth + "d: ", lineNum);
+                    if (lineNum == errorLine) {
+                        result.append(">>>").append(prefix).append(lines[i]).append("\n");
+                    } else if (Math.abs(lineNum - errorLine) <= 3) {
+                        result.append("    ").append(prefix).append(lines[i]).append("\n");
+                    }
+                }
+                result.append("\n").append("=".repeat(60)).append("\n");
+                result.append("TIP: Full mapping code is available in the 'Mapping Code' tab (F10)\n");
+                result.append("     Use the 'Whole Record Code' tab to see all mappings\n");
+                result.append("=".repeat(60)).append("\n");
+            } else {
+                result.append(error.replace("\\n", "\n").replace("\\'", "'"));
+            }
+            return result.toString();
         }
 
         public String toString() {
