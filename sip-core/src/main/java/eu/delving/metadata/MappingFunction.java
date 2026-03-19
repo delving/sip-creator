@@ -118,18 +118,25 @@ public class MappingFunction implements Comparable<MappingFunction> {
     }
 
     public void toCode(CodeOut codeOut, String editedCode) {
-        codeOut.line_(String.format("def %s = { it ->", name));
-        toUserCode(codeOut, editedCode);
-        codeOut._line("}");
+        String userCode = getEffectiveUserCode(editedCode);
+        if (userCode.trim().startsWith("def ")) {
+            // Full function definition - use as-is
+            codeOut.line_(userCode);
+        } else {
+            // Simple function - wrap in closure with 'it' parameter
+            codeOut.line_(String.format("def %s = { it ->", name));
+            codeOut.line(userCode);
+            codeOut._line("}");
+        }
     }
 
-    private void toUserCode(CodeOut codeOut, String editedCode) {
+    private String getEffectiveUserCode(String editedCode) {
         if (editedCode != null) {
-            StringUtil.indentCode(editedCode, codeOut);
+            return String.join("\n", StringUtil.stringToLines(editedCode));
         } else if (groovyCode != null) {
-            StringUtil.indentCode(groovyCode, codeOut);
+            return String.join("\n", groovyCode);
         } else {
-            codeOut.line(DEFAULT_VALUE);
+            return DEFAULT_VALUE;
         }
     }
 
