@@ -98,9 +98,7 @@ public class MappingFunction implements Comparable<MappingFunction> {
     }
 
     public String getUserCode(String editedCode) {
-        CodeOut codeOut = new CodeOut();
-        toUserCode(codeOut, editedCode);
-        return codeOut.toString();
+        return getEffectiveUserCode(editedCode);
     }
 
     public String getUserCode() {

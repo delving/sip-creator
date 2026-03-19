@@ -366,6 +366,9 @@ public class RemoteDataSetFrame extends FrameBase {
 
         @Override
         public DownloadItem getElementAt(int rowIndex) {
+            if (rowIndex < 0 || rowIndex >= filteredDownloadItems.size()) {
+                return null;
+            }
             return filteredDownloadItems.get(rowIndex);
         }
 
@@ -434,6 +437,9 @@ public class RemoteDataSetFrame extends FrameBase {
 
         @Override
         public WorkItem getElementAt(int rowIndex) {
+            if (rowIndex < 0 || rowIndex >= filteredWorkItems.size()) {
+                return null;
+            }
             return filteredWorkItems.get(rowIndex);
         }
 
@@ -498,6 +504,9 @@ public class RemoteDataSetFrame extends FrameBase {
 
         @Override
         public UploadItem getElementAt(int rowIndex) {
+            if (rowIndex < 0 || rowIndex >= filteredUploadItems.size()) {
+                return null;
+            }
             return filteredUploadItems.get(rowIndex);
         }
 

@@ -54,6 +54,9 @@ public class NodeMappingListModel extends AbstractListModel<NodeMappingEntry> {
 
     @Override
     public NodeMappingEntry getElementAt(int i) {
+        if (i < 0 || i >= entries.size()) {
+            return null;
+        }
         return entries.get(i);
     }
 
