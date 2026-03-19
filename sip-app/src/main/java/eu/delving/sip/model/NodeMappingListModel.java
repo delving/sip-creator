@@ -43,6 +43,7 @@ public class NodeMappingListModel extends AbstractListModel<NodeMappingEntry> {
         JList<NodeMappingEntry> list = new JList<>(this);
         list.setCellRenderer(new NodeMappingEntry.CellRenderer());
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        NodeMappingEntry.setList(list);
         return list;
     }
 

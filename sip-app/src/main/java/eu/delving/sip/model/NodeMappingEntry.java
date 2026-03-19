@@ -35,6 +35,11 @@ public class NodeMappingEntry {
     private NodeMapping nodeMapping;
     private boolean highlighted;
     private NodeMappingListModel listModel;
+    private static JList<NodeMappingEntry> list;
+
+    public static void setList(JList<NodeMappingEntry> list) {
+        NodeMappingEntry.list = list;
+    }
 
     public NodeMappingEntry(NodeMappingListModel listModel, NodeMapping nodeMapping) {
         this.listModel = listModel;
@@ -72,6 +77,9 @@ public class NodeMappingEntry {
         if (!highlighted) {
             highlighted = true;
             fireChanged();
+            if (list != null && index >= 0) {
+                list.ensureIndexIsVisible(index);
+            }
         }
     }
 
