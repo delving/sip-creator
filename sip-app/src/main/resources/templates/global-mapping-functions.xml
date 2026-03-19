@@ -6,14 +6,14 @@
         </sample-input>
         <documentation></documentation>
         <groovy-code>
-            <string>def uriBytes = it.toString().getBytes(&quot;UTF-8&quot;);</string>
-            <string>def digest = java.security.MessageDigest.getInstance(&quot;SHA-1&quot;)</string>
+            <string>def uriBytes = it.toString().getBytes("UTF-8");</string>
+            <string>def digest = java.security.MessageDigest.getInstance("SHA-1")</string>
             <string>def hash = new StringBuilder()</string>
             <string>for (Byte b in digest.digest(uriBytes)) {</string>
-            <string>hash.append(&apos;0123456789ABCDEF&apos;[(b &amp; 0xF0) &gt;&gt; 4])</string>
-            <string>hash.append(&apos;0123456789ABCDEF&apos;[b &amp; 0x0F])</string>
+            <string>hash.append('0123456789ABCDEF'[(b &amp; 0xF0) &gt;&gt; 4])</string>
+            <string>hash.append('0123456789ABCDEF'[b &amp; 0x0F])</string>
             <string>}</string>
-            <string>&quot;$spec/$hash&quot;.toString()</string>
+            <string>"$spec/$hash".toString()</string>
         </groovy-code>
     </mapping-function>
     <mapping-function name="toLocalId">
@@ -23,7 +23,73 @@
             <string>12345</string>
         </sample-input>
         <groovy-code>
-            <string>&quot;${spec}/${it}&quot;</string>
+            <string>"${spec}/${it}"</string>
+        </groovy-code>
+    </mapping-function>
+    <mapping-function name="byLang">
+        <sample-input>
+            <string>&lt;title xml:lang="nl"&gt;Dutch title&lt;/title&gt;</string>
+        </sample-input>
+        <documentation>Returns the node value only if its xml:lang matches. Usage: byLang(node, 'nl') or byLang(node, ['nl', 'en'])</documentation>
+        <groovy-code>
+            <string>def byLang = { node, langs -&gt;</string>
+            <string>    if (node == null || node == "") return null</string>
+            <string>    def nodeLang = node['@xml:lang']</string>
+            <string>    def langList = langs instanceof List ? langs : [langs]</string>
+            <string>    for (lang in langList) {</string>
+            <string>        if (nodeLang == ["$lang"]) {</string>
+            <string>            return node.toString()</string>
+            <string>        }</string>
+            <string>    }</string>
+            <string>    return null</string>
+            <string>}</string>
+            <string>byLang(it, ['nl', 'en'])</string>
+        </groovy-code>
+    </mapping-function>
+    <mapping-function name="langAttr">
+        <sample-input>
+            <string>&lt;title xml:lang="nl"&gt;Dutch title&lt;/title&gt;</string>
+        </sample-input>
+        <documentation>Returns the xml:lang attribute value of a node. Usage: langAttr(node)</documentation>
+        <groovy-code>
+            <string>def langAttr = { node -&gt;</string>
+            <string>    if (node == null) return null</string>
+            <string>    def lang = node['@xml:lang']</string>
+            <string>    return lang ? lang[0] : null</string>
+            <string>}</string>
+            <string>langAttr(it)</string>
+        </groovy-code>
+    </mapping-function>
+    <mapping-function name="sanitize">
+        <sample-input>
+            <string>Hello&amp;World&lt;Test&gt;</string>
+        </sample-input>
+        <documentation>Sanitizes a string for use in URIs by removing special characters. Usage: sanitize(string)</documentation>
+        <groovy-code>
+            <string>def sanitize = { s -&gt;</string>
+            <string>    if (s == null) return null</string>
+            <string>    return s.toString()</string>
+            <string>        .replaceAll(/[&lt;&gt;&amp;&quot;'()]/, '')</string>
+            <string>        .replaceAll(/\\s+/, '-')</string>
+            <string>        .toLowerCase()</string>
+            <string>        .trim()</string>
+            <string>}</string>
+            <string>sanitize(it)</string>
+        </groovy-code>
+    </mapping-function>
+    <mapping-function name="truncate">
+        <sample-input>
+            <string>This is a very long text that needs to be truncated to a maximum length</string>
+        </sample-input>
+        <documentation>Truncates a string to maxLength, adding ellipsis if truncated. Usage: truncate(string, maxLength)</documentation>
+        <groovy-code>
+            <string>def truncate = { str, maxLen -&gt;</string>
+            <string>    if (str == null) return null</string>
+            <string>    def s = str.toString()</string>
+            <string>    if (s.length() &lt;= maxLen) return s</string>
+            <string>    return s.substring(0, maxLen - 3) + '...'</string>
+            <string>}</string>
+            <string>truncate(it, 100)</string>
         </groovy-code>
     </mapping-function>
 </mapping-function-list>

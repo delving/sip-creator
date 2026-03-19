@@ -182,8 +182,7 @@ public class TargetFrame extends FrameBase {
                     if(duplicateElementAction.isValid()) {
                         JPopupMenu menu = new JPopupMenu();
                         menu.add(duplicateElementAction);
-                        // todo: when there is a ROOT opt list, show the values to choose from (as well), and then set the value?
-                        menu.show(recDefTree, rect.x + rect.width, rect.y + rect.height / 2);
+                        menu.show(recDefTree, e.getX(), e.getY());
                     }
                 }
             }
@@ -338,7 +337,7 @@ public class TargetFrame extends FrameBase {
         private DuplicateElementAction(JTree recDefTree) {
             super(createDuplicateActionName(recDefTree));
             path = recDefTree.getSelectionPath();
-            name = createDuplicateActionName(recDefTree);
+            name = getValue(NAME).toString(); // get the name from the action
             recDefTreeNode = getRecDefTreeNode(recDefTree);
         }
 
