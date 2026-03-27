@@ -230,6 +230,7 @@ public class CodeGenerator {
 
         codeOut.line("// Functions from Mapping:");
         for (MappingFunction function : recMapping.getFunctions()) {
+            if (names.contains(function.name)) continue;
             function.toCode(codeOut);
             names.add(function.name);
         }

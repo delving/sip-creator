@@ -61,30 +61,22 @@ class MappingFunctionTest {
     }
 
     @Test
-    void fullFunctionDefinitionNoDuplicateDef() {
-        MappingFunction function = new MappingFunction("utmOut");
+    void functionBodyStartingWithDefVarShouldStillBeWrapped() {
+        // Functions like convertToLATLONG have bodies starting with "def utmOut = false"
+        // which must NOT be mistaken for a full function definition
+        MappingFunction function = new MappingFunction("convertToLATLONG");
         function.setGroovyCode("def utmOut = false\n" +
             "String string = it.toString()\n" +
-            "utmOut");
+            "string");
 
         CodeOut codeOut = new CodeOut();
         function.toCode(codeOut);
 
         String code = codeOut.toString();
-        
-        // Should only have ONE def utmOut, not duplicated
-        int defCount = countOccurrences(code, "def utmOut");
-        assertEquals(1, defCount, 
-            "Function definition should appear exactly once, not be duplicated");
-    }
 
-    private int countOccurrences(String str, String substring) {
-        int count = 0;
-        int idx = 0;
-        while ((idx = str.indexOf(substring, idx)) != -1) {
-            count++;
-            idx += substring.length();
-        }
-        return count;
+        assertTrue(code.contains("def convertToLATLONG = { it ->"),
+            "Function body starting with 'def <var>' should be wrapped in closure");
+        assertTrue(code.contains("def utmOut = false"),
+            "Variable declaration inside closure should be preserved");
     }
 }

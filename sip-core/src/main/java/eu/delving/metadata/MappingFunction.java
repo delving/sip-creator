@@ -117,15 +117,23 @@ public class MappingFunction implements Comparable<MappingFunction> {
 
     public void toCode(CodeOut codeOut, String editedCode) {
         String userCode = getEffectiveUserCode(editedCode);
-        if (userCode.trim().startsWith("def ")) {
-            // Full function definition - use as-is
+        if (isFullFunctionDefinition(userCode)) {
+            // Full function definition (e.g. "def myFunc = { x, y -> ... }") - use as-is
             codeOut.line_(userCode);
         } else {
-            // Simple function - wrap in closure with 'it' parameter
+            // Simple function body - wrap in closure with 'it' parameter
             codeOut.line_(String.format("def %s = { it ->", name));
             codeOut.line(userCode);
             codeOut._line("}");
         }
+    }
+
+    private boolean isFullFunctionDefinition(String code) {
+        String trimmed = code.trim();
+        // Match "def <name> = {" pattern — a closure assignment
+        // This avoids false positives on function bodies that start with
+        // variable declarations like "def utmOut = false"
+        return trimmed.matches("(?s)def\\s+\\w+\\s*=\\s*\\{.*");
     }
 
     private String getEffectiveUserCode(String editedCode) {
