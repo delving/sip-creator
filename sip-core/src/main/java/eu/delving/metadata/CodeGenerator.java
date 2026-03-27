@@ -218,10 +218,17 @@ public class CodeGenerator {
         }
         codeOut.line("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'");
 
+        // Collect all function names first for deduplication
+        Set<String> names = new TreeSet<>();
+
+        // Add standard functions to names (they are already added by appendStandardFunctionsToScript)
+        for (MappingFunction sf : StandardMappingFunctions.asList()) {
+            names.add(sf.name);
+        }
+
         StandardMappingFunctions.appendStandardFunctionsToScript(codeOut);
 
         codeOut.line("// Functions from Mapping:");
-        Set<String> names = new TreeSet<>();
         for (MappingFunction function : recMapping.getFunctions()) {
             function.toCode(codeOut);
             names.add(function.name);

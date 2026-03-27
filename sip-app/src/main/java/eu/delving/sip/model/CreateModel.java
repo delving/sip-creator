@@ -234,8 +234,10 @@ public class CreateModel {
                                 NodeMappingEntry entry = sipModel.getMappingModel().getNodeMappingListModel().getEntry(nodeMapping);
                                 if (entry != null) {
                                     entry.setHighlighted();
-                                    for (Object sourceTreeNodeObject : nodeMapping.getSourceTreeNodes()) {
-                                        ((SourceTreeNode) sourceTreeNodeObject).setHighlighted();
+                                    if (nodeMapping.getSourceTreeNodes() != null) {
+                                        for (Object sourceTreeNodeObject : nodeMapping.getSourceTreeNodes()) {
+                                            ((SourceTreeNode) sourceTreeNodeObject).setHighlighted();
+                                        }
                                     }
                                 }
                             }
