@@ -19,8 +19,6 @@ package eu.delving.sip.model;
 
 import eu.delving.groovy.DiscardRecordException;
 import eu.delving.groovy.GroovyCodeResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import eu.delving.groovy.LanguageTagException;
 import eu.delving.groovy.MappingRunner;
 import eu.delving.groovy.AppMappingRunner;
@@ -86,7 +84,6 @@ import static eu.delving.sip.model.MappingCompileModel.Type.RECORD;
  */
 
 public class MappingCompileModel {
-    private static final Logger LOG = LoggerFactory.getLogger(MappingCompileModel.class);
     public final static int RUN_DELAY = 100;
     public final static int COMPILE_DELAY = 500;
     private XmlSerializer serializer = new XmlSerializer();
@@ -339,10 +336,18 @@ public class MappingCompileModel {
             if (metadataRecord == null)
                 return;
             compiling = true;
+            String generatedCode = null;
+            try {
+                generatedCode = new CodeGenerator(recMapping).withEditPath(editPath).withTrace(trace).toRecordMappingCode();
+                notifyCodeCompiled(generatedCode);
+            } catch (Exception e) {
+                notifyCodeCompiled(generatedCode != null ? generatedCode : "// Failed to generate code: " + e.getMessage());
+            }
             try {
                 if (MappingRunner == null) {
-                    MappingRunner = new AppMappingRunner(groovyCodeResource, recMapping, editPath, trace);
-                    notifyCodeCompiled(MappingRunner.getCode());
+                    MappingRunner = generatedCode != null
+                        ? new AppMappingRunner(groovyCodeResource, recMapping, generatedCode)
+                        : new AppMappingRunner(groovyCodeResource, recMapping, editPath, trace);
                 }
                 try {
                     Node node = MappingRunner.runMapping(metadataRecord);

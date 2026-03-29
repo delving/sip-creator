@@ -69,7 +69,15 @@ public class AppMappingRunner extends AbstractMappingRunner {
         final GroovyCodeResource groovyCodeResource,
         final RecMapping recMapping,
         final EditPath editPath, final boolean trace) {
-        super(recMapping, new CodeGenerator(recMapping).withEditPath(editPath).withTrace(trace).toRecordMappingCode());
+        this(groovyCodeResource, recMapping,
+            new CodeGenerator(recMapping).withEditPath(editPath).withTrace(trace).toRecordMappingCode());
+    }
+
+    public AppMappingRunner(
+        final GroovyCodeResource groovyCodeResource,
+        final RecMapping recMapping,
+        final String generatedCode) {
+        super(recMapping, generatedCode);
         this.script = groovyCodeResource.createMappingScript(code);
         this.script.getBinding().setVariable("WORLD", binding);
         GroovyNode factsNode = new GroovyNode(null, "facts");
