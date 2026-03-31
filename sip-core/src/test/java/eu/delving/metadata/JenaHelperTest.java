@@ -16,6 +16,7 @@ import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -303,6 +304,141 @@ public class JenaHelperTest {
 
             assertFalse(error.isEmpty(),
                     "Multiple typed children should be detected even after toJenaCompliantRDF transformation");
+        }
+
+        @Test
+        void relativeUriInRdfAboutShouldBeDetectedAsError() throws Exception {
+            // Build a DOM with rdf:about="123" — a relative URI
+            String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+            String DC = "http://purl.org/dc/elements/1.1/";
+            String NKC = "http://example.org/nkc/";
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            Document doc = dbf.newDocumentBuilder().newDocument();
+
+            Element root = doc.createElementNS(NKC, "nkc:RDF");
+            doc.appendChild(root);
+
+            Element desc = doc.createElementNS(RDF, "rdf:Description");
+            desc.setAttributeNS(RDF, "rdf:about", "123");
+            root.appendChild(desc);
+
+            Element title = doc.createElementNS(DC, "dc:title");
+            title.setTextContent("Test");
+            desc.appendChild(title);
+
+            XmlSerializer serializer = new XmlSerializer();
+            MappingResult result = new MappingResult(serializer, "test-1", root, null);
+
+            List<String> errors = result.getRDFErrors();
+
+            assertFalse(errors.isEmpty(),
+                "Relative URI '123' in rdf:about should be detected as an error");
+            assertTrue(errors.get(0).contains("relative URI"),
+                "Error message should mention 'relative URI', got: " + errors.get(0));
+        }
+
+        @Test
+        void absoluteUriInRdfAboutShouldNotBeError() throws Exception {
+            String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+            String DC = "http://purl.org/dc/elements/1.1/";
+            String NKC = "http://example.org/nkc/";
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            Document doc = dbf.newDocumentBuilder().newDocument();
+
+            Element root = doc.createElementNS(NKC, "nkc:RDF");
+            doc.appendChild(root);
+
+            Element desc = doc.createElementNS(RDF, "rdf:Description");
+            desc.setAttributeNS(RDF, "rdf:about", "http://example.org/item/1");
+            root.appendChild(desc);
+
+            Element title = doc.createElementNS(DC, "dc:title");
+            title.setTextContent("Test");
+            desc.appendChild(title);
+
+            XmlSerializer serializer = new XmlSerializer();
+            MappingResult result = new MappingResult(serializer, "test-1", root, null);
+
+            List<String> errors = result.getRDFErrors();
+
+            assertTrue(errors.isEmpty(),
+                "Absolute URI should not produce errors, got: " + errors);
+        }
+
+        @Test
+        void blankNodeInRdfAboutShouldNotBeError() throws Exception {
+            String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+            String DC = "http://purl.org/dc/elements/1.1/";
+            String NKC = "http://example.org/nkc/";
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            Document doc = dbf.newDocumentBuilder().newDocument();
+
+            Element root = doc.createElementNS(NKC, "nkc:RDF");
+            doc.appendChild(root);
+
+            Element desc = doc.createElementNS(RDF, "rdf:Description");
+            desc.setAttributeNS(RDF, "rdf:about", "_:b0");
+            root.appendChild(desc);
+
+            Element title = doc.createElementNS(DC, "dc:title");
+            title.setTextContent("Test");
+            desc.appendChild(title);
+
+            XmlSerializer serializer = new XmlSerializer();
+            MappingResult result = new MappingResult(serializer, "test-1", root, null);
+
+            List<String> errors = result.getRDFErrors();
+
+            assertTrue(errors.isEmpty(),
+                "Blank node URI should not produce errors, got: " + errors);
+        }
+
+        @Test
+        void commonPidSchemesShouldNotBeErrors() throws Exception {
+            String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+            String DC = "http://purl.org/dc/elements/1.1/";
+            String NKC = "http://example.org/nkc/";
+
+            String[] validUris = {
+                "https://example.org/item/1",
+                "http://example.org/item/1",
+                "urn:isbn:0451450523",
+                "urn:nbn:nl:ui:13-abc-123",
+                "ark:/12345/bcd6789",
+                "doi:10.1000/xyz123",
+                "hdl:loc.music/mushrs.8000",
+            };
+
+            for (String uri : validUris) {
+                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                dbf.setNamespaceAware(true);
+                Document doc = dbf.newDocumentBuilder().newDocument();
+
+                Element root = doc.createElementNS(NKC, "nkc:RDF");
+                doc.appendChild(root);
+
+                Element desc = doc.createElementNS(RDF, "rdf:Description");
+                desc.setAttributeNS(RDF, "rdf:about", uri);
+                root.appendChild(desc);
+
+                Element title = doc.createElementNS(DC, "dc:title");
+                title.setTextContent("Test");
+                desc.appendChild(title);
+
+                XmlSerializer serializer = new XmlSerializer();
+                MappingResult result = new MappingResult(serializer, "test-1", root, null);
+
+                List<String> errors = result.getRDFErrors();
+
+                assertTrue(errors.isEmpty(),
+                    "URI scheme '" + uri + "' should be accepted, got: " + errors);
+            }
         }
 
         @Test

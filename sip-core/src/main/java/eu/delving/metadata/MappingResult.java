@@ -42,8 +42,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.rdf.model.ModelFactory;
-
 /**
  * The result of the mapping engine is wrapped in this class so that some
  * post-processing and checking
@@ -102,11 +100,47 @@ public class MappingResult {
 
     public List<String> getRDFErrors() {
         List<String> errors = new ArrayList<String>();
-        String error = MappingResult.hasRDFError(toRDF());
-        if (error.length() > 0) {
-            errors.add(error);
+        collectRelativeUriErrors(root, errors);
+        if (recDefTree != null) {
+            String error = MappingResult.hasRDFError(toRDF());
+            if (error.length() > 0) {
+                errors.add(error);
+            }
         }
         return errors;
+    }
+
+    private static final String RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+
+    private void collectRelativeUriErrors(Node node, List<String> errors) {
+        if (node.getNodeType() == Node.ELEMENT_NODE) {
+            checkRdfAttribute(node, "about", errors);
+            checkRdfAttribute(node, "resource", errors);
+            NodeList children = node.getChildNodes();
+            for (int i = 0; i < children.getLength(); i++) {
+                collectRelativeUriErrors(children.item(i), errors);
+            }
+        }
+    }
+
+    private void checkRdfAttribute(Node node, String localName, List<String> errors) {
+        Node attr = node.getAttributes().getNamedItemNS(RDF_NS, localName);
+        if (attr == null) return;
+        String value = attr.getNodeValue();
+        if (value == null || value.isEmpty()) return;
+        if (value.startsWith("_:")) return; // blank node
+        try {
+            URI uri = new URI(value);
+            if (!uri.isAbsolute()) {
+                errors.add(String.format(
+                    "rdf:%s contains a relative URI [%s] on element <%s> — this will produce wrong triples downstream",
+                    localName, value, node.getNodeName()));
+            }
+        } catch (URISyntaxException e) {
+            errors.add(String.format(
+                "rdf:%s contains an invalid URI [%s] on element <%s>: %s",
+                localName, value, node.getNodeName(), e.getMessage()));
+        }
     }
 
     public Node root() {
