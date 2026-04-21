@@ -17,23 +17,33 @@
 
 package eu.delving.test;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static eu.delving.metadata.StringUtil.csvLineParse;
-import static org.junit.Assert.assertEquals;
+import static eu.delving.metadata.StringUtil.sanitizeId;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestStringUtil {
 
     @Test
     public void samples() {
-        assertEquals("simple", expect("gumby", "pokey"), csvLineParse("gumby, pokey"));
-        assertEquals("spaces", expect("gumby", "pokey"), csvLineParse(" gumby , pokey "));
-        assertEquals("numbers", expect("1", "2", "3"), csvLineParse("1,2,3"));
-        assertEquals("quotes", expect("1", " 2", "3"), csvLineParse("1,\" 2\",3"));
-        assertEquals("internal quotes", expect("1", " 2", "they say \"3\""), csvLineParse("1,\" 2\", \"they say \"\"3\"\"\""));
+        assertEquals(expect("gumby", "pokey"), csvLineParse("gumby, pokey"), "simple");
+        assertEquals(expect("gumby", "pokey"), csvLineParse(" gumby , pokey "), "spaces");
+        assertEquals(expect("1", "2", "3"), csvLineParse("1,2,3"), "numbers");
+        assertEquals(expect("1", " 2", "3"), csvLineParse("1,\" 2\",3"), "quotes");
+        assertEquals(expect("1", " 2", "they say \"3\""), csvLineParse("1,\" 2\", \"they say \"\"3\"\"\""), "internal quotes");
+    }
+
+    @Test
+    public void sanitizeIdCollapsesDashes() {
+        assertEquals("XN1012-1", sanitizeId("XN1012 - 1"), "spaces around dash");
+        assertEquals("a-b", sanitizeId("a_ b"), "underscore and space");
+        assertEquals("a-b", sanitizeId("a--b"), "existing double dash");
+        assertEquals("foo-bar", sanitizeId("foo/ bar"), "slash collapsed");
+        assertEquals("clean-id", sanitizeId("clean-id"), "no illegal chars");
     }
 
     private static List<String> expect(String... values) {

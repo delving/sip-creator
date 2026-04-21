@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 public class StringUtil {
 
     public static String sanitizeId(String id) {
-        return id.replaceAll("[/_ ]", "-");
+        return id.replaceAll("[/_ ]", "-").replaceAll("-{2,}", "-");
     }
 
     public static final Pattern IF_ABSENT_PATTERN = Pattern.compile("^ *if *\\( *_absent_ *\\) *\\{ *$");
