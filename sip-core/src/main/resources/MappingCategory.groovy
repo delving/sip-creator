@@ -31,6 +31,9 @@ import java.util.regex.Pattern
 @CompileStatic
 public class MappingCategory {
 
+    private static final Pattern URN_UNFRIENDLY = Pattern.compile('[:/_ \\[\\]\\\\]')
+    private static final Pattern DASH_RUNS = Pattern.compile('-{2,}')
+
     static String replaceAll(String s, String regex, String replacement) {
         return PatternCache.getPattern(regex).matcher(s).replaceAll(replacement);
     }
@@ -264,9 +267,8 @@ public class MappingCategory {
     static String sanitizeURN(Object object) {
         if (object == null) return ""
         String text = object.toString()
-        // Map URN-unfriendly characters to dash, then collapse runs of dashes.
-        text = text.replaceAll('[:/_ \\[\\]\\\\]', '-')
-        text = text.replaceAll('-{2,}', '-')
+        text = URN_UNFRIENDLY.matcher(text).replaceAll('-')
+        text = DASH_RUNS.matcher(text).replaceAll('-')
         return text
     }
 }
