@@ -100,6 +100,7 @@ public class MappingResult {
 
     public List<String> getRDFErrors() {
         List<String> errors = new ArrayList<String>();
+        collectMissingTopLevelSubjectErrors(root, errors);
         collectRelativeUriErrors(root, errors);
         if (recDefTree != null) {
             String error = MappingResult.hasRDFError(toRDF());
@@ -111,6 +112,36 @@ public class MappingResult {
     }
 
     private static final String RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+
+    private void collectMissingTopLevelSubjectErrors(Node node, List<String> errors) {
+        if (!isRdfRoot(node)) return;
+        NodeList children = node.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() != Node.ELEMENT_NODE) continue;
+            Node about = child.getAttributes().getNamedItemNS(RDF_NS, "about");
+            String value = about == null ? null : about.getNodeValue();
+            if (value == null || value.trim().isEmpty()) {
+                errors.add(String.format(
+                    "Top-level RDF resource <%s> has no rdf:about; "
+                        + "use internalRecordURI() for an internal record identifier",
+                    child.getNodeName()));
+            }
+            else if (value.startsWith("_:")) {
+                errors.add(String.format(
+                    "Top-level RDF resource <%s> uses a blank node rdf:about [%s]; "
+                        + "use internalRecordURI() for an internal record identifier",
+                    child.getNodeName(), value));
+            }
+        }
+    }
+
+    private boolean isRdfRoot(Node node) {
+        if (node == null || node.getNodeType() != Node.ELEMENT_NODE) return false;
+        String localName = node.getLocalName();
+        if (localName != null) return "RDF".equals(localName);
+        return node.getNodeName() != null && node.getNodeName().endsWith(":RDF");
+    }
 
     private void collectRelativeUriErrors(Node node, List<String> errors) {
         if (node.getNodeType() == Node.ELEMENT_NODE) {

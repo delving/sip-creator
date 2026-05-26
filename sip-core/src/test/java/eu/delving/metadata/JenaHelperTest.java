@@ -370,7 +370,74 @@ public class JenaHelperTest {
         }
 
         @Test
-        void blankNodeInRdfAboutShouldNotBeError() throws Exception {
+        void nestedBlankNodeInRdfAboutShouldNotBeError() throws Exception {
+            String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+            String DC = "http://purl.org/dc/elements/1.1/";
+            String NKC = "http://example.org/nkc/";
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            Document doc = dbf.newDocumentBuilder().newDocument();
+
+            Element root = doc.createElementNS(NKC, "nkc:RDF");
+            doc.appendChild(root);
+
+            Element desc = doc.createElementNS(RDF, "rdf:Description");
+            desc.setAttributeNS(RDF, "rdf:about", "http://example.org/item/1");
+            root.appendChild(desc);
+
+            Element relation = doc.createElementNS(DC, "dc:relation");
+            desc.appendChild(relation);
+
+            Element nested = doc.createElementNS(RDF, "rdf:Description");
+            nested.setAttributeNS(RDF, "rdf:about", "_:b0");
+            relation.appendChild(nested);
+
+            Element title = doc.createElementNS(DC, "dc:title");
+            title.setTextContent("Test");
+            nested.appendChild(title);
+
+            XmlSerializer serializer = new XmlSerializer();
+            MappingResult result = new MappingResult(serializer, "test-1", root, null);
+
+            List<String> errors = result.getRDFErrors();
+
+            assertTrue(errors.isEmpty(),
+                "Nested blank node URI should not produce errors, got: " + errors);
+        }
+
+        @Test
+        void topLevelRdfResourceWithoutRdfAboutShouldBeError() throws Exception {
+            String DC = "http://purl.org/dc/elements/1.1/";
+            String NKC = "http://example.org/nkc/";
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            Document doc = dbf.newDocumentBuilder().newDocument();
+
+            Element root = doc.createElementNS(NKC, "nkc:RDF");
+            doc.appendChild(root);
+
+            Element desc = doc.createElementNS(NKC, "nkc:CHO");
+            root.appendChild(desc);
+
+            Element title = doc.createElementNS(DC, "dc:title");
+            title.setTextContent("Test");
+            desc.appendChild(title);
+
+            XmlSerializer serializer = new XmlSerializer();
+            MappingResult result = new MappingResult(serializer, "test-1", root, null);
+
+            List<String> errors = result.getRDFErrors();
+
+            assertFalse(errors.isEmpty(),
+                "Top-level RDF resource without rdf:about should produce an error");
+            assertTrue(errors.get(0).contains("has no rdf:about"),
+                "Error message should mention missing rdf:about, got: " + errors.get(0));
+        }
+
+        @Test
+        void topLevelBlankNodeSubjectShouldBeError() throws Exception {
             String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
             String DC = "http://purl.org/dc/elements/1.1/";
             String NKC = "http://example.org/nkc/";
@@ -395,8 +462,10 @@ public class JenaHelperTest {
 
             List<String> errors = result.getRDFErrors();
 
-            assertTrue(errors.isEmpty(),
-                "Blank node URI should not produce errors, got: " + errors);
+            assertFalse(errors.isEmpty(),
+                "Top-level blank node subject should produce an error");
+            assertTrue(errors.get(0).contains("blank node rdf:about"),
+                "Error message should mention blank node rdf:about, got: " + errors.get(0));
         }
 
         @Test

@@ -78,6 +78,7 @@ public class CodeGenerator {
         codeOut.line("// - it: The current input node (GroovyNode object) being processed");
         codeOut.line("// - _input: The root input record (GroovyNode)");
         codeOut.line("// - _uniqueIdentifier: The unique ID for this record");
+        codeOut.line("// - internalRecordURI(): Stable internal URN for this record");
         codeOut.line("// - _facts: Mapping facts/metadata (provider, baseUrl, etc.)");
         codeOut.line("// - _optLookup: Access to controlled vocabularies/option lists");
         codeOut.line("// - _absent_: Boolean flag for conditional mapping");
@@ -217,9 +218,14 @@ public class CodeGenerator {
             codeOut.line(String.format("String %s = '''%s'''", entry.getKey(), value));
         }
         codeOut.line("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'");
+        codeOut.line("def internalRecordURI = { -> "
+                + "\"urn:${orgId}_${spec}_${_uniqueIdentifier.sanitizeURI()}/graph\" }");
+        codeOut.line("def internalRecordURN = internalRecordURI");
 
         // Collect all function names first for deduplication
         Set<String> names = new TreeSet<>();
+        names.add("internalRecordURI");
+        names.add("internalRecordURN");
 
         // Add standard functions to names (they are already added by appendStandardFunctionsToScript)
         for (MappingFunction sf : StandardMappingFunctions.asList()) {
@@ -532,11 +538,11 @@ public class CodeGenerator {
                 String editedCode = editPath.getEditedCode(nodeMapping.recDefNode.getPath());
                 if (nodeMapping.isConstant()) {
                     if (editedCode != null) {
-                        codeOut.line("'%s'", getConstantFromGroovyCode(stringToLines(editedCode)));
+                        toConstantCode(getConstantFromGroovyCode(stringToLines(editedCode)));
                         return;
                     }
                     else if (nodeMapping.groovyCode != null) {
-                        codeOut.line("'%s'", nodeMapping.getConstantValue());
+                        toConstantCode(nodeMapping.getConstantValue());
                         return;
                     }
                 }
@@ -553,7 +559,7 @@ public class CodeGenerator {
             }
         }
         else if (nodeMapping.isConstant()) {
-            codeOut.line("'%s'", nodeMapping.getConstantValue());
+            toConstantCode(nodeMapping.getConstantValue());
             return;
         }
         else if (nodeMapping.groovyCode != null) {
@@ -561,6 +567,28 @@ public class CodeGenerator {
             return;
         }
         toInnerLoop(nodeMapping, getLocalPath(nodeMapping), groovyParams);
+    }
+
+    private void toConstantCode(String value) {
+        String helperCall = toInternalRecordHelperCall(value);
+        if (helperCall != null) {
+            codeOut.line(helperCall);
+        }
+        else {
+            codeOut.line("'%s'", value);
+        }
+    }
+
+    private String toInternalRecordHelperCall(String value) {
+        if (value == null) return null;
+        String trimmed = value.trim();
+        if ("internalRecordURI".equals(trimmed) || "internalRecordURI()".equals(trimmed)) {
+            return "internalRecordURI()";
+        }
+        if ("internalRecordURN".equals(trimmed) || "internalRecordURN()".equals(trimmed)) {
+            return "internalRecordURN()";
+        }
+        return null;
     }
 
     private void toInnerLoop(NodeMapping nodeMapping, Path path, Stack<String> groovyParams) {
