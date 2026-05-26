@@ -260,4 +260,13 @@ public class MappingCategory {
         }
         return out.toString()
     }
+
+    static String sanitizeURN(Object object) {
+        if (object == null) return ""
+        String text = object.toString()
+        // Map URN-unfriendly characters to dash, then collapse runs of dashes.
+        text = text.replaceAll('[:/_ \\[\\]\\\\]', '-')
+        text = text.replaceAll('-{2,}', '-')
+        return text
+    }
 }
