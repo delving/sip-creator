@@ -219,7 +219,7 @@ public class CodeGenerator {
         }
         codeOut.line("String _uniqueIdentifier = 'UNIQUE_IDENTIFIER'");
         codeOut.line("def internalRecordURI = { -> "
-                + "\"urn:${orgId}_${spec}_${_uniqueIdentifier.sanitizeURI()}/graph\" }");
+                + "\"urn:${orgId}_${spec}_${_uniqueIdentifier.sanitizeURN()}/graph\" }");
         codeOut.line("def internalRecordURN = internalRecordURI");
 
         // Collect all function names first for deduplication

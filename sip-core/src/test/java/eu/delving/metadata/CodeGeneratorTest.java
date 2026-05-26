@@ -30,8 +30,8 @@ class CodeGeneratorTest {
         String code = new CodeGenerator(recMapping).toRecordMappingCode();
 
         assertTrue(code.contains(
-                "def internalRecordURI = { -> \"urn:${orgId}_${spec}_${_uniqueIdentifier.sanitizeURI()}/graph\" }"),
-            "Generated mapping code should expose a stable internal record URI helper");
+                "def internalRecordURI = { -> \"urn:${orgId}_${spec}_${_uniqueIdentifier.sanitizeURN()}/graph\" }"),
+            "Generated mapping code should expose a stable internal record URI helper using URN-safe sanitization");
         assertTrue(code.contains("def internalRecordURN = internalRecordURI"),
             "Generated mapping code should expose a URN alias for the helper");
     }
