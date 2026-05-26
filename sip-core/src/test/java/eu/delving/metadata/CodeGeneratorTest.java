@@ -7,6 +7,7 @@
 
 package eu.delving.metadata;
 
+import eu.delving.groovy.StandardMappingFunctions;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
@@ -33,6 +34,18 @@ class CodeGeneratorTest {
             "Generated mapping code should expose a stable internal record URI helper");
         assertTrue(code.contains("def internalRecordURN = internalRecordURI"),
             "Generated mapping code should expose a URN alias for the helper");
+    }
+
+    @Test
+    void internalRecordUriHelperIsListedAsStandardFunction() {
+        MappingFunction function = StandardMappingFunctions.asList().stream()
+            .filter(candidate -> "internalRecordURI".equals(candidate.name))
+            .findFirst()
+            .orElse(null);
+
+        assertNotNull(function, "internalRecordURI should be shown in the standard functions list");
+        assertTrue(function.toString().equals("internalRecordURI()"),
+            "internalRecordURI should be shown as a zero-argument function");
     }
 
     @Test

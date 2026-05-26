@@ -74,6 +74,10 @@ public class MappingFunction implements Comparable<MappingFunction> {
         return mappingFunction;
     }
 
+    public int getParameterCount() {
+        return parameterNames == null ? 1 : parameterNames.size();
+    }
+
     public String getDocumentation() {
         return StringUtil.linesToString(documentation);
     }

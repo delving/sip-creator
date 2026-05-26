@@ -29,6 +29,10 @@ import java.util.List;
 
 public class StandardMappingFunctions {
 
+    private static final MappingFunction INTERNAL_RECORD_URI =
+            MappingFunction.createStandardMappingFunction("internalRecordURI", List.of());
+    private static final MappingFunction INTERNAL_RECORD_URN =
+            MappingFunction.createStandardMappingFunction("internalRecordURN", List.of());
     private static List<String> mappingFunctionsScript = getMappingFunctionsScript();
     private static List<MappingFunction> mappingFunctions = getMappingFunctionsFromScript(mappingFunctionsScript);
 
@@ -51,6 +55,8 @@ public class StandardMappingFunctions {
 
     private static List<MappingFunction> getMappingFunctionsFromScript(List<String> script) {
         List<MappingFunction> mappingFunctions = new ArrayList<>();
+        mappingFunctions.add(INTERNAL_RECORD_URI);
+        mappingFunctions.add(INTERNAL_RECORD_URN);
         for(String line : script) {
             if (line.contains("#def")) {
                 String name = line.split("\\s+", 2)[1].split("\\(")[0].trim();

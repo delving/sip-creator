@@ -441,13 +441,26 @@ public class FieldMappingFrame extends FrameBase {
         private Timer timer = new Timer(500, actionEvent -> {
             String selectedText = codeArea.getSelectedText();
             MappingFunction mappingFunction = (MappingFunction) getSelectedValue();
-            if (selectedText != null && mappingFunction != null) {
-                int start = codeArea.getSelectionStart();
+            if (mappingFunction != null) {
                 try {
+                    Document doc = codeArea.getDocument();
+                    if (mappingFunction.getParameterCount() == 0) {
+                        int start = selectedText == null ? codeArea.getCaretPosition() : codeArea.getSelectionStart();
+                        if (selectedText != null) {
+                            doc.remove(start, selectedText.length());
+                        }
+                        doc.insertString(start, String.format("%s()", mappingFunction.name), null);
+                        clearSelection();
+                        return;
+                    }
+                    if (selectedText == null) {
+                        clearSelection();
+                        return;
+                    }
+                    int start = codeArea.getSelectionStart();
                     if (selectedText.endsWith("\n")) {
                         selectedText = selectedText.substring(0, selectedText.length() - 1);
                     }
-                    Document doc = codeArea.getDocument();
                     doc.remove(start, selectedText.length());
                     doc.insertString(start, String.format("%s(%s)", mappingFunction.name, selectedText), null);
                 } catch (BadLocationException e) {
