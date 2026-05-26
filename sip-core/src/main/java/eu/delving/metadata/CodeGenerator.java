@@ -32,6 +32,7 @@ public class CodeGenerator {
     private CodeOut codeOut = new CodeOut();
     private String prefixFirstBuilder = "outputNode = WORLD.output.";
     private boolean trace;
+    private RecDefNode autoRdfAboutTarget;
 
     public CodeGenerator(RecMapping recMapping) {
         this.recMapping = recMapping;
@@ -253,6 +254,7 @@ public class CodeGenerator {
         }
         codeOut.line("// Dictionaries:");
         recDefTree.getNodeMappings().forEach(this::toLookupCode);
+        autoRdfAboutTarget = findAutoRdfAboutTarget(recDefTree);
         codeOut.line("// DSL Category wraps Builder call:");
         codeOut.line("boolean _absent_ = true");
         codeOut.line("def outputNode");
@@ -271,6 +273,30 @@ public class CodeGenerator {
         codeOut.line("// ----------------------------------");
     }
 
+    private RecDefNode findAutoRdfAboutTarget(RecDefTree tree) {
+        if (tree == null) return null;
+        RecDefNode root = tree.getRoot();
+        if (root == null) return null;
+        for (RecDefNode child : root.getChildren()) {
+            if (child.isAttr()) continue;
+            if (!child.isPopulated()) continue;
+            RecDefNode aboutAttr = findChildAttr(child, "rdf:about");
+            if (aboutAttr == null) return null;
+            if (!aboutAttr.getNodeMappings().isEmpty()) return null;
+            return child;
+        }
+        return null;
+    }
+
+    private RecDefNode findChildAttr(RecDefNode parent, String attrTag) {
+        for (RecDefNode sub : parent.getChildren()) {
+            if (!sub.isAttr()) continue;
+            if (attrTag.equals(sub.getTag().toString())) {
+                return sub;
+            }
+        }
+        return null;
+    }
 
     private void toElementCode(RecDefNode recDefNode, Stack<String> groovyParams) {
         if (recDefNode.isAttr() || !recDefNode.isPopulated()) {
@@ -485,7 +511,8 @@ public class CodeGenerator {
 
     private void startBuilderCall(RecDefNode recDefNode, boolean absentFalse, Stack<String> groovyParams) {
         trace();
-        if (!recDefNode.hasActiveAttributes()) {
+        boolean injectRdfAbout = recDefNode == autoRdfAboutTarget;
+        if (!recDefNode.hasActiveAttributes() && !injectRdfAbout) {
             codeOut.line_("%s%s { %s",
                     prefixFirstBuilder, recDefNode.getTag().toBuilderCall(), absentFalse ? ABSENT_IS_FALSE : ""
             );
@@ -494,6 +521,15 @@ public class CodeGenerator {
             Tag tag = recDefNode.getTag();
 
             boolean comma = false;
+            if (injectRdfAbout) {
+                trace();
+                codeOut.line("// auto-injected rdf:about (fallback to internalRecordURI())");
+                codeOut.line_("%s (", tag.toBuilderCall());
+                codeOut.line_("'rdf:about' : {");
+                codeOut.line("internalRecordURI()");
+                codeOut._line("}");
+                comma = true;
+            }
             for (RecDefNode sub : recDefNode.getChildren()) {
                 if (!sub.isAttr()) continue;
                 OptBox subBox = sub.getOptBox();
@@ -510,7 +546,9 @@ public class CodeGenerator {
 
                         Boolean isNotEmpty = sub.getTag().toString().equals("xml:lang");
 
-                        codeOut.line_("%s (", tag.toBuilderCall());
+                        if (!injectRdfAbout) {
+                            codeOut.line_("%s (", tag.toBuilderCall());
+                        }
                         codeOut.line_("%s : {", sub.getTag().toBuilderCall());
                         if (isNotEmpty) {
                             codeOut.line("if (%s && %s != \"\") {", groovyParams.peek(), groovyParams.peek());
