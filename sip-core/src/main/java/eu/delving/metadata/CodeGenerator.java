@@ -95,6 +95,7 @@ public class CodeGenerator {
         codeOut.line("// STRING MANIPULATION FUNCTIONS (via MappingCategory):");
         codeOut.line("// - string.sanitize(): Removes newlines and extra spaces");
         codeOut.line("// - string.sanitizeURI(): Encodes for URIs (spaces→%20, []→%5B%5D, \\→%5C)");
+        codeOut.line("// - string.sanitizeURN(): Replaces colons/slashes/spaces/underscores/brackets/backslash with '-', collapses runs");
         codeOut.line("// - string.replaceAll(regex, replacement): Pattern-based replacement");
         codeOut.line("// - string.split(regex): Split by pattern");
         codeOut.line("// - string.matches(regex): Check pattern match");
