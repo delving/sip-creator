@@ -467,7 +467,14 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 }
             }
             
-            // Final join to ensure all engines are complete
+            // Final join to ensure all engines are complete. Reset before
+            // re-summing — the poll loop above already left totals populated,
+            // so re-adding engine.recordCount / engine.processedCount without
+            // resetting first double-counts every record. That bug fed
+            // doubled `processed` and `total` counts into the report JSON,
+            // which Narthex stored verbatim as processedValid.
+            recordCount = 0;
+            processedCount = 0;
             for (MappingEngine engine : engines) {
                 try {
                     engine.thread.join();
