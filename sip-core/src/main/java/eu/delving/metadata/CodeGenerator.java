@@ -273,6 +273,18 @@ public class CodeGenerator {
         codeOut.line("// ----------------------------------");
     }
 
+    /**
+     * Identify the first populated top-level resource under the rec-def root that
+     * declares an rdf:about attribute but has no user-authored mapping for it.
+     * That node will receive an auto-injected `'rdf:about': internalRecordURI()` entry
+     * inside startBuilderCall. Returns null when no such node exists, which keeps the
+     * generator a no-op for rec-defs that do not need this behaviour.
+     *
+     * Stops at the first populated child rather than searching siblings, so multi-root
+     * rec-defs only auto-inject on the resource the user actually started mapping
+     * under. Other top-level resources must supply their own rdf:about mapping;
+     * MappingResult validates this at runtime.
+     */
     private RecDefNode findAutoRdfAboutTarget(RecDefTree tree) {
         if (tree == null) return null;
         RecDefNode root = tree.getRoot();
@@ -281,8 +293,8 @@ public class CodeGenerator {
             if (child.isAttr()) continue;
             if (!child.isPopulated()) continue;
             RecDefNode aboutAttr = findChildAttr(child, "rdf:about");
-            if (aboutAttr == null) return null;
-            if (!aboutAttr.getNodeMappings().isEmpty()) return null;
+            if (aboutAttr == null) return null; // schema does not allow rdf:about here; validator will flag it
+            if (!aboutAttr.getNodeMappings().isEmpty()) return null; // user already supplies it
             return child;
         }
         return null;
