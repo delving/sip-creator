@@ -279,6 +279,7 @@ validator path; if `internalRecordURI()` returns empty (e.g.,
 - Decide whether the auto-injected attribute should be placed first or
   last in the generated builder map. Probably first, so user-eye
   scanning of generated code sees the record identity immediately.
+- 2026-05-27: No CRM/LRM-style mapping was available in `~/DelvingSIPCreator` during plan execution. Verification rests on the unit tests in `CodeGeneratorTest` (auto-inject fires, user override wins, no-op when nothing is populated) and the validator coverage in `MappingResult` from prior commits 01319cba and 93c408dc. To be re-verified manually when a CRM/LRM dataset is loaded.
 
 ## Files Touched (remaining work)
 
