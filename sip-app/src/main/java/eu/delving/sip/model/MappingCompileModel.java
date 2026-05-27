@@ -355,14 +355,14 @@ public class MappingCompileModel {
                         return;
                     // RDF validation always runs first, regardless of XSD validation setting
                     MappingResult result = new MappingResult(serializer, metadataRecord.getId(), node,
-                            recMapping.getRecDefTree());
+                            recMapping.getRecDefTree(), getDataSet().getDataSetFacts());
                     List<String> rdfErrors = result.getRDFErrors();
                     if (!rdfErrors.isEmpty()) {
                         StringBuilder out = new StringBuilder();
                         for (String rdfError : rdfErrors) {
                             out.append(rdfError).append("\n");
                         }
-                        compilationComplete(Completion.RDF_VIOLATION, node, out.toString());
+                        compilationComplete(Completion.RDF_VIOLATION, node, out.toString(), result);
                     } else {
                         boolean enableXSDValidation = sipModel.getPreferences().getProperty(XSD_VALIDATION, "false")
                                 .contentEquals("true");

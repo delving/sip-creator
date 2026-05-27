@@ -635,7 +635,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         // uriGenerator.generateUri(record.getId()), node,
                         // MappingRunner.getRecDefTree());
                         result = new MappingResult(serializer, record.getId(), node,
-                                MappingRunner.getRecDefTree());
+                                MappingRunner.getRecDefTree(), recMapping.getFacts());
                         validateRDF(result, shape, events);
                         List<String> uriErrors = result.getUriErrors();
                         try {

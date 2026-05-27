@@ -53,12 +53,23 @@ public class MappingResult {
     private Node root;
     private String localId;
     private RecDefTree recDefTree;
+    private Map<String, String> facts;
 
     public MappingResult(XmlSerializer serializer, String localId, Node root, RecDefTree recDefTree) {
+        this(serializer, localId, root, recDefTree, Collections.emptyMap());
+    }
+
+    public MappingResult(
+            XmlSerializer serializer,
+            String localId,
+            Node root,
+            RecDefTree recDefTree,
+            Map<String, String> facts) {
         this.serializer = serializer;
         this.localId = localId;
         this.root = root;
         this.recDefTree = recDefTree;
+        this.facts = facts == null ? Collections.emptyMap() : facts;
     }
 
     public String getLocalId() {
@@ -116,23 +127,24 @@ public class MappingResult {
     private void collectMissingTopLevelSubjectErrors(Node node, List<String> errors) {
         if (!isRdfRoot(node)) return;
         NodeList children = node.getChildNodes();
+        int topLevelResourceCount = 0;
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
             if (child.getNodeType() != Node.ELEMENT_NODE) continue;
+            topLevelResourceCount++;
             Node about = child.getAttributes().getNamedItemNS(RDF_NS, "about");
-            String value = about == null ? null : about.getNodeValue();
-            if (value == null || value.trim().isEmpty()) {
-                errors.add(String.format(
-                    "Top-level RDF resource <%s> has no rdf:about; "
-                        + "use internalRecordURI() for an internal record identifier",
-                    child.getNodeName()));
+            String value = about == null ? null : about.getNodeValue().trim();
+            if (value != null && !value.isEmpty() && !value.startsWith("_:")) {
+                return;
             }
-            else if (value.startsWith("_:")) {
-                errors.add(String.format(
-                    "Top-level RDF resource <%s> uses a blank node rdf:about [%s]; "
-                        + "use internalRecordURI() for an internal record identifier",
-                    child.getNodeName(), value));
-            }
+        }
+        if (topLevelResourceCount == 0) {
+            errors.add("RDF output has no top-level resources; "
+                + "map rdf:about on the record root using internalRecordURI()");
+        }
+        else {
+            errors.add("RDF output has no top-level resource with a non-blank rdf:about; "
+                + "map rdf:about on the record root using internalRecordURI()");
         }
     }
 
@@ -185,7 +197,7 @@ public class MappingResult {
      */
 
     public String toXml() {
-        return toXml(Collections.emptyMap());
+        return toXml(facts);
     }
 
     public String toXml(Map<String, String> facts) {
@@ -227,7 +239,8 @@ public class MappingResult {
     public static String toJenaCompliantRDF(String defaultPrefix, String rdf) {
         rdf = rdf.replaceAll(defaultPrefix + ":RDF", "rdf:RDF");
         rdf = rdf.replaceAll(" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"", "");
-        rdf = rdf.replaceAll("<rdf:RDF ", "$0xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" ");
+        rdf = rdf.replaceFirst("<rdf:RDF(\\s|>)",
+                "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"$1");
         return rdf;
     }
 

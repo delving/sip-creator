@@ -64,7 +64,8 @@ public class MappingExecutor {
                 baseRunner,
                 validator,
                 assertions,
-                rdfFormat);
+                rdfFormat,
+                recMapping.getFacts());
         this.facts = recMapping.getFacts();
     }
 
@@ -87,7 +88,8 @@ public class MappingExecutor {
                     new XmlSerializer(),
                     record.getId(),
                     node,
-                    baseRunner.getRecDefTree());
+                    baseRunner.getRecDefTree(),
+                    facts);
 
             // Generate the final output
             String output = result.toXml(facts);

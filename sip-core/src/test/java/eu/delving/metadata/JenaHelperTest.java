@@ -216,6 +216,21 @@ public class JenaHelperTest {
         }
 
         @Test
+        void emptyRdfRootShouldKeepRdfNamespaceAfterJenaRewrite() {
+            String rdf = MappingResult.toJenaCompliantRDF("ace", """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rdf:RDF>
+                </rdf:RDF>
+                """);
+
+            String error = MappingResult.hasRDFError(rdf);
+
+            assertEquals("", error, "Empty rdf:RDF root should retain a bound rdf namespace");
+            assertTrue(rdf.contains("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""),
+                "Rewritten RDF should contain the rdf namespace declaration");
+        }
+
+        @Test
         void multipleTypedChildrenViaDomSerializerShouldBeDetectedAsError() throws Exception {
             // Build a DOM that mimics what DOMBuilder produces
             String NKC = "https://wo2.collectienederland.nl/nk/terms/";
@@ -370,6 +385,38 @@ public class JenaHelperTest {
         }
 
         @Test
+        void mappingResultShouldUseConstructorFactsForGraphComment() throws Exception {
+            String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+            String DC = "http://purl.org/dc/elements/1.1/";
+            String NKC = "http://example.org/nkc/";
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            Document doc = dbf.newDocumentBuilder().newDocument();
+
+            Element root = doc.createElementNS(NKC, "nkc:RDF");
+            doc.appendChild(root);
+
+            Element desc = doc.createElementNS(RDF, "rdf:Description");
+            desc.setAttributeNS(RDF, "rdf:about", "http://example.org/item/1");
+            root.appendChild(desc);
+
+            Element title = doc.createElementNS(DC, "dc:title");
+            title.setTextContent("Test");
+            desc.appendChild(title);
+
+            Map<String, String> facts = new HashMap<>();
+            facts.put("orgId", "datahub");
+            facts.put("spec", "koha-test");
+
+            XmlSerializer serializer = new XmlSerializer();
+            MappingResult result = new MappingResult(serializer, "test-1", root, null, facts);
+
+            assertTrue(result.toXml().contains("<urn:datahub_koha-test_test-1/graph__"),
+                "Default serialization should use facts supplied to MappingResult");
+        }
+
+        @Test
         void nestedBlankNodeInRdfAboutShouldNotBeError() throws Exception {
             String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
             String DC = "http://purl.org/dc/elements/1.1/";
@@ -432,8 +479,8 @@ public class JenaHelperTest {
 
             assertFalse(errors.isEmpty(),
                 "Top-level RDF resource without rdf:about should produce an error");
-            assertTrue(errors.get(0).contains("has no rdf:about"),
-                "Error message should mention missing rdf:about, got: " + errors.get(0));
+            assertTrue(errors.get(0).contains("no top-level resource with a non-blank rdf:about"),
+                "Error message should mention missing top-level subject, got: " + errors.get(0));
         }
 
         @Test
@@ -464,8 +511,46 @@ public class JenaHelperTest {
 
             assertFalse(errors.isEmpty(),
                 "Top-level blank node subject should produce an error");
-            assertTrue(errors.get(0).contains("blank node rdf:about"),
-                "Error message should mention blank node rdf:about, got: " + errors.get(0));
+            assertTrue(errors.get(0).contains("no top-level resource with a non-blank rdf:about"),
+                "Error message should mention missing top-level subject, got: " + errors.get(0));
+        }
+
+        @Test
+        void anonymousTopLevelExtensionShouldBeAllowedWhenDocumentHasNamedSubject() throws Exception {
+            String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+            String DC = "http://purl.org/dc/elements/1.1/";
+            String NKC = "http://example.org/nkc/";
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            Document doc = dbf.newDocumentBuilder().newDocument();
+
+            Element root = doc.createElementNS(NKC, "nkc:RDF");
+            doc.appendChild(root);
+
+            Element desc = doc.createElementNS(RDF, "rdf:Description");
+            desc.setAttributeNS(RDF, "rdf:about", "http://example.org/item/1");
+            root.appendChild(desc);
+
+            Element title = doc.createElementNS(DC, "dc:title");
+            title.setTextContent("Test");
+            desc.appendChild(title);
+
+            Element extension = doc.createElementNS(NKC, "nkc:Extension");
+            root.appendChild(extension);
+
+            Element note = doc.createElementNS(NKC, "nkc:note");
+            note.setTextContent("Extra top-level metadata");
+            extension.appendChild(note);
+
+            XmlSerializer serializer = new XmlSerializer();
+            MappingResult result = new MappingResult(serializer, "test-1", root, null);
+
+            List<String> errors = result.getRDFErrors();
+
+            assertTrue(errors.isEmpty(),
+                "Anonymous top-level extension should be allowed when another top-level resource is named, got: "
+                    + errors);
         }
 
         @Test

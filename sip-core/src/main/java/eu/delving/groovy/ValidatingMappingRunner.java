@@ -40,7 +40,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A MappingRunner implementation that wraps another runner and adds validation.
@@ -55,17 +57,28 @@ public class ValidatingMappingRunner implements MappingRunner {
     private final List<AssertionTest> assertions;
     private final RDFFormat rdfFormat;
     private final XmlSerializer serializer;
+    private final Map<String, String> facts;
 
     public ValidatingMappingRunner(
             MappingRunner delegate,
             Validator validator,
             List<AssertionTest> assertions,
             RDFFormat rdfFormat) {
+        this(delegate, validator, assertions, rdfFormat, Collections.emptyMap());
+    }
+
+    public ValidatingMappingRunner(
+            MappingRunner delegate,
+            Validator validator,
+            List<AssertionTest> assertions,
+            RDFFormat rdfFormat,
+            Map<String, String> facts) {
         this.delegate = delegate;
         this.validator = validator;
         this.assertions = assertions;
         this.rdfFormat = rdfFormat;
         this.serializer = new XmlSerializer();
+        this.facts = facts == null ? Collections.emptyMap() : facts;
     }
 
     @Override
@@ -153,7 +166,8 @@ public class ValidatingMappingRunner implements MappingRunner {
                     serializer,
                     record.getId(),
                     node,
-                    getRecDefTree());
+                    getRecDefTree(),
+                    facts);
         } catch (Exception e) {
             throw new MappingException(
                     MappingException.ErrorType.EXECUTION,
