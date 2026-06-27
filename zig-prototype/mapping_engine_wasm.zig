@@ -604,7 +604,7 @@ export fn wasmAddMappingRule(
         .constant_value = constant_value,
     };
     
-    if (global_processor) |*processor| {
+    if (mapping_processor) |*processor| {
         processor.addRule(rule) catch return 0;
         return 1;
     }
