@@ -26,9 +26,9 @@ import eu.delving.metadata.MappingFunction;
 import groovy.lang.Binding;
 import groovy.lang.Script;
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class TestCoordinateConversion {
     private GroovyCodeResource groovyCodeResource = new GroovyCodeResource(ClassLoader.getSystemClassLoader());
     private Script functionScript;
 
-    @Before
+    @BeforeEach
     public void prep() throws IOException {
         URL input = getClass().getResource("/geo/TestCoordinateConversion.txt");
         inputLines = FileUtils.readLines(new File(input.getFile()));
@@ -68,7 +68,7 @@ public class TestCoordinateConversion {
             checkLatLong(line, latLongString);
             String utmString = functionCall(line, true);
             Matcher matcher = utmPattern.matcher(utmString);
-            Assert.assertTrue("SRID format violation: " + utmString, matcher.matches());
+            Assertions.assertTrue(matcher.matches(), "SRID format violation: " + utmString);
             String srid = matcher.group(1);
             String east = matcher.group(2);
             String north = matcher.group(3);
@@ -81,12 +81,12 @@ public class TestCoordinateConversion {
         String[] latLong = latLongString.split(",");
         double latitude = Double.parseDouble(latLong[0]);
         double longitude = Double.parseDouble(latLong[1]);
-        Assert.assertTrue(
-                String.format("Latitude is outside Norway [%s]=>[%s]", line, latLongString),
-                latitude > 58.0 && latitude < 72.0);
-        Assert.assertTrue(
-                String.format("Longitude is outside Norway [%s]=>[%s]", line, latLongString),
-                longitude > 4.0 && longitude < 30.0);
+        Assertions.assertTrue(
+                latitude > 58.0 && latitude < 72.0,
+                String.format("Latitude is outside Norway [%s]=>[%s]", line, latLongString));
+        Assertions.assertTrue(
+                longitude > 4.0 && longitude < 30.0,
+                String.format("Longitude is outside Norway [%s]=>[%s]", line, latLongString));
     }
 
     private String functionCall(String param, boolean utmOut) {
@@ -96,8 +96,8 @@ public class TestCoordinateConversion {
         binding.setVariable("utmOut", utmOut);
         functionScript.setBinding(binding);
         Object result = functionScript.run();
-        Assert.assertNotNull("No result for: " + param, result);
-        Assert.assertFalse("Empty result for: " + param, result.toString().isEmpty());
+        Assertions.assertNotNull(result, "No result for: " + param);
+        Assertions.assertFalse(result.toString().isEmpty(), "Empty result for: " + param);
         return result.toString();
     }
 

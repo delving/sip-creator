@@ -27,9 +27,9 @@ import eu.delving.metadata.AssertionTest;
 import eu.delving.metadata.Path;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.StructureTest;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -58,7 +58,7 @@ public class TestAssertions {
     private Document modsDoc, icnDoc;
     private DocContext modsContext;
 
-    @Before
+    @BeforeEach
     public void prep()
             throws ParserConfigurationException, IOException, SAXException, XPathFactoryConfigurationException {
         groovyCodeResource = new GroovyCodeResource(ClassLoader.getSystemClassLoader());
@@ -81,7 +81,7 @@ public class TestAssertions {
                 case NONE:
                     break;
                 default:
-                    Assert.fail();
+                    Assertions.fail();
                     break;
             }
         }
@@ -101,7 +101,7 @@ public class TestAssertions {
                     // System.out.println("OK: " + structureTest);
                     break;
                 default:
-                    Assert.fail();
+                    Assertions.fail();
                     break;
             }
         }
@@ -111,11 +111,11 @@ public class TestAssertions {
     public void testStructure() throws XPathExpressionException {
         StructureTest.Factory factory = new StructureTest.Factory(modsContext);
         StructureTest structureTest = factory.create(Path.create("/mods:mods/mods:name/mods:namePart"), true, true);
-        Assert.assertEquals("Unexpected Violation", StructureTest.Violation.NONE, structureTest.getViolation(modsDoc));
+        Assertions.assertEquals(StructureTest.Violation.NONE, structureTest.getViolation(modsDoc), "Unexpected Violation");
         // System.out.println(structureTest + ": " +
         // structureTest.getViolation(modsDoc));
         structureTest = factory.create(Path.create("/mods:mods/mods:subject/@authority"), true, false);
-        Assert.assertEquals("Unexpected Violation", StructureTest.Violation.NONE, structureTest.getViolation(modsDoc));
+        Assertions.assertEquals(StructureTest.Violation.NONE, structureTest.getViolation(modsDoc), "Unexpected Violation");
         // System.out.println(structureTest + ": " +
         // structureTest.getViolation(modsDoc));
     }
@@ -130,11 +130,11 @@ public class TestAssertions {
         for (Assertion assertion : assertionList.assertions)
             tests.add(factory.create(assertion));
         // violation messages can be found in assertion-list.xml
-        Assert.assertTrue(tests.get(0).getViolation(modsDoc).contains("No florida found in the string Agricultural"));
-        Assert.assertTrue(tests.get(1).getViolation(modsDoc).contains("No florida found in Agricultural"));
-        Assert.assertTrue(tests.get(2).getViolation(modsDoc).contains("Improper value: Collection"));
-        Assert.assertTrue(tests.get(3).getViolation(modsDoc).contains("Authority 'dubious' is not divine!"));
-        Assert.assertTrue(tests.get(4).getViolation(modsDoc).contains("empty!"));
+        Assertions.assertTrue(tests.get(0).getViolation(modsDoc).contains("No florida found in the string Agricultural"));
+        Assertions.assertTrue(tests.get(1).getViolation(modsDoc).contains("No florida found in Agricultural"));
+        Assertions.assertTrue(tests.get(2).getViolation(modsDoc).contains("Improper value: Collection"));
+        Assertions.assertTrue(tests.get(3).getViolation(modsDoc).contains("Authority 'dubious' is not divine!"));
+        Assertions.assertTrue(tests.get(4).getViolation(modsDoc).contains("empty!"));
     }
 
     private static XStream getStream() {
