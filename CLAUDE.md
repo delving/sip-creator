@@ -126,6 +126,7 @@ ABSENT → SOURCED → ANALYZED_SOURCE → MAPPING → PROCESSED
 - Unit tests for transformation logic in `sip-core`
 - Integration tests use test data in `src/test/resources/`
 - Test various metadata formats: ESE, EDM, LIDO, MODS, etc.
+- **JUnit 5 (Jupiter) only** — the surefire setup discovers no JUnit 4 tests. A class importing `org.junit.Test` compiles fine and is silently never run (this hid four dormant test classes for years, fixed 2026-07-10). Always import from `org.junit.jupiter.api`.
 
 ### Performance Tips
 - Use streaming parsers for XML processing
