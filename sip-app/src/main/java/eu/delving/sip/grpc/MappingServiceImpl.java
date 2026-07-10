@@ -24,8 +24,14 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HexFormat;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,9 +55,38 @@ import io.grpc.stub.StreamObserver;
 
 public class MappingServiceImpl extends MappingServiceGrpc.MappingServiceImplBase {
     private static final Logger logger = LoggerFactory.getLogger(MappingServiceImpl.class);
+
+    /**
+     * Maximum number of compiled mappings kept in {@link #runnerCache}. Each
+     * entry pins one compiled Groovy script class; bulk indexing typically
+     * cycles through a handful of active datasets, so a small bound suffices
+     * while capping Metaspace held by cached script classes.
+     */
+    private static final int MAX_CACHED_MAPPINGS = 32;
+
     private final GroovyCodeResource groovyCodeResource = new GroovyCodeResource(getClass().getClassLoader());
     private final XmlSerializer serializer = new XmlSerializer();
     private final String basePath;
+
+    /**
+     * LRU cache of compiled mapping runners, keyed by a SHA-256 over the
+     * mapping XML, record-definition XML, and any edit-path content of the
+     * request. Bulk indexing sends thousands of records that share identical
+     * mapping content; without this cache every record pays a full
+     * parse + code-generation + Groovy-compilation cycle, which is the root
+     * cause of slow indexing. {@code BulkMappingRunner} is safe to share
+     * across concurrent calls: its compiled script is immutable and bindings
+     * are created per invocation. Access-ordered {@link LinkedHashMap} in a
+     * synchronized wrapper; concurrent misses on the same key may compile
+     * twice, which is benign (last one wins).
+     */
+    private final Map<String, MappingRunner> runnerCache = Collections.synchronizedMap(
+            new LinkedHashMap<>(MAX_CACHED_MAPPINGS, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, MappingRunner> eldest) {
+                    return size() > MAX_CACHED_MAPPINGS;
+                }
+            });
 
     public MappingServiceImpl(String basePath) {
         this.basePath = basePath;
@@ -98,58 +133,73 @@ public class MappingServiceImpl extends MappingServiceGrpc.MappingServiceImplBas
     private void processRecord(SingleRecordRequest request, EditPath editPath,
             StreamObserver<MappingResult> responseObserver) {
         try {
-            // Get workspace path and find SIP files
-            Path sipDir = constructWorkspacePath(
-                    request.getDataset().getWorkspaceId(),
-                    request.getDataset().getDatasetId());
-            SIPFiles sipFiles = SIPFilesFinder.findRequiredFiles(sipDir);
+            // Content-in-request calls (the Orchestra bulk-indexing path) are
+            // cacheable: identical mapping content must compile only once.
+            // File-based calls are never cached — files can change on disk.
+            boolean contentProvided = request.hasMappingFile() && request.hasRecordDefinition();
+            String cacheKey = (contentProvided && editPath == null) ? cacheKey(request) : null;
 
-            // Initialize RecMapping from files first
-            RecMapping recMapping;
+            MappingRunner mappingRunner = cacheKey != null ? runnerCache.get(cacheKey) : null;
             String mappingFileUsed;
             String recordDefinitionUsed;
 
-            if (request.hasMappingFile() && request.hasRecordDefinition()) {
-                // If both are provided in the request, use those
-                recMapping = getRecMappingFromStrings(
-                        request.getMappingFile(),
-                        request.getRecordDefinition());
+            if (contentProvided) {
                 mappingFileUsed = "provided in request";
                 recordDefinitionUsed = "provided in request";
             } else {
-                // Otherwise use file-based initialization
-                recMapping = getRecMapping(sipFiles.getMappingFile(), sipFiles.getRecordDefinition());
-                mappingFileUsed = sipFiles.getMappingFile().toString();
-                recordDefinitionUsed = sipFiles.getRecordDefinition().toString();
+                mappingFileUsed = null;
+                recordDefinitionUsed = null;
+            }
+
+            if (mappingRunner == null) {
+                // Initialize RecMapping — prefer content-in-request over filesystem
+                RecMapping recMapping;
+                if (contentProvided) {
+                    recMapping = getRecMappingFromStrings(
+                            request.getMappingFile(),
+                            request.getRecordDefinition());
+                } else {
+                    // Fall back to file-based initialization
+                    Path sipDir = constructWorkspacePath(
+                            request.getDataset().getWorkspaceId(),
+                            request.getDataset().getDatasetId());
+                    SIPFiles sipFiles = SIPFilesFinder.findRequiredFiles(sipDir);
+                    recMapping = getRecMapping(sipFiles.getMappingFile(), sipFiles.getRecordDefinition());
+                    mappingFileUsed = sipFiles.getMappingFile().toString();
+                    recordDefinitionUsed = sipFiles.getRecordDefinition().toString();
+                }
+
+                if (request.hasEditPath() && request.getEditPath() != null) {
+                    NodeMapping nodeMapping = findNodeMapping(request.getEditPath().getNodeMapping(), recMapping);
+                    editPath = new EditPath(nodeMapping, request.getEditPath().getGroovyCode());
+                }
+
+                // Generate and compile the mapping code
+                String code;
+                if (editPath != null) {
+                    code = new CodeGenerator(recMapping)
+                            .withEditPath(editPath)
+                            .withTrace(true)
+                            .toRecordMappingCode();
+                } else {
+                    code = new CodeGenerator(recMapping)
+                            .withTrace(true)
+                            .toRecordMappingCode();
+                }
+
+                mappingRunner = new BulkMappingRunner(recMapping, code);
+
+                if (cacheKey != null) {
+                    runnerCache.put(cacheKey, mappingRunner);
+                    logger.info("Compiled mapping {} ({} mappings cached)",
+                            cacheKey.substring(0, 12), runnerCache.size());
+                }
             }
 
             // Parse the input XML into a MetadataRecord
             MetadataRecord record = parseRecord(request.getRecordXml(), request.getLocalRecordId());
 
-            if (request.hasEditPath() && request.getEditPath() != null) {
-                NodeMapping nodeMapping = findNodeMapping(request.getEditPath().getNodeMapping(), recMapping);
-                editPath = new EditPath(nodeMapping, request.getEditPath().getGroovyCode());
-            }
-
-            // Generate and compile the mapping code
-            String code;
-            if (editPath != null) {
-                code = new CodeGenerator(recMapping)
-                        .withEditPath(editPath)
-                        .withTrace(true)
-                        .toRecordMappingCode();
-            } else {
-                code = new CodeGenerator(recMapping)
-                        .withTrace(true)
-                        .toRecordMappingCode();
-            }
-
-            // System.out.printf("mapping code: \n %s", code);
-
-            MappingRunner mappingRunner = new BulkMappingRunner(recMapping, code);
-
-            logger.info("Running mapping for record with local ID: {}; with code:\n {}", request.getLocalRecordId(),
-                    code);
+            logger.debug("Running mapping for record with local ID: {}", request.getLocalRecordId());
 
             // Run the mapping
             Node mappedNode = mappingRunner.runMapping(record);
@@ -188,6 +238,37 @@ public class MappingServiceImpl extends MappingServiceGrpc.MappingServiceImplBas
 
             responseObserver.onNext(result);
             responseObserver.onCompleted();
+        }
+    }
+
+    /**
+     * Computes the cache key for a content-in-request mapping call: a SHA-256
+     * over the mapping XML, the record-definition XML, and — when present —
+     * the edit path's node-mapping path and Groovy code, each separated by a
+     * NUL byte so field boundaries cannot be forged by concatenation. Any
+     * change to the mapping, the recdef, or a live edit therefore produces a
+     * different key and a fresh compilation.
+     *
+     * @param request the request carrying mapping and record-definition content
+     * @return a hex-encoded SHA-256 digest identifying the compiled mapping
+     */
+    private String cacheKey(SingleRecordRequest request) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.update(request.getMappingFile().getBytes(StandardCharsets.UTF_8));
+            digest.update((byte) 0);
+            digest.update(request.getRecordDefinition().getBytes(StandardCharsets.UTF_8));
+            digest.update((byte) 0);
+            if (request.hasEditPath() && request.getEditPath() != null) {
+                digest.update(request.getEditPath().getNodeMapping().getBytes(StandardCharsets.UTF_8));
+                digest.update((byte) 0);
+                digest.update(request.getEditPath().getGroovyCode().getBytes(StandardCharsets.UTF_8));
+            }
+            return HexFormat.of().formatHex(digest.digest());
+        } catch (NoSuchAlgorithmException e) {
+            // SHA-256 is mandatory on every JVM; if it is somehow absent we
+            // must not silently serve a wrong mapping, so fail the call.
+            throw new IllegalStateException("SHA-256 unavailable", e);
         }
     }
 

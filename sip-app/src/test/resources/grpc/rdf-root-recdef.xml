@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<record-definition prefix="test" version="0.0.0">
+    <namespaces>
+        <namespace prefix="test" uri="http://test.example.org/" schema="http://test.example.org/test.xsd"/>
+        <namespace prefix="rdf" uri="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+        <namespace prefix="crm" uri="http://www.cidoc-crm.org/cidoc-crm/"/>
+        <namespace prefix="lrm" uri="https://www.iflastandards.info/ns/lrm/lrmoo/"/>
+    </namespaces>
+
+    <attrs>
+        <attr tag="rdf:about" uriCheck="true"/>
+        <attr tag="rdf:resource"/>
+        <attr tag="xml:lang"/>
+    </attrs>
+
+    <root tag="RDF">
+        <!-- Primary subject; declares rdf:about but has no built-in node-mapping for it -->
+        <elem tag="lrm:F3_Manifestation" attrs="rdf:about">
+            <elem tag="crm:P102_has_title" attrs="xml:lang"/>
+        </elem>
+
+        <!-- Sibling top-level resource also declares rdf:about; not auto-injected -->
+        <elem tag="lrm:F2_Expression" attrs="rdf:about">
+            <elem tag="crm:P102_has_title" attrs="xml:lang"/>
+        </elem>
+    </root>
+</record-definition>
