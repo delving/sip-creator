@@ -146,6 +146,55 @@ public class MappingServiceImplCacheTest {
     }
 
     /**
+     * An edit-path request (Mapper live preview) must never populate the
+     * compiled-mapping cache, and must not disturb entries already in it.
+     * A preview compile is one-shot — every keystroke changes the Groovy —
+     * so caching it would mint a new LRU entry per keystroke, evicting the
+     * hot bulk-indexing runners and advancing {@code EngineHolder} toward
+     * its periodic engine reset. Verified by observing that (a) the same
+     * edit-path request sent twice compiles twice (nothing was cached), and
+     * (b) a plain request cached before the edits is still served without
+     * recompilation afterwards (nothing was evicted).
+     */
+    @Test
+    public void editPathRequestsAreNeverCached() throws Exception {
+        MappingServiceImpl service = new MappingServiceImpl("unused-base-path");
+        SingleRecordRequest plain = fixtureRequest("cache-test-3");
+
+        // Prime the cache with the plain (bulk-indexing shaped) request.
+        CollectingObserver primed = new CollectingObserver();
+        service.mapRecord(plain, primed);
+        assertMappedSuccessfully(primed);
+        int compilationsAfterPlain = EngineHolder.getCompilationCount();
+
+        SingleRecordRequest edited = plain.toBuilder()
+                .setEditPath(EditPath.newBuilder()
+                        .setNodeMapping(titleNodePath)
+                        .setGroovyCode("'Edited Title'")
+                        .build())
+                .build();
+
+        // The identical edit-path request twice: each call must compile
+        // afresh, proving the first one put nothing into the cache.
+        CollectingObserver firstEdit = new CollectingObserver();
+        service.mapRecord(edited, firstEdit);
+        assertMappedSuccessfully(firstEdit);
+        CollectingObserver secondEdit = new CollectingObserver();
+        service.mapRecord(edited, secondEdit);
+        assertMappedSuccessfully(secondEdit);
+        assertEquals(compilationsAfterPlain + 2, EngineHolder.getCompilationCount(),
+                "identical edit-path requests must each compile afresh: previews are never cached");
+
+        // The plain request must still be a cache hit: the edit-path calls
+        // must not have evicted it.
+        CollectingObserver plainAgain = new CollectingObserver();
+        service.mapRecord(plain, plainAgain);
+        assertMappedSuccessfully(plainAgain);
+        assertEquals(compilationsAfterPlain + 2, EngineHolder.getCompilationCount(),
+                "the previously cached plain mapping must survive edit-path traffic without recompilation");
+    }
+
+    /**
      * Builds a content-in-request mapping request, mirroring how Orchestra
      * sends mapping and record-definition content on every call.
      *

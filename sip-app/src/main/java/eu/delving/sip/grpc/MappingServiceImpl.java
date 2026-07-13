@@ -70,15 +70,22 @@ public class MappingServiceImpl extends MappingServiceGrpc.MappingServiceImplBas
 
     /**
      * LRU cache of compiled mapping runners, keyed by a SHA-256 over the
-     * mapping XML, record-definition XML, and any edit-path content of the
-     * request. Bulk indexing sends thousands of records that share identical
-     * mapping content; without this cache every record pays a full
+     * mapping XML and record-definition XML of the request. Bulk indexing
+     * sends thousands of records that share identical mapping content;
+     * without this cache every record pays a full
      * parse + code-generation + Groovy-compilation cycle, which is the root
      * cause of slow indexing. {@code BulkMappingRunner} is safe to share
      * across concurrent calls: its compiled script is immutable and bindings
      * are created per invocation. Access-ordered {@link LinkedHashMap} in a
      * synchronized wrapper; concurrent misses on the same key may compile
      * twice, which is benign (last one wins).
+     *
+     * <p>Edit-path requests (Mapper live-preview edits) are deliberately
+     * <em>never</em> cached: each keystroke in an editing session changes the
+     * Groovy code and would mint a fresh one-shot entry, thrashing the LRU —
+     * evicting the hot bulk-indexing runners and marching
+     * {@code EngineHolder} toward its periodic engine reset. Preview compiles
+     * are compiled and served, then discarded.
      */
     private final Map<String, MappingRunner> runnerCache = Collections.synchronizedMap(
             new LinkedHashMap<>(MAX_CACHED_MAPPINGS, 0.75f, true) {
@@ -136,8 +143,13 @@ public class MappingServiceImpl extends MappingServiceGrpc.MappingServiceImplBas
             // Content-in-request calls (the Orchestra bulk-indexing path) are
             // cacheable: identical mapping content must compile only once.
             // File-based calls are never cached — files can change on disk.
+            // Edit-path calls (Mapper preview) are never cached — a preview
+            // compile is one-shot and would only thrash the LRU (see
+            // runnerCache javadoc).
             boolean contentProvided = request.hasMappingFile() && request.hasRecordDefinition();
-            String cacheKey = (contentProvided && editPath == null) ? cacheKey(request) : null;
+            String cacheKey = (contentProvided && editPath == null && !request.hasEditPath())
+                    ? cacheKey(request)
+                    : null;
 
             MappingRunner mappingRunner = cacheKey != null ? runnerCache.get(cacheKey) : null;
             String mappingFileUsed;
@@ -243,11 +255,11 @@ public class MappingServiceImpl extends MappingServiceGrpc.MappingServiceImplBas
 
     /**
      * Computes the cache key for a content-in-request mapping call: a SHA-256
-     * over the mapping XML, the record-definition XML, and — when present —
-     * the edit path's node-mapping path and Groovy code, each separated by a
-     * NUL byte so field boundaries cannot be forged by concatenation. Any
-     * change to the mapping, the recdef, or a live edit therefore produces a
-     * different key and a fresh compilation.
+     * over the mapping XML and the record-definition XML, separated by a NUL
+     * byte so field boundaries cannot be forged by concatenation. Any change
+     * to the mapping or the recdef therefore produces a different key and a
+     * fresh compilation. Edit-path requests never reach this method — they
+     * are excluded from caching entirely (see {@link #runnerCache}).
      *
      * @param request the request carrying mapping and record-definition content
      * @return a hex-encoded SHA-256 digest identifying the compiled mapping
@@ -258,12 +270,6 @@ public class MappingServiceImpl extends MappingServiceGrpc.MappingServiceImplBas
             digest.update(request.getMappingFile().getBytes(StandardCharsets.UTF_8));
             digest.update((byte) 0);
             digest.update(request.getRecordDefinition().getBytes(StandardCharsets.UTF_8));
-            digest.update((byte) 0);
-            if (request.hasEditPath() && request.getEditPath() != null) {
-                digest.update(request.getEditPath().getNodeMapping().getBytes(StandardCharsets.UTF_8));
-                digest.update((byte) 0);
-                digest.update(request.getEditPath().getGroovyCode().getBytes(StandardCharsets.UTF_8));
-            }
             return HexFormat.of().formatHex(digest.digest());
         } catch (NoSuchAlgorithmException e) {
             // SHA-256 is mandatory on every JVM; if it is somehow absent we
