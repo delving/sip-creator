@@ -99,9 +99,21 @@ public class MappingServiceImpl extends MappingServiceGrpc.MappingServiceImplBas
         this.basePath = basePath;
     }
 
+    /**
+     * gRPC entry point for mapping a single record: delegates to
+     * {@link #processRecord(SingleRecordRequest, StreamObserver)}, which
+     * compiles (or reuses) the mapping and streams back exactly one
+     * {@link MappingResult} — mapped XML on success, an error payload on
+     * failure.
+     *
+     * @param request          the record XML plus mapping/recdef content or a
+     *                         workspace/dataset reference, optionally with an
+     *                         edit path for Mapper live previews
+     * @param responseObserver receives the single result and stream completion
+     */
     @Override
     public void mapRecord(SingleRecordRequest request, StreamObserver<MappingResult> responseObserver) {
-        processRecord(request, null, responseObserver);
+        processRecord(request, responseObserver);
     }
 
     private MetadataRecord parseRecord(String xmlContent, String localRecordId) throws Exception {
@@ -137,31 +149,34 @@ public class MappingServiceImpl extends MappingServiceGrpc.MappingServiceImplBas
         }
     }
 
-    private void processRecord(SingleRecordRequest request, EditPath editPath,
-            StreamObserver<MappingResult> responseObserver) {
+    /**
+     * Maps one record and streams back exactly one {@link MappingResult}.
+     * Resolves the mapping and record definition either from the request
+     * content (the Orchestra path) or from the workspace filesystem, compiles
+     * the generated Groovy — reusing a cached runner when possible — runs it
+     * against the parsed record, and completes the stream. All failures are
+     * reported as an error payload inside the result rather than a gRPC
+     * error, so the stream always completes normally.
+     *
+     * <p>Caching: only content-in-request calls without an edit path are
+     * cached (see {@link #runnerCache}). File-based calls are never cached
+     * because files can change on disk; edit-path calls (Mapper live preview)
+     * are never cached because each edit is a one-shot compile that would
+     * only thrash the LRU.
+     *
+     * @param request          the record XML plus mapping/recdef content or a
+     *                         workspace/dataset reference, optionally with an
+     *                         edit path applying in-progress Groovy edits
+     * @param responseObserver receives the single result and stream completion
+     */
+    private void processRecord(SingleRecordRequest request, StreamObserver<MappingResult> responseObserver) {
         try {
-            // Content-in-request calls (the Orchestra bulk-indexing path) are
-            // cacheable: identical mapping content must compile only once.
-            // File-based calls are never cached — files can change on disk.
-            // Edit-path calls (Mapper preview) are never cached — a preview
-            // compile is one-shot and would only thrash the LRU (see
-            // runnerCache javadoc).
             boolean contentProvided = request.hasMappingFile() && request.hasRecordDefinition();
-            String cacheKey = (contentProvided && editPath == null && !request.hasEditPath())
-                    ? cacheKey(request)
-                    : null;
+            String cacheKey = (contentProvided && !request.hasEditPath()) ? cacheKey(request) : null;
 
             MappingRunner mappingRunner = cacheKey != null ? runnerCache.get(cacheKey) : null;
-            String mappingFileUsed;
-            String recordDefinitionUsed;
-
-            if (contentProvided) {
-                mappingFileUsed = "provided in request";
-                recordDefinitionUsed = "provided in request";
-            } else {
-                mappingFileUsed = null;
-                recordDefinitionUsed = null;
-            }
+            String mappingFileUsed = contentProvided ? "provided in request" : null;
+            String recordDefinitionUsed = contentProvided ? "provided in request" : null;
 
             if (mappingRunner == null) {
                 // Initialize RecMapping — prefer content-in-request over filesystem
@@ -181,23 +196,14 @@ public class MappingServiceImpl extends MappingServiceGrpc.MappingServiceImplBas
                     recordDefinitionUsed = sipFiles.getRecordDefinition().toString();
                 }
 
-                if (request.hasEditPath() && request.getEditPath() != null) {
+                // Generate and compile the mapping code, weaving in the
+                // in-progress Groovy edit when the Mapper preview sent one
+                CodeGenerator codeGenerator = new CodeGenerator(recMapping).withTrace(true);
+                if (request.hasEditPath()) {
                     NodeMapping nodeMapping = findNodeMapping(request.getEditPath().getNodeMapping(), recMapping);
-                    editPath = new EditPath(nodeMapping, request.getEditPath().getGroovyCode());
+                    codeGenerator.withEditPath(new EditPath(nodeMapping, request.getEditPath().getGroovyCode()));
                 }
-
-                // Generate and compile the mapping code
-                String code;
-                if (editPath != null) {
-                    code = new CodeGenerator(recMapping)
-                            .withEditPath(editPath)
-                            .withTrace(true)
-                            .toRecordMappingCode();
-                } else {
-                    code = new CodeGenerator(recMapping)
-                            .withTrace(true)
-                            .toRecordMappingCode();
-                }
+                String code = codeGenerator.toRecordMappingCode();
 
                 mappingRunner = new BulkMappingRunner(recMapping, code);
 
