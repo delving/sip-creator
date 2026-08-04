@@ -95,6 +95,40 @@ public class FieldMappingFrame extends FrameBase {
     @Override
     protected void onOpen(boolean opened) {
         sipModel.getFieldCompileModel().setEnabled(opened);
+        if (opened) {
+            // The frame content (and its CreateModel listener) is built lazily on first open,
+            // so a selection made before that misses this frame entirely; re-sync on every
+            // open so the code area always reflects the current selection (issue #3474).
+            exec(new Work() {
+                @Override
+                public void run() {
+                    CreateModel createModel = sipModel.getCreateModel();
+                    syncNodeMapping(createModel.hasNodeMapping() ? createModel.getNodeMapping() : null);
+                }
+
+                @Override
+                public Job getJob() {
+                    return Job.SELECT_NODE_MAPPING;
+                }
+            });
+        }
+    }
+
+    private void syncNodeMapping(final NodeMapping nodeMapping) {
+        if (nodeMapping != null) {
+            contextVarModel.setList(nodeMapping);
+            sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
+            exec(() -> {
+                setEditable(codeArea, nodeMapping.isUserCodeEditable(), themeMode);
+                mainTab.setSelectedIndex(nodeMapping.hasDictionary() ? 1 : 0);
+            });
+        } else {
+            contextVarModel.setList(null);
+            sipModel.getFieldCompileModel().setNodeMapping(null);
+            exec(() -> {
+                setEditable(codeArea, false, themeMode);
+            });
+        }
     }
 
     @Override
@@ -188,21 +222,7 @@ public class FieldMappingFrame extends FrameBase {
             @Override
             public void transition(CreateModel createModel, CreateTransition transition) {
                 if (!transition.nodeMappingChanged) return;
-                if (createModel.hasNodeMapping()) {
-                    final NodeMapping nodeMapping = createModel.getNodeMapping();
-                    contextVarModel.setList(nodeMapping);
-                    sipModel.getFieldCompileModel().setNodeMapping(nodeMapping);
-                    exec(() -> {
-                        setEditable(codeArea, nodeMapping.isUserCodeEditable(), themeMode);
-                        mainTab.setSelectedIndex(nodeMapping.hasDictionary() ? 1 : 0);
-                    });
-                } else {
-                    contextVarModel.setList(null);
-                    sipModel.getFieldCompileModel().setNodeMapping(null);
-                    exec(() -> {
-                        setEditable(codeArea, false, themeMode);
-                    });
-                }
+                syncNodeMapping(createModel.hasNodeMapping() ? createModel.getNodeMapping() : null);
             }
         });
         sipModel.getFieldCompileModel().addListener(new MappingCompileModel.Listener() {
@@ -341,7 +361,8 @@ public class FieldMappingFrame extends FrameBase {
                 variables.add(0, toGroovyIdentifier(back.peek()));
                 back = back.parent();
             }
-            SourceTreeNode sourceTreeNode = (SourceTreeNode) nodeMapping.getSingleSourceTreeNode();
+            SourceTreeNode sourceTreeNode = nodeMapping.hasSourceTreeNodes()
+                ? (SourceTreeNode) nodeMapping.getSingleSourceTreeNode() : null;
             if (sourceTreeNode != null) {
                 for (SourceTreeNode treeNode : sourceTreeNode.getChildren()) {
                     if (treeNode.getTag().isAttribute()) continue;

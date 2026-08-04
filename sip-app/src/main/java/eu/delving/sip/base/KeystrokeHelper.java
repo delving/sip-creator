@@ -18,7 +18,9 @@
 package eu.delving.sip.base;
 
 import javax.swing.*;
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import static javax.swing.Action.*;
@@ -91,10 +93,17 @@ public class KeystrokeHelper {
     }
 
     private static KeyStroke menuKeystroke(int virtualKey) {
-        return KeyStroke.getKeyStroke(virtualKey, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+        return KeyStroke.getKeyStroke(virtualKey, menuShortcutMask());
     }
 
     private static KeyStroke menuShiftKeystroke(int virtualKey) {
-        return KeyStroke.getKeyStroke(virtualKey, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_DOWN_MASK);
+        return KeyStroke.getKeyStroke(virtualKey, menuShortcutMask() | KeyEvent.SHIFT_DOWN_MASK);
+    }
+
+    private static int menuShortcutMask() {
+        // Toolkit throws HeadlessException in headless environments (tests, CI),
+        // which would permanently break this class's static initializer.
+        if (GraphicsEnvironment.isHeadless()) return InputEvent.CTRL_MASK;
+        return Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
     }
 }

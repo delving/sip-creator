@@ -162,33 +162,37 @@ public class MappingCompileModel {
     }
 
     public void setNodeMapping(final NodeMapping nodeMapping) {
-        sipModel.exec(new DocumentSetter(docDocument, "", true));
-        sipModel.exec(new DocumentSetter(codeDocument, "", true));
-        sipModel.exec(new DocumentSetter(outputDocument, "", true));
-        if (recMapping != null && (this.nodeMapping = nodeMapping) != null) {
-            sipModel.exec(new DocumentSetter(docDocument, nodeMapping.getDocumentation(), false));
-            sipModel.exec(new Swing() {
-                @Override
-                public void run() {
-                    String code;
-                    switch (type) {
-                        case RECORD:
-                            code = new CodeGenerator(recMapping).withTrace(trace).toRecordMappingCode();
-                            break;
-                        case FIELD:
-                            EditPath editPath = new EditPath(
-                                    nodeMapping,
-                                    nodeMapping.getGroovyCode());
-                            code = new CodeGenerator(recMapping).withTrace(trace).withEditPath(editPath)
-                                    .toNodeMappingCode();
-                            break;
-                        default:
-                            throw new RuntimeException();
-                    }
-                    new DocumentSetter(codeDocument, code, false).run();
+        // Clear and repopulate in a single EDT job: selections run on concurrent SILENT workers,
+        // and separately queued clear/set jobs from two selections can interleave, leaving the
+        // code document cleared by a stale job that lands after the set (issue #3474).
+        final RecMapping recMapping = this.recMapping;
+        final boolean hasNodeMapping = recMapping != null && (this.nodeMapping = nodeMapping) != null;
+        sipModel.exec(new Swing() {
+            @Override
+            public void run() {
+                new DocumentSetter(docDocument, "", true).run();
+                new DocumentSetter(codeDocument, "", true).run();
+                new DocumentSetter(outputDocument, "", true).run();
+                if (!hasNodeMapping) return;
+                new DocumentSetter(docDocument, nodeMapping.getDocumentation(), false).run();
+                String code;
+                switch (type) {
+                    case RECORD:
+                        code = new CodeGenerator(recMapping).withTrace(trace).toRecordMappingCode();
+                        break;
+                    case FIELD:
+                        EditPath editPath = new EditPath(
+                                nodeMapping,
+                                nodeMapping.getGroovyCode());
+                        code = new CodeGenerator(recMapping).withTrace(trace).withEditPath(editPath)
+                                .toNodeMappingCode();
+                        break;
+                    default:
+                        throw new RuntimeException();
                 }
-            });
-        }
+                new DocumentSetter(codeDocument, code, false).run();
+            }
+        });
         notifyStateChange(CompileState.ORIGINAL);
     }
 
