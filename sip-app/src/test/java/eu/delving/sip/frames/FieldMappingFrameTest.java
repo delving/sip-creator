@@ -23,9 +23,11 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.awt.GraphicsEnvironment;
 import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -48,6 +50,10 @@ class FieldMappingFrameTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        // RSyntaxTextArea installs real UI input maps via Toolkit, which throws
+        // HeadlessException without a display. Run under xvfb (CI) or a desktop.
+        assumeFalse(GraphicsEnvironment.isHeadless(),
+                "FieldMappingFrame builds real Swing components; needs a display or xvfb");
         sipModel = mock(SipModel.class);
         fieldCompileModel = mock(MappingCompileModel.class);
         when(fieldCompileModel.getCodeDocument()).thenReturn(new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_GROOVY));

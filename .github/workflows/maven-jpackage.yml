@@ -31,7 +31,11 @@ jobs:
         shell: bash
         run: echo "$SENTRY_PROPERTIES_CONTENTS" > sip-app/src/main/resources/sentry.properties
       - name: Build with Maven
-        run: mvn -B package --file pom.xml
+        # xvfb provides a display so Swing UI tests (FieldMappingFrameTest) can run;
+        # without it they are skipped via a headless assumption.
+        run: |
+          sudo apt-get install -y -qq xvfb
+          xvfb-run --auto-servernum mvn -B package --file pom.xml
       - name: Convert logo to Windows icon
         shell: bash
         run: |
