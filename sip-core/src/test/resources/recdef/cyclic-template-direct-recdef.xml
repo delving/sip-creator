@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!-- A template that injects itself via target: resolving must fail with a
+     catchable exception instead of recursing until StackOverflowError. -->
+<record-definition prefix="test" version="0.0.0">
+    <namespaces>
+        <namespace prefix="test" uri="http://test.example.org/" schema="http://test.example.org/test.xsd"/>
+    </namespaces>
+
+    <attrs>
+        <attr tag="id"/>
+    </attrs>
+
+    <templates>
+        <elem tag="loop" target="loop">
+            <elem tag="value"/>
+        </elem>
+    </templates>
+
+    <root tag="root">
+        <elem tag="thing" attrs="id" target="loop"/>
+    </root>
+
+    <field-markers/>
+    <opts/>
+</record-definition>

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- Two templates that inject each other (a -> b -> a): resolving must fail
+     with a catchable exception instead of recursing until StackOverflowError. -->
+<record-definition prefix="test" version="0.0.0">
+    <namespaces>
+        <namespace prefix="test" uri="http://test.example.org/" schema="http://test.example.org/test.xsd"/>
+    </namespaces>
+
+    <attrs>
+        <attr tag="id"/>
+    </attrs>
+
+    <templates>
+        <elem tag="ping" target="pong">
+            <elem tag="ping-value"/>
+        </elem>
+        <elem tag="pong" target="ping">
+            <elem tag="pong-value"/>
+        </elem>
+    </templates>
+
+    <root tag="root">
+        <elem tag="thing" attrs="id" target="ping"/>
+    </root>
+
+    <field-markers/>
+    <opts/>
+</record-definition>

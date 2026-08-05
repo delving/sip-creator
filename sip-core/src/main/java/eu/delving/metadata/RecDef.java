@@ -556,6 +556,14 @@ public class RecDef {
 
         public void resolve(Path path, RecDef recDef, Map<String, Elem> templatesByTag) {
             if (tag == null) throw new RuntimeException("Null tag at: " + path);
+            // A template or elem reference that (indirectly) contains itself
+            // would recurse forever and kill the JVM with StackOverflowError.
+            // No sane record definition nests this deep; fail as a normal,
+            // catchable exception naming the path instead.
+            if (path.size() > 100) {
+                throw new IllegalStateException("Rec-def element depth exceeded 100 at " + path
+                        + " — cyclic template/elem reference in record definition " + recDef.prefix);
+            }
             path = path.child(tag);
             tag = tag.defaultPrefix(recDef.prefix);
             if (attrs != null) {
