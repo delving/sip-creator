@@ -601,6 +601,7 @@ public class RecDef {
 
             if (target != null) {
                 String[] targets = target.split(",");
+                String pathString = path.toString() + "/";
                 for (String target : targets) {
                     if(target.isEmpty()) {
                         continue;
@@ -608,6 +609,14 @@ public class RecDef {
                     Elem template = templatesByTag.get(target);
                     if (template == null) {
                         throw new IllegalStateException("Unable to locate template with tag=" + target);
+                    }
+                    // A template that is already an ancestor on this path would
+                    // recurse forever (e.g. a shared "labels" group gives every
+                    // entity has-type -> E55_Type, including the E55_Type
+                    // template itself). Each entity expands once per branch;
+                    // deeper self-nesting adds nothing a mapping can target.
+                    if (pathString.contains("/" + template.tag.toString() + "/")) {
+                        continue;
                     }
                     elemList.add(template.deepCopy());
                 }
