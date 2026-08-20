@@ -20,8 +20,8 @@ package eu.delving.sip;
 import org.apache.commons.io.FileUtils;
 import org.apache.lucene.spatial.DistanceUtils;
 import org.apache.lucene.spatial.tier.InvalidGeoException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +43,7 @@ public class TestLuceneSpatial {
                 DistanceUtils.parseLatitudeLongitude(latlong);
             }
             catch (InvalidGeoException e) {
-                Assert.assertEquals("Unexpected exception", "624.3020535333326,76.0872380450499", latlong);
+                Assertions.assertEquals("624.3020535333326,76.0872380450499", latlong, "Unexpected exception");
             }
         }
     }

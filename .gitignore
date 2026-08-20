@@ -59,3 +59,7 @@ SipCreatorGUI.xml
 
 # Git worktrees
 .worktrees
+
+# Zig prototype build outputs
+.zig-cache
+zig-out

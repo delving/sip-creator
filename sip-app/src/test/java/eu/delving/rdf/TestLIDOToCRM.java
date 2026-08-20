@@ -18,8 +18,8 @@
 package eu.delving.rdf;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -44,7 +44,7 @@ public class TestLIDOToCRM {
         for (String originalLine : original) {
             originalLine = originalLine.trim();
             String freshLine = fresh[index].trim();
-            Assert.assertEquals("Line " + index, originalLine, freshLine);
+            Assertions.assertEquals(originalLine, freshLine, "Line " + index);
             index++;
         }
     }

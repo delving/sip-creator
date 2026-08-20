@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Thread-safe holder of the singleton Groovy scripting engine that processes our mappings.
@@ -48,6 +49,11 @@ public class EngineHolder {
 
     // Track number of script compilations since last reset
     private static final AtomicInteger compilationCount = new AtomicInteger(0);
+
+    // Total compilations ever (shared engine + isolated engines); never reset.
+    // Purely observational - lets tests prove compile-once behavior regardless
+    // of which engine performed the compile.
+    private static final AtomicLong totalCompilationCount = new AtomicLong(0);
 
     // Reset after N unique script compilations to prevent Metaspace exhaustion
     // Set to 0 to disable automatic reset
@@ -75,6 +81,7 @@ public class EngineHolder {
      * Will trigger engine reset if threshold is reached.
      */
     public static void notifyCompilation() {
+        totalCompilationCount.incrementAndGet();
         if (maxCompilationsBeforeReset > 0) {
             int count = compilationCount.incrementAndGet();
             if (count >= maxCompilationsBeforeReset) {
@@ -115,6 +122,42 @@ public class EngineHolder {
      */
     public static int getCompilationCount() {
         return compilationCount.get();
+    }
+
+    /**
+     * Total compilations ever performed, shared and isolated engines alike.
+     * Never reset; observational only.
+     */
+    public static long getTotalCompilationCount() {
+        return totalCompilationCount.get();
+    }
+
+    /**
+     * Current reset threshold, so callers that temporarily change it
+     * (e.g. tests) can restore the value they found.
+     */
+    public static int getResetThreshold() {
+        return maxCompilationsBeforeReset;
+    }
+
+    /**
+     * Record a compilation performed on an isolated engine: counts toward the
+     * observational total but not toward the shared engine's reset threshold,
+     * since it adds no classes to the shared classloader.
+     */
+    public static void notifyIsolatedCompilation() {
+        totalCompilationCount.incrementAndGet();
+    }
+
+    /**
+     * Create a fresh engine with its own classloader, independent of the
+     * shared singleton. A script compiled on it pins only that classloader,
+     * so releasing the script releases its classes - unlike the shared
+     * engine, where a long-lived CompiledScript pins every class its
+     * generation compiled. Used for cached bulk-mapping runners.
+     */
+    public static GroovyScriptEngineImpl createIsolatedEngine() {
+        return createNewEngine();
     }
 
     /**
