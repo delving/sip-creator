@@ -22,14 +22,25 @@ with a thread-safe `CompiledScript`) and maps in parallel.
 ## Fix
 
 A bounded (32-entry) synchronized access-order LRU in `MappingServiceImpl`, keyed by a
-SHA-256 over mapping XML + recdef XML + any edit-path content (NUL-separated fields).
+SHA-256 over mapping XML + recdef XML (NUL-separated fields).
 
 - Cache **hit**: reuse the shared `BulkMappingRunner` — safe because its `CompiledScript`
   is immutable and bindings are per-invocation (the established Narthex pattern).
 - Cache **miss**: existing parse/generate/compile path, then `put`. One INFO line per
-  compile ("Compiled mapping <hash12> (n mappings cached)").
-- **Never cached**: file-based requests (files can change on disk) and failed compiles
-  (exceptions propagate before `put`).
+  compile ("Compiled mapping <hash12> (n mappings cached)"). Cache-populating compiles
+  run on an **isolated engine** (`EngineHolder.createIsolatedEngine()`), so each entry
+  pins only its own classloader and eviction actually frees its Metaspace — a script
+  compiled on the shared engine would pin every class of its engine generation.
+- **Never cached**:
+  - edit-path requests (Mapper live preview) — each keystroke changes the Groovy, so
+    caching would mint a one-shot LRU entry per edit and thrash out the hot bulk
+    runners; previews compile on the shared engine and are discarded after serving
+    (an earlier revision keyed edit-path content into the cache; superseded);
+  - file-based requests — files can change on disk, and the GUI/file path is
+    low-volume, so per-record compilation is acceptable there (decision 2026-08-20:
+    keep uncached; an mtime-keyed entry is the follow-up if that path ever serves
+    bulk traffic);
+  - failed compiles (exceptions propagate before `put`).
 - The per-record INFO dump of generated code is demoted to a DEBUG line without the code.
 - Orchestra needs zero changes — it already sends mapping content per call.
 

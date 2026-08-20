@@ -69,23 +69,52 @@ public class MappingServiceImplCacheTest {
      */
     private String titleNodePath;
 
+    private int previousResetThreshold;
+
     /**
-     * Raises the EngineHolder reset threshold so the compilation counter keeps
-     * counting (threshold 0 would disable counting entirely) but an automatic
-     * engine reset can never zero it mid-test.
+     * Raises the EngineHolder reset threshold so an automatic engine reset can
+     * never zero the shared counter mid-test. The previous value is captured
+     * so teardown restores whatever was configured, not a hardcoded guess.
+     *
+     * <p>These tests observe global static counters in {@link EngineHolder}
+     * and therefore assume the sequential (default) surefire execution mode;
+     * running test classes in parallel within one JVM would interleave the
+     * counters.
      */
     @BeforeEach
     public void disableEngineReset() {
+        previousResetThreshold = EngineHolder.getResetThreshold();
         EngineHolder.setResetThreshold(1_000_000);
     }
 
     /**
-     * Restores the production reset threshold so other tests in the same JVM
-     * keep the Metaspace-protection behavior.
+     * Restores the reset threshold captured before the test so other tests in
+     * the same JVM keep the configured Metaspace-protection behavior.
      */
     @AfterEach
     public void restoreEngineReset() {
-        EngineHolder.setResetThreshold(100);
+        EngineHolder.setResetThreshold(previousResetThreshold);
+    }
+
+    /**
+     * Compiles that populate the bulk cache must run in their own isolated
+     * engine: they must not advance the shared engine's reset counter, so
+     * Mapper preview churn and bulk-cache compiles cannot interact. Also
+     * guarantees an evicted cache entry releases its own classloader instead
+     * of pinning a shared engine generation.
+     */
+    @Test
+    public void cachedCompilesDoNotAdvanceSharedEngineResetCounter() throws Exception {
+        MappingServiceImpl service = new MappingServiceImpl("unused-base-path");
+        SingleRecordRequest request = fixtureRequest("cache-test-isolated");
+
+        int sharedBefore = EngineHolder.getCompilationCount();
+        CollectingObserver observer = new CollectingObserver();
+        service.mapRecord(request, observer);
+        assertMappedSuccessfully(observer);
+
+        assertEquals(sharedBefore, EngineHolder.getCompilationCount(),
+                "a cache-populating compile must use an isolated engine, not the shared one");
     }
 
     /**
@@ -101,12 +130,12 @@ public class MappingServiceImplCacheTest {
         CollectingObserver first = new CollectingObserver();
         service.mapRecord(request, first);
         assertMappedSuccessfully(first);
-        int compilationsAfterFirst = EngineHolder.getCompilationCount();
+        long compilationsAfterFirst = EngineHolder.getTotalCompilationCount();
 
         CollectingObserver second = new CollectingObserver();
         service.mapRecord(request, second);
         assertMappedSuccessfully(second);
-        int compilationsAfterSecond = EngineHolder.getCompilationCount();
+        long compilationsAfterSecond = EngineHolder.getTotalCompilationCount();
 
         assertEquals(compilationsAfterFirst, compilationsAfterSecond,
                 "identical mapping content must reuse the compiled script");
@@ -127,7 +156,7 @@ public class MappingServiceImplCacheTest {
         CollectingObserver first = new CollectingObserver();
         service.mapRecord(plain, first);
         assertMappedSuccessfully(first);
-        int compilationsAfterPlain = EngineHolder.getCompilationCount();
+        long compilationsAfterPlain = EngineHolder.getTotalCompilationCount();
 
         SingleRecordRequest edited = plain.toBuilder()
                 .setEditPath(EditPath.newBuilder()
@@ -139,7 +168,7 @@ public class MappingServiceImplCacheTest {
         CollectingObserver second = new CollectingObserver();
         service.mapRecord(edited, second);
         assertMappedSuccessfully(second);
-        int compilationsAfterEdit = EngineHolder.getCompilationCount();
+        long compilationsAfterEdit = EngineHolder.getTotalCompilationCount();
 
         assertEquals(compilationsAfterPlain + 1, compilationsAfterEdit,
                 "an edit path changes the generated code and must trigger a fresh compilation");
@@ -165,7 +194,7 @@ public class MappingServiceImplCacheTest {
         CollectingObserver primed = new CollectingObserver();
         service.mapRecord(plain, primed);
         assertMappedSuccessfully(primed);
-        int compilationsAfterPlain = EngineHolder.getCompilationCount();
+        long compilationsAfterPlain = EngineHolder.getTotalCompilationCount();
 
         SingleRecordRequest edited = plain.toBuilder()
                 .setEditPath(EditPath.newBuilder()
@@ -182,7 +211,7 @@ public class MappingServiceImplCacheTest {
         CollectingObserver secondEdit = new CollectingObserver();
         service.mapRecord(edited, secondEdit);
         assertMappedSuccessfully(secondEdit);
-        assertEquals(compilationsAfterPlain + 2, EngineHolder.getCompilationCount(),
+        assertEquals(compilationsAfterPlain + 2, EngineHolder.getTotalCompilationCount(),
                 "identical edit-path requests must each compile afresh: previews are never cached");
 
         // The plain request must still be a cache hit: the edit-path calls
@@ -190,7 +219,7 @@ public class MappingServiceImplCacheTest {
         CollectingObserver plainAgain = new CollectingObserver();
         service.mapRecord(plain, plainAgain);
         assertMappedSuccessfully(plainAgain);
-        assertEquals(compilationsAfterPlain + 2, EngineHolder.getCompilationCount(),
+        assertEquals(compilationsAfterPlain + 2, EngineHolder.getTotalCompilationCount(),
                 "the previously cached plain mapping must survive edit-path traffic without recompilation");
     }
 

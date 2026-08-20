@@ -46,12 +46,33 @@ public class BulkMappingRunner implements MappingRunner {
      * @throws MappingException if script compilation fails
      */
     public BulkMappingRunner(RecMapping recMapping, String generatedCode) throws MappingException {
+        this(recMapping, generatedCode, false);
+    }
+
+    /**
+     * Creates a new BulkMappingRunner, optionally compiling on an isolated
+     * engine. Use {@code isolated} for runners that will be cached long-term:
+     * the compiled script then pins only its own classloader, so evicting the
+     * runner frees its classes. Non-isolated compiles use the shared engine
+     * and count toward its periodic Metaspace reset.
+     *
+     * @param recMapping    The mapping configuration to be applied
+     * @param generatedCode The Groovy code to be executed against each record
+     * @param isolated      compile on a private engine instead of the shared one
+     * @throws MappingException if script compilation fails
+     */
+    public BulkMappingRunner(RecMapping recMapping, String generatedCode, boolean isolated) throws MappingException {
         this.recMapping = recMapping;
         this.generatedCode = generatedCode;
 
         try {
-            this.compiledScript = EngineHolder.getInstance().compile(generatedCode);
-            EngineHolder.notifyCompilation();
+            if (isolated) {
+                this.compiledScript = EngineHolder.createIsolatedEngine().compile(generatedCode);
+                EngineHolder.notifyIsolatedCompilation();
+            } else {
+                this.compiledScript = EngineHolder.getInstance().compile(generatedCode);
+                EngineHolder.notifyCompilation();
+            }
         } catch (ScriptException e) {
             LOG.error("Failed to compile mapping script: {}", e.getMessage());
             throw new MappingException(

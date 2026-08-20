@@ -58,9 +58,10 @@ public class MappingServiceImpl extends MappingServiceGrpc.MappingServiceImplBas
 
     /**
      * Maximum number of compiled mappings kept in {@link #runnerCache}. Each
-     * entry pins one compiled Groovy script class; bulk indexing typically
-     * cycles through a handful of active datasets, so a small bound suffices
-     * while capping Metaspace held by cached script classes.
+     * entry compiles on its own isolated engine and therefore pins exactly its
+     * own classloader and script classes - eviction frees them. Bulk indexing
+     * typically cycles through a handful of active datasets, so a small bound
+     * suffices while capping Metaspace held by cached script classes.
      */
     private static final int MAX_CACHED_MAPPINGS = 32;
 
@@ -205,7 +206,10 @@ public class MappingServiceImpl extends MappingServiceGrpc.MappingServiceImplBas
                 }
                 String code = codeGenerator.toRecordMappingCode();
 
-                mappingRunner = new BulkMappingRunner(recMapping, code);
+                // Cached runners compile on an isolated engine so each cache
+                // entry pins only its own classes; one-shot compiles (previews,
+                // file-based calls) use the shared engine and its reset cycle.
+                mappingRunner = new BulkMappingRunner(recMapping, code, cacheKey != null);
 
                 if (cacheKey != null) {
                     runnerCache.put(cacheKey, mappingRunner);
