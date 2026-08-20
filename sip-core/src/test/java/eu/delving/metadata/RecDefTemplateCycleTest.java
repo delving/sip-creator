@@ -12,35 +12,46 @@ import org.junit.jupiter.api.Test;
 import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Record definitions are external input: a template whose target (indirectly) contains itself
- * would make Elem.resolve inject deep copies of itself forever, killing the JVM with
- * StackOverflowError. The depth guard must turn that into a normal, catchable exception
- * that names the offending path.
+ * Templates may legitimately reference each other in a cycle (a shared elem-group can give
+ * every entity a has-type -> E55_Type link, including the E55_Type template itself). Elem.resolve
+ * therefore expands a template once per branch and skips it when it is already an ancestor on
+ * the current path. The depth backstop remains for cycles the ancestor-skip cannot see, such
+ * as elem-group self-injection, and must fail catchably instead of with StackOverflowError.
  */
 class RecDefTemplateCycleTest {
 
     @Test
-    void directTemplateCycleFailsWithCatchableException() {
-        IllegalStateException e = assertThrows(IllegalStateException.class,
-                () -> readRecDef("/recdef/cyclic-template-direct-recdef.xml"),
-                "A self-referencing template must fail with an exception, not StackOverflowError");
-        assertTrue(e.getMessage().contains("cyclic"),
-                "Error should point at a cyclic template reference, was: " + e.getMessage());
-        assertTrue(e.getMessage().contains("loop"),
-                "Error path should show the offending template tag, was: " + e.getMessage());
+    void selfReferencingTemplateExpandsOncePerBranch() throws Exception {
+        RecDefTree tree = RecDefTree.create(readRecDef("/recdef/cyclic-template-direct-recdef.xml"));
+        assertNotNull(tree.getRecDefNode(Path.create("/test:root/test:thing/test:loop")),
+                "The template must be expanded under its referrer");
+        assertNotNull(tree.getRecDefNode(Path.create("/test:root/test:thing/test:loop/test:value")),
+                "The expanded template must keep its own children");
+        assertNull(tree.getRecDefNode(Path.create("/test:root/test:thing/test:loop/test:loop")),
+                "A template already an ancestor on the path must not be expanded again");
     }
 
     @Test
-    void indirectTemplateCycleFailsWithCatchableException() {
+    void mutuallyReferencingTemplatesExpandOncePerBranch() throws Exception {
+        RecDefTree tree = RecDefTree.create(readRecDef("/recdef/cyclic-template-indirect-recdef.xml"));
+        assertNotNull(tree.getRecDefNode(Path.create("/test:root/test:thing/test:ping/test:pong")),
+                "The first cycle round must be expanded");
+        assertNull(tree.getRecDefNode(Path.create("/test:root/test:thing/test:ping/test:pong/test:ping")),
+                "The cycle must stop where the template is already an ancestor");
+    }
+
+    @Test
+    void elemGroupCycleHitsDepthBackstopCatchably() {
         IllegalStateException e = assertThrows(IllegalStateException.class,
-                () -> readRecDef("/recdef/cyclic-template-indirect-recdef.xml"),
-                "Mutually referencing templates must fail with an exception, not StackOverflowError");
+                () -> readRecDef("/recdef/cyclic-elem-group-recdef.xml"),
+                "A cyclic elem-group must fail with an exception, not StackOverflowError");
         assertTrue(e.getMessage().contains("cyclic"),
-                "Error should point at a cyclic template reference, was: " + e.getMessage());
+                "Error should point at a cyclic reference, was: " + e.getMessage());
     }
 
     @Test
