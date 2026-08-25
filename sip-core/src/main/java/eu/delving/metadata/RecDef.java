@@ -347,6 +347,9 @@ public class RecDef {
         @XStreamAsAttribute
         public String name;
 
+        @XStreamAsAttribute
+        public String lang;
+
         public String content;
     }
 
@@ -498,6 +501,21 @@ public class RecDef {
         @XStreamAsAttribute
         @XStreamAlias("xsdMaxOccurs")
         public String xsdMaxOccurs;
+
+        // Semantic annotations for RDFS/SHACL/JSON-LD generation.
+        // Ignored by the mapping engine and by older SIP-Creators
+        // (XStream drops unknown attributes), like the xsd* group above.
+        @XStreamAsAttribute
+        @XStreamAlias("subclassof")
+        public String subclassof;
+
+        @XStreamAsAttribute
+        @XStreamAlias("equivalentClass")
+        public String equivalentClass;
+
+        @XStreamAsAttribute
+        @XStreamAlias("subPropertyOf")
+        public String subPropertyOf;
 
         @XStreamAsAttribute
         public boolean hidden;
