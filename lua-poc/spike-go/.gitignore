@@ -1,0 +1,3 @@
+# Built host binary and pipeline artifacts (regenerate with run-goldens.sh).
+/spike-go
+/out/
