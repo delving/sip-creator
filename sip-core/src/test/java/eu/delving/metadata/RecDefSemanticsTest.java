@@ -53,13 +53,16 @@ public class RecDefSemanticsTest {
 
     @Test
     public void rootDeclarationWinsOverTemplate() {
-        RecDefSemantics.Entity e = semantics().entities.get("crm:E22_Human-Made_Object");
+        RecDefSemantics s = semantics();
+        RecDefSemantics.Entity e = s.entities.get("crm:E22_Human-Made_Object");
         assertEquals(3, e.properties.size()); // the root shape, not the empty template shadow
         assertEquals("crm:E19_Physical_Object", e.subClassOf.get(0));
         assertEquals("Appellation", e.subClassOf.get(1)); // raw label, unresolved at this layer
         assertEquals("tst:HumanMadeObject", e.equivalentClass);
         assertEquals("Human Made Object", e.labels.get("en"));
         assertEquals("Doelbewust gemaakt object.", e.definitions.get("nl"));
+        assertTrue(e.fromRoot); // (re)declared under root, wins over the template shadow
+        assertFalse(s.entities.get("crm:E41_Appellation").fromRoot); // template-only
     }
 
     @Test

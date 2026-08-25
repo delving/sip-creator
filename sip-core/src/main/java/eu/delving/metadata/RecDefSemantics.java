@@ -13,8 +13,10 @@ package eu.delving.metadata;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Shared semantic model parsed from an unresolved record definition, giving
@@ -70,6 +72,7 @@ public class RecDefSemantics {
         // Collect entity definitions: templates + root children, keyed by tag.
         // Reference: XsdGenerator.generate, lines 50-61.
         Map<String, RecDef.Elem> entityElems = new LinkedHashMap<>();
+        Set<String> rootTags = new LinkedHashSet<>();
         if (recDef.templates != null) {
             for (RecDef.Elem template : recDef.templates) {
                 if (!hasUsableTag(template)) continue;
@@ -81,6 +84,7 @@ public class RecDefSemantics {
                 if (!hasUsableTag(child)) continue;
                 // Root declaration wins: it is the full mappable shape.
                 entityElems.put(child.tag.toString(), child);
+                rootTags.add(child.tag.toString());
             }
         }
 
@@ -89,7 +93,7 @@ public class RecDefSemantics {
         for (Map.Entry<String, RecDef.Elem> entry : entityElems.entrySet()) {
             String tag = entry.getKey();
             RecDef.Elem elem = entry.getValue();
-            entities.put(tag, toEntity(tag, elem));
+            entities.put(tag, toEntity(tag, elem, rootTags.contains(tag)));
             if (elem.label != null && !elem.label.isEmpty()) {
                 labelToTag.putIfAbsent(elem.label, tag);
             }
@@ -131,7 +135,7 @@ public class RecDefSemantics {
         return elem.tag != null && elem.tag.getLocalName() != null && !elem.tag.getLocalName().isEmpty();
     }
 
-    private static Entity toEntity(String tag, RecDef.Elem elem) {
+    private static Entity toEntity(String tag, RecDef.Elem elem, boolean fromRoot) {
         Map<String, String> labels = labelsOf(elem);
         Map<String, String> definitions = definitionsOf(elem);
 
@@ -152,7 +156,7 @@ public class RecDefSemantics {
             }
         }
 
-        return new Entity(tag, labels, definitions, subClassOf, elem.equivalentClass, properties);
+        return new Entity(tag, labels, definitions, subClassOf, elem.equivalentClass, properties, fromRoot);
     }
 
     private static PropertyUse toPropertyUse(String tag, RecDef.Elem elem) {
@@ -193,15 +197,18 @@ public class RecDefSemantics {
         public final List<String> subClassOf;
         public final String equivalentClass;
         public final List<PropertyUse> properties;
+        /** True when the tag was (re)declared under root -- the full mappable shape, not just a template. */
+        public final boolean fromRoot;
 
         Entity(String tag, Map<String, String> labels, Map<String, String> definitions,
-               List<String> subClassOf, String equivalentClass, List<PropertyUse> properties) {
+               List<String> subClassOf, String equivalentClass, List<PropertyUse> properties, boolean fromRoot) {
             this.tag = tag;
             this.labels = labels;
             this.definitions = definitions;
             this.subClassOf = Collections.unmodifiableList(subClassOf);
             this.equivalentClass = equivalentClass;
             this.properties = Collections.unmodifiableList(properties);
+            this.fromRoot = fromRoot;
         }
     }
 
