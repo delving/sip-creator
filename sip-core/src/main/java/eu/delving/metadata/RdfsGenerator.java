@@ -12,7 +12,6 @@ package eu.delving.metadata;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
@@ -33,10 +32,15 @@ import java.util.function.Consumer;
  *
  * Properties are declared once, merged ACROSS entities by tag: a property
  * used under two different entities gets one rdf:Property/owl:*Property
- * resource with an rdfs:domain triple per declaring entity and an
- * rdfs:range triple per distinct target (or a single range triple for the
- * XSD datatype). This mirrors how the same recdef tag can appear as a
- * subelement of several entities without meaning several distinct
+ * resource with an rdfs:domain triple per declaring entity. The type is a
+ * strict binary — owl:ObjectProperty if any merged use has a target, else
+ * owl:DatatypeProperty — and range emission follows the same gate: an
+ * object property gets one rdfs:range triple per distinct target (union
+ * across uses), a datatype property gets a single rdfs:range triple for
+ * the XSD datatype. The two are mutually exclusive per property so a merged
+ * property never ends up with both a class range and a datatype range,
+ * which OWL-DL forbids. This mirrors how the same recdef tag can appear as
+ * a subelement of several entities without meaning several distinct
  * properties.
  *
  * Unresolvable CURIEs at REFERENCE positions (subclassof, equivalentClass,
@@ -104,11 +108,17 @@ public class RdfsGenerator {
                 resolveOrSkip(semantics, domainTag, uri ->
                     propertyResource.addProperty(RDFS.domain, model.createResource(uri)));
             }
-            for (String targetCurie : acc.targets) {
-                resolveOrSkip(semantics, targetCurie, uri ->
-                    propertyResource.addProperty(RDFS.range, model.createResource(uri)));
-            }
-            if (acc.dataType != null) {
+            // Property type is a strict binary (ObjectProperty XOR DatatypeProperty),
+            // so range must follow the same gate: a target-derived range for object
+            // properties, a datatype-derived range otherwise. Emitting both would
+            // produce an owl:ObjectProperty with an XSD-datatype range, which is
+            // invalid OWL-DL.
+            if (acc.hasTarget) {
+                for (String targetCurie : acc.targets) {
+                    resolveOrSkip(semantics, targetCurie, uri ->
+                        propertyResource.addProperty(RDFS.range, model.createResource(uri)));
+                }
+            } else if (acc.dataType != null) {
                 resolveOrSkip(semantics, acc.dataType, uri ->
                     propertyResource.addProperty(RDFS.range, model.createResource(uri)));
             }
