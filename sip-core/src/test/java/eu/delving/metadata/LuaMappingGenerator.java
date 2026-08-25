@@ -152,10 +152,11 @@ public class LuaMappingGenerator {
         line("local builder = require(\"builder\")");
         line("");
         namespaces(recDef);
-        facts();
+        factsTable();
         helpers();
         line("return function(record_xml)");
         indent++;
+        factLocals();
         line("local _input = node.parse(record_xml)");
         line("-- CodeGenerator.java:263 boilerplate: _uniqueIdentifier = _input['@id'][0].toString()");
         line("local _uniqueIdentifier = _input:attr(\"id\") or \"\"");
@@ -206,13 +207,19 @@ public class LuaMappingGenerator {
     }
 
     /**
-     * Facts become module-level locals, mirroring CodeGenerator's
-     * {@code String <name> = '''<value>'''} block. {@code orgId} gets the same
-     * {@code "unknown"} default {@code MappingResult} applies (MappingResult.java:228),
-     * so {@code internalRecordURI()} is always callable.
+     * Emits the {@code FACTS} table and its {@code _flist} accessor.
+     *
+     * <p>Only the table lives at module level. The per-fact locals go
+     * <em>inside</em> the record function ({@link #factLocals()}) rather than
+     * beside the helpers, because fact names are user data and this corpus
+     * really does ship a fact called {@code type} in 8 of the 10 golden
+     * mappings: a module-level {@code local type = ""} shadows Lua's {@code type}
+     * for every helper defined after it, and {@code _or}/{@code _truthy} both
+     * call it. Declaring the facts inside the record function keeps the helpers'
+     * lexical view of the standard library intact while still giving snippets
+     * their bare {@code baseUrl}/{@code spec} names.
      */
-    private void facts() {
-        Set<String> emitted = new TreeSet<>();
+    private void factsTable() {
         line("-- Facts (CodeGenerator.java:216-220)");
         line("local FACTS = {");
         indent++;
@@ -228,18 +235,32 @@ public class LuaMappingGenerator {
         line("  if v == nil then return {} end");
         line("  return { v }");
         line("end");
+        line("");
+    }
+
+    /** Names the generated record function uses itself; a fact may not take them. */
+    private static final Set<String> RESERVED_NAMES = Set.of(
+            "node", "stdlib", "builder", "b", "el", "record_xml", "NAMESPACES", "FACTS",
+            "_input", "_uniqueIdentifier", "internalRecordURI", "internalRecordURN",
+            "_truthy", "_tget", "_or", "_tuple", "_alist", "_flist", "_v");
+
+    private void factLocals() {
+        Set<String> emitted = new TreeSet<>();
         for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
             String name = entry.getKey();
             if (!name.matches("[A-Za-z_][A-Za-z0-9_]*") || LUA_KEYWORDS.contains(name)) {
                 line("-- fact %s skipped: not a usable Lua identifier", luaString(name));
                 continue;
             }
-            line("local %s = %s", name, luaString(entry.getValue() == null ? "" : entry.getValue()));
+            if (RESERVED_NAMES.contains(name)) {
+                line("-- fact %s skipped: name reserved by the generated module", luaString(name));
+                continue;
+            }
+            line("local %s = FACTS[%s]", name, luaString(name));
             emitted.add(name);
         }
         if (!emitted.contains("orgId")) line("local orgId = \"unknown\"  -- MappingResult.java:228 default");
         if (!emitted.contains("spec")) line("local spec = \"\"");
-        line("");
     }
 
     private static final Set<String> LUA_KEYWORDS = Set.of(
