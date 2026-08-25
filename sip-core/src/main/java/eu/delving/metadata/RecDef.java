@@ -480,6 +480,25 @@ public class RecDef {
         @XStreamAsAttribute
         public boolean uriCheck;
 
+        // XSD-generation annotations (2026-08): optional modeller hints that
+        // drive the generated validation XSD. Unknown to older engines, which
+        // ignore unknown attributes — fully backward compatible.
+        @XStreamAsAttribute
+        @XStreamAlias("xsdDataType")
+        public String xsdDataType;
+
+        @XStreamAsAttribute
+        @XStreamAlias("xsdPattern")
+        public String xsdPattern;
+
+        @XStreamAsAttribute
+        @XStreamAlias("xsdMinOccurs")
+        public String xsdMinOccurs;
+
+        @XStreamAsAttribute
+        @XStreamAlias("xsdMaxOccurs")
+        public String xsdMaxOccurs;
+
         @XStreamAsAttribute
         public boolean hidden;
 
