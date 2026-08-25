@@ -1,0 +1,292 @@
+{
+  "summary": {
+    "canonical_mappings": 2241,
+    "distinct_patterns": 506,
+    "total_occurrences": 37520,
+    "lua_reachable_occurrences": 32874,
+    "lua_reachable_pct": 87.62,
+    "gap_occurrences": 4636,
+    "gap_pct": 12.36
+  },
+  "methods": [
+    "matches",
+    "replaceAll",
+    "split"
+  ],
+  "buckets": {
+    "lua_expressible": {
+      "occurrences": 16663,
+      "distinct": 134,
+      "examples": [
+        {
+          "method": "replaceAll",
+          "pattern": "^http",
+          "occurrences": 3488
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "^Ij",
+          "occurrences": 2784
+        },
+        {
+          "method": "replaceAll",
+          "pattern": " $",
+          "occurrences": 1935
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "^ ",
+          "occurrences": 1868
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "^http:",
+          "occurrences": 1814
+        },
+        {
+          "method": "matches",
+          "pattern": "[0-9]*",
+          "occurrences": 1448
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "^-",
+          "occurrences": 362
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "-\\$",
+          "occurrences": 362
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "<a href=\"https://www.youtube.com",
+          "occurrences": 292
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "\\u000c+",
+          "occurrences": 274
+        }
+      ],
+      "pct": 44.41
+    },
+    "literal": {
+      "occurrences": 16211,
+      "distinct": 323,
+      "examples": [
+        {
+          "method": "split",
+          "pattern": "/",
+          "occurrences": 3564
+        },
+        {
+          "method": "replaceAll",
+          "pattern": " ",
+          "occurrences": 3510
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "/",
+          "occurrences": 1545
+        },
+        {
+          "method": "split",
+          "pattern": "-",
+          "occurrences": 1187
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "&",
+          "occurrences": 480
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "--",
+          "occurrences": 417
+        },
+        {
+          "method": "replaceAll",
+          "pattern": ">",
+          "occurrences": 392
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "<",
+          "occurrences": 392
+        },
+        {
+          "method": "split",
+          "pattern": " - ",
+          "occurrences": 358
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "\\\\\\\\",
+          "occurrences": 310
+        }
+      ],
+      "pct": 43.21
+    },
+    "alternation": {
+      "occurrences": 3927,
+      "distinct": 34,
+      "examples": [
+        {
+          "method": "replaceAll",
+          "pattern": ".jpg|.JPG",
+          "occurrences": 3244
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "\\\\[|\\\\]",
+          "occurrences": 385
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "\\\\[|\\\\]|\\\\~",
+          "occurrences": 64
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "\\\\?|/",
+          "occurrences": 59
+        },
+        {
+          "method": "replaceAll",
+          "pattern": " |_",
+          "occurrences": 32
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "T:|Adlib Images",
+          "occurrences": 18
+        },
+        {
+          "method": "replaceAll",
+          "pattern": ".jpg|.JPG|.tif|.TIF",
+          "occurrences": 18
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "WORKSHOP|workshop|COPYAFTER|copy after|ATTRIBUTEDTO|attributed to|CIRCLEOF|circle of|SCHOOLOF|school of|REJECTED|rejected|FOLLOWER|follower of",
+          "occurrences": 12
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "jpg|JPG|jpeg|tif",
+          "occurrences": 10
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "\\\\[|]",
+          "occurrences": 8
+        }
+      ],
+      "pct": 10.47
+    },
+    "counted_repetition": {
+      "occurrences": 392,
+      "distinct": 3,
+      "examples": [
+        {
+          "method": "replaceAll",
+          "pattern": "[ ]{2,15}",
+          "occurrences": 368
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "[\\\\s]{2,5}",
+          "occurrences": 18
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "([0-9]{4})-[0-9]{2}-[0-9]{2}",
+          "occurrences": 6
+        }
+      ],
+      "pct": 1.04
+    },
+    "inline_group": {
+      "occurrences": 276,
+      "distinct": 5,
+      "examples": [
+        {
+          "method": "replaceAll",
+          "pattern": "(?i)\\\\.jpg|\\\\.jpeg|\\\\.tif|\\\\.tiff|\\\\.png|\\\\.gif",
+          "occurrences": 214
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "(?i)(WORKSHOP|COPYAFTER|ATTRIBUTEDTO|CIRCLEOF|SCHOOLOF|REJECTED|FOLLOWER)",
+          "occurrences": 51
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "(?i)",
+          "occurrences": 6
+        },
+        {
+          "method": "replaceAll",
+          "pattern": ".(?i)jpg|jpeg|tif|tiff",
+          "occurrences": 3
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "(?i)jpg|jpeg|tif|tiff",
+          "occurrences": 2
+        }
+      ],
+      "pct": 0.74
+    },
+    "lazy_possessive": {
+      "occurrences": 41,
+      "distinct": 6,
+      "examples": [
+        {
+          "method": "replaceAll",
+          "pattern": "(.*)(\\\\(.*?\\\\))(.*)",
+          "occurrences": 18
+        },
+        {
+          "method": "replaceAll",
+          "pattern": ".*?[\\\\\\\\|//]",
+          "occurrences": 9
+        },
+        {
+          "method": "replaceAll",
+          "pattern": ".*?:",
+          "occurrences": 8
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "thumb/.*?/",
+          "occurrences": 4
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "<FONT .*?>|<SPAN .*?>|<i>|<br>|<b>|<em .*?>|</FONT>|</SPAN>|</i>|</br>|<br/>|</b>|</em>",
+          "occurrences": 1
+        },
+        {
+          "method": "replaceAll",
+          "pattern": "[\\\\&|\\\\?|\\\\/]*?",
+          "occurrences": 1
+        }
+      ],
+      "pct": 0.11
+    },
+    "extraction_artifact": {
+      "occurrences": 10,
+      "distinct": 1,
+      "examples": [
+        {
+          "method": "replaceAll",
+          "pattern": "[\\",
+          "occurrences": 10
+        }
+      ],
+      "pct": 0.03
+    }
+  }
+}

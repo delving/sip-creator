@@ -993,22 +993,41 @@ Confirmed against `yuin/gopher-lua` upstream:
 `replaceAll`, `split` and `matches` take `java.util.regex` patterns (§4.3), and
 per §9.3.5 the host VM offers only Lua patterns. To size the gap, the 2,241
 canonical mappings were scanned for string-literal first arguments to those
-three methods: **506 distinct patterns, 37,520 occurrences**. Classifying each
-by the regex features it actually uses (after undoing Groovy string escaping,
-with a scanner that tracks character-class state):
+three methods: **506 distinct patterns, 37,520 occurrences**. Each pattern is
+classified by the strongest regex feature it uses, after undoing Groovy string
+escaping, with a scanner that tracks character-class context so that a `|` or
+`{` inside `[...]` is not miscounted.
 
-| Class | Occurrences | Share | Example |
-|---|------------:|------:|---------|
-| literal (no metacharacters) | 17,211 | 45.87% | `split('-')`, `replaceAll('ark:/')` |
-| expressible as a Lua pattern | 15,663 | 41.75% | `^http:`, `[0-9]*`, `.jpg` |
-| **alternation `\|`** | 3,927 | 10.47% | `'\[\|\]'`, `'WORKSHOP\|workshop'` |
-| **counted repetition `{n,m}`** | 392 | 1.04% | `'[ ]{2,15}'` |
-| **inline flags / groups `(?…)`** | 276 | 0.74% | `'(?i)\.jpg\|\.jpeg\|…'` |
-| **lazy/possessive quantifiers** | 41 | 0.11% | `'thumb/.*?/'` |
-| extraction artifacts | 10 | 0.03% | a literal truncated at an escaped quote (`"[\"…`) — not a real pattern |
+Reproducible: `lua-poc/analysis/regex_gap.py` (reuses `analyze_corpus.py`'s
+snippet extraction and `dedup_canonical.py`'s canonical-mapping grouping, so
+the population is exactly the one behind `corpus-report-canonical.json`).
+Raw output committed as `lua-poc/analysis/regex-gap-report.json`.
 
-So **≈87.6% of regex uses are reachable with Lua patterns alone**, and
-**≈12.4% are not** — dominated by alternation. Two viable strategies for Task 7,
+```
+python3 lua-poc/analysis/regex_gap.py \
+    ~/PocketMapper \
+    sip-app/src/test/resources \
+    sip-core/src/test/resources \
+    -o lua-poc/analysis/regex-gap-report.json
+```
+
+| Class | Distinct | Occurrences | Share | Example |
+|---|---:|------------:|------:|---------|
+| expressible as a Lua pattern | 134 | 16,663 | 44.41% | `^http:`, `[0-9]*`, `.jpg` |
+| literal (no metacharacters, no escapes) | 323 | 16,211 | 43.21% | `split('-')`, `replaceAll('ark:/')` |
+| **alternation `\|`** | 34 | 3,927 | 10.47% | `'\[\|\]'`, `'WORKSHOP\|workshop'` |
+| **counted repetition `{n,m}`** | 3 | 392 | 1.04% | `'[ ]{2,15}'` |
+| **inline flags / groups `(?…)`** | 5 | 276 | 0.74% | `'(?i)\.jpg\|\.jpeg\|…'` |
+| **lazy/possessive quantifiers** | 6 | 41 | 0.11% | `'thumb/.*?/'` |
+| extraction artifacts | 1 | 10 | 0.03% | a literal truncated at an escaped quote (`"[\"…`) — not a real pattern |
+
+An escaped literal such as `\[` counts as *Lua-expressible*, not *literal*:
+it matches a fixed string but still needs escape-aware translation, so it
+cannot be handed to a plain substring replace. The literal/Lua-expressible
+boundary therefore does not affect the headline — both are reachable.
+
+So **87.62% of regex uses are reachable with Lua patterns alone**, and
+**12.36% are not** — dominated by alternation. Two viable strategies for Task 7,
 in preference order:
 
 1. **Host callback.** Expose Go's `regexp` (RE2) to the Lua VM as a
@@ -1019,15 +1038,19 @@ in preference order:
    quantifiers are supported by RE2. This closes ~100% of the measured gap at
    the cost of making the Lua module non-standalone.
 2. **Pure-Lua translation layer.** Translate the common java.util.regex subset
-   to Lua patterns and fall back to an error on the rest — closes 87.6%, keeps
-   the rock dependency-free, and makes the residual 12.4% a visible, countable
+   to Lua patterns and fall back to an error on the rest — closes 87.62%, keeps
+   the rock dependency-free, and makes the residual 12.36% a visible, countable
    failure rather than a silent wrong answer.
 
-Caveats on the measurement: only string-literal first arguments were counted
-(slashy `/…/` patterns, `~/…/` literals and pattern variables are not included);
-the extractor does not handle escaped quotes inside a literal, which produced the
-10 truncated "artifact" occurrences above; and the classifier is conservative — a pattern is credited as Lua-expressible
-only if it uses no feature outside Lua's pattern grammar.
+Caveats on the measurement (also recorded in `regex_gap.py`'s docstring): only
+string-literal first arguments were counted — slashy `/…/` patterns, `~/…/`
+literals and patterns held in variables are excluded, so the gap figure is a
+floor over the literal population, not over all regex use. The extractor does
+not handle a quote escaped inside a literal of the same kind, which produced the
+10 truncated "artifact" occurrences above; these are detected and reported
+separately rather than silently misclassified. The classifier is otherwise
+conservative — a pattern is credited as Lua-expressible only if it uses no
+feature outside Lua's pattern grammar.
 
 ### 9.5 Rock names reserved
 
