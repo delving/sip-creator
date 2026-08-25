@@ -21,8 +21,10 @@ Source: `lua-poc/analysis/corpus-report-canonical.json`, `per_mapping[].max_tier
 over 2,241 canonical mappings (134 are T1-only). For each tier, mappings were
 grouped by dataset directory basename (the same dataset is checked out
 multiple times under different PocketMapper workspace roots — `lila/dcn`,
-`lila/dcn2`, etc. — with byte-identical mapping content; only the first
-occurrence per dataset name was kept) and sorted by the size of the dataset's
+`lila/dcn2`, etc. — representing the same logical mapping; workspace copies
+may differ in edit state, and the committed files here are the captured
+source of truth; only the first occurrence per dataset name was kept) and
+sorted by the size of the dataset's
 smallest `source.xml.gz`/`*.xml.zst` sibling, ascending. The 7 smallest-source
 T1-only, 2 smallest T2-max, and 1 smallest T3-max distinct datasets were
 picked, all well under 15KB compressed — small enough to read and diff by eye.

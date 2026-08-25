@@ -63,6 +63,7 @@ offers only Lua patterns (spec §9.3.5). Over 506 distinct literal patterns /
 | counted repetition `{n,m}` | 392 | 1.04% |
 | inline flags / groups `(?…)` | 276 | 0.74% |
 | lazy/possessive quantifiers | 41 | 0.11% |
+| extraction artifact (truncated literal, unclassifiable) | 10 | 0.03% |
 
 Zero backreferences and zero lookaround were measured, which is why the
 host-callback strategy (§4.3) closes essentially the whole gap.
@@ -367,6 +368,13 @@ the real work that is honest about what it does and does not know:
   ceiling, because the callee bodies behind 13,315 bare calls were not
   classified.
 - **Estimated:** every figure in the effort column of §4.3.
+- **Definitional, not measured:** "T1" names two slightly different sets —
+  the corpus classifier (`analyze_corpus.py`) excludes `substring` (counted
+  T3, 58 occ) and routes `matches`/`matcher` to T2 (377 T2 + 779 T3 occ),
+  while the converter whitelist (`GroovySnippetToLua`) accepts both. The
+  direction is conservative — true T1-convertible coverage is marginally
+  higher than the 5.49% cited above — and reconciling the two definitions is
+  sub-project 2 work, not done here.
 
 A go decision that does not fund T2 is a no decision wearing a yes. A go
 decision that assumes T2 retires the Groovy engine is a different mistake:

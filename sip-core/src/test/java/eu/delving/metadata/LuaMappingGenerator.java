@@ -212,7 +212,7 @@ public class LuaMappingGenerator {
      * <p>Only the table lives at module level. The per-fact locals go
      * <em>inside</em> the record function ({@link #factLocals()}) rather than
      * beside the helpers, because fact names are user data and this corpus
-     * really does ship a fact called {@code type} in 8 of the 10 golden
+     * really does ship a fact called {@code type} in 9 of the 10 golden
      * mappings: a module-level {@code local type = ""} shadows Lua's {@code type}
      * for every helper defined after it, and {@code _or}/{@code _truthy} both
      * call it. Declaring the facts inside the record function keeps the helpers'

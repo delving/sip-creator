@@ -45,8 +45,9 @@ python3 lua-poc/analysis/analyze_corpus.py \
 those contain at least one parseable `<groovy-code>` snippet and are counted
 below (the remaining ~213 are XML-parse failures or files with an empty/no
 `<groovy-code>` element — not investigated further, out of scope for this
-task). Combined with the two repo test-resource roots (12 + 6 files), the
-analyzer processed **3,578 mapping files** in total.
+task). Combined with the two repo test-resource roots (12 + 6
+snippet-bearing files — not the count of files globbed from those roots),
+the analyzer processed **3,578 mapping files** in total.
 
 ## Summary
 
@@ -111,7 +112,7 @@ python3 lua-poc/analysis/dedup_canonical.py \
 
 - Grouping starts from the same 3,578-file population `analyze_corpus.py`
   actually analyzes (files with at least one extractable `<groovy-code>`
-  snippet), not the raw 3,794-file glob — so every group is guaranteed a
+  snippet), not the raw 3,795-file glob — so every group is guaranteed a
   snippet-bearing representative and none get silently dropped.
 - Canonical identity = (parent directory, filename with any leading
   `<YYYY-MM-DDTHHMMSS>__` prefix stripped). Filenames with a *different*

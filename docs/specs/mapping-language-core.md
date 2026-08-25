@@ -32,7 +32,10 @@ Coverage is grounded in the canonical (deduplicated) corpus measured in Task 2
 | T2 (moderate) | 15,564 | **18.38%** |
 | T3 (exotic) | 11,981 | **14.15%** |
 
-Mappings in which *every* snippet is T1: **134 of 2,241 (5.98%)**.
+Mappings in which *every* snippet is T1: **134 of 2,241 (5.98%)**. This is the
+tier-table figure; `lua-poc/RESULTS.md` §1.2 corrects it to **5.49% (123 of
+2,241)** once bare user-function calls — invisible to the classifier — are
+accounted for.
 
 Two consequences that later tasks MUST NOT paper over:
 
@@ -43,8 +46,10 @@ Two consequences that later tasks MUST NOT paper over:
 2. **A T1-only engine converts ~6% of mappings end-to-end.** Per-snippet T1
    coverage is the interesting spike metric; per-mapping coverage is the
    product-relevant one, and it is small. The spike's success criterion is
-   "does the Lua engine reproduce byte-identical output for the T1 subset",
-   not "does it replace Groovy".
+   "does the Lua engine reproduce semantically identical (graph-isomorphic)
+   output for the T1 subset" — verified by `GoldenVerify` (Task 5) via RDF
+   graph isomorphism, with byte-identity noted as a bonus verdict where it
+   happens to hold, not required — not "does it replace Groovy".
 
 This spec covers the **T1 subset plus the structural machinery every mapping
 needs regardless of tier** (Navigation, Builder output, Facts & lookups,
