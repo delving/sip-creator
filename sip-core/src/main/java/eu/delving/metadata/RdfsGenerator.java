@@ -48,6 +48,11 @@ import java.util.function.Consumer;
  * vocabulary the recdef author forgot to declare a namespace for should not
  * kill generation of everything else. An unresolvable entity or property
  * SUBJECT tag is a broken recdef and throws.
+ *
+ * Properties in the `rdf:` namespace (e.g. `rdf:type`, used as a plain
+ * property elem rather than the `xsd_type="@id"` special case) are never
+ * published as an owl:*Property resource — they are RDF/XML syntax, not
+ * schema vocabulary the recdef is minting.
  */
 public class RdfsGenerator {
 
@@ -93,6 +98,7 @@ public class RdfsGenerator {
             }
 
             for (RecDefSemantics.PropertyUse use : entity.properties) {
+                if (isRdfNamespace(use.tag)) continue; // RDF/XML syntax property, not schema vocabulary
                 properties.computeIfAbsent(use.tag, tag -> new PropertyAccumulator())
                     .addUse(entity.tag, use);
             }
@@ -137,6 +143,11 @@ public class RdfsGenerator {
         StringWriter writer = new StringWriter();
         model.write(writer, jenaLang);
         return writer.toString();
+    }
+
+    private static boolean isRdfNamespace(String tag) {
+        int colon = tag.indexOf(':');
+        return colon >= 0 && "rdf".equals(tag.substring(0, colon));
     }
 
     private static void resolveOrSkip(RecDefSemantics semantics, String curie, Consumer<String> emit) {

@@ -112,6 +112,9 @@ public class JenaHelper {
         if (contextJson == null && frameJson == null) {
             return convertRDF(defaultPrefix, rdf, outputFormat);
         }
+        if (outputFormat == RDFFormat.JSONLD_FRAME_PRETTY && frameJson == null) {
+            throw new IllegalArgumentException("frame cannot be null for JSONLD_FRAME_PRETTY format");
+        }
 
         String compliantRDF = toJenaCompliantRDFIfNeeded(defaultPrefix, rdf);
         InputStream in = new ByteArrayInputStream(compliantRDF.getBytes(StandardCharsets.UTF_8));

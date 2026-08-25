@@ -111,6 +111,19 @@ public class JenaHelperTest {
     }
 
     @Test
+    public void frameWithContextButNoFrameThrows() {
+        // The 4-arg overload already guards frame == null for JSONLD_FRAME_PRETTY (see
+        // convertRDF(String, String, RDFFormat, Map)). The 5-arg overload must guard the
+        // same combination: a non-null contextJson does not substitute for a frame, and
+        // reaching the frame writer without one is a broken-caller bug, not a valid preview.
+        String context = """
+            {"@context": {"ex": "http://example.org/"}}
+            """;
+        assertThrows(IllegalArgumentException.class, () ->
+            JenaHelper.convertRDF("ex", SAMPLE_RDF, RDFFormat.JSONLD_FRAME_PRETTY, context, null));
+    }
+
+    @Test
     void shouldReturnCompactJsonLdWhenNoFrame() {
         String rdf = """
             <?xml version="1.0" encoding="UTF-8"?>

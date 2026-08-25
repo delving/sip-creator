@@ -122,4 +122,38 @@ public class RdfsGeneratorTest {
         assertFalse(m.contains(p3, RDFS.range,
             m.getResource("http://www.w3.org/2001/XMLSchema#string")));
     }
+
+    // rdf:type declared as a plain property elem (the legacy xsd_type="@id" attribute
+    // is invisible to sip-core) must not be published as an owl:*Property resource --
+    // it is RDF/XML syntax, not schema vocabulary the recdef is minting.
+    private static final String RDF_TYPE_PROPERTY_RECDEF = """
+            <?xml version="1.0"?>
+            <record-definition prefix="tst" version="0.0.1" flat="false">
+                <namespaces>
+                    <namespace prefix="tst" uri="http://example.org/tst#" schema="s"/>
+                    <namespace prefix="crm" uri="http://www.cidoc-crm.org/cidoc-crm/" schema="s"/>
+                </namespaces>
+                <root tag="rdf:RDF">
+                    <elem tag="crm:E22_Human-Made_Object">
+                        <elem tag="rdf:type" target="crm:E55_Type"/>
+                    </elem>
+                </root>
+                <templates>
+                    <elem tag="crm:E55_Type" label="Type"/>
+                </templates>
+            </record-definition>
+            """;
+
+    @Test
+    public void rdfTypePropertyIsNotPublishedAsOntologyProperty() {
+        RecDef recDef = RecDef.read(new ByteArrayInputStream(
+            RDF_TYPE_PROPERTY_RECDEF.getBytes(StandardCharsets.UTF_8)));
+        String rdfXml = RdfsGenerator.generate(recDef, "RDF/XML-ABBREV");
+        Model m = ModelFactory.createDefaultModel();
+        m.read(new StringReader(rdfXml), null, "RDF/XML");
+
+        Resource rdfType = m.getResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+        assertFalse(m.listStatements(rdfType, null, (org.apache.jena.rdf.model.RDFNode) null).hasNext(),
+            "rdf:type must not appear as a subject -- it must not be emitted as an ontology property");
+    }
 }
