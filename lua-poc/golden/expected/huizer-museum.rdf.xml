@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/huizer-museum/2661184">
+        <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/huizer-museum/2661184"/>
+        <edm:dataProvider>Huizer Museum</edm:dataProvider>
+        <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+        <edm:rights rdf:resource="http://www.europeana.eu/rights/rr-f/"/>
+    </ore:Aggregation>
+    <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/huizer-museum/2661184"/>
+    <nave:DcnResource>
+        <nave:province>Noord-Holland</nave:province>
+    </nave:DcnResource>
+    <nave:DelvingResource>
+        <nave:featured>false</nave:featured>
+        <nave:allowDeepZoom>true</nave:allowDeepZoom>
+        <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+        <nave:allowSourceDownload>false</nave:allowSourceDownload>
+        <nave:public>true</nave:public>
+    </nave:DelvingResource>
+</rdf:RDF>
+<!--<urn:dcn_huizer-museum_2661184/graph__2beff19aa6a96bd12c3c3d172e1859d4c4e99724>-->

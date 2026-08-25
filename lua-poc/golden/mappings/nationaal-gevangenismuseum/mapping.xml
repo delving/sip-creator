@@ -1,0 +1,80 @@
+<rec-mapping prefix="edm" schemaVersion="5.2.6" locked="true">
+  <facts>
+    <entry>
+      <string>baseUrl</string>
+      <string>http://data.collectienederland.nl</string>
+    </entry>
+    <entry>
+      <string>schemaVersions</string>
+      <string>edm_5.2.6</string>
+    </entry>
+    <entry>
+      <string>provider</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>rights</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>name</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>language</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>dataProvider</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>spec</string>
+      <string>nationaal-gevangenismuseum</string>
+    </entry>
+  </facts>
+  <functions/>
+  <dyn-opts/>
+  <node-mappings>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF"/>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF/ore:Aggregation/@rdf:about">
+      <groovy-code>
+        <string>
+                            &quot;${baseUrl}/resource/aggregation/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF/ore:Aggregation/edm:aggregatedCHO/@rdf:resource">
+      <groovy-code>
+        <string>
+                                &quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/csv-record/inventarisnummer" outputPath="/rdf:RDF/ore:Aggregation/edm:isShownBy">
+      <groovy-code>
+        <string>&quot;http://www.dcn-images.nl/img/gm/${_inventarisnummer.sanitizeURI()}.jpg&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/csv-record/inventarisnummer" outputPath="/rdf:RDF/ore:Aggregation/edm:object">
+      <groovy-code>
+        <string>&quot;http://www.dcn-images.nl/img/gm/${_inventarisnummer.sanitizeURI()}.jpg&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/ore:Aggregation/edm:rights/@rdf:resource">
+      <groovy-code>
+        <string>http://www.europeana.eu/portal/nl/rights/rr-f</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF/edm:ProvidedCHO/@rdf:about">
+      <groovy-code>
+        <string>
+                            &quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/csv-record/maker" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:creator"/>
+    <node-mapping inputPath="/input/csv-record/beschrijving" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:description"/>
+    <node-mapping inputPath="/input/csv-record/inventarisnummer" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:identifier"/>
+    <node-mapping inputPath="/input/csv-record/soort-object" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:title"/>
+    <node-mapping inputPath="/input/csv-record/materiaal" outputPath="/rdf:RDF/edm:ProvidedCHO/dcterms:medium"/>
+    <node-mapping inputPath="/input/csv-record/materiaal" outputPath="/rdf:RDF/nave:DcnResource/nave:material"/>
+  </node-mappings>
+</rec-mapping>

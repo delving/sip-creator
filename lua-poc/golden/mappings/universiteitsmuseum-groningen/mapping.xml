@@ -1,0 +1,149 @@
+<rec-mapping prefix="edm" schemaVersion="5.2.6" locked="true">
+  <facts>
+    <entry>
+      <string>baseUrl</string>
+      <string>http://data.collectienederland.nl</string>
+    </entry>
+    <entry>
+      <string>schemaVersions</string>
+      <string>edm_5.2.6</string>
+    </entry>
+    <entry>
+      <string>dataProviderURL</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>provider</string>
+      <string>Rijksdienst voor het Cultureel Erfgoed</string>
+    </entry>
+    <entry>
+      <string>rights</string>
+      <string>http://rightsstatements.org/vocab/InC/1.0/</string>
+    </entry>
+    <entry>
+      <string>dataType</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>name</string>
+      <string>Universiteitsmuseum Groningen</string>
+    </entry>
+    <entry>
+      <string>language</string>
+      <string>nl</string>
+    </entry>
+    <entry>
+      <string>dataProvider</string>
+      <string>Universiteitsmuseum Groningen</string>
+    </entry>
+    <entry>
+      <string>type</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>orgId</string>
+      <string>dcn</string>
+    </entry>
+    <entry>
+      <string>spec</string>
+      <string>universiteitsmuseum-groningen</string>
+    </entry>
+  </facts>
+  <functions/>
+  <dyn-opts/>
+  <node-mappings>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF"/>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF/ore:Aggregation/@rdf:about">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/aggregation/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF/ore:Aggregation/edm:aggregatedCHO/@rdf:resource">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/dataProvider" outputPath="/rdf:RDF/ore:Aggregation/edm:dataProvider"/>
+    <node-mapping inputPath="/facts/provider" outputPath="/rdf:RDF/ore:Aggregation/edm:provider"/>
+    <node-mapping inputPath="/facts/rights" outputPath="/rdf:RDF/ore:Aggregation/edm:rights/@rdf:resource"/>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF/edm:ProvidedCHO/@rdf:about">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/Production/production.place" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:coverage"/>
+    <node-mapping inputPath="/input/record/Production/creator" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:creator"/>
+    <node-mapping inputPath="/input/record/Production_date/production.date.end" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:date">
+      <siblings>
+        <path>/input/record/Production_date/production.date.start</path>
+      </siblings>
+      <groovy-code>
+        <string>if (_M4[&apos;productiondateend&apos;] != _M4[&apos;productiondatestart&apos;]) {</string>
+        <string>&quot;${_M4[&apos;productiondatestart&apos;]} - ${_M4[&apos;productiondateend&apos;]}&quot;</string>
+        <string>}</string>
+        <string>else {</string>
+        <string>&quot;${_M4[&apos;productiondatestart&apos;]}&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/Description/description" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:description"/>
+    <node-mapping inputPath="/input/record/object_number" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:identifier"/>
+    <node-mapping inputPath="/input/record/Object_name/object_name" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:subject"/>
+    <node-mapping inputPath="/input/record/Title/title" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:title"/>
+    <node-mapping inputPath="/input/record/object_category" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:type"/>
+    <node-mapping inputPath="/input/record/Production_date/production.date.end" outputPath="/rdf:RDF/edm:ProvidedCHO/dcterms:created">
+      <siblings>
+        <path>/input/record/Production_date/production.date.start</path>
+      </siblings>
+      <groovy-code>
+        <string>if (_M4[&apos;productiondateend&apos;] != _M4[&apos;productiondatestart&apos;]) {</string>
+        <string>&quot;${_M4[&apos;productiondatestart&apos;]} - ${_M4[&apos;productiondateend&apos;]}&quot;</string>
+        <string>}</string>
+        <string>else {</string>
+        <string>&quot;${_M4[&apos;productiondatestart&apos;]}&quot;</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/Dimension/dimension.type" outputPath="/rdf:RDF/edm:ProvidedCHO/dcterms:extent">
+      <siblings>
+        <path>/input/record/Dimension/dimension.unit</path>
+        <path>/input/record/Dimension/dimension.value</path>
+      </siblings>
+      <groovy-code>
+        <string>&quot;${_M4[&apos;dimensiontype&apos;]} ${_M4[&apos;dimensionvalue&apos;]} ${_M4[&apos;dimensionunit&apos;]}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/documentation.free_text" outputPath="/rdf:RDF/edm:ProvidedCHO/dcterms:isReferencedBy"/>
+    <node-mapping inputPath="/input/record/Material/material" outputPath="/rdf:RDF/edm:ProvidedCHO/dcterms:medium"/>
+    <node-mapping inputPath="/input/record/Inscription/inscription.content" outputPath="/rdf:RDF/nave:BrabantCloudResource/nave:inscription"/>
+    <node-mapping inputPath="/input/record/Inscription/inscription.position" outputPath="/rdf:RDF/nave:BrabantCloudResource/nave:inscriptionPosition"/>
+    <node-mapping inputPath="/input/record/Inscription/inscription.type" outputPath="/rdf:RDF/nave:BrabantCloudResource/nave:inscriptionType"/>
+    <node-mapping inputPath="/input/record/Technique/technique" outputPath="/rdf:RDF/nave:DcnResource/nave:technique"/>
+    <node-mapping inputPath="/input/record/collection" outputPath="/rdf:RDF/nave:DcnResource/nave:collectionPart"/>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:featured">
+      <groovy-code>
+        <string>false</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:allowDeepZoom">
+      <groovy-code>
+        <string>true</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:allowLinkedOpenData">
+      <groovy-code>
+        <string>true</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:allowSourceDownload">
+      <groovy-code>
+        <string>false</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:public">
+      <groovy-code>
+        <string>true</string>
+      </groovy-code>
+    </node-mapping>
+  </node-mappings>
+</rec-mapping>

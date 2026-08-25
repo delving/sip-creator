@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <ore:Aggregation rdf:about="http://data.brabantcloud.nl/resource/aggregation/enb-301-titels/enb-301.titels-719c9cd1-79a3-d1d5-6b69-a0c7a1bceaf4-00a1c272-c05b-99c4-5922-fd2c02846026">
+        <edm:aggregatedCHO rdf:resource="http://data.brabantcloud.nl/resource/document/enb-301-titels/enb-301.titels-719c9cd1-79a3-d1d5-6b69-a0c7a1bceaf4-00a1c272-c05b-99c4-5922-fd2c02846026"/>
+        <edm:isShownAt rdf:resource="https://www.erthepe.nl/collectie/objecten/?diw-id=brabantcloud_enb-301-titels_enb-301.titels-719c9cd1-79a3-d1d5-6b69-a0c7a1bceaf4-00a1c272-c05b-99c4-5922-fd2c02846026"/>
+        <edm:provider>Erfgoed Brabant</edm:provider>
+        <edm:rights rdf:resource="https://rightsstatements.org/vocab/InC/1.0/"/>
+    </ore:Aggregation>
+    <edm:ProvidedCHO rdf:about="http://data.brabantcloud.nl/resource/document/enb-301-titels/enb-301.titels-719c9cd1-79a3-d1d5-6b69-a0c7a1bceaf4-00a1c272-c05b-99c4-5922-fd2c02846026">
+        <edm:type>TEXT</edm:type>
+    </edm:ProvidedCHO>
+    <nave:BrabantCloudResource>
+        <nave:collectionType>Bibliotheek</nave:collectionType>
+    </nave:BrabantCloudResource>
+    <nave:DelvingResource>
+        <nave:featured>false</nave:featured>
+        <nave:allowDeepZoom>true</nave:allowDeepZoom>
+        <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+        <nave:allowSourceDownload>false</nave:allowSourceDownload>
+        <nave:public>true</nave:public>
+    </nave:DelvingResource>
+</rdf:RDF>
+<!--<urn:brabantcloud_enb-301-titels_enb-301.titels-719c9cd1-79a3-d1d5-6b69-a0c7a1bceaf4-00a1c272-c05b-99c4-5922-fd2c02846026/graph__f1777dc71fc6eae81ca87c3bc3eea31897ee3468>-->

@@ -1,0 +1,130 @@
+<rec-mapping prefix="edm" schemaVersion="5.2.6" locked="true">
+  <facts>
+    <entry>
+      <string>baseUrl</string>
+      <string>http://data.collectienederland.nl</string>
+    </entry>
+    <entry>
+      <string>schemaVersions</string>
+      <string>edm_5.2.6</string>
+    </entry>
+    <entry>
+      <string>dataProviderURL</string>
+      <string>https://cultureelerfgoed.nl</string>
+    </entry>
+    <entry>
+      <string>provider</string>
+      <string>Rijksdienst voor het Cultureel Erfgoed</string>
+    </entry>
+    <entry>
+      <string>rights</string>
+      <string>http://rightsstatements.org/vocab/InC/1.0/</string>
+    </entry>
+    <entry>
+      <string>name</string>
+      <string>Register Kerkelijke Ensembles</string>
+    </entry>
+    <entry>
+      <string>language</string>
+      <string>nl</string>
+    </entry>
+    <entry>
+      <string>dataProvider</string>
+      <string>Rijksdienst voor het Cultureel Erfgoed</string>
+    </entry>
+    <entry>
+      <string>type</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>orgId</string>
+      <string>dcn</string>
+    </entry>
+    <entry>
+      <string>spec</string>
+      <string>register-kerkelijke-ensembles</string>
+    </entry>
+  </facts>
+  <functions/>
+  <dyn-opts/>
+  <node-mappings>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF"/>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF/ore:Aggregation/@rdf:about">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/aggregation/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF/ore:Aggregation/edm:aggregatedCHO/@rdf:resource">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/dataProvider" outputPath="/rdf:RDF/ore:Aggregation/edm:dataProvider"/>
+    <node-mapping inputPath="/facts/rights" outputPath="/rdf:RDF/ore:Aggregation/edm:dataProvider"/>
+    <node-mapping inputPath="/facts/provider" outputPath="/rdf:RDF/ore:Aggregation/edm:provider"/>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF/edm:ProvidedCHO/@rdf:about">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/csv-records/csv-record/citname" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:coverage"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/dctermscreated" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:date"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/dcdescription" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:description"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/dcidentifier" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:identifier"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/description_url" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:relation/@rdf:resource"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/dcsubject" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:subject"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/dctitle" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:title"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/dctype" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:type"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/dctermscreated" outputPath="/rdf:RDF/edm:ProvidedCHO/dcterms:created"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/dctermshaspart" outputPath="/rdf:RDF/edm:ProvidedCHO/dcterms:hasPart"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/dctermsispartof" outputPath="/rdf:RDF/edm:ProvidedCHO/dcterms:isPartOf"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/dctermstemporal" outputPath="/rdf:RDF/edm:ProvidedCHO/dcterms:temporal"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/edmincorporates" outputPath="/rdf:RDF/edm:ProvidedCHO/edm:incorporates"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/afbeelding" outputPath="/rdf:RDF/edm:WebResource/@rdf:about">
+      <groovy-code>
+        <string>_input.csvrecords * { _csvrecords -&gt;</string>
+        <string>_csvrecords.csvrecord * { _csvrecord -&gt;</string>
+        <string>_csvrecord.afbeelding * { _afbeelding -&gt;</string>
+        <string>&quot;urn:kerkelijke-ensembles/${_afbeelding}&quot;.replaceAll(&quot;.jpg&quot;,&quot;&quot;)</string>
+        <string>}</string>
+        <string>}</string>
+        <string>}</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/csv-records/csv-record/lat" outputPath="/rdf:RDF/edm:Place/wgs84_pos:lat"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/long" outputPath="/rdf:RDF/edm:Place/wgs84_pos:long"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/citname" outputPath="/rdf:RDF/edm:Place/nave:city"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/country" outputPath="/rdf:RDF/edm:Place/nave:country"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/municipality" outputPath="/rdf:RDF/edm:Place/nave:municipality"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/province" outputPath="/rdf:RDF/edm:Place/nave:province"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/location" outputPath="/rdf:RDF/edm:Place/nave:street"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/province" outputPath="/rdf:RDF/nave:DcnResource"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/admission_reason" outputPath="/rdf:RDF/nave:RijksCollection/nave:reasonListed"/>
+    <node-mapping inputPath="/input/csv-records/csv-record/admission_year" outputPath="/rdf:RDF/nave:RijksCollection/nave:yearListed"/>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:featured">
+      <groovy-code>
+        <string>false</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:allowDeepZoom">
+      <groovy-code>
+        <string>true</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:allowLinkedOpenData">
+      <groovy-code>
+        <string>true</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:allowSourceDownload">
+      <groovy-code>
+        <string>false</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:public">
+      <groovy-code>
+        <string>true</string>
+      </groovy-code>
+    </node-mapping>
+  </node-mappings>
+</rec-mapping>

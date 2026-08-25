@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#">
+    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/register-kerkelijke-ensembles/0XX">
+        <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/register-kerkelijke-ensembles/0XX"/>
+        <edm:dataProvider>Rijksdienst voor het Cultureel Erfgoed</edm:dataProvider>
+        <edm:dataProvider>http://rightsstatements.org/vocab/InC/1.0/</edm:dataProvider>
+        <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+    </ore:Aggregation>
+    <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/register-kerkelijke-ensembles/0XX">
+        <dc:coverage>Maastricht</dc:coverage>
+        <dc:date>1100-1500</dc:date>
+        <dc:description>Het complex van de Sint-Servaasbasiliek en bijbehorend voormalig kapittelcomplex in Maastricht behoort tot het oudste en belangrijkste kerkelijke erfgoed in Nederland.</dc:description>
+        <dc:identifier>0XX</dc:identifier>
+        <dc:relation rdf:resource="https://kennis-staging.cultureelerfgoed.nl/index.php?title=Sint-Servaasbasiliek,_Maastricht_(kerkelijk_ensemble)&amp;returntoquery="/>
+        <dc:subject>Rooms-Katholiek, ensemble, kerkelijk erfgoed</dc:subject>
+        <dc:title>Sint-Servaasbasiliek en -klooster</dc:title>
+        <dc:type>Ensemble: diverse onroerende en roerende objecten</dc:type>
+        <dcterms:created>1100-1500</dcterms:created>
+        <dcterms:hasPart>number</dcterms:hasPart>
+        <dcterms:isPartOf>https://monumentenregister.cultureelerfgoed.nl/monumenten/27168?MonumentId=27168</dcterms:isPartOf>
+        <dcterms:temporal>1000-1500</dcterms:temporal>
+        <edm:incorporates>objecten</edm:incorporates>
+    </edm:ProvidedCHO>
+    <edm:WebResource rdf:about="urn:kerkelijke-ensembles/163839"/>
+    <edm:Place>
+        <wgs84_pos:lat>50.84866</wgs84_pos:lat>
+        <wgs84_pos:long>5.6866</wgs84_pos:long>
+        <nave:city>Maastricht</nave:city>
+        <nave:country>The Netherlands</nave:country>
+        <nave:municipality>Maastricht</nave:municipality>
+        <nave:province>Limburg</nave:province>
+        <nave:street>Keizer Karelplein 6</nave:street>
+    </edm:Place>
+    <nave:RijksCollection>
+        <nave:reasonListed>Het complex van de Sint-Servaasbasiliek en bijbehorend voormalig kapittelcomplex in Maastricht behoort tot het oudste en belangrijkste kerkelijke erfgoed in Nederland.</nave:reasonListed>
+        <nave:yearListed>2022</nave:yearListed>
+    </nave:RijksCollection>
+    <nave:DelvingResource>
+        <nave:featured>false</nave:featured>
+        <nave:allowDeepZoom>true</nave:allowDeepZoom>
+        <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+        <nave:allowSourceDownload>false</nave:allowSourceDownload>
+        <nave:public>true</nave:public>
+    </nave:DelvingResource>
+</rdf:RDF>
+<!--<urn:dcn_register-kerkelijke-ensembles_0XX/graph__4b2cf8ee3b5ad133ba521cb17c3e55ed4a1f8e77>-->

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/provinciaal-depot-bodemvondsten-noord-brabant-1/brabantcloud-provinciaal-depot-bodemvondsten-6706">
+        <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/provinciaal-depot-bodemvondsten-noord-brabant-1/brabantcloud-provinciaal-depot-bodemvondsten-6706"/>
+        <edm:dataProvider>Provinciaal Depot Bodemvondsten Noord-Brabant</edm:dataProvider>
+        <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+        <edm:rights rdf:resource="http://creativecommons.org/publicdomain/mark/1.0/"/>
+    </ore:Aggregation>
+    <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/provinciaal-depot-bodemvondsten-noord-brabant-1/brabantcloud-provinciaal-depot-bodemvondsten-6706"/>
+    <nave:DcnResource>
+        <nave:province>Noord-Brabant</nave:province>
+    </nave:DcnResource>
+    <nave:DelvingResource>
+        <nave:featured>false</nave:featured>
+        <nave:allowDeepZoom>true</nave:allowDeepZoom>
+        <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+        <nave:allowSourceDownload>false</nave:allowSourceDownload>
+        <nave:public>true</nave:public>
+    </nave:DelvingResource>
+</rdf:RDF>
+<!--<urn:dcn_provinciaal-depot-bodemvondsten-noord-brabant-1_brabantcloud-provinciaal-depot-bodemvondsten-6706/graph__ae166d163bfd2578313d7be6a1858df452c1b463>-->

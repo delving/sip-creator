@@ -1,0 +1,29 @@
+<pocket id="0XX">
+  <csv-records>
+    <csv-record>
+      <id>0XX</id>
+      <dccoverage>Maastricht</dccoverage>
+      <dcdescription>Het complex van de Sint-Servaasbasiliek en bijbehorend voormalig kapittelcomplex in Maastricht behoort tot het oudste en belangrijkste kerkelijke erfgoed in Nederland.</dcdescription>
+      <description_url>https://kennis-staging.cultureelerfgoed.nl/index.php?title=Sint-Servaasbasiliek,_Maastricht_(kerkelijk_ensemble)&amp;returntoquery=</description_url>
+      <dcidentifier>0XX</dcidentifier>
+      <dcsubject>Rooms-Katholiek, ensemble, kerkelijk erfgoed</dcsubject>
+      <dctitle>Sint-Servaasbasiliek en -klooster</dctitle>
+      <dctype>Ensemble: diverse onroerende en roerende objecten</dctype>
+      <dctermscreated>1100-1500</dctermscreated>
+      <edmincorporates>objecten</edmincorporates>
+      <dctermshaspart>number</dctermshaspart>
+      <dctermsispartof>https://monumentenregister.cultureelerfgoed.nl/monumenten/27168?MonumentId=27168</dctermsispartof>
+      <dctermstemporal>1000-1500</dctermstemporal>
+      <afbeelding>163839.jpg</afbeelding>
+      <location>Keizer Karelplein 6</location>
+      <province>Limburg</province>
+      <country>The Netherlands</country>
+      <lat>50.84866</lat>
+      <long>5.6866</long>
+      <municipality>Maastricht</municipality>
+      <citname>Maastricht</citname>
+      <admission_year>2022</admission_year>
+      <admission_reason>Het complex van de Sint-Servaasbasiliek en bijbehorend voormalig kapittelcomplex in Maastricht behoort tot het oudste en belangrijkste kerkelijke erfgoed in Nederland.</admission_reason>
+    </csv-record>
+  </csv-records>
+</pocket>

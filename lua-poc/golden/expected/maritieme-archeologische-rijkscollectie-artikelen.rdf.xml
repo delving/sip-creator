@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/maritieme-archeologische-rijkscollectie-artikelen/article-200000064">
+        <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/maritieme-archeologische-rijkscollectie-artikelen/article-200000064"/>
+        <edm:dataProvider>Batavialand</edm:dataProvider>
+        <edm:isShownBy rdf:resource="https://batavialand.adlibhosting.com/media/57684539-4aac-4d8a-ab51-752f552fb011.pdf"/>
+        <edm:object rdf:resource="https://batavialand.adlibhosting.com/media/57684539-4aac-4d8a-ab51-752f552fb011.pdf"/>
+        <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+        <edm:rights rdf:resource="http://rightsstatements.org/vocab/InC/1.0/"/>
+    </ore:Aggregation>
+    <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/maritieme-archeologische-rijkscollectie-artikelen/article-200000064">
+        <dc:creator>Edzes, H. (Harry)</dc:creator>
+        <dc:creator>Behrens, H. (Herbert)</dc:creator>
+        <dc:format>artikel</dc:format>
+        <dc:identifier>article:200000064</dc:identifier>
+        <dc:source>: , iss. 4, vol. 12, 1974, 5-7 pp</dc:source>
+        <dc:subject>Zwammerdam</dc:subject>
+        <dc:subject>Rotterdam</dc:subject>
+        <dc:subject>Ketelhaven, Centrum voor Scheepsarcheologie</dc:subject>
+        <dc:subject>scheepsopgraving</dc:subject>
+        <dc:subject>tentoonstellingen</dc:subject>
+        <dc:subject>transport</dc:subject>
+        <dc:title>Romeins schip uit de tweede eeuw in 1976 naar Rotterdam</dc:title>
+        <dc:type>Artikel</dc:type>
+    </edm:ProvidedCHO>
+    <edm:WebResource rdf:about="https://batavialand.adlibhosting.com/media/57684539-4aac-4d8a-ab51-752f552fb011.pdf">
+        <nave:fullTextObjectUrl>https://batavialand.adlibhosting.com/media/57684539-4aac-4d8a-ab51-752f552fb011.pdf</nave:fullTextObjectUrl>
+        <nave:allowSourceDownload>true</nave:allowSourceDownload>
+    </edm:WebResource>
+    <nave:DelvingResource>
+        <nave:featured>false</nave:featured>
+        <nave:allowDeepZoom>true</nave:allowDeepZoom>
+        <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+        <nave:allowSourceDownload>true</nave:allowSourceDownload>
+        <nave:public>true</nave:public>
+    </nave:DelvingResource>
+</rdf:RDF>
+<!--<urn:dcn_maritieme-archeologische-rijkscollectie-artikelen_article-200000064/graph__2d9770bffbb933622726783fdd90fc4422d3bafb>-->

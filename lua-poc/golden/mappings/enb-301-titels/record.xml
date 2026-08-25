@@ -1,0 +1,28 @@
+<pocket xmlns:ns0="http://www.openarchives.org/OAI/2.0/oai_enb/" xmlns:ns2="http://purl.org/enb_dc/elements/1.1/" xmlns:ns3="http://api.memorix-maior.nl/REST/3.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="enb-301.titels-719c9cd1-79a3-d1d5-6b69-a0c7a1bceaf4-00a1c272-c05b-99c4-5922-fd2c02846026">
+  <record>
+    <header>
+      <identifier>enb_301.titels:719c9cd1-79a3-d1d5-6b69-a0c7a1bceaf4:00a1c272-c05b-99c4-5922-fd2c02846026</identifier>
+      <datestamp>2016-12-17T16:10:51Z</datestamp>
+    </header>
+    <metadata>
+      <ns0:dc xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/          http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+        <ns2:set_title>Titels</ns2:set_title>
+        <ns2:tenant>enb_301</ns2:tenant>
+        <ns2:tenantname>Heemkundekring Erthepe</ns2:tenantname>
+        <ns2:col_entiteit>719c9cd1-79a3-d1d5-6b69-a0c7a1bceaf4</ns2:col_entiteit>
+        <ns2:entity_uuid>00a1c272-c05b-99c4-5922-fd2c02846026</ns2:entity_uuid>
+        <ns2:title>Zo leren lezen</ns2:title>
+        <ns2:dcterms_identifier>Ta 104</ns2:dcterms_identifier>
+        <ns2:spectrum_collection_name />
+        <ns2:dc_subject />
+        <ns2:dcterms_ispartof>3</ns2:dcterms_ispartof>
+        <ns2:physical_details />
+      </ns0:dc>
+    </metadata>
+    <about>
+      <ns3:memorix xsi:schemaLocation="http://api.memorix-maior.nl/REST/3.0/ http://api.memorix-maior.nl/REST/3.0/MRX-API-ANY.xsd">
+        <url>http://api.memorix-maior.nl/collectiebeheer/oai-pmh?verb=GetRecord&amp;metadataPrefix=oai_enb&amp;tenant=enb&amp;key=30afd54c-8a05-11e5-a67e-00155d012a81&amp;identifier=enb_301.titels:719c9cd1-79a3-d1d5-6b69-a0c7a1bceaf4:00a1c272-c05b-99c4-5922-fd2c02846026</url>
+      </ns3:memorix>
+    </about>
+  </record>
+</pocket>

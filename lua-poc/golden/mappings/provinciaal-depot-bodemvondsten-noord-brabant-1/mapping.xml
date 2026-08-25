@@ -1,0 +1,122 @@
+<rec-mapping prefix="edm" schemaVersion="5.2.6" locked="true">
+  <facts>
+    <entry>
+      <string>baseUrl</string>
+      <string>http://data.collectienederland.nl</string>
+    </entry>
+    <entry>
+      <string>schemaVersions</string>
+      <string>edm_5.2.6</string>
+    </entry>
+    <entry>
+      <string>dataProviderURL</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>provider</string>
+      <string>Rijksdienst voor het Cultureel Erfgoed</string>
+    </entry>
+    <entry>
+      <string>dataType</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>rights</string>
+      <string>http://creativecommons.org/publicdomain/mark/1.0/</string>
+    </entry>
+    <entry>
+      <string>name</string>
+      <string>Provinciaal Depot Bodemvondsten Noord-Brabant</string>
+    </entry>
+    <entry>
+      <string>language</string>
+      <string>nl</string>
+    </entry>
+    <entry>
+      <string>dataProvider</string>
+      <string>Provinciaal Depot Bodemvondsten Noord-Brabant</string>
+    </entry>
+    <entry>
+      <string>type</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>orgId</string>
+      <string>dcn</string>
+    </entry>
+    <entry>
+      <string>spec</string>
+      <string>provinciaal-depot-bodemvondsten-noord-brabant-1</string>
+    </entry>
+  </facts>
+  <functions/>
+  <dyn-opts/>
+  <node-mappings>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF"/>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF/ore:Aggregation/@rdf:about">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/aggregation/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF/ore:Aggregation/edm:aggregatedCHO/@rdf:resource">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/dataProvider" outputPath="/rdf:RDF/ore:Aggregation/edm:dataProvider"/>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/ore:Aggregation/edm:isShownAt/@rdf:resource" outputPath="/rdf:RDF/ore:Aggregation/edm:isShownAt/@rdf:resource"/>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/ore:Aggregation/edm:isShownBy/@rdf:resource" outputPath="/rdf:RDF/ore:Aggregation/edm:isShownBy/@rdf:resource"/>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/ore:Aggregation/edm:object/@rdf:resource" outputPath="/rdf:RDF/ore:Aggregation/edm:object/@rdf:resource"/>
+    <node-mapping inputPath="/facts/provider" outputPath="/rdf:RDF/ore:Aggregation/edm:provider"/>
+    <node-mapping inputPath="/facts/rights" outputPath="/rdf:RDF/ore:Aggregation/edm:rights/@rdf:resource"/>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF/edm:ProvidedCHO/@rdf:about">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/edm:ProvidedCHO/dc:coverage" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:coverage"/>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/edm:ProvidedCHO/dc:date" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:date"/>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/edm:ProvidedCHO/dc:description" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:description"/>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/edm:ProvidedCHO/dc:identifier" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:identifier"/>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/edm:ProvidedCHO/dc:type" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:title"/>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/edm:ProvidedCHO/dc:type" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:type"/>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/edm:ProvidedCHO/dc:date" outputPath="/rdf:RDF/edm:ProvidedCHO/dcterms:created"/>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/edm:ProvidedCHO/dcterms:created" outputPath="/rdf:RDF/edm:ProvidedCHO/dcterms:created"/>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/edm:ProvidedCHO/dcterms:extent" outputPath="/rdf:RDF/edm:ProvidedCHO/dcterms:extent"/>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/edm:ProvidedCHO/dcterms:medium" outputPath="/rdf:RDF/edm:ProvidedCHO/dcterms:medium"/>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/ore:Aggregation/edm:isShownBy/@rdf:resource" outputPath="/rdf:RDF/edm:WebResource/@rdf:about"/>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/ore:Aggregation/edm:isShownBy/@rdf:resource" outputPath="/rdf:RDF/edm:WebResource/nave:thumbSmall"/>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/ore:Aggregation/edm:isShownBy/@rdf:resource" outputPath="/rdf:RDF/edm:WebResource/nave:thumbMedium"/>
+    <node-mapping inputPath="/input/record/metadata/rdf:RDF/ore:Aggregation/edm:isShownBy/@rdf:resource" outputPath="/rdf:RDF/edm:WebResource/nave:thumbLarge"/>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DcnResource/nave:province">
+      <groovy-code>
+        <string>Noord-Brabant</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:featured">
+      <groovy-code>
+        <string>false</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:allowDeepZoom">
+      <groovy-code>
+        <string>true</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:allowLinkedOpenData">
+      <groovy-code>
+        <string>true</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:allowSourceDownload">
+      <groovy-code>
+        <string>false</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:public">
+      <groovy-code>
+        <string>true</string>
+      </groovy-code>
+    </node-mapping>
+  </node-mappings>
+</rec-mapping>

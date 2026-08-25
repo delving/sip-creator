@@ -1,0 +1,103 @@
+<pocket id="1">
+  <record>
+    <header>
+      <identifier>synagoge:130000000</identifier>
+      <datestamp>2023-01-09T15:32:19Z</datestamp>
+      <setSpec>synagoge</setSpec>
+    </header>
+    <metadata>
+      <record priref="130000000">
+        <dimension.free>60 x 110 cm</dimension.free>
+        <Dimension>
+          <dimension.notes />
+          <dimension.part />
+          <dimension.precision />
+          <dimension.type />
+          <dimension.unit>cm</dimension.unit>
+          <dimension.value>0</dimension.value>
+        </Dimension>
+        <Inscription>
+          <inscription.content>“Mogelijk benutbaar [sic.] vloeroppervlakte met behoud van het eigene karakter de synagoge in de Folkingestraat te Groningen sch. 1:100”</inscription.content>
+          <inscription.creator />
+          <inscription.creator.role />
+          <inscription.date />
+          <inscription.description />
+          <inscription.interpretation />
+          <inscription.language>Nederlands</inscription.language>
+          <inscription.method>geschreven</inscription.method>
+          <inscription.notes />
+          <inscription.position>Bovenaan</inscription.position>
+          <inscription.script />
+          <inscription.translation />
+          <inscription.transliteration />
+          <inscription.type />
+        </Inscription>
+        <Inscription>
+          <inscription.content>“doorsnede naar entree toe gezien”, “langs doorsnede” en “doorsnede naar absis toe gezien”.</inscription.content>
+          <inscription.creator />
+          <inscription.creator.role />
+          <inscription.date />
+          <inscription.description>Onder de drie tekeningen staat van links naar rechts bovenstaande tekst.</inscription.description>
+          <inscription.interpretation />
+          <inscription.language />
+          <inscription.method>geschreven</inscription.method>
+          <inscription.notes />
+          <inscription.position>Onder afbeelding(-en)</inscription.position>
+          <inscription.script />
+          <inscription.translation />
+          <inscription.transliteration />
+          <inscription.type />
+        </Inscription>
+        <Inscription>
+          <inscription.content>“schetsvoorstel betreffende de plattegronden / werkkollektief “archus” / d.d. 1 mei 1976</inscription.content>
+          <inscription.creator />
+          <inscription.creator.role />
+          <inscription.date />
+          <inscription.description />
+          <inscription.interpretation />
+          <inscription.language />
+          <inscription.method>geschreven</inscription.method>
+          <inscription.notes />
+          <inscription.position>Onderaan</inscription.position>
+          <inscription.script />
+          <inscription.translation />
+          <inscription.transliteration />
+          <inscription.type />
+        </Inscription>
+        <Material>
+          <material>papier</material>
+          <material.notes />
+          <material.part />
+        </Material>
+        <Material>
+          <material>inkt</material>
+          <material.notes>zwarte n</material.notes>
+          <material.part />
+        </Material>
+        <Production>
+          <creator>Werkkollektief Archus</creator>
+          <creator.qualifier />
+          <creator.role />
+          <production.notes />
+          <production.place>Groningen</production.place>
+        </Production>
+        <Production_date>
+          <production.date.end>1976</production.date.end>
+          <production.date.end.prec />
+          <production.date.start>1976-05-01</production.date.start>
+          <production.date.start.prec>circa</production.date.start.prec>
+        </Production_date>
+        <Title>
+          <title>Ontwerp verbouwing Folkingestraat synagoge, 1976, pentekening</title>
+          <title.notes />
+          <title.type />
+        </Title>
+        <institution.name>Synagoge Groningen</institution.name>
+        <object_category>ontwerp</object_category>
+        <object_number>1</object_number>
+        <priref>130000000</priref>
+        <production.reason>Mogelijke verbouwing synagoge. Ontwerp is niet uitgevoerd.</production.reason>
+      </record>
+    </metadata>
+  </record>
+</pocket>

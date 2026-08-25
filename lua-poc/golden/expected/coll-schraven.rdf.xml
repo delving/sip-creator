@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/coll-schraven/36">
+        <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/coll-schraven/36"/>
+        <edm:dataProvider>Collectie Schraven</edm:dataProvider>
+        <edm:isShownBy rdf:resource="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSyqv5_6RH0gBA-CG08fZp9u1P-rwPHv2ViA1itHbYXfn-1Ch1pUZ63lI8RiY9o_2cNmXgpoK_b1MRY21HT7i-SMXolLUezU87cMg3zLUCdPXx4tyiyF7kOImDn2JBZKt34yLEQnQffTrQr6KpZG9hpPiv6fG6P2KA2bPwrDPsRfYytCiWQOEauC0_/s400/8d71549d7f5b63573917fa8f0c3776fd.jpg"/>
+        <edm:object rdf:resource="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSyqv5_6RH0gBA-CG08fZp9u1P-rwPHv2ViA1itHbYXfn-1Ch1pUZ63lI8RiY9o_2cNmXgpoK_b1MRY21HT7i-SMXolLUezU87cMg3zLUCdPXx4tyiyF7kOImDn2JBZKt34yLEQnQffTrQr6KpZG9hpPiv6fG6P2KA2bPwrDPsRfYytCiWQOEauC0_/s400/8d71549d7f5b63573917fa8f0c3776fd.jpg"/>
+        <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+        <edm:rights>http://creativecommons.org/licenses/by-sa/4.0/</edm:rights>
+    </ore:Aggregation>
+    <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/coll-schraven/36">
+        <dc:creator>Hans Schraven</dc:creator>
+        <dc:date>2009</dc:date>
+        <dc:identifier>36</dc:identifier>
+        <dc:title>Face Thirty Six</dc:title>
+        <dcterms:created>2009</dcterms:created>
+    </edm:ProvidedCHO>
+    <edm:WebResource rdf:about="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSyqv5_6RH0gBA-CG08fZp9u1P-rwPHv2ViA1itHbYXfn-1Ch1pUZ63lI8RiY9o_2cNmXgpoK_b1MRY21HT7i-SMXolLUezU87cMg3zLUCdPXx4tyiyF7kOImDn2JBZKt34yLEQnQffTrQr6KpZG9hpPiv6fG6P2KA2bPwrDPsRfYytCiWQOEauC0_/s400/8d71549d7f5b63573917fa8f0c3776fd.jpg">
+        <nave:thumbSmall>https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSyqv5_6RH0gBA-CG08fZp9u1P-rwPHv2ViA1itHbYXfn-1Ch1pUZ63lI8RiY9o_2cNmXgpoK_b1MRY21HT7i-SMXolLUezU87cMg3zLUCdPXx4tyiyF7kOImDn2JBZKt34yLEQnQffTrQr6KpZG9hpPiv6fG6P2KA2bPwrDPsRfYytCiWQOEauC0_/s400/8d71549d7f5b63573917fa8f0c3776fd.jpg</nave:thumbSmall>
+        <nave:thumbMedium>https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSyqv5_6RH0gBA-CG08fZp9u1P-rwPHv2ViA1itHbYXfn-1Ch1pUZ63lI8RiY9o_2cNmXgpoK_b1MRY21HT7i-SMXolLUezU87cMg3zLUCdPXx4tyiyF7kOImDn2JBZKt34yLEQnQffTrQr6KpZG9hpPiv6fG6P2KA2bPwrDPsRfYytCiWQOEauC0_/s400/8d71549d7f5b63573917fa8f0c3776fd.jpg</nave:thumbMedium>
+        <nave:thumbLarge>https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSyqv5_6RH0gBA-CG08fZp9u1P-rwPHv2ViA1itHbYXfn-1Ch1pUZ63lI8RiY9o_2cNmXgpoK_b1MRY21HT7i-SMXolLUezU87cMg3zLUCdPXx4tyiyF7kOImDn2JBZKt34yLEQnQffTrQr6KpZG9hpPiv6fG6P2KA2bPwrDPsRfYytCiWQOEauC0_/s400/8d71549d7f5b63573917fa8f0c3776fd.jpg</nave:thumbLarge>
+    </edm:WebResource>
+    <nave:DcnResource>
+        <nave:creatorYearOfBirth>1956</nave:creatorYearOfBirth>
+        <nave:technique>potlood, kleurpotlood</nave:technique>
+        <nave:province>Noord-Holland</nave:province>
+    </nave:DcnResource>
+    <nave:DelvingResource>
+        <nave:featured>false</nave:featured>
+        <nave:allowDeepZoom>true</nave:allowDeepZoom>
+        <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+        <nave:allowSourceDownload>false</nave:allowSourceDownload>
+        <nave:public>true</nave:public>
+    </nave:DelvingResource>
+</rdf:RDF>
+<!--<urn:dcn_coll-schraven_36/graph__4baccd64d0f1a4e031506ee56102471c16f04582>-->

@@ -1,0 +1,36 @@
+<pocket xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns1="http://www.openarchives.org/ore/terms/" xmlns:ns2="http://www.europeana.eu/schemas/edm/" xmlns:ns4="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="brabantcloud-provinciaal-depot-bodemvondsten-6706">
+  <record>
+    <header>
+      <identifier>brabantcloud_provinciaal-depot-bodemvondsten_6706</identifier>
+      <datestamp>2023-07-06T13:17:50Z</datestamp>
+      <setSpec>provinciaal-depot-bodemvondsten</setSpec>
+    </header>
+    <metadata>
+      <rdf:RDF>
+        <ns1:Aggregation rdf:about="http://data.brabantcloud.nl/resource/aggregation/provinciaal-depot-bodemvondsten/6706">
+          <ns2:dataProvider>Provinciaal Depot Bodemvondsten</ns2:dataProvider>
+          <ns2:provider>Erfgoed Brabant</ns2:provider>
+          <ns2:isShownBy rdf:resource="https://media.delving.org/thumbnail/brabantcloud/provinciaal-depot-bodemvondsten/urn_66/500" />
+          <ns2:rights rdf:resource="https://rightsstatements.org/vocab/InC/1.0/" />
+          <ns2:isShownAt rdf:resource="https://data.brabantcloud.nl/resource/aggregation/provinciaal-depot-bodemvondsten/6706" />
+          <ns2:object rdf:resource="https://media.delving.org/thumbnail/brabantcloud/provinciaal-depot-bodemvondsten/urn_66/500" />
+          <ns2:aggregatedCHO rdf:resource="http://data.brabantcloud.nl/resource/document/provinciaal-depot-bodemvondsten/6706" />
+        </ns1:Aggregation>
+        <ns2:ProvidedCHO rdf:about="http://data.brabantcloud.nl/resource/document/provinciaal-depot-bodemvondsten/6706">
+          <dc:date>1100 – 800 v. Chr.</dc:date>
+          <dc:rights>Provinciaal Depot Bodemvondsten Noord-Brabant</dc:rights>
+          <dc:coverage>Bergeijk</dc:coverage>
+          <ns4:medium>Aardewerk</ns4:medium>
+          <dc:language>NL</dc:language>
+          <dc:type>Urn</dc:type>
+          <ns2:type>IMAGE</ns2:type>
+          <ns4:extent>diameter: 10 cm</ns4:extent>
+          <dc:description>Deze kerbschitt urn uit de late bronstijd (1100-800 v. Chr.) is afkomstig uit een urnenveld bij Bergeijk. In deze periode zijn de doden niet begraven, maar gecremeerd en in een urn geplaatst. De urn zette men in een kuil. Rond de kuil werd een greppel gegraven en met die grond werd een heuveltje over de kuil gemaakt. Omdat de doden bij elkaar in de buurt begraven zijn, ontstonden er in de loop der tijd uitgestrekte terreinen met heuveltjes, de urnenvelden. Dit urnenveld is in de jaren 60 van de vorige eeuw vrijwel helemaal verdwenen door herontginningen. Het aardewerk dat gebruikt is voor begravingen is waarschijnlijk niet speciaal gemaakt voor het grafritueel. Men nam de potten die dagelijks gebruikt werden. In Zuid-Nederland komt veel van dit soort mooi versierd aardewerk voor. De term kerbschnitt verwijst naar de manier van versieren. Het aardewerk is, voordat het gebakken werd, eerst een tijd te drogen gezet. Op het moment dat de pot bijna droog is ("leerdroog") zijn er versieringen ingesneden. Na het bakken van het aardewerk deed men soms witte verf in de ingesneden versieringen, die daardoor beter zichtbaar werden. Op deze pot zitten op de hals en schouder drie golvende banden met tussen de banden drie diagonale korte strepen.</dc:description>
+          <ns4:created>1100 – 800 v. Chr.</ns4:created>
+          <ns4:extent>hoogte: 19 cm</ns4:extent>
+          <dc:identifier>6706</dc:identifier>
+        </ns2:ProvidedCHO>
+      </rdf:RDF>
+    </metadata>
+  </record>
+</pocket>

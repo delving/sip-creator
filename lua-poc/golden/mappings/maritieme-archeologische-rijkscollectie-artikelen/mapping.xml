@@ -1,0 +1,129 @@
+<rec-mapping prefix="edm" schemaVersion="5.2.6" locked="true">
+  <facts>
+    <entry>
+      <string>baseUrl</string>
+      <string>http://data.collectienederland.nl</string>
+    </entry>
+    <entry>
+      <string>schemaVersions</string>
+      <string>edm_5.2.6</string>
+    </entry>
+    <entry>
+      <string>dataProviderURL</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>provider</string>
+      <string>Rijksdienst voor het Cultureel Erfgoed</string>
+    </entry>
+    <entry>
+      <string>rights</string>
+      <string>http://rightsstatements.org/vocab/InC/1.0/</string>
+    </entry>
+    <entry>
+      <string>dataType</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>name</string>
+      <string>Maritieme Archeologische Rijkscollectie Artikelen (Batavialand)</string>
+    </entry>
+    <entry>
+      <string>language</string>
+      <string>nl</string>
+    </entry>
+    <entry>
+      <string>dataProvider</string>
+      <string>Batavialand</string>
+    </entry>
+    <entry>
+      <string>type</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>orgId</string>
+      <string>dcn</string>
+    </entry>
+    <entry>
+      <string>spec</string>
+      <string>maritieme-archeologische-rijkscollectie-artikelen</string>
+    </entry>
+  </facts>
+  <functions/>
+  <dyn-opts/>
+  <node-mappings>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF"/>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF/ore:Aggregation/@rdf:about">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/aggregation/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF/ore:Aggregation/edm:aggregatedCHO/@rdf:resource">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/facts/dataProvider" outputPath="/rdf:RDF/ore:Aggregation/edm:dataProvider"/>
+    <node-mapping inputPath="/input/record/metadata/record/Digital_reference/digital_reference_URL" outputPath="/rdf:RDF/ore:Aggregation/edm:isShownBy/@rdf:resource"/>
+    <node-mapping inputPath="/input/record/metadata/record/Digital_reference/digital_reference_URL" outputPath="/rdf:RDF/ore:Aggregation/edm:object/@rdf:resource"/>
+    <node-mapping inputPath="/facts/provider" outputPath="/rdf:RDF/ore:Aggregation/edm:provider"/>
+    <node-mapping inputPath="/facts/rights" outputPath="/rdf:RDF/ore:Aggregation/edm:rights/@rdf:resource"/>
+    <node-mapping inputPath="/input" outputPath="/rdf:RDF/edm:ProvidedCHO/@rdf:about">
+      <groovy-code>
+        <string>&quot;${baseUrl}/resource/document/${spec}/${_uniqueIdentifier.sanitizeURI()}&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/record/Author/author.name" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:creator"/>
+    <node-mapping inputPath="/input/record/metadata/record/Digital_reference/digital_reference.description" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:format"/>
+    <node-mapping inputPath="/input/record/header/identifier" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:identifier"/>
+    <node-mapping inputPath="/input/record/metadata/record/Source/source.issue" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:source">
+      <siblings>
+        <path>/input/record/metadata/record/Source/source.material_type</path>
+        <path>/input/record/metadata/record/Source/source.month</path>
+        <path>/input/record/metadata/record/Source/source.pagination</path>
+        <path>/input/record/metadata/record/Source/source.publication_years</path>
+        <path>/input/record/metadata/record/Source/source.title</path>
+        <path>/input/record/metadata/record/Source/source.volume</path>
+      </siblings>
+      <groovy-code>
+        <string>&quot;${_M6[&apos;sourcematerialtype&apos;]}: ${_M6[&apos;sourcetitle&apos;]}, iss. ${_M6[&apos;sourceissue&apos;]}, vol. ${_M6[&apos;sourcevolume&apos;]}, ${_M6[&apos;sourcepublicationyears&apos;]}, ${_M6[&apos;sourcepagination&apos;]} pp&quot;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/input/record/metadata/record/geographical_keyword" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:subject"/>
+    <node-mapping inputPath="/input/record/metadata/record/Keyword/keyword.contents" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:subject"/>
+    <node-mapping inputPath="/input/record/metadata/record/Title/title" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:title"/>
+    <node-mapping inputPath="/input/record/metadata/record/material_type" outputPath="/rdf:RDF/edm:ProvidedCHO/dc:type"/>
+    <node-mapping inputPath="/input/record/metadata/record/Digital_reference/digital_reference_URL" outputPath="/rdf:RDF/edm:WebResource/@rdf:about"/>
+    <node-mapping inputPath="/input/record/metadata/record/Digital_reference/digital_reference_URL" outputPath="/rdf:RDF/edm:WebResource/nave:fullTextObjectUrl"/>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/edm:WebResource/nave:allowSourceDownload">
+      <groovy-code>
+        <string>&apos;true&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:featured">
+      <groovy-code>
+        <string>&apos;false&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:allowDeepZoom">
+      <groovy-code>
+        <string>&apos;true&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:allowLinkedOpenData">
+      <groovy-code>
+        <string>true</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:allowSourceDownload">
+      <groovy-code>
+        <string>&apos;true&apos;</string>
+      </groovy-code>
+    </node-mapping>
+    <node-mapping inputPath="/constant" outputPath="/rdf:RDF/nave:DelvingResource/nave:public">
+      <groovy-code>
+        <string>&apos;true&apos;</string>
+      </groovy-code>
+    </node-mapping>
+  </node-mappings>
+</rec-mapping>

@@ -1,0 +1,38 @@
+<pocket xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns1="http://www.europeana.eu/schemas/edm/" xmlns:ns3="http://purl.org/dc/terms/" xmlns:ns4="http://www.openarchives.org/ore/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="2661184">
+  <record>
+    <header>
+      <identifier>2661184</identifier>
+      <datestamp>2024-06-21T14:01:11Z</datestamp>
+      <setSpec>Zuiderzeecollectie</setSpec>
+    </header>
+    <metadata>
+      <rdf:RDF>
+        <ns1:ProvidedCHO rdf:about="https://HM.hosting.deventit.net/detail.php?id=2661184">
+          <dc:description xml:lang="nl">Zwart vrouwenjak met lage hals voor en achter, uitgevoerd in Empire stijl. Het kledingstuk heeft zeer lange mouwen met een bandje erom en is gevoerd met blauw-wit geruite stof. Dit jak werd gedragen tijdens de rouw gedragen over een witte fichu of driehoekige halsdoek.</dc:description>
+          <dc:date xml:lang="nl">1870</dc:date>
+          <dc:identifier xml:lang="nl">K00009</dc:identifier>
+          <dc:language>nl</dc:language>
+          <dc:title xml:lang="nl">Zijden jak met fichu</dc:title>
+          <dc:type xml:lang="nl">jak</dc:type>
+          <ns3:medium xml:lang="nl">wol</ns3:medium>
+          <ns3:medium xml:lang="nl">katoen</ns3:medium>
+          <ns3:medium xml:lang="nl">textiel</ns3:medium>
+          <ns3:extent xml:lang="nl">bovenwijdte 86 cm</ns3:extent>
+          <ns3:extent xml:lang="nl">taillewijdte 74 cm</ns3:extent>
+          <ns3:extent xml:lang="nl">lengte 49 cm</ns3:extent>
+          <ns3:extent xml:lang="nl">lengte 65 cm</ns3:extent>
+        </ns1:ProvidedCHO>
+        <ns4:Aggregation rdf:about="https://HM.hosting.deventit.net/detail.php?id=2661184">
+          <ns1:aggregatedCHO rdf:resource="https://HM.hosting.deventit.net/detail.php?id=2661184" />
+          <ns1:dataProvider>Huizer Museum</ns1:dataProvider>
+          <ns1:isShownAt rdf:resource="https://HM.hosting.deventit.net/detail.php?id=2661184" />
+          <ns1:isShownBy rdf:resource="https://HM.hosting.deventit.net/HttpHandler/icoon.ico?file=2661220" />
+          <ns1:hasView rdf:resource="https://HM.hosting.deventit.net/HttpHandler/icoon.ico?icoon=2661220" />
+          <ns1:object rdf:resource="https://HM.hosting.deventit.net/HttpHandler/icoon.ico?file=2661220" />
+          <ns1:rights rdf:resource="http://rightsstatements.org/vocab/InC/1.0/" />
+          <ns1:provider>DEVENTit B.V.</ns1:provider>
+        </ns4:Aggregation>
+      </rdf:RDF>
+    </metadata>
+  </record>
+</pocket>

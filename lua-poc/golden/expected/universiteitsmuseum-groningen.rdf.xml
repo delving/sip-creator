@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/universiteitsmuseum-groningen/1934-61a,b">
+        <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/universiteitsmuseum-groningen/1934-61a,b"/>
+        <edm:dataProvider>Universiteitsmuseum Groningen</edm:dataProvider>
+        <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+        <edm:rights rdf:resource="http://rightsstatements.org/vocab/InC/1.0/"/>
+    </ore:Aggregation>
+    <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/universiteitsmuseum-groningen/1934-61a,b">
+        <dc:creator>Stratingh Ez., Sibrand</dc:creator>
+        <dc:creator>Deutgen, W. (Willem)</dc:creator>
+        <dc:date>1836</dc:date>
+        <dc:identifier>1934/61a,b</dc:identifier>
+        <dc:subject>elektromagnetisch wagentje</dc:subject>
+        <dc:title>Elektromagnetisch wagentje ontworpen door professor Sibrand Stratingh en gebouwd door Willem Deutgen, 1836</dc:title>
+        <dc:type>modellen</dc:type>
+        <dcterms:created>1836</dcterms:created>
+        <dcterms:medium>glas</dcterms:medium>
+        <dcterms:medium>hout</dcterms:medium>
+        <dcterms:medium>ijzer</dcterms:medium>
+        <dcterms:medium>messing</dcterms:medium>
+        <dcterms:medium>zink</dcterms:medium>
+    </edm:ProvidedCHO>
+    <nave:DcnResource>
+        <nave:collectionPart>Natuurkunde</nave:collectionPart>
+    </nave:DcnResource>
+    <nave:DelvingResource>
+        <nave:featured>false</nave:featured>
+        <nave:allowDeepZoom>true</nave:allowDeepZoom>
+        <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+        <nave:allowSourceDownload>false</nave:allowSourceDownload>
+        <nave:public>true</nave:public>
+    </nave:DelvingResource>
+</rdf:RDF>
+<!--<urn:dcn_universiteitsmuseum-groningen_1934-61a,b/graph__f071270828edbce6eebf7fa4d6d2680b26e2ab3f>-->

@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/coll-schraven/87">
+        <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/coll-schraven/87"/>
+        <edm:dataProvider>Collectie Schraven</edm:dataProvider>
+        <edm:isShownBy rdf:resource="http://www.ietsheelanders.nl/wp-content/uploads/2010/09/faceeightyseven.jpg"/>
+        <edm:object rdf:resource="http://www.ietsheelanders.nl/wp-content/uploads/2010/09/faceeightyseven.jpg"/>
+        <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+        <edm:rights>http://creativecommons.org/licenses/by-nc/3.0/nl/</edm:rights>
+    </ore:Aggregation>
+    <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/coll-schraven/87">
+        <dc:creator> Hans Schraven</dc:creator>
+        <dc:date>2009</dc:date>
+        <dc:identifier>87</dc:identifier>
+        <dc:title>Face Eighty Seven</dc:title>
+        <edm:type>IMAGE</edm:type>
+    </edm:ProvidedCHO>
+    <edm:WebResource rdf:about="http://www.ietsheelanders.nl/wp-content/uploads/2010/09/faceeightyseven.jpg"/>
+    <nave:DcnResource>
+        <nave:creatorYearOfBirth>1956</nave:creatorYearOfBirth>
+        <nave:technique>potlood, kleurpotlood</nave:technique>
+        <nave:province>Noord-Holland</nave:province>
+    </nave:DcnResource>
+</rdf:RDF>
+<!--<urn:dcn_coll-schraven_87/graph__e921dc9559e2048b6b567700594c1606a95b520d>-->

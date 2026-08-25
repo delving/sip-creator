@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/synagoge-groningen/1">
+        <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/synagoge-groningen/1"/>
+        <edm:dataProvider>Stichting Folkingestraat Synagoge</edm:dataProvider>
+        <edm:provider>Rijksdienst voor het Cultureel Erfgoed</edm:provider>
+        <edm:rights rdf:resource="http://rightsstatements.org/vocab/InC/1.0/"/>
+    </ore:Aggregation>
+    <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/synagoge-groningen/1">
+        <dc:coverage>Groningen</dc:coverage>
+        <dc:creator>Werkkollektief Archus</dc:creator>
+        <dc:date>1976-05-01 - 1976</dc:date>
+        <dc:identifier>1</dc:identifier>
+        <dc:title>Ontwerp verbouwing Folkingestraat synagoge, 1976, pentekening</dc:title>
+        <dc:type>ontwerp</dc:type>
+        <dcterms:created>1976-05-01 - 1976</dcterms:created>
+        <dcterms:extent>    0 cm</dcterms:extent>
+        <dcterms:medium>papier</dcterms:medium>
+        <dcterms:medium>inkt</dcterms:medium>
+    </edm:ProvidedCHO>
+    <nave:BrabantCloudResource>
+        <nave:inscription>“Mogelijk benutbaar [sic.] vloeroppervlakte met behoud van het eigene karakter de synagoge in de Folkingestraat te Groningen sch. 1:100”</nave:inscription>
+        <nave:inscription>“doorsnede naar entree toe gezien”, “langs doorsnede” en “doorsnede naar absis toe gezien”.</nave:inscription>
+        <nave:inscription>“schetsvoorstel betreffende de plattegronden / werkkollektief “archus” / d.d. 1 mei 1976</nave:inscription>
+        <nave:inscription>Onder de drie tekeningen staat van links naar rechts bovenstaande tekst.</nave:inscription>
+        <nave:inscriptionMethod>geschreven</nave:inscriptionMethod>
+        <nave:inscriptionMethod>geschreven</nave:inscriptionMethod>
+        <nave:inscriptionMethod>geschreven</nave:inscriptionMethod>
+        <nave:inscriptionPosition>Bovenaan</nave:inscriptionPosition>
+        <nave:inscriptionPosition>Onder afbeelding(-en)</nave:inscriptionPosition>
+        <nave:inscriptionPosition>Onderaan</nave:inscriptionPosition>
+    </nave:BrabantCloudResource>
+    <nave:DelvingResource>
+        <nave:featured>false</nave:featured>
+        <nave:allowDeepZoom>true</nave:allowDeepZoom>
+        <nave:allowLinkedOpenData>true</nave:allowLinkedOpenData>
+        <nave:allowSourceDownload>false</nave:allowSourceDownload>
+        <nave:public>true</nave:public>
+    </nave:DelvingResource>
+</rdf:RDF>
+<!--<urn:dcn_synagoge-groningen_1/graph__e1c5195eb52f02d12d156529c1da1fe4898c1e5c>-->

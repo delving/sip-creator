@@ -1,0 +1,48 @@
+<pocket id="article-200000064">
+  <record>
+    <header>
+      <identifier>article:200000064</identifier>
+      <datestamp>2023-03-13T11:44:20Z</datestamp>
+      <setSpec>article</setSpec>
+    </header>
+    <metadata>
+      <record priref="200000064" created="2023-03-13T11:32:39Z" modification="2023-03-13T11:44:20Z" selected="false" deleted="false">
+        <geographical_keyword>Zwammerdam</geographical_keyword>
+        <geographical_keyword>Rotterdam</geographical_keyword>
+        <geographical_keyword>Ketelhaven, Centrum voor Scheepsarcheologie</geographical_keyword>
+        <Author>
+          <author.name>Edzes, H. (Harry)</author.name>
+        </Author>
+        <Author>
+          <author.name>Behrens, H. (Herbert)</author.name>
+        </Author>
+        <Digital_reference>
+          <digital_reference>57684539-4aac-4d8a-ab51-752f552fb011.pdf</digital_reference>
+          <digital_reference.description>artikel</digital_reference.description>
+          <digital_reference_URL>https://batavialand.adlibhosting.com/media/57684539-4aac-4d8a-ab51-752f552fb011.pdf</digital_reference_URL>
+        </Digital_reference>
+        <Keyword>
+          <keyword.contents>scheepsopgraving</keyword.contents>
+        </Keyword>
+        <Keyword>
+          <keyword.contents>tentoonstellingen</keyword.contents>
+        </Keyword>
+        <Keyword>
+          <keyword.contents>transport</keyword.contents>
+        </Keyword>
+        <Source>
+          <source.issue>4</source.issue>
+          <source.pagination>5-7</source.pagination>
+          <source.publication_years>1974</source.publication_years>
+          <source.volume>12</source.volume>
+        </Source>
+        <Title>
+          <title>Romeins schip uit de tweede eeuw in 1976 naar Rotterdam</title>
+        </Title>
+        <illustrations>foto's</illustrations>
+        <material_type>Artikel</material_type>
+        <priref>200000064</priref>
+      </record>
+    </metadata>
+  </record>
+</pocket>

@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:nave="http://schemas.delving.eu/nave/terms/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <ore:Aggregation rdf:about="http://data.collectienederland.nl/resource/aggregation/nationaal-gevangenismuseum/H7807b">
+        <edm:aggregatedCHO rdf:resource="http://data.collectienederland.nl/resource/document/nationaal-gevangenismuseum/H7807b"/>
+        <edm:isShownBy>http://www.dcn-images.nl/img/gm/H7807b.jpg</edm:isShownBy>
+        <edm:object>http://www.dcn-images.nl/img/gm/H7807b.jpg</edm:object>
+        <edm:rights rdf:resource="http://www.europeana.eu/portal/nl/rights/rr-f"/>
+    </ore:Aggregation>
+    <edm:ProvidedCHO rdf:about="http://data.collectienederland.nl/resource/document/nationaal-gevangenismuseum/H7807b">
+        <dc:creator>onbekend</dc:creator>
+        <dc:description>ontsnappingstouw gemaakt van lakens en plastic</dc:description>
+        <dc:identifier>H7807b</dc:identifier>
+        <dc:title>Ontsnappingstouw met houten balk.</dc:title>
+        <dcterms:medium>geheel: katoen &amp; plastic &amp; hout</dcterms:medium>
+    </edm:ProvidedCHO>
+    <nave:DcnResource>
+        <nave:material>geheel: katoen &amp; plastic &amp; hout</nave:material>
+    </nave:DcnResource>
+</rdf:RDF>
+<!--<urn:unknown_nationaal-gevangenismuseum_H7807b/graph__ee49c5351bf4ee9208a2dc1108754efaf31f53d9>-->

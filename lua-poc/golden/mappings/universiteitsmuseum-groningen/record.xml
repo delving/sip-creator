@@ -1,0 +1,89 @@
+<pocket id="1934-61a,b">
+  <record modification="2023-03-28T08:07:11" creation="2016-10-11T08:44:49" priref="6488">
+    <object_number>1934/61a,b</object_number>
+    <collection>Natuurkunde</collection>
+    <collection.lref>38682</collection.lref>
+    <object_category>modellen</object_category>
+    <object_category.lref>11527</object_category.lref>
+    <Object_name>
+      <object_name>elektromagnetisch wagentje</object_name>
+      <object_name.lref>825</object_name.lref>
+    </Object_name>
+    <Title>
+      <title>Elektromagnetisch wagentje ontworpen door professor Sibrand Stratingh en gebouwd door Willem Deutgen, 1836</title>
+    </Title>
+    <Production>
+      <creator>Stratingh Ez., Sibrand</creator>
+      <creator.lref>6470</creator.lref>
+      <creator.role>ontwerper</creator.role>
+      <creator.role.lref>36200</creator.role.lref>
+    </Production>
+    <Production>
+      <creator>Deutgen, W. (Willem)</creator>
+      <creator.lref>3155</creator.lref>
+      <creator.role>instrumentmaker</creator.role>
+      <creator.role.lref>9429</creator.role.lref>
+    </Production>
+    <Production_date>
+      <production.date.start>1836</production.date.start>
+      <production.date.start.prec>exact</production.date.start.prec>
+      <production.date.end>1836</production.date.end>
+      <production.date.end.prec>exact</production.date.end.prec>
+    </Production_date>
+    <Material>
+      <material>glas</material>
+      <material.lref>105</material.lref>
+    </Material>
+    <Material>
+      <material>hout</material>
+      <material.lref>254</material.lref>
+    </Material>
+    <Material>
+      <material>ijzer</material>
+      <material.lref>116</material.lref>
+    </Material>
+    <Material>
+      <material>messing</material>
+      <material.lref>23</material.lref>
+    </Material>
+    <Material>
+      <material>zink</material>
+      <material.lref>20099</material.lref>
+    </Material>
+    <Exhibition>
+      <exhibition>From Stratingh to the future</exhibition>
+      <exhibition.lref>11</exhibition.lref>
+      <exhibition.date.start>2010-09-14</exhibition.date.start>
+      <exhibition.date.end>2011-03-10</exhibition.date.end>
+      <exhibition.reference_number>00000001</exhibition.reference_number>
+    </Exhibition>
+    <Exhibition>
+      <exhibition>EcarTec</exhibition>
+      <exhibition.lref>60</exhibition.lref>
+      <exhibition.date.start>2010-10-14</exhibition.date.start>
+      <exhibition.date.end>2010-10-21</exhibition.date.end>
+      <exhibition.reference_number>0000002</exhibition.reference_number>
+    </Exhibition>
+    <Exhibition>
+      <exhibition>AutoRai</exhibition>
+      <exhibition.lref>61</exhibition.lref>
+      <exhibition.date.start>2011-04-12</exhibition.date.start>
+      <exhibition.date.end>2011-04-23</exhibition.date.end>
+      <exhibition.reference_number>000003</exhibition.reference_number>
+    </Exhibition>
+    <Exhibition>
+      <exhibition>Wetenschap als proces</exhibition>
+      <exhibition.lref>13</exhibition.lref>
+      <exhibition.date.start />
+      <exhibition.date.end />
+      <exhibition.reference_number />
+    </Exhibition>
+    <Exhibition>
+      <exhibition>Vind het uit - Energie</exhibition>
+      <exhibition.lref>111</exhibition.lref>
+      <exhibition.date.start>2022-01-01</exhibition.date.start>
+      <exhibition.date.end>2030-01-01</exhibition.date.end>
+      <exhibition.reference_number>VHU-ENERGIE</exhibition.reference_number>
+    </Exhibition>
+  </record>
+</pocket>
