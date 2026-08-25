@@ -248,13 +248,16 @@ public class LuaMappingGenerator {
         Set<String> emitted = new TreeSet<>();
         for (Map.Entry<String, String> entry : recMapping.getFacts().entrySet()) {
             String name = entry.getKey();
-            if (!name.matches("[A-Za-z_][A-Za-z0-9_]*") || LUA_KEYWORDS.contains(name)) {
+            if (!name.matches("[A-Za-z_][A-Za-z0-9_]*") || GroovySnippetToLua.LUA_KEYWORDS.contains(name)) {
                 line("-- fact %s skipped: not a usable Lua identifier", luaString(name));
                 continue;
             }
             if (RESERVED_NAMES.contains(name)) {
-                line("-- fact %s skipped: name reserved by the generated module", luaString(name));
-                continue;
+                // Skipping it silently would leave any snippet that references
+                // this fact resolving to the engine module of the same name --
+                // a wrong answer with no error, which is exactly what this
+                // spike must not produce.
+                throw new UnsupportedConstructException("ReservedFactName", name);
             }
             line("local %s = FACTS[%s]", name, luaString(name));
             emitted.add(name);
@@ -262,11 +265,6 @@ public class LuaMappingGenerator {
         if (!emitted.contains("orgId")) line("local orgId = \"unknown\"  -- MappingResult.java:228 default");
         if (!emitted.contains("spec")) line("local spec = \"\"");
     }
-
-    private static final Set<String> LUA_KEYWORDS = Set.of(
-            "and", "break", "do", "else", "elseif", "end", "false", "for", "function", "goto",
-            "if", "in", "local", "nil", "not", "or", "repeat", "return", "then", "true",
-            "until", "while");
 
     /**
      * Runtime helpers the generated code needs that are not part of the Task 6/7

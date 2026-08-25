@@ -1,14 +1,35 @@
 # Lua mapping engine — spike results and go/no-go
 
 Sub-project 1 (feasibility spike) of the Lua mapping-engine deep-dive.
-Plan: `docs/superpowers/plans/2026-08-25-lua-mapping-engine-deepdive.md`.
-Design/success criteria: `docs/superpowers/specs/2026-08-25-lua-mapping-engine-deepdive-design.md`.
-Semantic contract: `docs/specs/mapping-language-core.md`.
+Semantic contract: [`docs/specs/mapping-language-core.md`](../docs/specs/mapping-language-core.md)
+— the one planning artifact that *is* under version control.
+
+> **Note on sources.** The plan and design documents for this sub-project live
+> under `docs/superpowers/`, which is git-ignored on the machine this work was
+> done on, so they are not in the repository and cannot be linked. Everything
+> this document depends on them for — the four success criteria, and the
+> next-phase DSL evaluation — is therefore reproduced in full below (§0 and §7)
+> rather than cited. This document is intended to be decision-grade on its own.
+
+## 0. Success criteria (reproduced verbatim from the design document)
+
+1. Tier table with percentage coverage per tier over the full corpus.
+2. Mapping Language Core spec reviewed and committed.
+3. ≥7/10 goldens green from the Go host; all pure-T1 mappings green.
+4. Written recommendation: proceed to sub-project 2 (full converter) or stop —
+   with T2/T3 cost estimated from corpus numbers, and the Lua-ecosystem verdict
+   (reuse vs build for XML/RDF libs).
+
+Status: **1 met** (§1), **2 met** (`docs/specs/mapping-language-core.md`,
+committed), **3 NOT met** (6/10, §2), **4 met** (§3, §4).
 
 **Recommendation: GO — but only for a sub-project 2 that includes T2 from
-day one.** A T1-only engine is not a product: it covers 5.49% of mappings.
-The spike proves the architecture works end to end; it also proves the T1
-boundary is far too narrow to ship behind. See §5.
+day one, and with eyes open about where T2 stops.** A T1-only engine is not a
+product: it covers 5.49% of mappings. T1+T2 complete reaches **34.1%** — a real
+migration, but still not engine retirement, which needs the T3 long tail. The
+spike proves the architecture works end to end; it also proves the T1 boundary
+is far too narrow to ship behind. See §4.3 for the increments and §5 for the
+framing.
 
 ---
 
@@ -70,19 +91,40 @@ python3 lua-poc/analysis/bare_call_gap.py \
 - **11 of the 134 T1-only mappings** contain one — including `coll-schraven`,
   which is exactly why it is the T1 golden this spike could not convert (§2).
 
-Corrected picture:
+Corrected picture — **snippet-level, and an upper bound on the correction,
+not a measurement**:
 
-| Tier | Snippets (corrected) | Share |
-|---|---:|---:|
-| T1 | 43,838 | 51.76% |
-| T2 | 15,564 | 18.38% |
-| T3 | 25,296 | 29.87% |
+| Tier | Snippets | Share | |
+|---|---:|---:|---|
+| T1 | 43,838 | 51.76% | lower bound |
+| T2 | 15,564 | 18.38% | unchanged |
+| T3 | 25,296 | 29.87% | **upper bound** |
 
-**Corrected T1-only mappings: 123 of 2,241 = 5.49%.**
+**Read this table as a ceiling.** `bare_call_gap.py` detects that a snippet
+*contains* a bare user-function call; it does not parse the callee's body and
+classify it. Some callees are genuinely T1 — the single most frequent name is
+`remove_whitespace` (2,259 occurrences), which is plausibly a one-line
+`replaceAll`. Reclassifying all 13,315 affected snippets as T3 is therefore the
+worst case: real T1 is somewhere between 51.76% and 67.48%, and real T3 between
+14.15% and 29.87%. Pinning it down requires resolving each call to its
+definition (mapping `<functions>` or rec-def `<mapping-function>`) and
+classifying that body recursively — worth doing in sub-project 2, out of scope
+here.
+
+**The mapping-level figure is not a ceiling — it is measured.**
+`coll-schraven` demonstrates the mechanism directly: a mapping was selected as
+T1-only, its bare call resolved to a real rec-def function, and that function's
+body is unambiguously T2/T3. Whether *every* one of the 11 affected mappings
+resolves that way is unverified, so:
+
+**Corrected T1-only mappings: 123 of 2,241 = 5.49%** (between 5.49% and 5.98%;
+at least one — `coll-schraven` — is confirmed by inspection, and the
+recommendation rests on this mapping-level number, not on the snippet table
+above).
 
 This does not change the recommendation — it sharpens it. Every headline in
-this document uses the corrected figure where mapping-level coverage is at
-stake, and cites both where the snippet-level number is quoted.
+this document uses the mapping-level figure where coverage is at stake, and
+labels the snippet-level number as bounded where it is quoted.
 
 ---
 
@@ -174,12 +216,20 @@ should add a case with that shape before trusting §3.4 of the spec.
   No golden case has two mapped attributes on one element, so this is recorded,
   not verified — and the Groovy side looks like a latent bug worth its own
   ticket.
+- **Ternary and Elvis are lowered unsoundly for falsy true-branches.**
+  `a ? b : c` becomes Lua's `((a) and (b) or (c))` idiom
+  (`GroovySnippetToLua.java`, `TernaryExpression` case), which silently yields
+  `c` whenever `b` evaluates to `false` or `nil`. Sound for T1, where every
+  branch value is a string or a gstring table, and no golden case uses a
+  ternary at all — but unlike the two divergences above this one fails
+  *quietly*, so sub-project 2 should replace it with an
+  immediately-invoked-function lowering rather than inherit it.
 - **Option lists / dictionaries / `ifAbsent`** raise by name; none appear in
   the golden set.
 
 ### 2.5 A concrete Lua-hosting hazard found by running the code
 
-**8 of the 10 golden mappings ship a fact named `type`.** Emitted naively as a
+**9 of the 10 golden mappings ship a fact named `type`.** Emitted naively as a
 module-level `local type = ""`, it shadows Lua's `type` function for every
 helper defined after it, and three of the generated helpers call it. Three
 goldens died on `attempt to call a non-function object` until the fact locals
@@ -239,7 +289,8 @@ vendored parser, and the host is 119 lines of Go.
 ### 4.2 What it also proved
 
 **A T1-only engine covers 5.49% of mappings (123 of 2,241)** — and it failed
-one of the seven T1 goldens because even that 5.49% was measured optimistically.
+one of the seven T1 goldens, because the 5.98% those goldens were selected
+against was itself optimistic (§1.2); 5.49% is the corrected figure.
 Shipping T1 alone would convert roughly one mapping in twenty and leave the
 Groovy engine running for the other nineteen: two engines, two behaviours, two
 sets of bugs, indefinitely. **That is a worse position than not starting.**
@@ -250,28 +301,47 @@ Scoped from the corrected corpus numbers (§1.2). "Coverage" is
 mapping-level: the share of the 2,241 canonical mappings whose *every* snippet
 becomes convertible.
 
-| Increment | Constructs | Est. effort | Cumulative mapping coverage |
+| Increment | Constructs | Est. effort (engineering judgement, not measured) | Cumulative mapping coverage |
 |---|---|---|---:|
 | **Baseline** (this spike) | T1 | done | 5.49% |
-| **A. User functions** | bare calls to mapping/rec-def-defined Groovy functions — emit each as a Lua function, converting its body with the same converter | 1–2 wks | ~11% |
-| **B. Spread + closures** | `*`, `**`, `>>`, `\|` with closure bodies; element multiplication in `builder.lua`; list literals | 3–4 wks | ~35–40% |
-| **C. Regex** | host-callback `regex.*` over Go's RE2 (closes ~100% of the 12.36% gap), or pure-Lua translation (closes 87.62%) | 1 wk | ~45–50% |
-| **D. Option lists / dictionaries** | `_optLookup`, generated `lookupX` closures, `_absent_`/`ifAbsent` | 1–2 wks | ~55–60% |
-| **E. The T3 long tail** | `def`/local variables, `each`/`collect`/`findAll`, `getValueNodes`, `first`/`last`, date helpers, `discardRecord` | 4–6 wks | 85%+ |
+| **A. User functions** | bare calls to mapping/rec-def-defined Groovy functions — emit each as a Lua function, converting its body with the same converter | 1–2 wks | ~8–12% |
+| **B. Spread + closures** | `*`, `**`, `>>`, `\|` with closure bodies; element multiplication in `builder.lua`; list literals | 3–4 wks | ~25–34% |
+| **C. Regex** | host-callback `regex.*` over Go's RE2 (closes ~100% of the 12.36% gap), or pure-Lua translation (closes 87.62%) | 1 wk | **≤34% (T2 tier complete)** |
+| **D. Option lists / dictionaries** | `_optLookup`, generated `lookupX` closures, `_absent_`/`ifAbsent` | 1–2 wks | ≤34% (prerequisite, not an extension — see below) |
+| **E. The T3 long tail** | `def`/local variables, `each`/`collect`/`findAll`, `getValueNodes`, `first`/`last`, date helpers, `discardRecord` | 4–6 wks | 85%+ (the only increment that breaks 34.1%) |
 
-Ranges are deliberately wide: they are extrapolations from snippet-frequency
-data (`TIER_TABLE.md` top-20 constructs) onto mapping-level coverage, not
-measurements. The shape is what matters — **A+B+C is the minimum viable
-increment**, roughly 5–7 weeks, and it is the point at which conversion
-becomes a migration rather than a science project.
+**Hard ceiling on A+B+C: 34.1%.** Increments A, B and C add only T1 and T2
+constructs, so the most they can reach is every mapping whose `max_tier` is T1
+or T2 — **764 of 2,241 = 34.1%** by the committed canonical tier table
+(`analysis/TIER_TABLE.md`: 134 T1-only + 630 T2-max). The rows above are capped
+at that. Anything beyond 34.1% requires **E**, which is where the 1,477 T3-max
+mappings (65.9%) live.
+
+**D is a prerequisite, not an extension.** Option lists, dictionaries and
+`ifAbsent` are properties of a mapping's *structure*, not of its snippet tier —
+a mapping can be T1-only in every snippet and still use an option list, and
+this spike refuses it (`OptListLookup`). D is therefore needed to actually
+*reach* the 34.1% ceiling, not to go past it. It is listed separately because
+it is separable work, not because it buys separable coverage.
+
+The effort column is engineering judgement from the construct inventory, not a
+measurement, and the coverage ranges are extrapolations from snippet-frequency
+data (`TIER_TABLE.md` top-20 constructs) onto mapping-level coverage. The shape
+is what matters — **A+B+C is the minimum viable increment**, roughly 5–7 weeks,
+and it is the point at which conversion becomes a migration rather than a
+science project. It is *not* the point at which the Groovy engine can be
+retired: that needs D and E.
 
 **A+B is non-negotiable.** `closure_literal` is the 5th most common construct
 in the corpus (30,003 occurrences) and every single T2/T3 golden refused on it.
 
 ### 4.4 Recommended decision
 
-**Proceed to sub-project 2, scoped as T1+A+B+C.** Do not scope it as "finish
-T1". Do not begin mass conversion until §6 is answered.
+**Proceed to sub-project 2, scoped as T1+A+B+C+D.** Do not scope it as "finish
+T1". Fund it against a **34.1% ceiling**, not against "most of the corpus" —
+the Groovy engine keeps running for the other 65.9% until increment E lands, so
+plan for a two-engine period and decide up front how long it is acceptable. Do
+not begin mass conversion until §6 and §7 are answered.
 
 Two decisions to take before starting:
 
@@ -287,10 +357,20 @@ Two decisions to take before starting:
 ## 5. Framing, stated plainly
 
 The spike succeeded and the T1 tier is not a viable shipping boundary. Both
-are true. The value delivered here is a working architecture plus a *measured*
-scope for the real work — including the discovery that the original scope
-estimate was 16 points optimistic. A go decision that does not fund T2 is a
-no decision wearing a yes.
+are true. The value delivered here is a working architecture plus a scope for
+the real work that is honest about what it does and does not know:
+
+- **Measured:** T1-only mappings are 5.49–5.98% of the corpus, T1+T2 mappings
+  are 34.1%, and the golden set proves the architecture end to end for
+  everything the T1 converter accepts.
+- **Bounded, not measured:** the snippet-level T1/T3 correction in §1.2 is a
+  ceiling, because the callee bodies behind 13,315 bare calls were not
+  classified.
+- **Estimated:** every figure in the effort column of §4.3.
+
+A go decision that does not fund T2 is a no decision wearing a yes. A go
+decision that assumes T2 retires the Groovy engine is a different mistake:
+it stops at 34.1%.
 
 ---
 
@@ -340,26 +420,36 @@ also changes which records ship is two changes wearing one commit.
 
 ## 7. Next phase: evaluate a mapping DSL before mass conversion
 
-Per the design spec's section *"Named next-phase evaluation: a mapping DSL
-above Lua"*
-(`docs/superpowers/specs/2026-08-25-lua-mapping-engine-deepdive-design.md`),
-there is a distinct phase between this spike and any mass conversion:
-evaluate a purpose-built mapping DSL that
+**There is a distinct phase between this spike and any mass conversion, and it
+is not optional.** (Reproduced here in full rather than cited: the design
+document that named it is not under version control — see the note at the top
+of this file.)
 
-- converts 1:1 to Lua for execution (this engine stays the target),
-- is form-representable, round-tripping between GUI controls and text,
-- is writable, reviewable and diffable by non-programmer mappers,
-- supports browser autocompletion typed against source-tree paths and the
-  mapping-language-core function set.
+Groovy was chosen historically because the app was Java and needed scripting.
+The snippet language is an accident of platform, not a design. If the execution
+engine is being replaced anyway, the snippet surface the mappers actually type
+is up for redesign at the same time — and **converting the corpus twice would
+be waste**, so the question must be answered *before* sub-project 2's
+conversion work starts, not after.
 
-Groovy was an accident of platform, not a design choice. If the engine is being
-replaced anyway, the snippet surface is up for redesign — and **converting the
-corpus twice would be waste**, so the DSL question must be answered before
-sub-project 2's conversion work begins.
+Before committing to raw Lua snippets as the user-facing language, evaluate a
+purpose-built mapping DSL that:
 
-The corpus tier table scopes that DSL directly: T1 constructs are what it must
-express natively, and §1.2's bare-call finding says user-defined functions are
-a first-class DSL feature, not an escape hatch.
+- **converts 1:1 to Lua for execution** — the engine built here stays the
+  target, so this is a front end, not a second runtime;
+- **is form-representable** — the same expression renders as GUI form controls
+  in the editor *and* as text, round-tripping both ways;
+- **is easy to write, review and diff for non-programmer mappers** — the people
+  who maintain these 2,241 mappings are not Groovy developers, and the corpus
+  shows it;
+- **supports browser autocompletion**, typed against source-tree paths and the
+  `mapping-language-core` function set.
+
+The corpus tier table scopes that DSL directly: **T1 constructs define what the
+DSL must express natively.** §1.2's bare-call finding adds one requirement the
+original framing missed — user-defined functions are used heavily enough
+(13,315 snippet occurrences; `remove_whitespace` alone 2,259 times) that they
+are a first-class DSL feature, not an escape hatch.
 
 ---
 

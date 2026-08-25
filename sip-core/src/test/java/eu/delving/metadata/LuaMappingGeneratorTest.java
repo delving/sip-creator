@@ -125,6 +125,32 @@ public class LuaMappingGeneratorTest {
         assertEquals("ClosureExpression", e.getConstructName());
     }
 
+    @Test
+    public void factCollidingWithAReservedNameHardFails() throws Exception {
+        // A fact named `stdlib` would be silently dropped and any snippet
+        // referring to it would then resolve to the engine module instead --
+        // a silent wrong answer, so it has to be a named refusal.
+        java.nio.file.Path temp = Files.createTempDirectory("lua-reserved-fact");
+        try {
+            java.nio.file.Path source = caseDir("nationaal-gevangenismuseum");
+            Files.copy(source.resolve("recdef.xml"), temp.resolve("recdef.xml"));
+            String mapping = Files.readString(source.resolve("mapping.xml"));
+            mapping = mapping.replace("<facts>",
+                    "<facts>\n    <entry>\n      <string>stdlib</string>\n      <string>x</string>\n    </entry>");
+            Files.writeString(temp.resolve("mapping.xml"), mapping);
+
+            UnsupportedConstructException e = assertThrows(UnsupportedConstructException.class,
+                    () -> LuaMappingGenerator.fromCaseDirectory(temp));
+            assertEquals("ReservedFactName", e.getConstructName());
+            assertTrue(e.getMessage().contains("stdlib"), e.getMessage());
+        }
+        finally {
+            try (java.util.stream.Stream<java.nio.file.Path> walk = Files.walk(temp)) {
+                walk.sorted(java.util.Comparator.reverseOrder()).forEach(path -> path.toFile().delete());
+            }
+        }
+    }
+
     private static int countOccurrences(String haystack, String needle) {
         int count = 0;
         for (int at = haystack.indexOf(needle); at >= 0; at = haystack.indexOf(needle, at + needle.length())) {

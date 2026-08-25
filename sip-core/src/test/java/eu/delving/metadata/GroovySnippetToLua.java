@@ -81,8 +81,17 @@ import org.codehaus.groovy.control.CompilePhase;
  *   \&lt;punct&gt;            -&gt; %&lt;punct&gt;            (escaped literal)
  *   %                   -&gt; %%                   (Lua's own escape character)
  *   - (outside a class) -&gt; %-                   (Lua's lazy-repeat quantifier)
- *   ^ $ . * + ? [ ] ( ) -&gt; unchanged            (same meaning in Lua)
+ *   ^ $ * + ? [ ] ( )   -&gt; unchanged            (same meaning in Lua)
+ *   .                   -&gt; unchanged            (NOT the same meaning: see below)
  * </pre>
+ * {@code .} is passed through but is not an exact equivalent. Without
+ * {@code Pattern.DOTALL} — and no corpus pattern sets it, since inline flags
+ * are refused outright — Java's {@code .} excludes line terminators, whereas
+ * Lua's {@code .} matches every character including newline. A pattern such as
+ * {@code '.*'} therefore matches further in Lua than in Java on multi-line
+ * input. Element text in this corpus is single-line in practice, so no golden
+ * case distinguishes the two; a real implementation should either restrict
+ * {@code .} to {@code [^\n]} or measure the multi-line population first.
  * Replacement strings are rewritten too: {@code $1} becomes {@code %1} and a
  * literal {@code %} becomes {@code %%}.
  *
@@ -102,6 +111,17 @@ public class GroovySnippetToLua {
             "toUpperCase", "toString", "toInteger", "indexOf", "contains",
             "startsWith", "endsWith", "sanitize", "sanitizeURI", "sanitizeURN",
             "isEmpty", "size", "join", "substring", "matches"));
+
+    /**
+     * Lua 5.1 reserved words, plus 5.2's {@code goto} which gopher-lua also
+     * reserves (spec section 9.3.1). A Groovy identifier that happens to be one
+     * of these is legal Groovy and a syntax error in Lua, so it is refused by
+     * name rather than emitted.
+     */
+    public static final Set<String> LUA_KEYWORDS = Set.of(
+            "and", "break", "do", "else", "elseif", "end", "false", "for", "function", "goto",
+            "if", "in", "local", "nil", "not", "or", "repeat", "return", "then", "true",
+            "until", "while");
 
     /** Methods whose first argument is a java.util.regex pattern. */
     private static final Set<String> REGEX_FIRST_ARG = new HashSet<>(Arrays.asList(
@@ -233,6 +253,9 @@ public class GroovySnippetToLua {
             String name = ((VariableExpression) expression).getName();
             if (!name.matches("[A-Za-z_][A-Za-z0-9_]*")) {
                 throw new UnsupportedConstructException("VariableExpression", name);
+            }
+            if (LUA_KEYWORDS.contains(name)) {
+                throw new UnsupportedConstructException("LuaKeywordCollision", name);
             }
             return name;
         }

@@ -185,6 +185,17 @@ public class GroovySnippetToLuaTest {
     }
 
     @Test
+    public void luaKeywordVariableNameHardFails() {
+        // `end` is a legal Groovy identifier and a Lua keyword; emitting it
+        // verbatim would produce a syntax error at load time rather than a
+        // named refusal.
+        UnsupportedConstructException e = assertThrows(UnsupportedConstructException.class,
+                () -> GroovySnippetToLua.convert("end.trim()"));
+        assertEquals("LuaKeywordCollision", e.getConstructName());
+        assertTrue(e.getMessage().contains("end"), e.getMessage());
+    }
+
+    @Test
     public void listLiteralHardFailsWithConstructName() {
         UnsupportedConstructException e = assertThrows(UnsupportedConstructException.class,
                 () -> GroovySnippetToLua.convert("['a','b']"));

@@ -22,10 +22,12 @@ generated=0
 refused=0
 for caseDir in "$repo"/lua-poc/golden/mappings/*/; do
     name="$(basename "$caseDir")"
+    # stderr goes to a per-case log rather than /dev/null: a generator crash
+    # would otherwise show up only as an empty verdict with no cause.
     verdict=$(mvn -q -f "$repo/pom.xml" -pl sip-core exec:java \
         -Dexec.classpathScope=test \
         -Dexec.mainClass=eu.delving.metadata.LuaMappingGenerator \
-        -Dexec.args="$caseDir $out/$name.lua" 2>/dev/null \
+        -Dexec.args="$caseDir $out/$name.lua" 2> "$out/$name.gen.log" \
         | grep -E '^(GENERATED|UNSUPPORTED)')
     case "$verdict" in
         GENERATED*)
@@ -43,7 +45,8 @@ for caseDir in "$repo"/lua-poc/golden/mappings/*/; do
             refused=$((refused+1))
             ;;
         *)
-            echo "$name: GENERATOR FAILED (no verdict line)"
+            echo "$name: GENERATOR FAILED -- see $out/$name.gen.log"
+            tail -5 "$out/$name.gen.log" | sed 's/^/    /'
             ;;
     esac
 done
