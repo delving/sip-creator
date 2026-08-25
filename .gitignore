@@ -63,3 +63,11 @@ SipCreatorGUI.xml
 # Zig prototype build outputs
 .zig-cache
 zig-out
+
+# Python
+__pycache__
+*.pyc
+.pytest_cache
+
+# lua-poc analysis: test-generated report artifact
+lua-poc/analysis/out.json
