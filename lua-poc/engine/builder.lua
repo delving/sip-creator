@@ -14,25 +14,37 @@ Surface (task-7-brief.md):
   b:elem(qname, attrs, fn_or_text) -> el   -- nestable
   b:to_rdfxml() -> string
 
-`attrs` is a plain `{ qname = value }` table; each value is resolved via
-the same rule as body content (spec 3.3 `resolveValue`): a function is
-called and its result resolved recursively; a `stdlib.gs(...)` gstring
+`attrs` is a plain `{ qname = value }` table. Each value goes through
+`Builder:resolve` (spec 3.3 `resolveValue`): a `stdlib.gs(...)` gstring
 table is reduced to its text or dropped (nil) if `suppressed`; anything
-else passes through. A value that resolves to nil is a skipped attribute
-(spec 3.5, DOMBuilder.java:270), never an empty `attr=""`.
+else (besides a function or gstring) passes through. A value that resolves
+to nil is a skipped attribute (spec 3.5, DOMBuilder.java:270), never an
+empty `attr=""`.
 
 `fn_or_text` (the element's content) may be:
   - nil                         -> no content
   - a plain Lua string          -> text content, NEVER suppressed (spec
                                     3.4: only a GString/gstring is subject
                                     to suppressIfAllVariablesEmpty)
-  - a function                  -> called with `(b, el)`; nested `b:elem`
+  - a function                  -> called directly by `elem` as
+                                    `fn_or_text(b, el)`; nested `b:elem`
                                     calls inside it attach children to
                                     `el` (this is what makes elem
-                                    "nestable"); the function's return
-                                    value, if any, is resolved the same
-                                    way as a plain content value and
-                                    becomes `el`'s own text
+                                    "nestable"). Its RETURN value, if any,
+                                    is then resolved like any other content
+                                    value and becomes `el`'s own text.
+
+CALLING-CONVENTION ASYMMETRY (accurate, not "the same rule" — see
+`Builder:elem`/`Builder:resolve` below): only this one, outermost
+`fn_or_text` function is ever called with two arguments, `(b, el)`. Every
+OTHER function value this module calls — an attribute value, or a
+function returned from a content closure — is invoked through
+`Builder:resolve`, which calls it with a single argument, `(b)` only
+(`resolve`'s `v(self)`; there is no second `el` argument available at that
+point, since `resolve` does not know which element a given value is being
+resolved for). Concretely: `b:elem('ns:x', {['rdf:about'] = function(b)
+... end}, function(b, el) ... end)` — the attribute closure sees only
+`b`; the content closure sees `b` and the `el` it is filling in.
 
 Verification note: golden comparison (Task 5's GoldenVerify) is a Jena
 RDF-graph isomorphism check, not a byte-diff, so this module does not
@@ -76,12 +88,13 @@ function M.new(namespaces)
   }, Builder)
 end
 
--- spec 3.3 resolveValue: a function is called (and its result resolved
--- recursively); a gstring table is reduced to its text, or dropped (nil)
--- if `suppressed`; an element table already attached to its parent's
--- content (returned from a nested b:elem call) contributes no text of its
--- own; anything else (nil, a plain string, a number/boolean) passes
--- through unchanged.
+-- spec 3.3 resolveValue: a function is called WITH ONLY `self` (one
+-- argument, `b` — see the module header's calling-convention note: `el`
+-- is not available here) and its result resolved recursively; a gstring
+-- table is reduced to its text, or dropped (nil) if `suppressed`; an
+-- element table already attached to its parent's content (returned from a
+-- nested b:elem call) contributes no text of its own; anything else (nil,
+-- a plain string, a number/boolean) passes through unchanged.
 function Builder:resolve(v)
   if v == nil then
     return nil
