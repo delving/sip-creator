@@ -1,0 +1,90 @@
+{
+  "canonical_mappings": 2241,
+  "t1_snippets": 57153,
+  "t1_snippets_with_bare_call": 13315,
+  "t1_snippets_with_bare_call_pct": 23.3,
+  "t1_only_mappings": 134,
+  "t1_only_mappings_with_bare_call": 11,
+  "top_function_names": [
+    [
+      "remove_whitespace",
+      2259
+    ],
+    [
+      "createEDMAgentUri",
+      2151
+    ],
+    [
+      "switch_dates",
+      1912
+    ],
+    [
+      "checkLangNL",
+      1153
+    ],
+    [
+      "extractYear",
+      971
+    ],
+    [
+      "memorixLink",
+      876
+    ],
+    [
+      "create_geoname_uri",
+      844
+    ],
+    [
+      "toDecadeRanges",
+      602
+    ],
+    [
+      "checkLang",
+      500
+    ],
+    [
+      "checkLangEN",
+      491
+    ],
+    [
+      "imageProxySmall",
+      382
+    ],
+    [
+      "createTimelineURI",
+      326
+    ],
+    [
+      "checkType",
+      302
+    ],
+    [
+      "youTube",
+      291
+    ],
+    [
+      "mintSnkDeclarationURI",
+      268
+    ],
+    [
+      "mintSnkRegistrationURI",
+      268
+    ],
+    [
+      "baseID",
+      257
+    ],
+    [
+      "imageProxyLarge",
+      249
+    ],
+    [
+      "fullTextFromURL",
+      196
+    ],
+    [
+      "largeThumbnail",
+      140
+    ]
+  ]
+}
