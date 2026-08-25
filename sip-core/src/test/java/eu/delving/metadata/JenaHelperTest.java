@@ -67,6 +67,29 @@ public class JenaHelperTest {
     }
 
     @Test
+    public void compactWithGeneratedContextUsesShortTerms() {
+        String context = """
+            {"@context": {"ex": "http://example.org/",
+                          "name": {"@id": "http://example.org/name"}}}
+            """;
+        String compact = JenaHelper.convertRDF("ex", SAMPLE_RDF,
+            RDFFormat.JSONLD_COMPACT_PRETTY, context, null);
+        assertTrue(compact.contains("\"name\""), compact);
+        assertFalse(compact.contains("http://example.org/name"), compact);
+    }
+
+    @Test
+    public void frameStringDrivesFraming() {
+        String frame = """
+            {"@context": {"ex": "http://example.org/"},
+             "@type": "http://example.org/Thing"}
+            """;
+        String framed = JenaHelper.convertRDF("ex", SAMPLE_RDF,
+            RDFFormat.JSONLD_FRAME_PRETTY, null, frame);
+        assertTrue(framed.contains("item1"), framed);
+    }
+
+    @Test
     void shouldReturnCompactJsonLdWhenNoFrame() {
         String rdf = """
             <?xml version="1.0" encoding="UTF-8"?>

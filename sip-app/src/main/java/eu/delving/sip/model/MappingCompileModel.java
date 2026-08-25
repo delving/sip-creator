@@ -28,10 +28,12 @@ import eu.delving.metadata.AssertionTest;
 import eu.delving.metadata.CodeGenerator;
 import eu.delving.metadata.EditPath;
 import eu.delving.metadata.JenaHelper;
+import eu.delving.metadata.JsonLdContextGenerator;
 import eu.delving.metadata.MappingFunction;
 import eu.delving.metadata.MappingResult;
 import eu.delving.metadata.NodeMapping;
 import eu.delving.metadata.NodeMappingChange;
+import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefNode;
 import eu.delving.metadata.RecMapping;
 import eu.delving.metadata.StructureTest;
@@ -488,7 +490,28 @@ public class MappingCompileModel {
             String syntaxStyle = outputDocument.getSyntaxStyle();
             if (error == null) {
                 try {
-                    output = JenaHelper.convertRDF(recMapping.getDefaultPrefix(), output, rdfFormat);
+                    if (rdfFormat == RDFFormat.JSONLD_COMPACT_PRETTY || rdfFormat == RDFFormat.JSONLD_FRAME_PRETTY) {
+                        String contextJson = null;
+                        String frameJson = null;
+                        try {
+                            RecDef recDef = recMapping.getRecDefTree().getRecDef();
+                            contextJson = JsonLdContextGenerator.generateContext(recDef);
+                            frameJson = rdfFormat == RDFFormat.JSONLD_FRAME_PRETTY
+                                    ? JsonLdContextGenerator.generateFrame(recDef) : null;
+                        } catch (Throwable generatorError) {
+                            // A recdef defect in the generator must never blank the preview;
+                            // fall back to the old convertRDF(prefix, output, rdfFormat) behavior below.
+                            contextJson = null;
+                            frameJson = null;
+                        }
+                        if (contextJson == null && frameJson == null) {
+                            output = JenaHelper.convertRDF(recMapping.getDefaultPrefix(), output, rdfFormat);
+                        } else {
+                            output = JenaHelper.convertRDF(recMapping.getDefaultPrefix(), output, rdfFormat, contextJson, frameJson);
+                        }
+                    } else {
+                        output = JenaHelper.convertRDF(recMapping.getDefaultPrefix(), output, rdfFormat);
+                    }
                 } catch (Throwable t) {
                     ByteArrayOutputStream errorBuffer = new ByteArrayOutputStream();
                     try (PrintWriter writer = new PrintWriter(errorBuffer)) {

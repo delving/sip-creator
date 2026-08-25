@@ -80,6 +80,38 @@ public class JenaHelper {
         return convertRDF(defaultPrefix, rdf, outputFormat);
     }
 
+    public static String convertRDF(String defaultPrefix, String rdf, RDFFormat outputFormat, String contextJson, String frameJson) {
+        if (contextJson == null && frameJson == null) {
+            return convertRDF(defaultPrefix, rdf, outputFormat);
+        }
+
+        String compliantRDF = toJenaCompliantRDFIfNeeded(defaultPrefix, rdf);
+        InputStream in = new ByteArrayInputStream(compliantRDF.getBytes(StandardCharsets.UTF_8));
+        Model model = ModelFactory.createDefaultModel().read(in, "", "RDF/XML");
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream(2048);
+
+        JsonLDWriteContext ctx = new JsonLDWriteContext();
+        if (contextJson != null) {
+            ctx.setJsonLDContext(contextJson);
+            // The JSON-LD compaction algorithm always echoes the context it was given
+            // back into the "@context" node of the compacted output (see
+            // JsonLdProcessor#compact). For a recdef-derived context that can be large,
+            // so substitute an empty placeholder for the echoed node while still using
+            // the real context (set above) to drive the compaction itself.
+            ctx.setJsonLDContextSubstitution("{}");
+        }
+        if (frameJson != null) {
+            ctx.setFrame(frameJson);
+        }
+
+        WriterGraphRIOT writer = RDFDataMgr.createGraphWriter(outputFormat);
+        PrefixMap prefixes = RiotLib.prefixMap(model.getGraph());
+        writer.write(out, model.getGraph(), prefixes, null, ctx);
+
+        return formatJSON(out.toByteArray());
+    }
+
     private static String convertRDFWithFrame(String defaultPrefix, String rdf, RDFFormat outputFormat, Map<String, Object> frame) {
         String compliantRDF = toJenaCompliantRDFIfNeeded(defaultPrefix, rdf);
         InputStream in = new ByteArrayInputStream(compliantRDF.getBytes(StandardCharsets.UTF_8));
