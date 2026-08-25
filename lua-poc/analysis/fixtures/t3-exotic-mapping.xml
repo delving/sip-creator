@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mapping>
   <node-mapping>
-    <groovy-code>"${input_.sanitizeURI()}"</groovy-code>
+    <groovy-code>
+      <string>"${input_.sanitizeURI()}"</string>
+    </groovy-code>
   </node-mapping>
   <node-mapping>
-    <groovy-code>def x = new java.util.Date(); x.toString()</groovy-code>
+    <groovy-code>
+      <string>def x = new java.util.Date(); x.toString()</string>
+    </groovy-code>
   </node-mapping>
 </mapping>

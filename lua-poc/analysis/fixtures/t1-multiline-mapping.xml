@@ -3,11 +3,7 @@
   <node-mapping>
     <groovy-code>
       <string>"${input_.sanitizeURI()}"</string>
-    </groovy-code>
-  </node-mapping>
-  <node-mapping>
-    <groovy-code>
-      <string>input.* { it.toString().capitalize() }</string>
+      <string>input_.replaceAll('^0+','')</string>
     </groovy-code>
   </node-mapping>
 </mapping>

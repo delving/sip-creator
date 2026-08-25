@@ -3,9 +3,10 @@
 Corpus analyzer with T1/T2/T3 tier classification for Groovy mapping snippets.
 
 Walks one or more corpus roots for `*mapping*.xml` files, extracts the text
-of every `<groovy-code>` element, classifies each snippet's constructs into
-tiers (T1 = trivially portable, T2 = moderate, T3 = exotic/needs bespoke
-handling), and writes an aggregate JSON report.
+of every `<groovy-code>` element (real mapping XML nests one line per
+<string> child; a flat text form is also supported), classifies each
+snippet's constructs into tiers (T1 = trivially portable, T2 = moderate,
+T3 = exotic/needs bespoke handling), and writes an aggregate JSON report.
 
 Usage:
     analyze_corpus.py ROOT [ROOT...] -o corpus-report.json
@@ -33,36 +34,48 @@ T1_STRING_METHODS = [
 # Classification table kept as data so the spec can cite it directly.
 # Each entry: name -> (tier, compiled regex). Regexes are matched with
 # re.search against the raw snippet text.
-CONSTRUCT_TABLE = {}
+def _build_construct_table():
+    table = {}
+    for method in T1_STRING_METHODS:
+        table[f"method:{method}"] = (
+            "T1",
+            re.compile(r"\." + re.escape(method) + r"\s*\("),
+        )
+    table.update({
+        "gstring_interpolation": ("T1", re.compile(r"\$\{[^}]*\}")),
+        "property_access": ("T1", re.compile(r"\b\w+(?:_\.|\.)\w+")),
+        "string_literal": ("T1", re.compile(r"""(['"]).*?\1""")),
+        "ternary": ("T1", re.compile(r"\?[^:]*:")),
+        "elvis": ("T1", re.compile(r"\?:")),
+        "equality": ("T1", re.compile(r"(==|!=)")),
 
-for _method in T1_STRING_METHODS:
-    CONSTRUCT_TABLE[f"method:{_method}"] = (
-        "T1",
-        re.compile(r"\." + re.escape(_method) + r"\s*\("),
-    )
+        "spread_operator": ("T2", re.compile(r"\*\.|\.\*\s")),
+        "closure_literal": ("T2", re.compile(r"\{[^{}]*->")),
+        "each_collect_findall": ("T2", re.compile(r"\.(each|collect|findAll)\b")),
+        "regex_match": ("T2", re.compile(r"\.matches\s*\(|=~|\.matcher\b")),
+        # Negative lookbehind excludes subscript indexing (`arr[0]`,
+        # `input_.split(',')[1]`): a `[...]` immediately preceded by an
+        # identifier char, `)`, or `]` is navigation (T1), not a list
+        # literal (T2). A `[...]` at the start of an expression, or after
+        # an operator/whitespace, is a genuine list literal.
+        "list_literal": ("T2", re.compile(r"(?<![\w)\]])\[[^\[\]]*\]")),
+        "discard_record": ("T2", re.compile(r"\bdiscardRecord\b")),
+    })
+    return table
 
-CONSTRUCT_TABLE.update({
-    "gstring_interpolation": ("T1", re.compile(r"\$\{[^}]*\}")),
-    "property_access": ("T1", re.compile(r"\b\w+(?:_\.|\.)\w+")),
-    "string_literal": ("T1", re.compile(r"""(['"]).*?\1""")),
-    "ternary": ("T1", re.compile(r"\?[^:]*:")),
-    "elvis": ("T1", re.compile(r"\?:")),
-    "equality": ("T1", re.compile(r"(==|!=)")),
 
-    "spread_operator": ("T2", re.compile(r"\*\.|\.\*\s")),
-    "closure_literal": ("T2", re.compile(r"\{[^{}]*->")),
-    "each_collect_findall": ("T2", re.compile(r"\.(each|collect|findAll)\b")),
-    "regex_match": ("T2", re.compile(r"\.matches\s*\(|=~|\.matcher\b")),
-    "list_literal": ("T2", re.compile(r"\[[^\[\]]*\]")),
-    "discard_record": ("T2", re.compile(r"\bdiscardRecord\b")),
-})
+CONSTRUCT_TABLE = _build_construct_table()
 
 TIER_RANK = {"T1": 1, "T2": 2, "T3": 3}
 
-# Methods that are T2 "collection" style calls, so a bare `.methodName(`
-# that isn't in this set and isn't a T1 method falls through to T3 as an
-# "arbitrary method call".
-_T2_METHOD_NAMES = {"each", "collect", "findAll"}
+# Method names already covered by a dedicated CONSTRUCT_TABLE rule (T1
+# string methods, plus the T2 collection/regex methods). The "arbitrary
+# method call -> T3" fallback below must exclude all of these, or it
+# double-classifies snippets like `input.matches(...)` as T3 even though
+# the dedicated `regex_match` rule already correctly tags them T2.
+_DEDICATED_METHOD_NAMES = set(T1_STRING_METHODS) | {
+    "each", "collect", "findAll", "matches", "matcher",
+}
 
 
 def classify_snippet(code):
@@ -91,14 +104,13 @@ def classify_snippet(code):
             found.append(name)
             tier = "T3"
 
-    # Arbitrary method calls not in the T1 list and not a recognized T2
-    # collection method are T3. Capitalized names are excluded: they are
-    # class references (e.g. the `Date` in `new java.util.Date()`), already
+    # Arbitrary method calls not already covered by a dedicated rule
+    # (_DEDICATED_METHOD_NAMES = T1 string methods + T2 collection/regex
+    # methods) are T3. Capitalized names are excluded: they are class
+    # references (e.g. the `Date` in `new java.util.Date()`), already
     # covered by the constructor_call signal above, not real method calls.
     for method_name in re.findall(r"\.(\w+)\s*\(", code):
-        if method_name in T1_STRING_METHODS:
-            continue
-        if method_name in _T2_METHOD_NAMES:
+        if method_name in _DEDICATED_METHOD_NAMES:
             continue
         if method_name[:1].isupper():
             continue
@@ -122,8 +134,27 @@ def find_mapping_files(roots):
     return files
 
 
+def _local_tag(elem):
+    return elem.tag.split("}")[-1]  # strip namespace if present
+
+
 def extract_snippets(xml_path):
-    """Return list of <groovy-code> text snippets in an XML mapping file."""
+    """Return list of <groovy-code> text snippets in an XML mapping file.
+
+    Real mapping XML (see sip-core/src/test/resources/ese/mapping_ese.xml
+    and NodeMapping.java's `List<String> groovyCode`) stores each line of a
+    snippet as a separate <string> child of <groovy-code>:
+
+        <groovy-code>
+          <string>line one</string>
+          <string>line two</string>
+        </groovy-code>
+
+    That nested form is the primary case: <string> children are joined with
+    newlines into a single snippet. A flat `<groovy-code>text</groovy-code>`
+    form (no <string> children) is also supported as a fallback, matching
+    the shape used by the task's own minimal test fixtures.
+    """
     snippets = []
     try:
         tree = ET.parse(xml_path)
@@ -131,9 +162,17 @@ def extract_snippets(xml_path):
         return snippets
     root = tree.getroot()
     for elem in root.iter():
-        tag = elem.tag.split("}")[-1]  # strip namespace if present
-        if tag == "groovy-code" and elem.text and elem.text.strip():
-            snippets.append(elem.text.strip())
+        if _local_tag(elem) != "groovy-code":
+            continue
+        string_children = [c for c in elem if _local_tag(c) == "string"]
+        if string_children:
+            snippet = "\n".join(c.text or "" for c in string_children).strip()
+        elif elem.text and elem.text.strip():
+            snippet = elem.text.strip()
+        else:
+            snippet = ""
+        if snippet:
+            snippets.append(snippet)
     return snippets
 
 
