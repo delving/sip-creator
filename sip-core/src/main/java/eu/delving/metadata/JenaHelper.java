@@ -80,6 +80,34 @@ public class JenaHelper {
         return convertRDF(defaultPrefix, rdf, outputFormat);
     }
 
+    /**
+     * Preview-oriented JSON-LD conversion driven by an explicit (typically recdef-generated)
+     * {@code @context} and/or frame, both supplied as raw JSON strings.
+     *
+     * <p>Both {@code contextJson} and {@code frameJson} may be {@code null}; if both are
+     * {@code null} this delegates unchanged to {@link #convertRDF(String, String, RDFFormat)}.
+     *
+     * <p>For {@link RDFFormat#JSONLD_COMPACT_PRETTY}, {@code contextJson} drives compaction
+     * (short terms in the output), but the output's own {@code "@context"} node is replaced
+     * with an empty object ({@code "{}"}) via
+     * {@link org.apache.jena.riot.JsonLDWriteContext#setJsonLDContextSubstitution(String)}
+     * rather than echoing {@code contextJson} back verbatim. This is deliberate: the JSON-LD
+     * compaction algorithm always echoes the context it was given into the compacted result
+     * (see {@code com.github.jsonldjava.core.JsonLdProcessor#compact}), and a recdef-derived
+     * context can be large; re-embedding it in every previewed record would be noisy. As a
+     * result, <b>the returned string for the compact case is preview output, not a
+     * self-contained/round-trippable JSON-LD document</b> — its {@code "@context"} does not
+     * carry the term definitions used to produce it. Callers that need the full context
+     * in-band (e.g. downstream consumers expanding/re-compacting the result) should use the
+     * 3-arg {@link #convertRDF(String, String, RDFFormat)} overload (auto-generated context,
+     * embedded as-is) or extend this API with an explicit "embed context" option — do not
+     * assume this overload's compact output already carries one.
+     *
+     * <p>For {@link RDFFormat#JSONLD_FRAME_PRETTY}, {@code frameJson} drives framing via
+     * {@link org.apache.jena.riot.JsonLDWriteContext#setFrame(String)}; a non-null
+     * {@code contextJson} is set on the write context but has no effect on the frame branch
+     * (framing does not consult {@code JSONLD_CONTEXT}) and is otherwise harmless to pass.
+     */
     public static String convertRDF(String defaultPrefix, String rdf, RDFFormat outputFormat, String contextJson, String frameJson) {
         if (contextJson == null && frameJson == null) {
             return convertRDF(defaultPrefix, rdf, outputFormat);

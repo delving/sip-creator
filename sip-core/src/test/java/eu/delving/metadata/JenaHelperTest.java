@@ -90,6 +90,27 @@ public class JenaHelperTest {
     }
 
     @Test
+    public void frameWithBothContextAndFrameStillFramesAndDoesNotThrow() {
+        // This is the combination MappingCompileModel actually produces for
+        // JSONLD_FRAME_PRETTY: it always generates a contextJson, and additionally
+        // a frameJson. The frame branch ignores JSONLD_CONTEXT, so passing a
+        // non-null contextJson alongside frameJson must remain harmless.
+        String context = """
+            {"@context": {"ex": "http://example.org/",
+                          "name": {"@id": "http://example.org/name"}}}
+            """;
+        String frame = """
+            {"@context": {"ex": "http://example.org/"},
+             "@type": "http://example.org/Thing"}
+            """;
+        String framed = JenaHelper.convertRDF("ex", SAMPLE_RDF,
+            RDFFormat.JSONLD_FRAME_PRETTY, context, frame);
+        assertTrue(framed.contains("item1"), framed);
+        assertTrue(framed.contains("@graph"), framed);
+        assertTrue(framed.contains("Thing"), framed);
+    }
+
+    @Test
     void shouldReturnCompactJsonLdWhenNoFrame() {
         String rdf = """
             <?xml version="1.0" encoding="UTF-8"?>
