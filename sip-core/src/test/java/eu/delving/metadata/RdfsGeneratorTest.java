@@ -34,6 +34,19 @@ public class RdfsGeneratorTest {
             e22.getProperty(RDFS.label, "en").getString());
     }
 
+    // The recdef's established subclassof convention is a bare parent label
+    // (e.g. subclassof="Appellation"), not a curie -- RecDefSemanticsTest's
+    // fixture root entity declares subclassof="crm:E19_Physical_Object, Appellation".
+    // End to end through the generator, "Appellation" must resolve to the
+    // crm:E41_Appellation template's tag URI (its label="Appellation").
+    @Test
+    public void subClassOfResolvesLabelValuedParentReference() {
+        Model m = generateModel();
+        Resource e22 = m.getResource("http://www.cidoc-crm.org/cidoc-crm/E22_Human-Made_Object");
+        assertTrue(m.contains(e22, RDFS.subClassOf,
+            m.getResource("http://www.cidoc-crm.org/cidoc-crm/E41_Appellation")));
+    }
+
     @Test
     public void objectAndDatatypePropertiesWithDomainRange() {
         Model m = generateModel();

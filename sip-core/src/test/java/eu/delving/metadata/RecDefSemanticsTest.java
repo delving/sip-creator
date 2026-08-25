@@ -17,7 +17,7 @@ public class RecDefSemanticsTest {
                 </namespaces>
                 <root tag="rdf:RDF">
                     <elem tag="crm:E22_Human-Made_Object" label="HumanMadeObject"
-                          subclassof="crm:E19_Physical_Object" equivalentClass="tst:HumanMadeObject">
+                          subclassof="crm:E19_Physical_Object, Appellation" equivalentClass="tst:HumanMadeObject">
                         <doc>
                             <para name="Label" lang="en">Human Made Object</para>
                             <para name="Definition" lang="nl">Doelbewust gemaakt object.</para>
@@ -56,6 +56,7 @@ public class RecDefSemanticsTest {
         RecDefSemantics.Entity e = semantics().entities.get("crm:E22_Human-Made_Object");
         assertEquals(3, e.properties.size()); // the root shape, not the empty template shadow
         assertEquals("crm:E19_Physical_Object", e.subClassOf.get(0));
+        assertEquals("Appellation", e.subClassOf.get(1)); // raw label, unresolved at this layer
         assertEquals("tst:HumanMadeObject", e.equivalentClass);
         assertEquals("Human Made Object", e.labels.get("en"));
         assertEquals("Doelbewust gemaakt object.", e.definitions.get("nl"));
@@ -84,5 +85,25 @@ public class RecDefSemanticsTest {
             s.uriFor("crm:E22_Human-Made_Object"));
         assertEquals("http://example.org/full", s.uriFor("http://example.org/full"));
         assertThrows(IllegalArgumentException.class, () -> s.uriFor("nope:X"));
+    }
+
+    // subclassof follows the recdef's own established convention of naming the
+    // parent by its `label` attribute (e.g. subclassof="Appellation"), not a
+    // curie -- unlike equivalentClass/subPropertyOf/target/datatype. uriForSubClassOf
+    // must still accept a plain curie too, so an author who *does* spell out a
+    // full curie isn't punished for it.
+    @Test
+    public void uriForSubClassOfResolvesLabelViaFallbackAndStillAcceptsCuries() {
+        RecDefSemantics s = semantics();
+        // curie-valued subclassof (crm:E19_Physical_Object isn't itself declared
+        // as an entity anywhere in the fixture -- resolution must not require that)
+        assertEquals("http://www.cidoc-crm.org/cidoc-crm/E19_Physical_Object",
+            s.uriForSubClassOf("crm:E19_Physical_Object"));
+        // label-valued subclassof: "Appellation" is the label= of the
+        // crm:E41_Appellation template -- must resolve to that entity's tag URI.
+        assertEquals("http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
+            s.uriForSubClassOf("Appellation"));
+        // a label with no matching entity anywhere is genuinely unresolvable.
+        assertThrows(IllegalArgumentException.class, () -> s.uriForSubClassOf("NoSuchLabel"));
     }
 }

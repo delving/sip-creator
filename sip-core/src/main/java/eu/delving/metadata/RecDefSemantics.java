@@ -33,14 +33,17 @@ public class RecDefSemantics {
     public final String version;
     public final Map<String, String> namespaces;
     public final Map<String, Entity> entities;
+    public final Map<String, String> labelToTag;
 
     private RecDefSemantics(String ontologyUri, List<String> imports, String version,
-                             Map<String, String> namespaces, Map<String, Entity> entities) {
+                             Map<String, String> namespaces, Map<String, Entity> entities,
+                             Map<String, String> labelToTag) {
         this.ontologyUri = ontologyUri;
         this.imports = Collections.unmodifiableList(imports);
         this.version = version;
         this.namespaces = Collections.unmodifiableMap(namespaces);
         this.entities = Collections.unmodifiableMap(entities);
+        this.labelToTag = Collections.unmodifiableMap(labelToTag);
     }
 
     public static RecDefSemantics from(RecDef recDef) {
@@ -82,11 +85,17 @@ public class RecDefSemantics {
         }
 
         Map<String, Entity> entities = new LinkedHashMap<>();
+        Map<String, String> labelToTag = new LinkedHashMap<>();
         for (Map.Entry<String, RecDef.Elem> entry : entityElems.entrySet()) {
-            entities.put(entry.getKey(), toEntity(entry.getKey(), entry.getValue()));
+            String tag = entry.getKey();
+            RecDef.Elem elem = entry.getValue();
+            entities.put(tag, toEntity(tag, elem));
+            if (elem.label != null && !elem.label.isEmpty()) {
+                labelToTag.putIfAbsent(elem.label, tag);
+            }
         }
 
-        return new RecDefSemantics(ontologyUri, imports, recDef.version, namespaces, entities);
+        return new RecDefSemantics(ontologyUri, imports, recDef.version, namespaces, entities, labelToTag);
     }
 
     public String uriFor(String curie) {
@@ -98,6 +107,24 @@ public class RecDefSemantics {
         String uri = namespaces.get(prefix);
         if (uri == null) throw new IllegalArgumentException("Unknown prefix: " + prefix);
         return uri + localName;
+    }
+
+    /**
+     * Resolve a subClassOf reference, which -- unlike equivalentClass/subPropertyOf/
+     * target/datatype -- follows the record definition's own established convention
+     * of naming the parent by its {@code label} attribute rather than by curie (e.g.
+     * {@code subclassof="PhysicalHumanMadeThing"} referring to the entity whose
+     * {@code label="PhysicalHumanMadeThing"}). Falls back to plain curie resolution
+     * for any value that does contain a colon, so a subclassof value given as a full
+     * curie still works. Throws if neither resolves, exactly like {@link #uriFor}.
+     */
+    public String uriForSubClassOf(String ref) {
+        if (ref.indexOf(':') >= 0 || ref.startsWith("http://") || ref.startsWith("https://")) {
+            return uriFor(ref);
+        }
+        String tag = labelToTag.get(ref);
+        if (tag == null) throw new IllegalArgumentException("No entity with label: " + ref);
+        return uriFor(tag);
     }
 
     private static boolean hasUsableTag(RecDef.Elem elem) {

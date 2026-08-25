@@ -84,7 +84,7 @@ public class RdfsGenerator {
                 classResource.addProperty(RDFS.comment, model.createLiteral(def.getValue(), def.getKey()));
             }
             for (String subClassOf : entity.subClassOf) {
-                resolveOrSkip(semantics, subClassOf, uri ->
+                resolveSubClassOfOrSkip(semantics, subClassOf, uri ->
                     classResource.addProperty(RDFS.subClassOf, model.createResource(uri)));
             }
             if (entity.equivalentClass != null) {
@@ -143,6 +143,18 @@ public class RdfsGenerator {
         String uri;
         try {
             uri = semantics.uriFor(curie);
+        } catch (IllegalArgumentException e) {
+            return;
+        }
+        emit.accept(uri);
+    }
+
+    // subClassOf follows the recdef's own label-based parent-reference convention
+    // (see RecDefSemantics#uriForSubClassOf), not a plain curie -- resolve it that way.
+    private static void resolveSubClassOfOrSkip(RecDefSemantics semantics, String ref, Consumer<String> emit) {
+        String uri;
+        try {
+            uri = semantics.uriForSubClassOf(ref);
         } catch (IllegalArgumentException e) {
             return;
         }
