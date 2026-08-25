@@ -78,6 +78,38 @@ describe("node:get_ (recursive, self-included, first non-empty-text match)", fun
   end)
 end)
 
+describe("namespace declarations are not attributes (MetadataParser.java:135-144)", function()
+  -- SLAXML's SAX layer fires the attribute callback for xmlns="..." and
+  -- xmlns:foo="..." the same as any ordinary attribute, but the real Java
+  -- engine (StAX getAttributeCount/getAttributeName) never exposes
+  -- namespace declarations that way. The whole golden corpus is
+  -- namespaced (EDM/LIDO/MODS), so a leak here would put "xmlns" and
+  -- "xmlns:<prefix>" into every element's attribute set.
+  local r = node.parse(
+    '<r xmlns="http://default/" xmlns:dc="http://purl.org/dc/elements/1.1/" dc:title="t" real="x"></r>'
+  )
+
+  it("does not expose the default-namespace declaration as an attribute", function()
+    assert.is_nil(r:attr("xmlns"))
+  end)
+
+  it("does not expose a prefixed namespace declaration as an attribute", function()
+    assert.is_nil(r:attr("xmlns:dc"))
+  end)
+
+  it("still exposes a real qualified attribute", function()
+    assert.equal("t", r:attr("dc:title"))
+  end)
+
+  it("still exposes a real unprefixed attribute", function()
+    assert.equal("x", r:attr("real"))
+  end)
+
+  it("keeps only the real attributes in the ordered attrs list", function()
+    assert.equal(2, #r.raw.attrs)
+  end)
+end)
+
 describe("absorber nil-absorption", function()
   local root = node.parse("<r></r>")
   local absorber = root:get_("nope")

@@ -202,6 +202,12 @@ local function wrap(raw)
   return raw._node
 end
 
+-- Absorber-detection only, NOT a text-emptiness check: `is_empty()` answers
+-- "is this the shared absorber standing in for a get_/attr miss", not "does
+-- this node's text() happen to be """. A real node — even one whose own
+-- text is "" (e.g. an element with only child elements, no direct text) —
+-- is a real node and always returns false here. Check `:text() == ""`
+-- separately if text-emptiness is what's actually wanted.
 function Node:is_empty()
   return false
 end

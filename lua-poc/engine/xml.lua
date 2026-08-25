@@ -59,6 +59,23 @@ function M.parse(xmlString)
   end
 
   function callbacks.attribute(name, value, uri, prefix)
+    -- Namespace declarations (xmlns="..." / xmlns:foo="...") fire through
+    -- this same SAX callback in SLAXML, but MetadataParser/StAX never
+    -- exposes them as attributes (MetadataParser.java:135-144 iterates
+    -- getAttributeCount()/getAttributeName(), which excludes namespace
+    -- declarations by construction). Drop them here so attr()/attrs stay
+    -- spec-faithful: a namespaced corpus (EDM/LIDO/MODS) would otherwise
+    -- leak "xmlns" and "xmlns:<prefix>" into every element's attribute set.
+    --
+    -- Verified empirically (not just read off SLAXML's source): for both
+    -- forms, SLAXML always passes `prefix == nil` and folds the colon into
+    -- `name` itself (name == "xmlns" or name == "xmlns:dc") — unlike every
+    -- other prefixed attribute, where `name` is the bare local part and
+    -- `prefix` carries the prefix separately. So the guard must match on
+    -- `name`, not `prefix`.
+    if name == "xmlns" or name:sub(1, 6) == "xmlns:" then
+      return
+    end
     local qname = name
     if prefix then
       qname = prefix .. ":" .. name
