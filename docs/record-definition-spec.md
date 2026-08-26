@@ -95,7 +95,7 @@ the class-level Javadoc.
 the sip.zip as `mapping_{prefix}.xml`.  Its `NodeMapping` instances reference
 output paths defined by the `RecDef`.
 
-### 1.4 Relationship to XSD/SHACL
+### 1.4 Relationship to XSD/SHACL, and the four generators
 
 The validation XSD (`*_validation.xsd`) and SHACL shape (`*_shacl.ttl`) are
 shipped alongside the record-definition for the same schema version (see
@@ -105,6 +105,57 @@ record-definition should be a (looser, editor-friendly) shape that produces XSD-
 and SHACL-valid records when populated.  The Java implementation does **not**
 cross-validate the record-definition against the XSD; consistency is a hand-
 maintained property of the schema repository at https://schemas.delving.eu.
+
+Since the *recdef-semantics-generators* feature, `*_validation.xsd` and
+`*_shacl.ttl` are no longer the only artefacts a record-definition can
+produce.  `sip-core/src/main/java/eu/delving/metadata/` ships **four**
+generators, all reading the same semantic annotations off `RecDef` via a
+shared parsed view, `RecDefSemantics.from(recDef)`
+(`sip-core/.../RecDefSemantics.java:59`) — entities keyed by tag (templates
+first, root overwrites), each with its properties (direct subelements, plus
+-- since the nested-rangenode traversal added in this round of follow-ups --
+the direct subelements of any inline rangenode nested anywhere inside the
+entity, attributed to the entity matching the *nested* elem's tag; see
+`RecDefSemantics.collectNestedProperties`):
+
+| Generator                 | Output                                    | Reads (beyond the base shape)                                          |
+| -------------------------- | ------------------------------------------ | ------------------------------------------------------------------------ |
+| `XsdGenerator`              | `*_validation.xsd` (lax XSD)               | `required`, `singular`, `xsdDataType`, `xsdPattern`, `xsdMinOccurs`, `xsdMaxOccurs` |
+| `RdfsGenerator`             | OWL/RDFS ontology (Turtle or RDF/XML)      | `subclassof`, `equivalentClass`, `subPropertyOf`, `target`, `xsdDataType`, Label/Definition `<para>`s (see §8.4) |
+| `ShaclGenerator`            | SHACL shapes (Turtle)                      | `required`/`singular` → `sh:minCount`/`sh:maxCount`, `xsdDataType` → `sh:datatype`, `uriCheck` → `sh:nodeKind sh:IRI`, `target` → `sh:class`, `xsdPattern` → `sh:pattern` |
+| `JsonLdContextGenerator`   | JSON-LD `@context`                         | `target`, `xsdDataType`, `uriCheck` (`@type: "@id"`)                    |
+
+None of the four is invoked from the mapping/output pipeline in §1.2 above —
+they are read-only views over the record-definition, generated on demand:
+
+- **Narthex** exposes them as on-the-fly artifacts, never stored to disk, so a
+  generator improvement is visible immediately without re-uploading anything:
+  `GET /narthex/app/rec-defs/:prefix/:hash/artifact/:name` with
+  `name` one of `ontology.rdf`, `ontology.ttl`, `shapes.ttl`, `context.jsonld`
+  (`narthex/app/controllers/AppController.scala:1294-1320`, wired in
+  `narthex/conf/routes:101`). The same file also falls back to
+  `XsdGenerator.generate(recDef)` for `*_validation.xsd` when a record-def is
+  uploaded without a hand-made XSD (`AppController.scala:1346-1357`).
+- **SIP-Creator** applies the same on-the-fly-when-missing pattern to SHACL
+  validation: the Expert menu's "Toggle SHACL Validation" checkbox
+  (`sip-app/src/main/java/eu/delving/sip/menus/ExpertMenu.java:196-208`) makes
+  `FileProcessor` validate every generated record against `shacl.ttl`
+  (`sip-app/.../FileProcessor.java:228-231`, `697-720`). `StorageImpl`'s
+  shape-loading path (`sip-app/.../StorageImpl.java:692-719`) loads
+  `{prefix}_{version}_shacl.ttl` from disk if present; if the file is absent
+  it generates shapes on the fly from the dataset's own record-definition via
+  `ShaclGenerator.generate(recDef)`, parses the resulting Turtle into a Jena
+  graph, and uses that instead. Any failure in that fallback (missing/broken
+  recdef, a generator bug, a Turtle parse error) is caught and treated as "no
+  shape" — SHACL validation is silently skipped for that run, exactly as
+  before the fallback existed; it never breaks record processing. The toggle
+  itself still defaults to off.
+
+§5.1 below notes that unknown `<elem>` attributes are ignored by the mapping
+engine. `xsdDataType`, `xsdPattern`, `xsdMinOccurs`, `xsdMaxOccurs`,
+`subclassof`, `equivalentClass` and `subPropertyOf` are the named exceptions:
+still inert for the mapping/output pipeline, but read by one or more of the
+four generators above.
 
 ---
 
@@ -319,8 +370,17 @@ All fields are `@XStreamAsAttribute`.
 | `operator`     | `Operator`| no       | `ALL`   | Default cardinality operator (`ALL`/`FIRST`/`COMMA_DELIM`/`SEMI_DELIM`/`SPACE_DELIM`/`PIPE_DELIM`/`AS_ARRAY` — see `Operator.java`). |
 | `initialValue` | string    | no       | —       | Convenience: equivalent to attaching a `<node-mapping inputPath="/constant">` with `groovyCode = "'<initialValue>'"`. Applied in `RecDefNode.java:110-117`. |
 | `target`       | string    | no       | —       | Comma-delimited list of template tag-strings to deep-copy into this elem's children (see §5.6).    |
+| `xsdDataType`  | string (curie) | no  | —       | XSD type curie (e.g. `xsd:date`) for the generated validation XSD's element type, and — since the recdef-semantics-generators feature — the datatype-property `rdfs:range`/`sh:datatype` emitted by `RdfsGenerator`/`ShaclGenerator`. Inert for the mapping engine (`RecDef.java:489-491`). |
+| `xsdPattern`   | string (regex) | no  | —       | Regex constraining the element's text content in the generated XSD and in `ShaclGenerator`'s `sh:pattern`. Inert for the mapping engine (`RecDef.java:493-495`). |
+| `xsdMinOccurs` | string (int) | no    | `"1"` if `required`, else `"0"` | Overrides the XSD/SHACL minimum cardinality otherwise derived from `required`. Inert for the mapping engine (`RecDef.java:497-499`). |
+| `xsdMaxOccurs` | string (int or `"unbounded"`) | no | `"1"` if `singular`, else unbounded | Overrides the XSD/SHACL maximum cardinality otherwise derived from `singular`. Inert for the mapping engine (`RecDef.java:501-503`). |
+| `subclassof`   | string (comma-delimited; curie **or** entity label) | no | — | Parent class(es) for the entity this elem declares, emitted as `rdfs:subClassOf` by `RdfsGenerator`. Uniquely among the generator-facing attributes in this table, each token follows the record-definition's own established convention of naming the parent by its `label=` attribute (e.g. `subclassof="PhysicalHumanMadeThing"`) rather than by curie; a token containing a `:` is still accepted and resolved as a plain curie (see `RecDefSemantics.uriForSubClassOf`). Inert for the mapping engine (`RecDef.java:508-510`). |
+| `equivalentClass` | string (curie) | no | — | `owl:equivalentClass` target for the entity this elem declares, emitted by `RdfsGenerator`. Inert for the mapping engine (`RecDef.java:512-514`). |
+| `subPropertyOf` | string (curie) | no  | —       | `rdfs:subPropertyOf` target for the property this elem declares, emitted by `RdfsGenerator`. Inert for the mapping engine (`RecDef.java:516-518`). |
 
 **Unknown attributes are silently ignored** (XStream is in `ignoreUnknownElements` mode — `XStreamFactory.java:54`).  This is how `nodeid`, `rangenode_id`, `xsd_type`, `path`, `fieldType` (seen in ACE/SMFR/ICN files) survive — they are domain-specific annotations that do **not** map to any `RecDef.Elem` field today.  A Go re-implementation should **preserve unknown attributes** when round-tripping (e.g. into a generic `extra: map[string]string`).
+
+**Named exceptions.**  `xsdDataType`, `xsdPattern`, `xsdMinOccurs`, `xsdMaxOccurs`, `subclassof`, `equivalentClass` and `subPropertyOf` (rows above) are *not* unknown attributes and are *not* ignored outright — the mapping/output pipeline (§1.2) still never reads them, but the four generators described in §1.4 do. Treat them as inert-but-load-bearing: safe to drop for a mapping-only re-implementation, but required for XSD/RDFS/SHACL/JSON-LD generation parity with the Java reference.
 
 ### 5.2 Nested children
 
@@ -739,9 +799,30 @@ Two mutually-exclusive content models:
 ```
 
 `@XStreamImplicit(itemFieldName="para") List<DocParagraph> paraList`
-(`RecDef.java:304-305`).  `DocParagraph` (`RecDef.java:344-351`) uses
+(`RecDef.java:304-305`).  `DocParagraph` (`RecDef.java:344-354`) uses
 `ToAttributedValueConverter` so the paragraph **text content** becomes the
 `content` field and the `name="…"` becomes the `name` attribute.
+
+`<para>` also carries an optional `lang="…"` attribute (`DocParagraph.lang`,
+`RecDef.java:350-351`), an IETF language tag (`en`, `nl`, …) for the
+paragraph's content — same convention as `xml:lang` elsewhere in the format,
+but as a plain (non-namespaced) XStream attribute on `<para>` itself rather
+than an inherited XML `xml:lang`. `lang` is optional for free-form paragraphs
+(`Obligation and Occurrence`, `Example`, `Note`, …), which are display-only
+and untyped by language as far as the Java implementation is concerned. It
+is, however, **load-bearing** for the two names the recdef-semantics-
+generators feature reads: `RecDefSemantics.labelsOf`/`definitionsOf`
+(`sip-core/.../RecDefSemantics.java:172-191`) collect only `<para
+name="Label" lang="…">`/`<para name="Definition" lang="…">` entries **that
+have a `lang`** into a `{lang → text}` map, keyed by tag on whichever `<elem>`
+the `<doc>` resolved onto. `RdfsGenerator` emits one `rdfs:label`/
+`rdfs:comment` triple per language present (`RdfsGenerator.java:85-90`,
+`135-140`) — for both entity classes and properties. A `Label`/`Definition`
+paragraph with **no** `lang` attribute is silently invisible to the
+generators (parsed as a doc paragraph like any other, but never reaches the
+ontology) — this is a common source of "why didn't my label show up in
+ontology.ttl" confusion when porting older record-definitions that predate
+this convention.
 
 ```xml
 <para name="Note"><![CDATA[CDATA-wrapped HTML or special chars allowed here]]></para>
@@ -793,7 +874,11 @@ Obligation and Occurrence, Example, Rationale, Comment, Note,
 Value type, Cardinality
 ```
 
-Treat as convention, not schema.
+Treat as convention, not schema — with one exception: `Label` and
+`Definition` (each with a `lang` attribute, see §8.2.1) are the two names the
+`RdfsGenerator` generator actually reads to emit `rdfs:label`/`rdfs:comment`.
+The rest of the palette (`Obligation and Occurrence`, `Example`, `Rationale`,
+…) is display-only in the Java implementation today.
 
 ---
 
