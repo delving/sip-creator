@@ -382,6 +382,16 @@ it stops at 34.1%.
 
 ---
 
+## Decisions taken (2026-08-26, project owner)
+
+- **Null-receiver semantics: PARITY.** The Lua engine must reject a record where
+  Groovy would (visible per-record failure in the report), not publish it with
+  empty strings. Sub-project 2 reworks the stdlib accordingly; the ergonomic fix
+  for missing values belongs to the DSL phase, not the engine.
+- **Success criterion 3: spike ACCEPTED at 6/10.** The miss exposed and corrected
+  a real measurement bug (bare-call blind spot); the engine produced correct
+  output for every case its converter accepted.
+
 ## 6. OPEN DECISION for sub-project 2: stdlib null-receiver semantics
 
 **Parked from Task 7. The user must rule on this; it was not decided here.**
