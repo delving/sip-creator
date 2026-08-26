@@ -30,11 +30,15 @@ import java.util.function.Consumer;
  *
  * Only annotated constraints are emitted: sh:minCount/sh:maxCount from
  * cardinality, sh:datatype from an explicit XSD type, sh:nodeKind sh:IRI
- * from uriCheck/target, sh:class per resolvable target, sh:pattern from an
- * explicit regex. Nothing else is constrained -- in particular there is NO
- * sh:closed, because the same tag can be dually declared (once via target,
- * once via datatype in a different entity) and processed records commonly
- * carry extra rdf:type triples; a closed shape would false-positive on both.
+ * from uriCheck ONLY, sh:class per resolvable target, sh:pattern from an
+ * explicit regex. A target property gets sh:class but deliberately NOT
+ * sh:nodeKind sh:IRI, because a target's value may legitimately be an
+ * inline typed blank node (rdf:parseType="Resource") rather than an IRI
+ * reference -- sh:nodeKind sh:IRI would wrongly reject those. Nothing else
+ * is constrained -- in particular there is NO sh:closed, because the same
+ * tag can be dually declared (once via target, once via datatype in a
+ * different entity) and processed records commonly carry extra rdf:type
+ * triples; a closed shape would false-positive on both.
  *
  * jena-arq 3.17 ships no SHACL vocabulary class, so the sh: terms used here
  * are declared privately below, exactly as far as this generator needs them.
@@ -95,7 +99,7 @@ public class ShaclGenerator {
                     resolveOrSkip(semantics, use.dataType, uri ->
                         propertyShape.addProperty(shDatatype, model.createResource(uri)));
                 }
-                if (use.uriCheck || (use.target != null && !use.target.isEmpty())) {
+                if (use.uriCheck) {
                     propertyShape.addProperty(shNodeKind, shIRI);
                 }
                 if (use.target != null && !use.target.isEmpty()) {

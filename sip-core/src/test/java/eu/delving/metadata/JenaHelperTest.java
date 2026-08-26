@@ -43,102 +43,113 @@ public class JenaHelperTest {
         return frame;
     }
 
-    @Test
-    void shouldProduceFramedJsonLd() {
-        Map<String, Object> frame = createThingFrame();
+    // Grouped in a @Nested class (rather than left as top-level @Test methods
+    // alongside RdfXmlValidation below) because mixing top-level @Test methods
+    // with a @Nested class in the same file made surefire's junit-platform
+    // provider silently discover and run zero of the top-level tests --
+    // see eu.delving.metadata.JenaHelperTest.txt reporting "Tests run: 0"
+    // while the sibling @Nested report showed its tests correctly. All tests
+    // must live under a @Nested group for `mvn -pl sip-core test` to run them.
+    @Nested
+    class JsonLdFraming {
 
-        String framed = JenaHelper.convertRDF("ex", SAMPLE_RDF, RDFFormat.JSONLD_FRAME_PRETTY, frame);
+        @Test
+        void shouldProduceFramedJsonLd() {
+            Map<String, Object> frame = createThingFrame();
 
-        assertNotNull(framed);
-        assertTrue(framed.contains("@graph"));
-        assertTrue(framed.contains("Test Item"));
-        assertTrue(framed.contains("@type"));
-        assertTrue(framed.contains("Thing"));
-    }
+            String framed = JenaHelper.convertRDF("ex", SAMPLE_RDF, RDFFormat.JSONLD_FRAME_PRETTY, frame);
 
-    @Test
-    void framedDiffersFromCompact() {
-        Map<String, Object> frame = createThingFrame();
+            assertNotNull(framed);
+            assertTrue(framed.contains("@graph"));
+            assertTrue(framed.contains("Test Item"));
+            assertTrue(framed.contains("@type"));
+            assertTrue(framed.contains("Thing"));
+        }
 
-        String compact = JenaHelper.convertRDF("ex", SAMPLE_RDF, RDFFormat.JSONLD_COMPACT_PRETTY);
-        String framed = JenaHelper.convertRDF("ex", SAMPLE_RDF, RDFFormat.JSONLD_FRAME_PRETTY, frame);
+        @Test
+        void framedDiffersFromCompact() {
+            Map<String, Object> frame = createThingFrame();
 
-        assertNotEquals(compact, framed);
-    }
+            String compact = JenaHelper.convertRDF("ex", SAMPLE_RDF, RDFFormat.JSONLD_COMPACT_PRETTY);
+            String framed = JenaHelper.convertRDF("ex", SAMPLE_RDF, RDFFormat.JSONLD_FRAME_PRETTY, frame);
 
-    @Test
-    public void compactWithGeneratedContextUsesShortTerms() {
-        String context = """
-            {"@context": {"ex": "http://example.org/",
-                          "name": {"@id": "http://example.org/name"}}}
-            """;
-        String compact = JenaHelper.convertRDF("ex", SAMPLE_RDF,
-            RDFFormat.JSONLD_COMPACT_PRETTY, context, null);
-        assertTrue(compact.contains("\"name\""), compact);
-        assertFalse(compact.contains("http://example.org/name"), compact);
-    }
+            assertNotEquals(compact, framed);
+        }
 
-    @Test
-    public void frameStringDrivesFraming() {
-        String frame = """
-            {"@context": {"ex": "http://example.org/"},
-             "@type": "http://example.org/Thing"}
-            """;
-        String framed = JenaHelper.convertRDF("ex", SAMPLE_RDF,
-            RDFFormat.JSONLD_FRAME_PRETTY, null, frame);
-        assertTrue(framed.contains("item1"), framed);
-    }
+        @Test
+        public void compactWithGeneratedContextUsesShortTerms() {
+            String context = """
+                {"@context": {"ex": "http://example.org/",
+                              "name": {"@id": "http://example.org/name"}}}
+                """;
+            String compact = JenaHelper.convertRDF("ex", SAMPLE_RDF,
+                RDFFormat.JSONLD_COMPACT_PRETTY, context, null);
+            assertTrue(compact.contains("\"name\""), compact);
+            assertFalse(compact.contains("http://example.org/name"), compact);
+        }
 
-    @Test
-    public void frameWithBothContextAndFrameStillFramesAndDoesNotThrow() {
-        // This is the combination MappingCompileModel actually produces for
-        // JSONLD_FRAME_PRETTY: it always generates a contextJson, and additionally
-        // a frameJson. The frame branch ignores JSONLD_CONTEXT, so passing a
-        // non-null contextJson alongside frameJson must remain harmless.
-        String context = """
-            {"@context": {"ex": "http://example.org/",
-                          "name": {"@id": "http://example.org/name"}}}
-            """;
-        String frame = """
-            {"@context": {"ex": "http://example.org/"},
-             "@type": "http://example.org/Thing"}
-            """;
-        String framed = JenaHelper.convertRDF("ex", SAMPLE_RDF,
-            RDFFormat.JSONLD_FRAME_PRETTY, context, frame);
-        assertTrue(framed.contains("item1"), framed);
-        assertTrue(framed.contains("@graph"), framed);
-        assertTrue(framed.contains("Thing"), framed);
-    }
+        @Test
+        public void frameStringDrivesFraming() {
+            String frame = """
+                {"@context": {"ex": "http://example.org/"},
+                 "@type": "http://example.org/Thing"}
+                """;
+            String framed = JenaHelper.convertRDF("ex", SAMPLE_RDF,
+                RDFFormat.JSONLD_FRAME_PRETTY, null, frame);
+            assertTrue(framed.contains("item1"), framed);
+        }
 
-    @Test
-    public void frameWithContextButNoFrameThrows() {
-        // The 4-arg overload already guards frame == null for JSONLD_FRAME_PRETTY (see
-        // convertRDF(String, String, RDFFormat, Map)). The 5-arg overload must guard the
-        // same combination: a non-null contextJson does not substitute for a frame, and
-        // reaching the frame writer without one is a broken-caller bug, not a valid preview.
-        String context = """
-            {"@context": {"ex": "http://example.org/"}}
-            """;
-        assertThrows(IllegalArgumentException.class, () ->
-            JenaHelper.convertRDF("ex", SAMPLE_RDF, RDFFormat.JSONLD_FRAME_PRETTY, context, null));
-    }
+        @Test
+        public void frameWithBothContextAndFrameStillFramesAndDoesNotThrow() {
+            // This is the combination MappingCompileModel actually produces for
+            // JSONLD_FRAME_PRETTY: it always generates a contextJson, and additionally
+            // a frameJson. The frame branch ignores JSONLD_CONTEXT, so passing a
+            // non-null contextJson alongside frameJson must remain harmless.
+            String context = """
+                {"@context": {"ex": "http://example.org/",
+                              "name": {"@id": "http://example.org/name"}}}
+                """;
+            String frame = """
+                {"@context": {"ex": "http://example.org/"},
+                 "@type": "http://example.org/Thing"}
+                """;
+            String framed = JenaHelper.convertRDF("ex", SAMPLE_RDF,
+                RDFFormat.JSONLD_FRAME_PRETTY, context, frame);
+            assertTrue(framed.contains("item1"), framed);
+            assertTrue(framed.contains("@graph"), framed);
+            assertTrue(framed.contains("Thing"), framed);
+        }
 
-    @Test
-    void shouldReturnCompactJsonLdWhenNoFrame() {
-        String rdf = """
-            <?xml version="1.0" encoding="UTF-8"?>
-            <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                     xmlns:ex="http://example.org/">
-                <rdf:Description rdf:about="http://example.org/item1">
-                    <ex:name>Test Item</ex:name>
-                </rdf:Description>
-            </rdf:RDF>
-            """;
-        
-        String result = JenaHelper.convertRDF("ex", rdf, RDFFormat.JSONLD_COMPACT_PRETTY);
-        
-        assertNotNull(result);
-        assertTrue(result.contains("Test Item"));
+        @Test
+        public void frameWithContextButNoFrameThrows() {
+            // The 4-arg overload already guards frame == null for JSONLD_FRAME_PRETTY (see
+            // convertRDF(String, String, RDFFormat, Map)). The 5-arg overload must guard the
+            // same combination: a non-null contextJson does not substitute for a frame, and
+            // reaching the frame writer without one is a broken-caller bug, not a valid preview.
+            String context = """
+                {"@context": {"ex": "http://example.org/"}}
+                """;
+            assertThrows(IllegalArgumentException.class, () ->
+                JenaHelper.convertRDF("ex", SAMPLE_RDF, RDFFormat.JSONLD_FRAME_PRETTY, context, null));
+        }
+
+        @Test
+        void shouldReturnCompactJsonLdWhenNoFrame() {
+            String rdf = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                         xmlns:ex="http://example.org/">
+                    <rdf:Description rdf:about="http://example.org/item1">
+                        <ex:name>Test Item</ex:name>
+                    </rdf:Description>
+                </rdf:RDF>
+                """;
+
+            String result = JenaHelper.convertRDF("ex", rdf, RDFFormat.JSONLD_COMPACT_PRETTY);
+
+            assertNotNull(result);
+            assertTrue(result.contains("Test Item"));
+        }
     }
 
     @Nested

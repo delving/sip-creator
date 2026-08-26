@@ -81,4 +81,37 @@ public class ShaclGeneratorTest {
             """);
         assertTrue(report.conforms(), report.toString());
     }
+
+    // Decision (26-08 meeting): a target property gets sh:class only, never
+    // sh:nodeKind sh:IRI -- its value may legitimately be an inline typed
+    // blank node (rdf:parseType="Resource" style), not just an IRI reference.
+    // sh:nodeKind sh:IRI is now emitted ONLY for uriCheck properties.
+
+    @Test
+    public void targetPropertyAsInlineBlankNodeConforms() {
+        ValidationReport report = validate("""
+            @prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+            @prefix dc: <http://purl.org/dc/elements/1.1/> .
+            @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+            <http://x/obj> a crm:E22_Human-Made_Object ;
+                dc:date "2020-01-01"^^xsd:date ;
+                dc:identifier <http://x/id/1> ;
+                crm:P1_is_identified_by [ a crm:E41_Appellation ] .
+            """);
+        assertTrue(report.conforms(), report.toString());
+    }
+
+    @Test
+    public void targetPropertyAsPlainLiteralFailsClass() {
+        ValidationReport report = validate("""
+            @prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+            @prefix dc: <http://purl.org/dc/elements/1.1/> .
+            @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+            <http://x/obj> a crm:E22_Human-Made_Object ;
+                dc:date "2020-01-01"^^xsd:date ;
+                dc:identifier <http://x/id/1> ;
+                crm:P1_is_identified_by "not an appellation" .
+            """);
+        assertFalse(report.conforms());
+    }
 }
