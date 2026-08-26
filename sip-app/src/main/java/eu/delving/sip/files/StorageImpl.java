@@ -24,6 +24,7 @@ import eu.delving.metadata.MetadataException;
 import eu.delving.metadata.RecDef;
 import eu.delving.metadata.RecDefModel;
 import eu.delving.metadata.RecMapping;
+import eu.delving.metadata.ShaclGenerator;
 import eu.delving.schema.SchemaRepository;
 import eu.delving.schema.SchemaResponse;
 import eu.delving.schema.SchemaVersion;
@@ -34,8 +35,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.jena.graph.Graph;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RiotException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
 
@@ -72,6 +78,7 @@ import static org.apache.commons.io.FileUtils.deleteQuietly;
  */
 
 public class StorageImpl implements Storage {
+    private static final Logger LOG = LoggerFactory.getLogger(StorageImpl.class);
     private File home;
     private Properties sipProperties;
     private static SchemaFactory schemaFactory;
@@ -692,7 +699,23 @@ public class StorageImpl implements Storage {
                     throw new StorageException("Unable to load shape " + fileName, e);
                 }
             }
-            return null;
+            // No shacl.ttl shipped with this schema version -- generate one on
+            // the fly from the dataset's own record definition (the same
+            // ShaclGenerator narthex's artifact endpoint uses) rather than
+            // silently skipping SHACL validation. Best-effort: any failure
+            // here (missing/unreadable recdef, a generator bug, a Turtle
+            // parse problem on the generated text) must not break processing
+            // -- fall back to no shape, exactly as before this fallback existed.
+            try {
+                RecDef recDef = recDef(schemaVersion);
+                String shapesTurtle = ShaclGenerator.generate(recDef);
+                Model model = ModelFactory.createDefaultModel();
+                RDFDataMgr.read(model, new StringReader(shapesTurtle), null, Lang.TURTLE);
+                return model.getGraph();
+            } catch (Throwable e) {
+                LOG.warn("Unable to generate SHACL shapes on the fly for {}; SHACL validation skipped", schemaVersion, e);
+                return null;
+            }
         }
     }
 
