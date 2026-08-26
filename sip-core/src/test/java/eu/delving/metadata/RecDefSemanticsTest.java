@@ -3,6 +3,7 @@ package eu.delving.metadata;
 import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class RecDefSemanticsTest {
@@ -79,6 +80,114 @@ public class RecDefSemanticsTest {
         assertEquals("xsd:anyURI", id.dataType);
         assertEquals("1", id.maxOccurs);
         assertEquals("0", id.minOccurs);
+    }
+
+    // A property declared only inside a nested rangenode (an inline child elem
+    // that is itself entity-like, i.e. has its own subelements) must still reach
+    // the ontology -- attributed to the entity matching the NESTED elem's tag,
+    // not the ancestor that contains it. Existing direct properties on both
+    // entities must be unaffected (additive, not replacing).
+    static final String NESTED_RANGENODE_RECDEF = """
+            <?xml version="1.0"?>
+            <record-definition prefix="tst" version="0.0.1" flat="false">
+                <namespaces>
+                    <namespace prefix="tst" uri="http://example.org/tst#" schema="s"/>
+                    <namespace prefix="skos" uri="http://www.w3.org/2004/02/skos/core#" schema="s"/>
+                    <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/" schema="s"/>
+                </namespaces>
+                <root tag="rdf:RDF">
+                    <elem tag="tst:Object" label="Object">
+                        <elem tag="dc:identifier"/>
+                        <elem tag="dc:type">
+                            <elem tag="skos:Concept">
+                                <elem tag="skos:prefLabel"/>
+                                <elem tag="skos:altLabel"/>
+                            </elem>
+                        </elem>
+                    </elem>
+                </root>
+                <templates>
+                    <elem tag="skos:Concept" label="Concept">
+                        <elem tag="skos:notation"/>
+                    </elem>
+                </templates>
+            </record-definition>
+            """;
+
+    @Test
+    public void nestedRangenodePropertiesAttachToNestedEntityClass() {
+        RecDefSemantics s = RecDefSemantics.from(RecDef.read(
+            new ByteArrayInputStream(NESTED_RANGENODE_RECDEF.getBytes(StandardCharsets.UTF_8))));
+
+        // The nested elem itself still stays a PropertyUse of the parent, unchanged.
+        RecDefSemantics.Entity object = s.entities.get("tst:Object");
+        assertEquals(2, object.properties.size());
+        assertEquals("dc:identifier", object.properties.get(0).tag);
+        assertEquals("dc:type", object.properties.get(1).tag);
+
+        // Concept's own direct (template) property is unaffected...
+        RecDefSemantics.Entity concept = s.entities.get("skos:Concept");
+        List<String> conceptPropertyTags = concept.properties.stream().map(p -> p.tag).toList();
+        assertTrue(conceptPropertyTags.contains("skos:notation"));
+        // ...and the nested occurrence's own subelements are additively merged in.
+        assertTrue(conceptPropertyTags.contains("skos:prefLabel"));
+        assertTrue(conceptPropertyTags.contains("skos:altLabel"));
+        assertEquals(3, concept.properties.size());
+    }
+
+    // Two entities that nest each other (A nests B, B nests A) must not recurse
+    // forever; the visited-set on entity tag caps how deep re-entry goes.
+    static final String CYCLIC_NESTING_RECDEF = """
+            <?xml version="1.0"?>
+            <record-definition prefix="tst" version="0.0.1" flat="false">
+                <namespaces>
+                    <namespace prefix="tst" uri="http://example.org/tst#" schema="s"/>
+                </namespaces>
+                <root tag="rdf:RDF">
+                    <elem tag="tst:A" label="A">
+                        <elem tag="tst:hasB">
+                            <elem tag="tst:B" label="B">
+                                <elem tag="tst:bOwn"/>
+                                <elem tag="tst:hasA">
+                                    <elem tag="tst:A">
+                                        <elem tag="tst:aOwn"/>
+                                        <elem tag="tst:hasB">
+                                            <elem tag="tst:B">
+                                                <elem tag="tst:neverReached"/>
+                                            </elem>
+                                        </elem>
+                                    </elem>
+                                </elem>
+                            </elem>
+                        </elem>
+                    </elem>
+                </root>
+                <templates>
+                    <elem tag="tst:B" label="B"/>
+                </templates>
+            </record-definition>
+            """;
+
+    @Test
+    public void cyclicNestingBetweenTwoEntitiesDoesNotLoop() {
+        RecDefSemantics s = RecDefSemantics.from(RecDef.read(
+            new ByteArrayInputStream(CYCLIC_NESTING_RECDEF.getBytes(StandardCharsets.UTF_8))));
+
+        RecDefSemantics.Entity a = s.entities.get("tst:A");
+        RecDefSemantics.Entity b = s.entities.get("tst:B");
+        List<String> aTags = a.properties.stream().map(p -> p.tag).toList();
+        List<String> bTags = b.properties.stream().map(p -> p.tag).toList();
+
+        // direct shape unaffected
+        assertTrue(aTags.contains("tst:hasB"));
+        // one level of re-entry into B is followed and merged...
+        assertTrue(bTags.contains("tst:bOwn"));
+        // ...whose own nested A is, in turn, followed and merged once...
+        assertTrue(aTags.contains("tst:aOwn"));
+        // ...but the second-level re-entry into B (tst:B already visited on this
+        // path) is not followed, so its property never gets merged anywhere.
+        assertFalse(aTags.contains("tst:neverReached"));
+        assertFalse(bTags.contains("tst:neverReached"));
     }
 
     @Test

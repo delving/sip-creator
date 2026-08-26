@@ -27,6 +27,14 @@ import java.util.Set;
  * Entities are collected the same way as {@link XsdGenerator}: templates
  * first, then root children overwriting on the same tag (root declares the
  * full mappable shape; a template is just a reusable fragment).
+ *
+ * An entity's properties are its DIRECT subelements, plus -- recursively --
+ * the direct subelements of any inline rangenode nested anywhere inside it
+ * (a child elem that is itself entity-like because it has its own
+ * subelements, e.g. a nested skos:Concept Type variant). Those nested
+ * properties are attributed to the entity matching the nested elem's TAG,
+ * not to the ancestor that contains it, and are additive on top of that
+ * entity's own root-wins direct shape. See {@code collectNestedProperties}.
  */
 public class RecDefSemantics {
 
@@ -88,12 +96,37 @@ public class RecDefSemantics {
             }
         }
 
+        // Pass 1: direct properties per entity, same as before -- root-wins shape,
+        // one PropertyUse per distinct immediate subelement tag.
+        Map<String, List<PropertyUse>> propertiesByTag = new LinkedHashMap<>();
+        Map<String, Set<String>> seenByTag = new LinkedHashMap<>();
+        for (Map.Entry<String, RecDef.Elem> entry : entityElems.entrySet()) {
+            String tag = entry.getKey();
+            List<PropertyUse> properties = new ArrayList<>();
+            Set<String> seen = new LinkedHashSet<>();
+            collectDirectProperties(entry.getValue(), properties, seen);
+            propertiesByTag.put(tag, properties);
+            seenByTag.put(tag, seen);
+        }
+
+        // Pass 2: recursive rangenode traversal. An inline child elem that is
+        // itself entity-like (has its own subelements) may nest arbitrarily
+        // deep; whenever its tag matches a known entity, its OWN direct
+        // subelements are properties of THAT entity's class, not of whatever
+        // ancestor happens to contain it (matches how generate_rdfs.py
+        // attributed them). Additive: appended only if the tag isn't already
+        // present on the target entity. A visited-set of entity tags guards
+        // against cycles (e.g. a Concept nesting a Concept nesting a Concept).
+        for (RecDef.Elem elem : entityElems.values()) {
+            collectNestedProperties(elem, propertiesByTag, seenByTag, Collections.emptySet());
+        }
+
         Map<String, Entity> entities = new LinkedHashMap<>();
         Map<String, String> labelToTag = new LinkedHashMap<>();
         for (Map.Entry<String, RecDef.Elem> entry : entityElems.entrySet()) {
             String tag = entry.getKey();
             RecDef.Elem elem = entry.getValue();
-            entities.put(tag, toEntity(tag, elem, rootTags.contains(tag)));
+            entities.put(tag, toEntity(tag, elem, rootTags.contains(tag), propertiesByTag.get(tag)));
             if (elem.label != null && !elem.label.isEmpty()) {
                 labelToTag.putIfAbsent(elem.label, tag);
             }
@@ -135,7 +168,7 @@ public class RecDefSemantics {
         return elem.tag != null && elem.tag.getLocalName() != null && !elem.tag.getLocalName().isEmpty();
     }
 
-    private static Entity toEntity(String tag, RecDef.Elem elem, boolean fromRoot) {
+    private static Entity toEntity(String tag, RecDef.Elem elem, boolean fromRoot, List<PropertyUse> properties) {
         Map<String, String> labels = labelsOf(elem);
         Map<String, String> definitions = definitionsOf(elem);
 
@@ -144,19 +177,60 @@ public class RecDefSemantics {
             for (String s : elem.subclassof.split(",")) subClassOf.add(s.trim());
         }
 
-        List<PropertyUse> properties = new ArrayList<>();
-        Map<String, Boolean> seen = new LinkedHashMap<>();
-        if (elem.subelements != null) {
-            for (RecDef.Elem child : elem.subelements) {
-                if (!hasUsableTag(child)) continue;
-                String childTag = child.tag.toString();
-                if (seen.containsKey(childTag)) continue;
-                seen.put(childTag, Boolean.TRUE);
-                properties.add(toPropertyUse(childTag, child));
-            }
-        }
-
         return new Entity(tag, labels, definitions, subClassOf, elem.equivalentClass, properties, fromRoot);
+    }
+
+    /** Direct subelements of {@code elem} only, one PropertyUse per distinct tag. */
+    private static void collectDirectProperties(RecDef.Elem elem, List<PropertyUse> properties, Set<String> seen) {
+        if (elem.subelements == null) return;
+        for (RecDef.Elem child : elem.subelements) {
+            if (!hasUsableTag(child)) continue;
+            String childTag = child.tag.toString();
+            if (seen.contains(childTag)) continue;
+            seen.add(childTag);
+            properties.add(toPropertyUse(childTag, child));
+        }
+    }
+
+    /**
+     * Walks {@code elem}'s subelement tree looking for inline rangenodes --
+     * child elems that are themselves entity-like (have their own subelements).
+     * When such a child's tag matches a known entity (a key in
+     * {@code propertiesByTag}), that child's own direct subelements are
+     * additively merged in as properties of the MATCHED entity (not the
+     * ancestor being walked), and the walk continues depth-first inside the
+     * child with the matched tag added to the visited set so a nesting cycle
+     * (entity A containing entity B containing entity A, or a tag nesting
+     * itself repeatedly) cannot recurse forever. Wrapper elems that don't
+     * themselves match a known entity are transparent: the walk passes
+     * through them without touching the visited set.
+     */
+    private static void collectNestedProperties(RecDef.Elem elem, Map<String, List<PropertyUse>> propertiesByTag,
+                                                  Map<String, Set<String>> seenByTag, Set<String> visitedEntityTags) {
+        if (elem.subelements == null) return;
+        for (RecDef.Elem child : elem.subelements) {
+            if (!hasUsableTag(child)) continue;
+            if (child.subelements == null || child.subelements.isEmpty()) continue; // leaf, nothing nested inside
+            String childTag = child.tag.toString();
+            boolean isKnownEntity = propertiesByTag.containsKey(childTag);
+            if (!isKnownEntity) {
+                collectNestedProperties(child, propertiesByTag, seenByTag, visitedEntityTags);
+                continue;
+            }
+            if (visitedEntityTags.contains(childTag)) continue; // cycle guard
+            List<PropertyUse> targetProperties = propertiesByTag.get(childTag);
+            Set<String> targetSeen = seenByTag.get(childTag);
+            for (RecDef.Elem grandchild : child.subelements) {
+                if (!hasUsableTag(grandchild)) continue;
+                String grandchildTag = grandchild.tag.toString();
+                if (targetSeen.contains(grandchildTag)) continue;
+                targetSeen.add(grandchildTag);
+                targetProperties.add(toPropertyUse(grandchildTag, grandchild));
+            }
+            Set<String> nextVisited = new LinkedHashSet<>(visitedEntityTags);
+            nextVisited.add(childTag);
+            collectNestedProperties(child, propertiesByTag, seenByTag, nextVisited);
+        }
     }
 
     private static PropertyUse toPropertyUse(String tag, RecDef.Elem elem) {

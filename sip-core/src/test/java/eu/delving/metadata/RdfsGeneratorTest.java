@@ -123,6 +123,26 @@ public class RdfsGeneratorTest {
             m.getResource("http://www.w3.org/2001/XMLSchema#string")));
     }
 
+    // A property declared only inside a nested rangenode (RecDefSemantics'
+    // recursive traversal, see RecDefSemanticsTest#nestedRangenodePropertiesAttachToNestedEntityClass)
+    // must reach the generated ontology with rdfs:domain pointing at the
+    // NESTED entity's class -- skos:Concept, here -- not the ancestor
+    // (tst:Object) that merely contains the nested occurrence.
+    @Test
+    public void nestedRangenodePropertyGetsDomainOfNestedEntity() {
+        RecDef recDef = RecDef.read(new ByteArrayInputStream(
+            RecDefSemanticsTest.NESTED_RANGENODE_RECDEF.getBytes(StandardCharsets.UTF_8)));
+        String rdfXml = RdfsGenerator.generate(recDef, "RDF/XML-ABBREV");
+        Model m = ModelFactory.createDefaultModel();
+        m.read(new StringReader(rdfXml), null, "RDF/XML");
+
+        Resource prefLabel = m.getResource("http://www.w3.org/2004/02/skos/core#prefLabel");
+        Resource concept = m.getResource("http://www.w3.org/2004/02/skos/core#Concept");
+        Resource object = m.getResource("http://example.org/tst#Object");
+        assertTrue(m.contains(prefLabel, RDFS.domain, concept));
+        assertFalse(m.contains(prefLabel, RDFS.domain, object));
+    }
+
     // rdf:type declared as a plain property elem (the legacy xsd_type="@id" attribute
     // is invisible to sip-core) must not be published as an owl:*Property resource --
     // it is RDF/XML syntax, not schema vocabulary the recdef is minting.
