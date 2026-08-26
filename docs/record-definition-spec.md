@@ -812,7 +812,7 @@ than an inherited XML `xml:lang`. `lang` is optional for free-form paragraphs
 and untyped by language as far as the Java implementation is concerned. It
 is, however, **load-bearing** for the two names the recdef-semantics-
 generators feature reads: `RecDefSemantics.labelsOf`/`definitionsOf`
-(`sip-core/.../RecDefSemantics.java:172-191`) collect only `<para
+(`sip-core/.../RecDefSemantics.java:246-264`) collect only `<para
 name="Label" lang="…">`/`<para name="Definition" lang="…">` entries **that
 have a `lang`** into a `{lang → text}` map, keyed by tag on whichever `<elem>`
 the `<doc>` resolved onto. `RdfsGenerator` emits one `rdfs:label`/
