@@ -126,7 +126,17 @@ public class RecDefSemantics {
         for (Map.Entry<String, RecDef.Elem> entry : entityElems.entrySet()) {
             String tag = entry.getKey();
             RecDef.Elem elem = entry.getValue();
-            entities.put(tag, toEntity(tag, elem, rootTags.contains(tag), propertiesByTag.get(tag)));
+            // Legacy recdefs in the field use prefixes without declaring the
+            // namespace (e.g. crm:P79F... inside edm). The mapping engine
+            // tolerates that, so the semantic model silently skips such
+            // entities/properties instead of letting every generator throw
+            // "Unknown prefix" and 500 the whole artifact.
+            if (!resolvableTag(tag, namespaces)) continue;
+            List<PropertyUse> resolvedProperties = new ArrayList<>();
+            for (PropertyUse use : propertiesByTag.get(tag)) {
+                if (resolvableTag(use.tag, namespaces)) resolvedProperties.add(use);
+            }
+            entities.put(tag, toEntity(tag, elem, rootTags.contains(tag), resolvedProperties));
             if (elem.label != null && !elem.label.isEmpty()) {
                 labelToTag.putIfAbsent(elem.label, tag);
             }
@@ -166,6 +176,13 @@ public class RecDefSemantics {
 
     private static boolean hasUsableTag(RecDef.Elem elem) {
         return elem.tag != null && elem.tag.getLocalName() != null && !elem.tag.getLocalName().isEmpty();
+    }
+
+    /** True when the tag's prefix resolves against the declared namespaces (plus the xsd/rdf seeds). */
+    private static boolean resolvableTag(String tag, Map<String, String> namespaces) {
+        int colon = tag.indexOf(':');
+        if (colon <= 0) return false;
+        return namespaces.containsKey(tag.substring(0, colon));
     }
 
     private static Entity toEntity(String tag, RecDef.Elem elem, boolean fromRoot, List<PropertyUse> properties) {

@@ -218,4 +218,42 @@ public class RecDefSemanticsTest {
         // a label with no matching entity anywhere is genuinely unresolvable.
         assertThrows(IllegalArgumentException.class, () -> s.uriForSubClassOf("NoSuchLabel"));
     }
+
+    // Legacy recdefs in the field reference prefixes that are never declared in
+    // <namespaces> (the shipped edm recdef has crm:P79F... properties without a
+    // crm namespace). The mapping engine tolerates that, so the semantic model
+    // must silently drop those elems instead of letting every generator throw
+    // "Unknown prefix" and fail the whole artifact.
+    @Test
+    public void undeclaredPrefixElemsAreSkippedAndGeneratorsStillRun() {
+        String recdefXml = """
+                <?xml version="1.0"?>
+                <record-definition prefix="tst" version="0.0.1" flat="false">
+                    <namespaces>
+                        <namespace prefix="tst" uri="http://example.org/tst#" schema="s"/>
+                        <namespace prefix="dc" uri="http://purl.org/dc/elements/1.1/" schema="s"/>
+                    </namespaces>
+                    <root tag="rdf:RDF">
+                        <elem tag="tst:Thing" label="Thing">
+                            <elem tag="dc:title"/>
+                            <elem tag="crm:P79F.beginning_is_qualified_by"/>
+                        </elem>
+                        <elem tag="ghost:Entity" label="Ghost">
+                            <elem tag="dc:title"/>
+                        </elem>
+                    </root>
+                </record-definition>
+                """;
+        RecDef recDef = RecDef.read(new java.io.ByteArrayInputStream(
+            recdefXml.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+        RecDefSemantics s = RecDefSemantics.from(recDef);
+        assertFalse(s.entities.containsKey("ghost:Entity"));
+        RecDefSemantics.Entity thing = s.entities.get("tst:Thing");
+        assertEquals(1, thing.properties.size());
+        assertEquals("dc:title", thing.properties.get(0).tag);
+        // all three generators must produce output without throwing
+        assertFalse(RdfsGenerator.generate(recDef, "TURTLE").isEmpty());
+        assertFalse(ShaclGenerator.generate(recDef).isEmpty());
+        assertFalse(JsonLdContextGenerator.generateContext(recDef).isEmpty());
+    }
 }
