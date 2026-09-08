@@ -551,15 +551,21 @@ public class StorageImpl implements Storage {
                         String fileName = zipEntry.getName();
                         if (fileName.equals(unzippedName)) {
                             File source = new File(here, FileType.SOURCE.getName());
-                            GZIPOutputStream outputStream = null;
+                            // write to a partial file and rename at the end, so a crash, full disk or cancel
+                            // never leaves a truncated source.xml.gz that reads as SOURCED
+                            File partial = new File(here, FileType.SOURCE.getName() + ".part");
                             try {
-                                outputStream = new GZIPOutputStream(new FileOutputStream(source));
-                                while (-1 != (bytesRead = zipInputStream.read(buffer))) {
-                                    outputStream.write(buffer, 0, bytesRead);
-                                    progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE));
+                                try (OutputStream outputStream = new GZIPOutputStream(new FileOutputStream(partial))) {
+                                    while (-1 != (bytesRead = zipInputStream.read(buffer))) {
+                                        outputStream.write(buffer, 0, bytesRead);
+                                        progressListener.setProgress((int) (counting.getByteCount() / BLOCK_SIZE));
+                                    }
+                                }
+                                if (!partial.renameTo(source)) {
+                                    throw new IOException("Unable to rename " + partial.getName() + " to " + source.getName());
                                 }
                             } finally {
-                                IOUtils.closeQuietly(outputStream);
+                                delete(partial);
                             }
                         } else {
                             File file = new File(here, fileName);
