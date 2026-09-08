@@ -377,7 +377,9 @@ public class NetworkClient {
                 }
             }
             catch (Exception e) {
-                feedback().alert("Unable to download data set", e);
+                // a cancel arrives bare from the progress listener or wrapped in fromSipZip's StorageException
+                boolean cancelled = e instanceof CancelException || e.getCause() instanceof CancelException;
+                if (!cancelled) feedback().alert("Unable to download data set", e);
             }
             finally {
                 if (!success) {

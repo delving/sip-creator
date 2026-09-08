@@ -144,7 +144,7 @@ public class AnalysisParser implements Work.LongTermWork, Work.DataSetWork {
             listener.success(stats);
         }
         catch (CancelException e) {
-            listener.failure("Cancellation", e);
+            listener.failure("Cancellation", null); // the user asked for this; a null exception means nothing to alert
         }
         catch (Exception e) {
             if (dataSetModel != null) {
