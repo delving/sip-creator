@@ -307,7 +307,8 @@ public class RemoteDataSetFrame extends FrameBase {
         @Override
         public Component getListCellRendererComponent(JList list, WorkItem workItem, int index, boolean isSelected,
                 boolean cellHasFocus) {
-            String html = String.format(
+            // null when Swing paints an index the model no longer has (repaint racing a refresh)
+            String html = workItem == null ? "" : String.format(
                     "<html><b>%s</b> %s",
                     workItem.dataset.getSipFile().getName(), workItem.dataset.getState());
             return defaultListCellRenderer.getListCellRendererComponent(list, html, index, isSelected, cellHasFocus);
@@ -463,13 +464,13 @@ public class RemoteDataSetFrame extends FrameBase {
         }
 
         public void refreshWorkItems() {
-            fireIntervalRemoved(this, 0, getSize());
-            workItems.clear();
+            // build aside and swap: the alert below runs a modal dialog that repaints this list mid-loop
+            List<WorkItem> fresh = new ArrayList<>();
             for (Map.Entry<String, DataSet> entry : sipModel.getStorage().getDataSets().entrySet()) {
                 DataSet dataSet = entry.getValue();
                 try {
                     if (!dataSet.getSchemaVersion().getPrefix().equals("unknown")) {
-                        workItems.add(new WorkItem(dataSet));
+                        fresh.add(new WorkItem(dataSet));
                     }
                 } catch (IllegalArgumentException e) {
                     // Something wrong with the schema - ignore this dataset
@@ -477,18 +478,23 @@ public class RemoteDataSetFrame extends FrameBase {
                 }
             }
 
-            Collections.sort(workItems, (o1, o2) -> {
+            Collections.sort(fresh, (o1, o2) -> {
                 if (sortMode == SortMode.DATE)
                     return o2.dateTime.compareTo(o1.dateTime);
-                return o1.dataset.getSipFile().getName().compareTo(o1.dataset.getSipFile().getName());
+                return o1.dataset.getSipFile().getName().compareTo(o2.dataset.getSipFile().getName());
             });
+            int oldSize = getSize();
+            workItems = fresh;
             activateFilter();
-            fireIntervalAdded(this, 0, getSize());
+            if (oldSize > 0) fireIntervalRemoved(this, 0, oldSize - 1);
+            if (getSize() > 0) fireIntervalAdded(this, 0, getSize() - 1);
         }
 
         public void removeWorkItem(WorkItem selectedWorkItem) {
+            int index = filteredWorkItems.indexOf(selectedWorkItem);
             workItems.remove(selectedWorkItem);
             activateFilter();
+            if (index >= 0) fireIntervalRemoved(this, index, index);
         }
     }
 
@@ -575,20 +581,24 @@ public class RemoteDataSetFrame extends FrameBase {
             networkClient.fetchNarthexSipList(new NetworkClient.NarthexListListener() {
                 @Override
                 public void listReceived(NetworkClient.SipZips sipZips) {
-                    RemoteDataSetFrame.this.sipZips = sipZips;
-                    downloadModel.refreshDownloads();
-                    workItemModel.refreshWorkItems();
-                    uploadModel.refreshUploads();
-                    setEnabled(true);
+                    sipModel.exec(() -> { // called from the network thread; list models belong to the EDT
+                        RemoteDataSetFrame.this.sipZips = sipZips;
+                        downloadModel.refreshDownloads();
+                        workItemModel.refreshWorkItems();
+                        uploadModel.refreshUploads();
+                        setEnabled(true);
+                    });
                 }
 
                 @Override
                 public void failed(Exception e) {
-                    sipModel.getFeedback().alert("Unable to fetch Narthex sip-zip list", e);
-                    downloadModel.refreshDownloads();
-                    workItemModel.refreshWorkItems();
-                    uploadModel.refreshUploads();
-                    setEnabled(true);
+                    sipModel.exec(() -> {
+                        sipModel.getFeedback().alert("Unable to fetch Narthex sip-zip list", e);
+                        downloadModel.refreshDownloads();
+                        workItemModel.refreshWorkItems();
+                        uploadModel.refreshUploads();
+                        setEnabled(true);
+                    });
                 }
             });
         }
