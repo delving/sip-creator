@@ -15,20 +15,20 @@ the model layer once, not per frame.
 Ten fix commits landed on `main` on 2026-09-08 from a Sentry triage, none pushed yet:
 
 ```
-e6d6a8a8 fix(sip-app): do not report user cancels of analysis or download as errors
-236f56df fix(sip-app): stop WorkModel job list timer racing the background driver
-6b37509b fix(sip-app): correct "foudn" typo in missing validation XSD message
-660f2e7b fix(sip-app): keep RemoteDataSetFrame work item list consistent with the JList
-ef19db5d fix(sip-core): map RDF-style xsd: datatypes to xs: in XsdGenerator
-0de61cb5 fix(schema-repo,sip-app): make the unknown SchemaVersion fallback usable
-87e0f1dd fix(sip-app): write source.xml.gz atomically in fromSipZip
-8019c3db fix(sip-app): tolerate already-removed mapping in RemoveNodeMappingAction
-d7e8d139 fix(sip-app): clear CreateModel target when RecMapping is replaced
-8ccc985e fix(sip-core): skip xml:lang empty guard when no enclosing loop var
+da1404be fix(sip-app): do not report user cancels of analysis or download as errors
+1e3e446c fix(sip-app): stop WorkModel job list timer racing the background driver
+bbc22077 fix(sip-app): correct "foudn" typo in missing validation XSD message
+e0ef471a fix(sip-app): keep RemoteDataSetFrame work item list consistent with the JList
+eb67b666 fix(sip-core): map RDF-style xsd: datatypes to xs: in XsdGenerator
+9e3652f6 fix(schema-repo,sip-app): make the unknown SchemaVersion fallback usable
+561b9b8e fix(sip-app): write source.xml.gz atomically in fromSipZip
+03c1ef3f fix(sip-app): tolerate already-removed mapping in RemoveNodeMappingAction
+300d6faa fix(sip-app): clear CreateModel target when RecMapping is replaced
+2fdc2dfe fix(sip-core): skip xml:lang empty guard when no enclosing loop var
 ```
 
 Three read-only surveys of `sip-app` followed. Their findings, condensed, are the
-inventory below. File and line references are as of `e6d6a8a8`.
+inventory below. File and line references are as of `da1404be`.
 
 ### Inventory A: notifications and Swing touched off the EDT
 
@@ -209,7 +209,7 @@ Wait for human acknowledgment before proceeding to commit.
   the colour. Three-file change in `RecMapping.validateMappings`, `SipModel.analyzeFields`
   and the two renderers. Separate plan when picked up.
 - `RecMapping.resolve` silently drops mappings whose output path left the recdef.
-- Narthex rebuild against sip-core `ef19db5d` so newly uploaded recdefs get a loadable
+- Narthex rebuild against sip-core `eb67b666` so newly uploaded recdefs get a loadable
   generated XSD.
 - Bounding the thread pool.
 
@@ -217,3 +217,6 @@ Wait for human acknowledgment before proceeding to commit.
 
 Push the ten fix commits, then start Step 1 on a worktree. Flip ADR-0001 to Accepted
 when Step 1 merges.
+
+## Commits
+- `013ceba0` 2026-09-08 21:27: docs: record EDT ownership decision and sip-app threading hardening plan ( 2 files changed, 341 insertions(+))

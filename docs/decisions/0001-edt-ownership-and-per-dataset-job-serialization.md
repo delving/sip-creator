@@ -7,8 +7,8 @@ Status: Proposed
 
 ## Why this decision was needed
 
-A Sentry triage on 2026-09-08 fixed seven GUI crashes in one day (commits `8ccc985e`
-through `e6d6a8a8`). Five of them were the same shape: a Swing model or a model field
+A Sentry triage on 2026-09-08 fixed seven GUI crashes in one day (commits `2fdc2dfe`
+through `da1404be`). Five of them were the same shape: a Swing model or a model field
 was read on the Event Dispatch Thread (EDT) while a worker thread was replacing it, or
 two workers touched the same dataset at once. A follow-up review of the whole `sip-app`
 module (three read-only surveys, findings recorded in
@@ -115,8 +115,8 @@ per-field locking. Fields that are still read cross-thread outside a listener
 - Implementation plan: `docs/plans/2026-09-08-sip-app-threading-hardening.md`
 - Prior threading overview: `docs/SWING_APP_ANALYSIS.md` (section on WorkModel and
   the EDT/worker routing diagram)
-- Fixes that motivated this ADR, all on `main` dated 2026-09-08: `d7e8d139`
-  (stale `CreateModel` target), `8019c3db` (double remove), `660f2e7b`
-  (`RemoteDataSetFrame` list drift), `236f56df` (`WorkModel` double driver),
-  `e6d6a8a8` (cancel reported as error)
+- Fixes that motivated this ADR, all on `main` dated 2026-09-08: `300d6faa`
+  (stale `CreateModel` target), `03c1ef3f` (double remove), `e0ef471a`
+  (`RemoteDataSetFrame` list drift), `1e3e446c` (`WorkModel` double driver),
+  `da1404be` (cancel reported as error)
 - Sentry issues: 7706901827, 7696467688, 7695359832, 7678612971, 7582237133
