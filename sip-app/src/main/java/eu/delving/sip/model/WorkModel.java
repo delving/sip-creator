@@ -212,19 +212,22 @@ public class WorkModel {
             if (!snapshot.isEmpty()) {
                 int size = getSize();
                 snapshot.clear();
-                fireIntervalRemoved(this, 0, size);
+                fireIntervalRemoved(this, 0, size - 1);
             }
             for (JobContext context : jobContexts) {
                 if (context.doWork()) {
                     jobContexts.remove(context);
+                    continue;
                 }
-                else if (context.getWork().getJob() != Work.Job.CHECK_STATE) {
+                // the background loop in the constructor drives the same contexts; it may empty the queue between our doWork and this peek
+                Work work = context.getWork();
+                if (work != null && work.getJob() != Work.Job.CHECK_STATE) {
                     snapshot.add(context);
                 }
             }
             if (!snapshot.isEmpty()) {
                 Collections.sort(snapshot);
-                fireIntervalAdded(this, 0, snapshot.size());
+                fireIntervalAdded(this, 0, snapshot.size() - 1);
             }
         }
     }
@@ -244,7 +247,7 @@ public class WorkModel {
             return queue.peek();
         }
 
-        public boolean doWork() {
+        public synchronized boolean doWork() { // two drivers: the EDT timer and the background loop
             if (executor.isShutdown() || queue.isEmpty()) return true;
             if (!(future.isDone() || future.isCancelled())) return false;
             queue.remove();
