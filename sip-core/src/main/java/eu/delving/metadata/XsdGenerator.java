@@ -74,14 +74,14 @@ public class XsdGenerator {
 
         Set<String> emitted = new LinkedHashSet<>();
         for (Map.Entry<String, RecDef.Elem> entry : entities.entrySet()) {
-            emitComplexType(out, entry.getKey(), entry.getValue(), emitted);
+            emitComplexType(out, recDef, entry.getKey(), entry.getValue(), emitted);
         }
 
         out.append("</xs:schema>\n");
         return out.toString();
     }
 
-    private static void emitComplexType(StringBuilder out, String tag, RecDef.Elem elem, Set<String> emitted) {
+    private static void emitComplexType(StringBuilder out, RecDef recDef, String tag, RecDef.Elem elem, Set<String> emitted) {
         String typeName = typeName(tag);
         if (!emitted.add(typeName)) return;
         out.append("  <xs:complexType name=\"").append(typeName).append("\">\n");
@@ -95,7 +95,7 @@ public class XsdGenerator {
             for (RecDef.Elem child : elem.subelements) {
                 if (child.tag == null || !seenNames.add(localName(child.tag.toString()))) continue;
                 int before = out.length();
-                emitPropertyElement(out, child);
+                emitPropertyElement(out, recDef, child);
                 declared |= out.length() > before;
             }
         }
@@ -111,7 +111,7 @@ public class XsdGenerator {
         out.append("  </xs:complexType>\n\n");
     }
 
-    private static void emitPropertyElement(StringBuilder out, RecDef.Elem elem) {
+    private static void emitPropertyElement(StringBuilder out, RecDef recDef, RecDef.Elem elem) {
         if (elem.tag == null) return;
         // A tagless or prefix-only elem cannot be a valid xs:element name —
         // it is a recdef defect the resolver reports elsewhere; skip here.
@@ -121,7 +121,7 @@ public class XsdGenerator {
         out.append("      <xs:element name=\"").append(localName(elem.tag.toString()))
            .append("\" minOccurs=\"").append(min)
            .append("\" maxOccurs=\"").append(max).append("\"");
-        String dataType = elem.xsdDataType != null ? elem.xsdDataType : (elem.uriCheck ? "xs:anyURI" : null);
+        String dataType = elem.xsdDataType != null ? schemaPrefixed(elem.xsdDataType, recDef) : (elem.uriCheck ? "xs:anyURI" : null);
         if (elem.xsdPattern != null) {
             out.append(">\n");
             out.append("        <xs:simpleType>\n");
@@ -143,6 +143,26 @@ public class XsdGenerator {
             out.append("        </xs:complexType>\n");
             out.append("      </xs:element>\n");
         }
+    }
+
+    /**
+     * Recdefs spell datatypes the RDF way, {@code xsd:string} with {@code xsd} bound to
+     * {@code http://www.w3.org/2001/XMLSchema#}. Inside an XSD that prefix must resolve to the
+     * XML Schema namespace itself, so rewrite it to this document's {@code xs} prefix.
+     */
+    private static String schemaPrefixed(String dataType, RecDef recDef) {
+        int colon = dataType.indexOf(':');
+        if (colon < 0) return dataType;
+        String prefix = dataType.substring(0, colon);
+        boolean schemaNamespace = prefix.equals("xsd");
+        if (recDef.namespaces != null) {
+            for (RecDef.Namespace ns : recDef.namespaces) {
+                if (prefix.equals(ns.prefix)) {
+                    schemaNamespace = ns.uri != null && ns.uri.replaceAll("#$", "").equals("http://www.w3.org/2001/XMLSchema");
+                }
+            }
+        }
+        return schemaNamespace ? "xs:" + dataType.substring(colon + 1) : dataType;
     }
 
     private static String localName(String tag) {
