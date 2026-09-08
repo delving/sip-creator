@@ -175,7 +175,7 @@ public class StorageImpl implements Storage {
             if (schemaVersion == null) {
                 String fact = getDataSetFacts().get(SCHEMA_VERSIONS);
                 if (fact == null) {
-                    schemaVersion = new SchemaVersion("unknown", "0.0.0");
+                    return SchemaVersion.UNKNOWN; // not cached: the facts may arrive with a later download
                 }
                 schemaVersion = new SchemaVersion(fact);
             }

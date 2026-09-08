@@ -28,8 +28,15 @@ import java.util.regex.Pattern;
 
 public class SchemaVersion implements Comparable<SchemaVersion> {
     private static final Pattern PATTERN = Pattern.compile("([a-z]{3,6})_([0-9][.][0-9][.][0-9]+)");
+    // placeholder for a dataset that carries no schemaVersions fact; the prefix is longer than PATTERN allows on purpose
+    public static final SchemaVersion UNKNOWN = new SchemaVersion();
     private String prefix;
     private String version;
+
+    private SchemaVersion() {
+        this.prefix = "unknown";
+        this.version = "0.0.0";
+    }
 
     public SchemaVersion(String string) {
         Matcher matcher = PATTERN.matcher(string);
