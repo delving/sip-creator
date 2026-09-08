@@ -556,7 +556,8 @@ public class CodeGenerator {
                         if (comma) codeOut.line(",");
                         trace();
 
-                        Boolean isNotEmpty = sub.getTag().toString().equals("xml:lang");
+                        // ponytail: guard needs an enclosing loop var; constant/branch-level xml:lang has none
+                        boolean isNotEmpty = sub.getTag().toString().equals("xml:lang") && !groovyParams.isEmpty();
 
                         if (!injectRdfAbout) {
                             codeOut.line_("%s (", tag.toBuilderCall());

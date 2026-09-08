@@ -155,4 +155,20 @@ class CodeGeneratorTest {
         }
         return count;
     }
+
+    @Test
+    void xmlLangMappedWithoutEnclosingLoopDoesNotThrow() throws Exception {
+        InputStream stream = getClass().getResourceAsStream("/recdef/elem-groups-recdef.xml");
+        assertNotNull(stream, "Test fixture recdef/elem-groups-recdef.xml must exist");
+
+        RecDefTree tree = RecDefTree.create(RecDef.read(stream));
+        RecDefNode lang = tree.getRecDefNode(Path.create("/test:root/test:concept/skos:prefLabel/@xml:lang"));
+        assertNotNull(lang, "Test recdef should contain /test:root/test:concept/skos:prefLabel/@xml:lang");
+        lang.addNodeMapping(NodeMapping.forConstant("nl"));
+
+        RecMapping recMapping = RecMapping.create(tree);
+        String code = new CodeGenerator(recMapping).toRecordMappingCode();
+
+        assertTrue(code.contains("'xml:lang' : {"), "xml:lang attribute should be emitted");
+    }
 }
