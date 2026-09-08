@@ -71,3 +71,5 @@ __pycache__
 
 # lua-poc analysis: test-generated report artifact
 lua-poc/analysis/out.json
+.claude/.commit-approved-*
+.claude/settings.local.json
