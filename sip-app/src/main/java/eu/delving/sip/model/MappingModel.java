@@ -53,6 +53,7 @@ public class MappingModel implements RecDefNodeListener {
     }
 
     public void setRecMapping(RecMapping recMapping) {
+        if (this.recMapping != null) this.recMapping.getRecDefTree().setListener(null); // stale tree must not fire into the new one
         this.recMapping = recMapping;
         recDefTreeRoot = null;
         if (recMapping != null) recMapping.getRecDefTree().setListener(this);

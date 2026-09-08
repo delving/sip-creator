@@ -64,6 +64,8 @@ public class CreateModel {
 
     public CreateModel(final SipModel sipModel) {
         this.sipModel = sipModel;
+        // a new RecMapping means a new RecDefTreeNode tree; a target from the old tree would add mappings to a discarded RecDefTree
+        sipModel.getMappingModel().addSetListener(mappingModel -> setNodeMapping(null));
         sipModel.getDataSetModel().addListener(new DataSetModel.SwingListener() {
             @Override
             public void stateChanged(DataSetModel model, DataSetState state) {
