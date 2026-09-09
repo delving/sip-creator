@@ -237,7 +237,11 @@ public class RecDefTreeNode extends FilterNode {
         private void setColor(boolean selected, RecDefTreeNode node) {
             Color color = node.isHighlighted() ? HIGHLIGHTED_COLOR : MAPPED_COLOR;
 
-            if (selected) {
+            if (node.recDefNode.inputPathMissing) { // the warning must survive selection
+                setOpaque(true);
+                setBackground(Color.RED);
+                setForeground(Color.WHITE);
+            } else if (selected) {
                 setOpaque(false);
                 setBackground(Color.WHITE);
                 setForeground(color);
@@ -245,10 +249,6 @@ public class RecDefTreeNode extends FilterNode {
                 setOpaque(true);
                 setBackground(Color.YELLOW);
                 setForeground(Color.BLACK);
-            } else if (node.recDefNode.inputPathMissing) {
-                setOpaque(true);
-                setBackground(Color.RED);
-                setForeground(Color.WHITE);
             } else {
                 setOpaque(true);
                 setBackground(color);

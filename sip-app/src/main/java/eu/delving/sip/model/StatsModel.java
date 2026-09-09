@@ -48,6 +48,7 @@ public class StatsModel {
     private SipModel sipModel;
     private FactModel hintsModel = new FactModel();
     private SourceTreeNode sourceTree = SourceTreeNode.create("Select a data set from the File menu, or download one");
+    private boolean hasStatistics;
     private FilterTreeModel sourceTreeModel = new FilterTreeModel(sourceTree);
     // TODO record count is never used
     private int recordCount;
@@ -104,7 +105,12 @@ public class StatsModel {
         return false;
     }
 
+    public boolean hasStatistics() {
+        return hasStatistics;
+    }
+
     public void setStatistics(Stats stats) {
+        hasStatistics = stats != null;
         if (stats != null) {
             sourceTree = SourceTreeNode.create(stats.fieldValueMap, sipModel.getDataSetFacts().getFacts());
             setSourceTree(sourceTree);

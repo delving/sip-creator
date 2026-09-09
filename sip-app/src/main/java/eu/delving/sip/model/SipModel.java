@@ -139,16 +139,19 @@ public class SipModel {
             public void nodeMappingChanged(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping,
                     NodeMappingChange change) {
                 dataSetModel.deleteResults();
+                revalidateMappings();
             }
 
             @Override
             public void nodeMappingAdded(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
                 dataSetModel.deleteResults();
+                revalidateMappings();
             }
 
             @Override
             public void nodeMappingRemoved(MappingModel mappingModel, RecDefNode node, NodeMapping nodeMapping) {
                 dataSetModel.deleteResults();
+                revalidateMappings();
             }
 
             @Override
@@ -408,6 +411,15 @@ public class SipModel {
 
     }
 
+    // keeps the red "input path missing" marking current; validateMappings clears before it sets
+    private void revalidateMappings() {
+        if (statsModel == null || !statsModel.hasStatistics()) return; // placeholder tree would flag everything
+        MappingModel mappingModel = dataSetModel.getMappingModel();
+        if (mappingModel.hasRecMapping()) {
+            mappingModel.getRecMapping().validateMappings(new StatsModel.SourceTreeImpl(statsModel));
+        }
+    }
+
     public void analyzeFields() {
         exec(new AnalysisParser(dataSetModel.getDataSet(), dataSetModel, statsModel.getMaxUniqueValueLength(),
             new AnalysisParser.Listener() {
@@ -418,6 +430,7 @@ public class SipModel {
                     dataSetModel.getDataSet().setStats(stats);
                     exec(() -> {
                         statsModel.setStatistics(stats);
+                        revalidateMappings();
                         seekFirstRecord();
                     });
                 } catch (StorageException e) {

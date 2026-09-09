@@ -275,6 +275,7 @@ public class RecMapping {
     }
 
     public void validateMappings(RecDefTree.SourceTree sourceTree) {
+        clearInputPathMissing(recDefTree.getRoot()); // idempotent: re-run after every analysis or mapping change
         for (NodeMapping nm : recDefTree.getNodeMappings()) {
             RecDefNode node = recDefTree.getRecDefNode(nm.outputPath);
             if (!sourceTree.contains(nm)) {
@@ -286,6 +287,12 @@ public class RecMapping {
                 }
             }
         }
+    }
+
+    private static void clearInputPathMissing(RecDefNode node) {
+        node.inputPathMissing = false;
+        for (NodeMapping nm : node.getNodeMappings().values()) nm.inputPathMissing = false;
+        for (RecDefNode child : node.getChildren()) clearInputPathMissing(child);
     }
 
     public static RecMapping create(RecDefTree recDefTree) throws MetadataException {

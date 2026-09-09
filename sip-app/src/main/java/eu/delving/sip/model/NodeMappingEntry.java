@@ -99,12 +99,12 @@ public class NodeMappingEntry {
             NodeMappingEntry entry = (NodeMappingEntry) value;
             String string = getHtml(entry.nodeMapping);
             JLabel label = (JLabel) super.getListCellRendererComponent(list, string, index, selected, cellHasFocus);
-            if (selected) {
+            if (entry.getNodeMapping().inputPathMissing) { // the warning must survive selection
+                setBackground(Color.RED);
+                setForeground(selected ? Color.WHITE : Color.BLACK);
+            } else if (selected) {
                 setBackground(list.getSelectionBackground());
                 setForeground(list.getSelectionForeground());
-            } else if (entry.getNodeMapping().inputPathMissing) {
-                setBackground(Color.RED);
-                setForeground(Color.BLACK);
             } else if (entry.isHighlighted()) {
                 setBackground(SwingHelper.HIGHLIGHTED_COLOR);
                 setForeground(Color.BLACK);
