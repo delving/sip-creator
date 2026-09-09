@@ -73,3 +73,9 @@ __pycache__
 lua-poc/analysis/out.json
 .claude/.commit-approved-*
 .claude/settings.local.json
+# OpenWolf / per-machine agent config (mirrors pletka): hooks carry absolute paths
+.claude/settings.json
+.claude/hooks/
+.codex/
+.opencode/
+GEMINI.md

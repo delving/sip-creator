@@ -250,3 +250,4 @@ ADR-0001 and this plan first. Flip ADR-0001 to Accepted when Step 1 merges.
 ## Commits
 - `013ceba0` 2026-09-08 21:27: docs: record EDT ownership decision and sip-app threading hardening plan ( 2 files changed, 341 insertions(+))
 - `94fc0ad2` 2026-09-08 21:29: docs: point ADR-0001 and threading plan at the rewritten commit hashes ( 2 files changed, 21 insertions(+), 18 deletions(-))
+- `b6b470b7` 2026-09-09 16:48: fix(sip-core,sip-app): keep the missing-input-path red marking current ( 6 files changed, 74 insertions(+), 9 deletions(-))
