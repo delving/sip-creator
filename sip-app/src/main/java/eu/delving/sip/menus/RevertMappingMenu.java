@@ -17,7 +17,6 @@
 
 package eu.delving.sip.menus;
 
-import eu.delving.metadata.RecMapping;
 import eu.delving.sip.base.Work;
 import eu.delving.sip.files.DataSet;
 import eu.delving.sip.files.StorageException;
@@ -92,11 +91,10 @@ public class RevertMappingMenu extends JMenu implements MappingSaveTimer.ListRec
         @Override
         public void run() {
             try {
-                RecMapping previousMapping = sipModel.getDataSetModel().getDataSet().revertRecMapping(file, sipModel.getDataSetModel());
-                sipModel.getMappingModel().setRecMapping(previousMapping);
-
-                // Trigger a reload of the dataset in order to refresh source tree mappings
-                sipModel.setDataSet(sipModel.getDataSetModel().getDataSet(), () -> {});
+                dataSet.revertRecMapping(file, sipModel.getDataSetModel()); // rewrites the mapping file
+                // one load, inside this EDIT-lane job: reading the file back sets the mapping and rebuilds the
+                // source tree links, instead of setRecMapping followed by a second SET_DATASET chain
+                sipModel.reloadDataSet(dataSet);
             }
             catch (StorageException e) {
                 sipModel.getFeedback().alert("Unable to revert mapping", e);

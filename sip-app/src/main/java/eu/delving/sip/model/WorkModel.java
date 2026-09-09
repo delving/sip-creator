@@ -27,6 +27,7 @@ import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -35,6 +36,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 /**
  * A model of all the work that is being done in background threads at any time.  The contents of the list
@@ -42,6 +44,8 @@ import java.util.concurrent.TimeUnit;
  * shown or not, depending on its type, and long term jobs also have an associated progress listener which
  * allows for cancellation as well as reporting of progress.
  *
+ * Jobs are queued per (dataset, lane), see {@link Work.Lane}: jobs with the same key run one after the other
+ * in one JobContext, jobs with different keys run concurrently.
  *
  */
 
@@ -49,8 +53,11 @@ public class WorkModel {
     private static final int REFRESH_RATE = 666;
     private ExecutorService executor = Executors.newCachedThreadPool();
     private List<JobContext> jobContexts = new CopyOnWriteArrayList<JobContext>();
+    private Map<LaneKey, JobContext> laneContexts = new ConcurrentHashMap<LaneKey, JobContext>();
     private JobListModel jobListModel = new JobListModel();
+    private Timer tick;
     private Feedback feedback;
+    private Supplier<DataSet> currentDataSet;
 
     public interface ProgressIndicator {
         void cancel();
@@ -58,8 +65,14 @@ public class WorkModel {
         String getProgressString();
     }
 
-    public WorkModel(final Feedback feedback) {
+    /**
+     * @param currentDataSet the dataset that is open right now, or null. SILENT jobs that do not name a dataset
+     *                       (most of them do not implement DataSetWork) are queued in the EDIT lane of this
+     *                       dataset, because that is the dataset whose models they touch.
+     */
+    public WorkModel(final Feedback feedback, Supplier<DataSet> currentDataSet) {
         this.feedback = feedback;
+        this.currentDataSet = currentDataSet;
         this.executor = new ThreadPoolExecutor(
                 0, Integer.MAX_VALUE,
                 60L, TimeUnit.SECONDS,
@@ -72,21 +85,18 @@ public class WorkModel {
                 feedback.alert("Exception: " + throwable.toString(), throwable);
             }
         };
-        Timer tick = new Timer(REFRESH_RATE, jobListModel);
+        tick = new Timer(REFRESH_RATE, jobListModel);
         tick.setRepeats(true);
         tick.start();
-        executor.execute(new Runnable() {
+        executor.execute(new Runnable() { // the sole driver of the job contexts; the timer only snapshots them
             @Override
             public void run() {
-                while (true) {
+                while (!executor.isShutdown()) {
                     try {
                         Thread.sleep(30);
                         for (JobContext context : jobContexts) {
-                            if (context.doWork()) jobContexts.remove(context);
+                            if (context.doWork()) retire(context);
                         }
-                    }
-                    catch (NoSuchElementException e) {
-                        break;
                     }
                     catch (InterruptedException e) {
                         break;
@@ -97,6 +107,7 @@ public class WorkModel {
     }
 
     public void shutdown() {
+        tick.stop();
         executor.shutdown();
     }
 
@@ -117,81 +128,79 @@ public class WorkModel {
     }
 
     public void exec(Work work) {
-        switch (work.getJob().getKind()) {
-            case SILENT:
-                executor.execute(work);
-                break;
-            case NETWORK:
-                network(work);
-                break;
-            case NETWORK_DATA_SET:
-                dataSet(work);
-                break;
-            case DATA_SET:
-                dataSet(work);
-                break;
-            case DATA_SET_PREFIX:
-                dataSetPrefix(work);
-                break;
-            default:
-                throw new RuntimeException();
+        LaneKey key = LaneKey.of(work, currentDataSet);
+        if (key == null) {
+            justDoIt(work);
+            return;
         }
-    }
-
-    private void dataSetPrefix(Work work) {
-        Work.DataSetPrefixWork w = (Work.DataSetPrefixWork) work;
-        DataSet dataSet = w.getDataSet();
-        String prefix = w.getPrefix();
-        if (dataSet != null && prefix == null) { // todo: what's with prefix here?
-            for (JobContext context : jobContexts) {
-                String dataSetSpec = context.getDataSet();
-                String contextPrefix = context.getPrefix();
-                if (dataSetSpec != null && contextPrefix != null &&
-                        dataSetSpec.equals(dataSet.getSpec()) && contextPrefix.equals(prefix)) {
-                    context.add(work);
-                    work = null;
-                    break;
-                }
-            }
+        JobContext running = laneContexts.get(key);
+        if (running != null && running.isBusyWith(work)) {
+            feedback.alert(running + " busy"); // outside the map lock: the alert blocks on a modal dialog
+            return;
         }
-        justDoIt(work);
-    }
-
-    private void dataSet(Work work) {
-        Work.DataSetWork w = (Work.DataSetWork) work;
-        DataSet dataSet = w.getDataSet();
-        if (dataSet != null) {
-            for (JobContext context : jobContexts) {
-                String dataSetSpec = context.getDataSet();
-                if (context.getPrefix() != null) continue;
-                if (dataSetSpec != null && dataSetSpec.equals(dataSet.getSpec())) {
-                    context.add(work);
-                    work = null;
-                    break;
-                }
-            }
-        }
-        justDoIt(work);
-    }
-
-    private void network(Work work) {
-        for (JobContext context : jobContexts) {
-            if (context.isNetwork()) {
-                context.add(work);
-                work = null;
-                break;
-            }
-        }
-        justDoIt(work);
+        laneContexts.compute(key, (laneKey, context) -> { // merge-or-create is atomic per (dataset, lane)
+            if (context != null && context.add(work)) return context;
+            JobContext fresh = new JobContext(work, laneKey);
+            jobContexts.add(fresh);
+            return fresh;
+        });
     }
 
     private void justDoIt(Work work) {
-        if (work == null) return;
-        jobContexts.add(new JobContext(work));
+        jobContexts.add(new JobContext(work, null));
+    }
+
+    private void retire(JobContext context) {
+        jobContexts.remove(context);
+        if (context.key != null) laneContexts.remove(context.key, context); // no-op if exec already replaced it
     }
 
     public ListModel<JobContext> getListModel() {
         return jobListModel;
+    }
+
+    /**
+     * What a job queues behind: the same dataset in the same lane. NETWORK jobs share one key.
+     */
+    private static class LaneKey {
+        private static final LaneKey NETWORK = new LaneKey("", Work.Lane.NETWORK);
+        private final String dataSetSpec;
+        private final Work.Lane lane;
+
+        private LaneKey(String dataSetSpec, Work.Lane lane) {
+            this.dataSetSpec = dataSetSpec;
+            this.lane = lane;
+        }
+
+        // DataSetWork names its dataset; the many SILENT jobs that do not are keyed on the dataset that is open
+        // when they are queued, which is the one whose models they touch. No dataset means nothing to queue behind.
+        private static LaneKey of(Work work, Supplier<DataSet> currentDataSet) {
+            Work.Lane lane = work.getJob().getLane();
+            switch (lane) {
+                case NETWORK:
+                    return NETWORK;
+                case NONE:
+                    return null;
+                default:
+                    DataSet dataSet = work instanceof Work.DataSetWork
+                            ? ((Work.DataSetWork) work).getDataSet()
+                            : currentDataSet.get();
+                    return dataSet == null ? null : new LaneKey(dataSet.getSpec(), lane);
+            }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof LaneKey)) return false;
+            LaneKey other = (LaneKey) o;
+            return dataSetSpec.equals(other.dataSetSpec) && lane == other.lane;
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * dataSetSpec.hashCode() + lane.hashCode();
+        }
     }
 
     private class JobListModel extends AbstractListModel<JobContext> implements ActionListener {
@@ -208,18 +217,13 @@ public class WorkModel {
         }
 
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) { // snapshot only; the background loop in the constructor drives the contexts
             if (!snapshot.isEmpty()) {
                 int size = getSize();
                 snapshot.clear();
                 fireIntervalRemoved(this, 0, size - 1);
             }
             for (JobContext context : jobContexts) {
-                if (context.doWork()) {
-                    jobContexts.remove(context);
-                    continue;
-                }
-                // the background loop in the constructor drives the same contexts; it may empty the queue between our doWork and this peek
                 Work work = context.getWork();
                 if (work != null && work.getJob() != Work.Job.CHECK_STATE) {
                     snapshot.add(context);
@@ -233,12 +237,14 @@ public class WorkModel {
     }
 
     public class JobContext implements Comparable<JobContext> {
-        private Date start;
-        private Future<?> future;
+        private final LaneKey key;
+        private volatile Date start;
+        private volatile Future<?> future;
         private Queue<Work> queue = new ConcurrentLinkedQueue<Work>();
-        private ProgressImpl progressImpl;
+        private volatile ProgressImpl progressImpl;
 
-        public JobContext(Work work) {
+        private JobContext(Work work, LaneKey key) {
+            this.key = key;
             this.queue.add(work);
             launch();
         }
@@ -247,7 +253,7 @@ public class WorkModel {
             return queue.peek();
         }
 
-        public synchronized boolean doWork() { // two drivers: the EDT timer and the background loop
+        public synchronized boolean doWork() { // synchronized against add: a drained context must not accept work
             if (executor.isShutdown() || queue.isEmpty()) return true;
             if (!(future.isDone() || future.isCancelled())) return false;
             queue.remove();
@@ -285,31 +291,21 @@ public class WorkModel {
             }
         }
 
-        public boolean isNetwork() {
-            final Work work = queue.peek();
-            if (work == null) return false;
-            switch (work.getJob().getKind()) {
-                case NETWORK:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
         public ProgressIndicator getProgressIndicator() {
             return progressImpl;
         }
 
-        public void add(Work work) {
-            if (work instanceof Work.LongTermWork) {
-                final Work existingWork = queue.peek();
-                if (existingWork == null) return;
-                if (!queue.isEmpty() && work.getClass() == existingWork.getClass() && !isDone()) {
-                    feedback.alert(this + " busy");
-                    return;
-                }
-            }
+        // the busy guard for LongTermWork: a second Validate while one is running for this dataset is refused
+        private boolean isBusyWith(Work work) {
+            if (!(work instanceof Work.LongTermWork)) return false;
+            final Work existingWork = queue.peek();
+            return existingWork != null && work.getClass() == existingWork.getClass() && !isDone();
+        }
+
+        private synchronized boolean add(Work work) {
+            if (isDone()) return false; // drained and about to be retired: exec starts a fresh context instead
             queue.add(work);
+            return true;
         }
 
         @Override
@@ -352,10 +348,10 @@ public class WorkModel {
 
     private static class ProgressImpl implements ProgressListener, ProgressIndicator {
         private Feedback feedback;
-        private String progressMessage;
-        private int current, maximum;
-        private boolean cancelled;
-        private TimeEstimator timeEstimator;
+        private volatile String progressMessage;
+        private volatile int current, maximum;
+        private volatile boolean cancelled;
+        private volatile TimeEstimator timeEstimator;
 
         private ProgressImpl(Feedback feedback) {
             this.feedback = feedback;

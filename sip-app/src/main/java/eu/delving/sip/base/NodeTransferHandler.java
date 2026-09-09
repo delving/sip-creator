@@ -91,7 +91,11 @@ public class NodeTransferHandler extends TransferHandler {
                     if (treePath.getLastPathComponent() instanceof RecDefTreeNode) {
                         RecDefTreeNode recDefTreeNode = (RecDefTreeNode) treePath.getLastPathComponent();
                         createModel.setTarget(recDefTreeNode);
-                        if (createModel.canCreate()) createModel.createMapping();
+                        // back on the EDT, after this job: createMapping asks for a constant value there and
+                        // queues the job that adds the mapping
+                        sipModel.exec(() -> {
+                            if (createModel.canCreate()) createModel.createMapping();
+                        });
                     }
                 }
 
