@@ -47,17 +47,24 @@ Two rules, enforced in the model layer rather than in every frame:
   `FunctionCompileModel`, `FactModel`, `ReportFileModel` and `SipModel.ParseListener`
   dispatch through `Swing.Exec.later`, which gains an `isEventDispatchThread()`
   shortcut so EDT callers stay synchronous. Listener interfaces that carry this
-  guarantee are named `SwingListener`, following the existing `DataSetModel`
-  precedent. Frames and panels then touch Swing directly in their listeners and drop
+  guarantee are renamed `Swing*` (`SwingSetListener`, `SwingChangeListener`,
+  `SwingListener`), following the existing `DataSetModel` precedent, so the contract
+  is visible at every implementation site. Frames and panels then touch Swing directly in their listeners and drop
   their ad-hoc `exec(Swing)` wrappers. Callbacks that arrive from non-pool threads
   (`NetworkClient`, `FileProcessor.Termination`, `AnalysisParser`) are marshalled at
   the boundary in the same way.
-- **Jobs for the same dataset run one at a time.** `WorkModel` merges every
-  `DATA_SET` and `DATA_SET_PREFIX` job into the `JobContext` for that dataset,
-  regardless of prefix, and makes the scan-then-add atomic. `SILENT` selection jobs
-  (`SELECT_*`, `CREATE_MAPPING`, `REMOVE_NODE_MAPPING`, and the like) route through
-  the same per-dataset context. The single background driver owns `doWork`; the Swing
-  timer only snapshots for display.
+- **Jobs for the same dataset run one at a time per lane.** `WorkModel` keys its
+  `JobContext`s by (dataset, lane) and makes the scan-then-add atomic. Two lanes:
+  EDIT for everything that mutates or reads the live mapping and models
+  (`SET_DATASET`, `SAVE_MAPPING`, `COMPILE_*`, `RELOAD_MAPPING`, `REVERT_MAPPING`,
+  `SCAN_RECORDS`, `SEEK_RESET`, `PARSE_ANALYZE` and every `SILENT` job that touches a
+  dataset), and BATCH for long jobs that snapshot their inputs at start (`PROCESS`,
+  `LOAD_REPORT`, `GATHER_*_STATS`, `CHECK_LINK`, `LOAD_LINKS`, `SAVE_LINKS`,
+  `DELETE_CACHES`). A selection never waits for a running validation; a second
+  Validate is refused by the existing busy guard. `SILENT` remains only for jobs that
+  touch no shared model (`READ_FRAME_ARRANGEMENTS`). The single background driver owns
+  `doWork`; the Swing timer only snapshots for display. The pool stays unbounded for
+  now; lanes cap useful concurrency and bounding is revisited only on evidence.
 
 With those two rules in place, model fields written by a job and read by a listener are
 handed over by the EDT dispatch and by per-dataset ordering, so they need no

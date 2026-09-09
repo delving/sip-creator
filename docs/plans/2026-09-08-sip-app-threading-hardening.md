@@ -116,20 +116,50 @@ report twice), `frames/RemoteDataSetFrame.java:596, 818`, `model/MappingHintsMod
 Ordered by leverage. Each step is one PR, green on `mvn test -pl sip-app` and
 `mvn test -pl sip-core`, and each ends with a human diff review before commit.
 
-### Step 1: make `WorkModel` merging real
+### Step 0: red marking of orphaned mappings (own PR, before Step 1)
 
-- Fix `dataSetPrefix`: merge into any context whose head job is for the same dataset,
-  regardless of prefix. Drop the `prefix == null` condition and the `todo`.
-- Make merge-or-create atomic: one `synchronized` block around scan plus `justDoIt`,
-  or a `ConcurrentHashMap<String, JobContext>` keyed by dataset spec.
-- Route `SILENT` jobs that carry a dataset (`SELECT_*`, `CREATE_MAPPING`,
-  `REMOVE_NODE_MAPPING`, `REFRESH_DICTIONARY`, `DUPLICATE_ELEMENT`) through the
-  dataset context; keep true `SILENT` for jobs that touch no shared model.
+Decided 2026-09-08: land first so Step 1 branches from a base that has it, since it
+touches `SipModel.setDataSet` and `analyzeFields`, which Steps 1 and 2 rework.
+
+- `RecMapping.validateMappings`: clear `inputPathMissing` on every mapping and every
+  recdef node first, then set. Idempotent, so it can run repeatedly.
+- Call it after `statsModel.setStatistics(stats)` in `analyzeFields` success and on
+  node-mapping add/remove/change, only when real statistics are loaded.
+- `NodeMappingEntry` and `RecDefTreeNode` renderers: red survives selection.
+- Check: sip-core test that `validateMappings` on a source tree without the path
+  marks mapping and node, and on a source tree with the path clears both.
+
+### Step 1: `WorkModel` lanes
+
+Decisions 2026-09-08: two lanes per dataset (EDIT and BATCH), every dataset-touching
+`SILENT` job goes to the EDIT lane, pool stays unbounded, and the two synchronous-effect
+callers are resequenced in this step.
+
+- `JobContext`s keyed by (dataset spec, lane). EDIT lane: `SET_DATASET`,
+  `SAVE_MAPPING`, `COMPILE_NODE_MAPPING`, `COMPILE_FUNCTION`, `RELOAD_MAPPING`,
+  `REVERT_MAPPING`, `DELETE_SOURCE`, `CHECK_STATE`, `SEEK_RESET`, `SAVE_HINTS`,
+  `PARSE_ANALYZE`, `SCAN_RECORDS`, and every `SILENT` job except
+  `READ_FRAME_ARRANGEMENTS`. BATCH lane: `PROCESS`, `LOAD_REPORT`, `CHECK_LINK`,
+  `LOAD_LINKS`, `SAVE_LINKS`, `GATHER_LINK_STATS`, `GATHER_PRESENCE_STATS`,
+  `DELETE_CACHES`. Derive the lane from `Job` (a `Lane` enum next to `Kind`, or fold
+  it into `Kind`); `NETWORK` unchanged. `FileProcessor` already snapshots the mapping
+  code at start (`FileProcessor.java:241`) and Validate locks the mapping, so BATCH
+  jobs are safe to overlap EDIT jobs.
+- Fix `dataSetPrefix`: drop the `prefix == null` condition and the `todo`; merge by
+  dataset and lane regardless of prefix.
+- Make merge-or-create atomic: `ConcurrentHashMap<Key, JobContext>` with
+  `computeIfAbsent`, or one `synchronized` block around scan plus `justDoIt`.
 - Remove the EDT timer's call to `doWork`; the background loop is the sole driver, the
   timer only snapshots. Delete the now-dead `NoSuchElementException` catch.
 - Make `ProgressImpl` counters and `JobContext.start/future` `volatile`.
+- `RevertMappingMenu`: one EDIT-lane job that does `setRecMapping` then the reload,
+  in order, instead of two chains.
+- `CreateModel.createMapping`: ask for the constant value on the EDT before the job
+  is queued; the job only adds the mapping.
 - Check: two rapid Validate clicks produce one `FileProcessor` and one "busy" alert.
-  Two rapid Open clicks produce one load. `RevertMappingMenu` no longer double-loads.
+  A selection during a running validation completes immediately. Two rapid Open
+  clicks produce one load. Revert no longer double-loads. A `WorkModel` unit test
+  with fake `Work`s asserts lane assignment and per-lane ordering.
 
 **Step 1 review: Human diff review**
 Reference skill: diff-review-before-task-commit
@@ -155,6 +185,8 @@ Wait for human acknowledgment before proceeding to commit.
 - Fix the direct offenders that a marshalled listener does not cover:
   `MappingCompileModel:529` `setDocument`, `StatsModel:123` from the clear-stats
   work, `TargetFrame:266, 270` null checks, `FieldMappingFrame:117-132`.
+- Naming decided 2026-09-08: rename to `Swing*` everywhere, including the boundary
+  callbacks, so each implementation site is visibly reviewed.
 - `VisualFeedback.form/ask/confirm`: wrap in `invokeAndWait` when off the EDT, as
   `alert`/`info` already do.
 - Check: run with `-Dsun.awt.exception.handler` or a `RepaintManager` EDT checker
@@ -204,10 +236,6 @@ Wait for human acknowledgment before proceeding to commit.
 
 ## Out of scope, tracked separately
 
-- Red marking of mappings whose source path disappeared (`inputPathMissing`): works on
-  load, but the flag is sticky, re-analysis never re-validates, and selection hides
-  the colour. Three-file change in `RecMapping.validateMappings`, `SipModel.analyzeFields`
-  and the two renderers. Separate plan when picked up.
 - `RecMapping.resolve` silently drops mappings whose output path left the recdef.
 - Narthex rebuild against sip-core `eb67b666` so newly uploaded recdefs get a loadable
   generated XSD.
@@ -215,8 +243,10 @@ Wait for human acknowledgment before proceeding to commit.
 
 ## What's next
 
-Push the ten fix commits, then start Step 1 on a worktree. Flip ADR-0001 to Accepted
-when Step 1 merges.
+Step 0 lands on `main` from the triage session, then push, then Step 1 in worktree
+`../sip-creator-threading` on branch `threading-step-1` with a fresh session that reads
+ADR-0001 and this plan first. Flip ADR-0001 to Accepted when Step 1 merges.
 
 ## Commits
 - `013ceba0` 2026-09-08 21:27: docs: record EDT ownership decision and sip-app threading hardening plan ( 2 files changed, 341 insertions(+))
+- `94fc0ad2` 2026-09-08 21:29: docs: point ADR-0001 and threading plan at the rewritten commit hashes ( 2 files changed, 21 insertions(+), 18 deletions(-))
