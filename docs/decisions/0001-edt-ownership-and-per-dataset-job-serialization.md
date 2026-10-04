@@ -1,7 +1,7 @@
 # ADR-0001: Models marshal their notifications to the EDT; WorkModel serializes jobs per dataset
 
 Date: 2026-09-08
-Status: Proposed
+Status: Accepted (2026-10-04, Step 1 merged as PR #534)
 
 ---
 

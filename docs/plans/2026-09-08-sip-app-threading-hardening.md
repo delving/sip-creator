@@ -1,8 +1,7 @@
 # sip-app threading hardening
 
-**Status:** planned 2026-09-08, not started. Decision recorded in
-`docs/decisions/0001-edt-ownership-and-per-dataset-job-serialization.md` (Proposed;
-flip to Accepted when step 1 merges).
+**Status:** Step 0 landed 2026-09-09 (`b6b470b7`). Step 1 merged 2026-10-04 as PR #534
+after the five hand checks passed. ADR-0001 is Accepted. Next: Step 2.
 
 ## Goal
 
