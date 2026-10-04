@@ -25,6 +25,7 @@ import eu.delving.sip.files.DataSetState;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
@@ -116,34 +117,62 @@ public class CreateModel {
         fireStateChanged();
     }
 
+    /**
+     * Call on the EDT. Asks for the constant value when the mapping needs one, then queues the job that adds
+     * the mapping: the dialog blocks on the EDT, so it must not run inside a job that holds the dataset's EDIT lane.
+     */
     public void createMapping() {
         if (!canCreate()) throw new RuntimeException("Should have checked");
+        // a probe with the input paths and target the job will use, so isConstant/hasOptList answer the same
+        // as for the real mapping; the probe is attached to nothing
+        NodeMapping probe = new NodeMapping();
+        probe.recDefNode = recDefTreeNode.getRecDefNode();
+        List<Path> inputPaths = new ArrayList<Path>();
+        for (SourceTreeNode node : sourceTreeNodes) inputPaths.add(node.getUnwrappedPath());
+        probe.setInputPaths(inputPaths);
+        String constantValue = null;
+        if (probe.isConstant()) {
+            constantValue = askConstantValue(probe);
+            if (constantValue == null) return; // cancelled
+        }
+        final String groovyCode = constantValue;
+        sipModel.exec(new Work() {
+            @Override
+            public void run() {
+                if (canCreate()) addCreatedMapping(groovyCode);
+            }
+
+            @Override
+            public Job getJob() {
+                return Job.CREATE_MAPPING;
+            }
+        });
+    }
+
+    // null means cancelled; cancelling the free-text question now also cancels, instead of creating a
+    // mapping with null code as before
+    private String askConstantValue(NodeMapping probe) {
+        if (probe.hasOptList()) {
+            String [] array = new String[probe.getOptListValues().size()];
+            JComboBox box = new JComboBox<String>(probe.getOptListValues().toArray(array));
+            while (true) {
+                boolean ok = sipModel.getFeedback().form("Please choose the constant value", box);
+                if (!ok) return null;
+                String selected = (String) box.getSelectedItem();
+                if (selected != null) return selected;
+            }
+        }
+        else {
+            return sipModel.getFeedback().ask("Please enter the constant value");
+        }
+    }
+
+    private void addCreatedMapping(String groovyCode) {
         NodeMapping created = new NodeMapping().setOutputPath(recDefTreeNode.getRecDefPath().getTagPath());
         created.recDefNode = recDefTreeNode.getRecDefNode();
         SourceTreeNode.setStatsTreeNodes(sourceTreeNodes, created);
         recDefTreeNode.addNodeMapping(created);
-        if (created.isConstant()) {
-            if (created.hasOptList()) {
-                String [] array = new String[created.getOptListValues().size()];
-                JComboBox box = new JComboBox<String>(created.getOptListValues().toArray(array));
-                while (true) {
-                    boolean ok = sipModel.getFeedback().form("Please choose the constant value", box);
-                    if (!ok) {
-                        SourceTreeNode.removeStatsTreeNodes(created);
-                        recDefTreeNode.removeNodeMapping(created); // remove it again
-                        return;
-                    }
-                    String selected = (String) box.getSelectedItem();
-                    if (selected != null) {
-                        created.setGroovyCode(selected);
-                        break;
-                    }
-                }
-            }
-            else {
-                created.setGroovyCode(sipModel.getFeedback().ask("Please enter the constant value"));
-            }
-        }
+        if (groovyCode != null) created.setGroovyCode(groovyCode);
         setNodeMappingInternal(created);
         adjustHighlights();
         fireStateChanged();

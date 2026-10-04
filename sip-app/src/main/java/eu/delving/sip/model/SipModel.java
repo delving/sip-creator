@@ -105,7 +105,7 @@ public class SipModel {
         this.appProperties = appProperties;
         this.preferences = sipProperties.getProp();
         this.appPreferences = appProperties.getProp();
-        this.workModel = new WorkModel(feedback);
+        this.workModel = new WorkModel(feedback, () -> dataSetModel.getDataSet());
         dataSetModel = new DataSetModel(this);
         functionCompileModel = new FunctionCompileModel(this, groovyCodeResource);
         recordCompileModel = new MappingCompileModel(this, MappingCompileModel.Type.RECORD, groovyCodeResource);
@@ -263,6 +263,12 @@ public class SipModel {
 
     public void setDataSet(DataSet dataSet, Swing success) {
         exec(new DatasetAnalyzer(dataSet, new DatasetLoader(dataSet, success)));
+    }
+
+    // for a job that has just rewritten the mapping file: reads it back into the models on that job's own
+    // thread, so the reload is sequenced inside the job instead of queued as a second SET_DATASET chain
+    public void reloadDataSet(DataSet dataSet) {
+        new DatasetLoader(dataSet, null).run();
     }
 
     private class DatasetAnalyzer implements Work.DataSetWork {

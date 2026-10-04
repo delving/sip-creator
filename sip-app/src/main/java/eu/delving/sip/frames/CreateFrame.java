@@ -262,17 +262,8 @@ public class CreateFrame extends FrameBase {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            exec(new Work() {
-                @Override
-                public void run() {
-                    if (createModel.canCreate()) createModel.createMapping();
-                }
-
-                @Override
-                public Job getJob() {
-                    return Job.CREATE_MAPPING;
-                }
-            });
+            // on the EDT: createMapping asks for a constant value here and queues the job that adds the mapping
+            if (createModel.canCreate()) createModel.createMapping();
         }
 
         public void setIncomplete() {

@@ -23,6 +23,8 @@ import static eu.delving.sip.base.Work.Kind.DATA_SET;
 import static eu.delving.sip.base.Work.Kind.DATA_SET_PREFIX;
 import static eu.delving.sip.base.Work.Kind.NETWORK;
 import static eu.delving.sip.base.Work.Kind.SILENT;
+import static eu.delving.sip.base.Work.Lane.BATCH;
+import static eu.delving.sip.base.Work.Lane.NONE;
 
 /**
  * A runnable that will be executed in the worker thread
@@ -40,6 +42,18 @@ public interface Work extends Runnable {
         DATA_SET_PREFIX
     }
     
+    /**
+     * Which queue a job waits in. EDIT and BATCH are per dataset: WorkModel runs the jobs of one (dataset, lane)
+     * one after the other, and lets an EDIT job overlap a BATCH job because BATCH jobs snapshot their inputs at
+     * start. NETWORK is one global queue. NONE runs unqueued, for jobs that touch no shared model.
+     */
+    public enum Lane {
+        EDIT,
+        BATCH,
+        NETWORK,
+        NONE
+    }
+
     public enum Job {
 
         CLEAR_FACTS_STATS(SILENT),
@@ -67,7 +81,7 @@ public interface Work extends Runnable {
         SELECT_ANOTHER_MAPPING(SILENT),
         DUPLICATE_ELEMENT(SILENT),
 
-        READ_FRAME_ARRANGEMENTS(SILENT),
+        READ_FRAME_ARRANGEMENTS(SILENT, NONE),
 
         COMPILE_NODE_MAPPING(DATA_SET_PREFIX),
         COMPILE_FUNCTION(DATA_SET_PREFIX),
@@ -83,15 +97,15 @@ public interface Work extends Runnable {
 
         PARSE_ANALYZE(DATA_SET),
         SCAN_RECORDS(DATA_SET),
-        PROCESS(DATA_SET_PREFIX),
-        LOAD_REPORT(DATA_SET_PREFIX),
-        CHECK_LINK(DATA_SET_PREFIX),
-        LOAD_LINKS(DATA_SET_PREFIX),
-        SAVE_LINKS(DATA_SET_PREFIX),
-        GATHER_LINK_STATS(DATA_SET_PREFIX),
-        GATHER_PRESENCE_STATS(DATA_SET_PREFIX),
+        PROCESS(DATA_SET_PREFIX, BATCH),
+        LOAD_REPORT(DATA_SET_PREFIX, BATCH),
+        CHECK_LINK(DATA_SET_PREFIX, BATCH),
+        LOAD_LINKS(DATA_SET_PREFIX, BATCH),
+        SAVE_LINKS(DATA_SET_PREFIX, BATCH),
+        GATHER_LINK_STATS(DATA_SET_PREFIX, BATCH),
+        GATHER_PRESENCE_STATS(DATA_SET_PREFIX, BATCH),
         RELOAD_MAPPING(DATA_SET_PREFIX),
-        DELETE_CACHES(DATA_SET_PREFIX),
+        DELETE_CACHES(DATA_SET_PREFIX, BATCH),
 
         LOGIN(NETWORK),
         FETCH_LIST(NETWORK),
@@ -102,13 +116,24 @@ public interface Work extends Runnable {
         UPLOAD(NETWORK);
 
         private Kind kind;
+        private Lane lane;
 
+        // the default lane: network jobs share the network queue, everything else edits the live models
         private Job(Kind kind) {
+            this(kind, kind == NETWORK ? Lane.NETWORK : Lane.EDIT);
+        }
+
+        private Job(Kind kind, Lane lane) {
             this.kind = kind;
+            this.lane = lane;
         }
 
         public Kind getKind() {
             return kind;
+        }
+
+        public Lane getLane() {
+            return lane;
         }
     }
 
