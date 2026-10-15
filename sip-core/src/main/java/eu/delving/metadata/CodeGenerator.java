@@ -534,9 +534,14 @@ public class CodeGenerator {
 
             boolean comma = false;
             if (injectRdfAbout) {
-                trace();
                 codeOut.line("// auto-injected rdf:about (fallback to internalRecordURI())");
-                codeOut.line_("%s (", tag.toBuilderCall());
+            }
+            // Open the element once: every attribute below is a named argument
+            // of this one call. Opening it per attribute mapping produced
+            // invalid Groovy as soon as an element had two attribute mappings.
+            codeOut.line_("%s (", tag.toBuilderCall());
+            if (injectRdfAbout) {
+                trace();
                 codeOut.line_("'rdf:about' : {");
                 codeOut.line("internalRecordURI()");
                 codeOut._line("}");
@@ -559,9 +564,6 @@ public class CodeGenerator {
                         // ponytail: guard needs an enclosing loop var; constant/branch-level xml:lang has none
                         boolean isNotEmpty = sub.getTag().toString().equals("xml:lang") && !groovyParams.isEmpty();
 
-                        if (!injectRdfAbout) {
-                            codeOut.line_("%s (", tag.toBuilderCall());
-                        }
                         codeOut.line_("%s : {", sub.getTag().toBuilderCall());
                         if (isNotEmpty) {
                             codeOut.line("if (%s && %s != \"\") {", groovyParams.peek(), groovyParams.peek());

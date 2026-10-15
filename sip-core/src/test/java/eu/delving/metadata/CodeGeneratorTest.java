@@ -10,8 +10,11 @@ package eu.delving.metadata;
 import eu.delving.groovy.StandardMappingFunctions;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -170,5 +173,29 @@ class CodeGeneratorTest {
         String code = new CodeGenerator(recMapping).toRecordMappingCode();
 
         assertTrue(code.contains("'xml:lang' : {"), "xml:lang attribute should be emitted");
+    }
+
+    @Test
+    void elementWithTwoMappedAttributesCompiles() throws Exception {
+        // Regression: the element call was opened once per attribute mapping
+        // but closed once, so two mapped attributes gave invalid Groovy
+        // (adlib-collect-test on datahub, 2026-10).
+        String recDefXml = "<?xml version=\"1.0\"?>"
+            + "<record-definition prefix=\"test\" version=\"0.0.0\">"
+            + "<namespaces><namespace prefix=\"test\" uri=\"http://test.example.org/\" schema=\"http://test.example.org/test.xsd\"/></namespaces>"
+            + "<attrs><attr tag=\"id\"/><attr tag=\"ref\"/></attrs>"
+            + "<root tag=\"test:root\"><elem tag=\"test:thing\" attrs=\"id, ref\"><elem tag=\"test:name\"/></elem></root>"
+            + "</record-definition>";
+        RecDefTree tree = RecDefTree.create(RecDef.read(new ByteArrayInputStream(recDefXml.getBytes(StandardCharsets.UTF_8))));
+        tree.getRecDefNode(Path.create("/test:root/test:thing/@test:id")).addNodeMapping(NodeMapping.forConstant("one"));
+        tree.getRecDefNode(Path.create("/test:root/test:thing/@test:ref")).addNodeMapping(NodeMapping.forConstant("two"));
+        tree.getRecDefNode(Path.create("/test:root/test:thing/test:name")).addNodeMapping(NodeMapping.forConstant("name"));
+        RecMapping recMapping = RecMapping.create(tree);
+        recMapping.setFact("orgId", "datahub");
+        recMapping.setFact("spec", "test");
+
+        String code = new CodeGenerator(recMapping).toRecordMappingCode();
+
+        assertDoesNotThrow(() -> new groovy.lang.GroovyShell().parse(code), code);
     }
 }
