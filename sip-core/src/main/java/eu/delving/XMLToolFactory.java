@@ -17,7 +17,9 @@
 
 package eu.delving;
 
+import com.ctc.wstx.stax.WstxEventFactory;
 import com.ctc.wstx.stax.WstxInputFactory;
+import com.ctc.wstx.stax.WstxOutputFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -64,20 +66,46 @@ public class XMLToolFactory {
         return path;
     }
 
+    /**
+     * Returns a new Woodstox input factory with entity replacement, external
+     * entities and coalescing switched off.
+     *
+     * The factory is constructed directly rather than through
+     * {@code XMLInputFactory.newInstance()}: that static lookup goes through
+     * the thread context class loader, and under a container's class loader
+     * (Play's dev mode, for one) it can hand back the JDK parser instead.
+     * {@link eu.delving.groovy.MetadataRecordFactory} casts the reader to
+     * {@code XMLStreamReader2}, which only Woodstox provides.
+     *
+     * @return a fresh, configured Woodstox input factory
+     */
     public static XMLInputFactory xmlInputFactory() {
-        XMLInputFactory inputFactory = WstxInputFactory.newInstance();
+        XMLInputFactory inputFactory = new WstxInputFactory();
         inputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
         inputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
         inputFactory.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
         return inputFactory;
     }
 
+    /**
+     * Returns a new Woodstox output factory, constructed directly for the same
+     * reason as {@link #xmlInputFactory()}: the output does not depend on which
+     * class loader the calling thread has.
+     *
+     * @return a fresh Woodstox output factory
+     */
     public static XMLOutputFactory xmlOutputFactory() {
-        return XMLOutputFactory.newInstance();
+        return new WstxOutputFactory();
     }
 
+    /**
+     * Returns a new Woodstox event factory, constructed directly for the same
+     * reason as {@link #xmlInputFactory()}.
+     *
+     * @return a fresh Woodstox event factory
+     */
     public static XMLEventFactory xmlEventFactory() {
-        return XMLEventFactory.newInstance();
+        return new WstxEventFactory();
     }
 
     public static SchemaFactory schemaFactory(String prefix) {
