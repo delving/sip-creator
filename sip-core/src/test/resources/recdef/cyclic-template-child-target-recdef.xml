@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!-- Two templates whose own children inject each other (ping/to-pong -> pong,
+     pong/to-ping -> ping), used from two root elements. Each copy of a template
+     must get its own children: when copies share them, the children resolved
+     under "first" (where ping is not yet an ancestor) carry that expansion into
+     "second", past the ancestor skip, until the depth backstop fails. -->
+<record-definition prefix="test" version="0.0.0">
+    <namespaces>
+        <namespace prefix="test" uri="http://test.example.org/" schema="http://test.example.org/test.xsd"/>
+    </namespaces>
+
+    <attrs>
+        <attr tag="id"/>
+    </attrs>
+
+    <templates>
+        <elem tag="ping">
+            <elem tag="to-pong" target="pong"/>
+        </elem>
+        <elem tag="pong">
+            <elem tag="to-ping" target="ping"/>
+        </elem>
+    </templates>
+
+    <root tag="root">
+        <elem tag="first" target="pong"/>
+        <elem tag="second" target="ping"/>
+    </root>
+
+    <field-markers/>
+    <opts/>
+</record-definition>

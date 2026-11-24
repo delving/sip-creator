@@ -669,6 +669,18 @@ public class RecDef {
                 for (Attr attr : attrList) clone.attrList.add(attr.copy());
                 clone.elemList = new ArrayList<Elem>();
                 for (Elem elem : elemList) clone.elemList.add(elem.deepCopy());
+                // clone() is shallow: without these, every copy of a template
+                // shares the template's own child elems, so resolving one copy
+                // mutates them for all (expansions made under one branch leak
+                // into others, past the ancestor skip in resolve).
+                if (subelements != null) {
+                    clone.subelements = new ArrayList<Elem>();
+                    for (Elem elem : subelements) clone.subelements.add(elem.deepCopy());
+                }
+                if (subattrs != null) {
+                    clone.subattrs = new ArrayList<Attr>();
+                    for (Attr attr : subattrs) clone.subattrs.add(attr.copy());
+                }
                 return clone;
             }
             catch (CloneNotSupportedException e) {
