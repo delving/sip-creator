@@ -46,6 +46,17 @@ class RecDefTemplateCycleTest {
     }
 
     @Test
+    void templateCopiesDoNotShareTheirChildren() throws Exception {
+        RecDefTree tree = RecDefTree.create(readRecDef("/recdef/cyclic-template-child-target-recdef.xml"));
+        assertNotNull(tree.getRecDefNode(Path.create("/test:root/test:first/test:pong/test:to-ping/test:ping")),
+                "Under first, ping is not an ancestor and must be expanded");
+        assertNotNull(tree.getRecDefNode(Path.create("/test:root/test:second/test:ping/test:to-pong/test:pong/test:to-ping")),
+                "Under second, the first cycle round must be expanded");
+        assertNull(tree.getRecDefNode(Path.create("/test:root/test:second/test:ping/test:to-pong/test:pong/test:to-ping/test:ping")),
+                "A copy must not inherit an expansion made for another copy: ping is an ancestor here");
+    }
+
+    @Test
     void elemGroupCycleHitsDepthBackstopCatchably() {
         IllegalStateException e = assertThrows(IllegalStateException.class,
                 () -> readRecDef("/recdef/cyclic-elem-group-recdef.xml"),
