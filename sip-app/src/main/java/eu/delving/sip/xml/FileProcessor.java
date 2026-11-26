@@ -475,12 +475,14 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             boolean allEnginesDone = false;
             while (!allEnginesDone) {
                 allEnginesDone = true;
+                MappingEngine running = null;
                 recordCount = 0;
                 processedCount = 0;
                 
                 for (MappingEngine engine : engines) {
                     if (!engine.isDone) {
                         allEnginesDone = false;
+                        if (running == null) running = engine;
                     }
                     recordCount += engine.recordCount;
                     processedCount += engine.processedCount;
@@ -503,7 +505,10 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 
                 if (!allEnginesDone) {
                     try {
-                        Thread.sleep(1000); // Update every second
+                        // Update every second, but wake as soon as that engine
+                        // ends: a plain sleep left up to a second idle after the
+                        // last record.
+                        running.thread.join(1000);
                     } catch (InterruptedException e) {
                         termination.dueToException(e);
                         break;
