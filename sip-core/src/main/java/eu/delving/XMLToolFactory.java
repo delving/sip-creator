@@ -46,7 +46,11 @@ public class XMLToolFactory {
 
     static {
         try {
-            XPATH_FACTORY = net.sf.saxon.xpath.XPathFactoryImpl.newInstance();
+            // Constructed directly: XPathFactoryImpl.newInstance() is the static
+            // XPathFactory.newInstance(), which ignores the class it is called
+            // through and returns the JDK default (Xalan). Saxon 9.6 registers
+            // no XPath service, so that is what this line had been getting.
+            XPATH_FACTORY = new net.sf.saxon.xpath.XPathFactoryImpl();
         }
         catch (Exception e) {
             LOG.error("Error initializing Xpath? ", e);
