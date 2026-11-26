@@ -353,6 +353,37 @@ public class JenaHelperTest {
         }
 
         @Test
+        void rdfErrorsFromGivenXmlMatchSerializingAgain() throws Exception {
+            // the bulk path hands in the bytes it will write instead of serializing twice
+            String NKC = "https://wo2.collectienederland.nl/nk/terms/";
+            String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+            Document doc = DocumentBuilderFactory.newDefaultNSInstance().newDocumentBuilder().newDocument();
+            Element root = doc.createElementNS(NKC, "nkc:RDF");
+            doc.appendChild(root);
+            Element cho = doc.createElementNS(NKC, "nkc:CHO");
+            cho.setAttributeNS(RDF, "rdf:about", "http://example.org/cho/1");
+            root.appendChild(cho);
+            Element creator = doc.createElementNS(NKC, "nkc:creator");
+            cho.appendChild(creator);
+            for (String name : new String[]{"A", "B"}) { // two typed children: E201
+                Element typed = doc.createElementNS(NKC, "nkc:Creator");
+                Element creatorName = doc.createElementNS(NKC, "nkc:creatorName");
+                creatorName.setTextContent(name);
+                typed.appendChild(creatorName);
+                creator.appendChild(typed);
+            }
+            RecDefTree tree = org.mockito.Mockito.mock(RecDefTree.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
+            org.mockito.Mockito.when(tree.getRoot().getDefaultPrefix()).thenReturn("nkc");
+            MappingResult result = new MappingResult(new XmlSerializer(), "test-1", root, tree);
+
+            List<String> expected = result.getRDFErrors();
+            assertEquals(1, expected.size(), "E201 expected: " + expected);
+            assertEquals(expected, result.getRDFErrors(result.toXml(), true));
+            assertEquals(List.of(), result.getRDFErrors(result.toXml(), false),
+                    "without the parse check only the DOM checks run");
+        }
+
+        @Test
         void multipleTypedChildrenViaToJenaCompliantRDFShouldBeDetectedAsError() {
             // Simulate what toRDF() produces: root is nkc:RDF, then
             // toJenaCompliantRDF rewrites it to rdf:RDF

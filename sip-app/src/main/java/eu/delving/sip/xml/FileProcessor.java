@@ -81,6 +81,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private final Termination termination = new Termination();
     private final Object lock = new Object();
     private RDFFormat rdfFormat;
+    private boolean rdfParseCheck = true;
     private final Date time;
 
     public Feedback getFeedback() {
@@ -133,6 +134,15 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     public void setRdfFormat(RDFFormat rdfFormat) {
         this.rdfFormat = rdfFormat;
+    }
+
+    /**
+     * Whether every record is parsed as RDF/XML with Jena before it is
+     * accepted (on by default). The DOM checks for a top-level subject and
+     * relative URIs run either way.
+     */
+    public void setRdfParseCheck(boolean rdfParseCheck) {
+        this.rdfParseCheck = rdfParseCheck;
     }
 
     private void info(String message) {
@@ -322,13 +332,15 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private class MappingOutput {
         final MetadataRecord metadataRecord;
         final MappingResult mappingResult;
+        final ByteArrayOutputStream xml;
         final Exception exception;
         final List<String> events;
 
-        private MappingOutput(MetadataRecord metadataRecord, MappingResult mappingResult, Exception exception,
-                List<String> events) {
+        private MappingOutput(MetadataRecord metadataRecord, MappingResult mappingResult, ByteArrayOutputStream xml,
+                Exception exception, List<String> events) {
             this.metadataRecord = metadataRecord;
             this.mappingResult = mappingResult;
+            this.xml = xml;
             this.exception = exception;
             this.events = events;
         }
@@ -340,7 +352,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         if (!events.isEmpty()) {
                             reportWriter.warn(metadataRecord, mappingResult, events, recMapping.getFacts());
                         }
-                        mappingResult.toByteArrayOutputStream(recMapping.getFacts()).writeTo(outputStream);
+                        xml.writeTo(outputStream);
                         return true;
                     }
                 } else if (exception instanceof DiscardRecordException) {
@@ -613,8 +625,17 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         public void accept(MetadataRecord metadataRecord, MappingResult mappingResult, Exception exception,
                 List<String> events) {
+            accept(metadataRecord, mappingResult, null, exception, events);
+        }
+
+        /**
+         * @param xml the record's serialization, written as the output when
+         *            there is no exception
+         */
+        public void accept(MetadataRecord metadataRecord, MappingResult mappingResult, ByteArrayOutputStream xml,
+                Exception exception, List<String> events) {
             //try {
-            MappingOutput mappingOutput = new MappingOutput(metadataRecord, mappingResult, exception, events);
+            MappingOutput mappingOutput = new MappingOutput(metadataRecord, mappingResult, xml, exception, events);
             recordCount++;
             if (rdfFormat == RDFFormat.RDFXML) {
                 if (mappingOutput.record(reportWriter, outputStream)) {
@@ -658,7 +679,9 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         // MappingRunner.getRecDefTree());
                         result = new MappingResult(serializer, record.getId(), node,
                                 MappingRunner.getRecDefTree(), recMapping.getFacts());
-                        validateRDF(result, shape, events);
+                        // Serialized once: checked as RDF and, if accepted, written as is.
+                        ByteArrayOutputStream xml = serialize(result);
+                        validateRDF(result, xml.toString(StandardCharsets.UTF_8), shape, events);
                         List<String> uriErrors = result.getUriErrors();
                         try {
                             if (!uriErrors.isEmpty()) {
@@ -669,7 +692,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                                 throw new Exception("URI Errors\n" + uriErrorsString);
                             }
                             if (validator == null) {
-                                accept(record, result, null, events);
+                                accept(record, result, xml, null, events);
                             } else {
                                 try {
                                     Source source = new DOMSource(node);
@@ -679,7 +702,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                                         if (violation != null)
                                             throw new AssertionException(violation);
                                     }
-                                    accept(record, result, null, events);
+                                    accept(record, result, xml, null, events);
                                 } catch (Exception e) {
                                     accept(record, result, e, events);
                                     if (!allowInvalid) {
@@ -716,8 +739,21 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         }
     }
 
-    private void validateRDF(MappingResult result, Graph shape, List<String> events) throws MappingException {
-        List<String> rdfErrors = result.getRDFErrors();
+    /**
+     * The record as written to the output. An IOException cannot happen on
+     * a byte array; it is rethrown unchecked, as MappingResult.toXml does.
+     */
+    private ByteArrayOutputStream serialize(MappingResult result) {
+        try {
+            return result.toByteArrayOutputStream(recMapping.getFacts());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void validateRDF(MappingResult result, String xml, Graph shape, List<String> events)
+            throws MappingException {
+        List<String> rdfErrors = result.getRDFErrors(xml, rdfParseCheck);
         if (!rdfErrors.isEmpty()) {
             for (String rdfError : rdfErrors) {
                 events.add(rdfError);
