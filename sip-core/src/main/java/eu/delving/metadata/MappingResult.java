@@ -22,8 +22,11 @@ import eu.delving.groovy.Utils;
 import eu.delving.groovy.XmlSerializer;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RIOT;
+import org.apache.jena.riot.WebContent;
+import org.apache.jena.riot.lang.ReaderRIOTRDFXML;
+import org.apache.jena.riot.system.ErrorHandlerFactory;
+import org.apache.jena.riot.system.StreamRDFLib;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -281,21 +284,36 @@ public class MappingResult {
         return Utils.stripNonPrinting(toXml());
     }
 
+    /**
+     * One RIOT RDF/XML reader per thread. Building one per record was a large
+     * share of the check's cost: jena-core 3.17's RDFXMLParser.create() asks
+     * the JDK whether a charset named "UTF" exists, the JDK caches only the
+     * charsets it finds, and so every new parser walks the charset providers
+     * again. A reader can be reused because ARP starts every load from a
+     * fresh state (frames, rdf:ID and rdf:nodeID scopes, encoding checks)
+     * and RIOT re-applies the handlers and options on every read.
+     */
+    private static final ThreadLocal<ReaderRIOTRDFXML> RDFXML_READER =
+            ThreadLocal.withInitial(() -> new ReaderRIOTRDFXML(ErrorHandlerFactory.getDefaultErrorHandler()));
+
     public static String hasRDFError(String rdf) {
         try {
             InputStream in = new ByteArrayInputStream(rdf.getBytes("UTF-8"));
-            // Use RDFDataMgr (RIOT) instead of Model.read() because the legacy
-            // ARP parser logs E201 (multiple children of property element) but
-            // does not throw, silently producing invalid RDF models.
+            // Use RIOT instead of Model.read() because the legacy ARP path
+            // logs E201 (multiple children of property element) but does not
+            // throw, silently producing invalid RDF models. This is what
+            // RDFDataMgr.read(model, in, Lang.RDFXML) does, minus building a
+            // new reader: no base, RDF/XML, the global RIOT context.
             Model model = ModelFactory.createDefaultModel();
-            RDFDataMgr.read(model, in, Lang.RDFXML);
+            RDFXML_READER.get().read(in, null, WebContent.ctRDFXML,
+                    StreamRDFLib.graph(model.getGraph()), RIOT.getContext().copy());
         } catch (Exception e) {
             return formatRDFError(e, rdf);
         }
         return "";
     }
 
-    private static String formatRDFError(Exception e, String rdf) {
+    static String formatRDFError(Exception e, String rdf) {
         String message = e.getMessage();
         int errorLine = extractLineNumber(message);
         if (errorLine < 0) {
