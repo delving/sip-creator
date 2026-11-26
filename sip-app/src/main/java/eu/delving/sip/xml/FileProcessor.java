@@ -261,7 +261,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(),
                     groovyCodeResource);
 
-            MetadataParserRunner metadataParserRunner = new MetadataParserRunner(parser);
+            MetadataParserRunner metadataParserRunner = new MetadataParserRunner(parser, engineCount);
             metadataParserRunner.start();
             for (int walk = 0; walk < engineCount; walk++) {
                 Validator validator = null;
@@ -391,13 +391,15 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         // Bounded: the parser blocks once this many records wait for an engine,
         // and wakes as soon as an engine takes one.
         static final int QUEUE_CAPACITY = 1000;
-        static final int POISON_PILLS = 100;
         final BlockingQueue<MetadataRecord> outputQueue = new ArrayBlockingQueue<>(QUEUE_CAPACITY);
         final Thread thread = new Thread(this);
         final MetadataParser metadataParser;
+        // one poison pill per engine: an engine without one blocks in take() forever
+        final int engineCount;
 
-        private MetadataParserRunner(MetadataParser metadataParser) {
+        private MetadataParserRunner(MetadataParser metadataParser, int engineCount) {
             this.metadataParser = metadataParser;
+            this.engineCount = engineCount;
             thread.setName(getClass().getName());
         }
 
@@ -425,7 +427,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 }
             } finally {
                 try {
-                    for (int i = 0; i < POISON_PILLS; i++) {
+                    for (int i = 0; i < engineCount; i++) {
                         if (!enqueue(MetadataRecord.poisonPill()))
                             break;
                     }
