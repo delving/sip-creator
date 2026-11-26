@@ -19,22 +19,36 @@ package eu.delving.groovy;
 
 import eu.delving.metadata.RecDefTree;
 import eu.delving.metadata.RecMapping;
+import groovy.lang.Binding;
+import groovy.lang.Closure;
+import groovy.lang.Script;
+import org.codehaus.groovy.control.CompilationFailedException;
+import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl;
+import org.codehaus.groovy.runtime.GroovyCategorySupport;
+import org.codehaus.groovy.runtime.InvokerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
-import javax.script.CompiledScript;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
 /**
  * Optimized implementation for high-throughput batch processing of mappings.
  * Pre-compiles the script for efficiency and provides minimal overhead.
+ *
+ * <p>The script class is compiled once and each record runs on a new
+ * instance of it with its own {@link Binding}. It deliberately does not go
+ * through {@code CompiledScript.eval}: Groovy's JSR-223 eval gives every
+ * script instance its own metaclass, and while a class has per-instance
+ * metaclasses Groovy's invokedynamic call sites cannot cache, so every call
+ * in the mapping was relinked on every record, all threads contending on
+ * the JDK's method-handle caches.
  */
 public class BulkMappingRunner implements MappingRunner {
     private static final Logger LOG = LoggerFactory.getLogger(BulkMappingRunner.class);
 
-    private final CompiledScript compiledScript;
+    private final Class<?> scriptClass;
     private final RecMapping recMapping;
     private final String generatedCode;
 
@@ -67,10 +81,10 @@ public class BulkMappingRunner implements MappingRunner {
 
         try {
             if (isolated) {
-                this.compiledScript = EngineHolder.createIsolatedEngine().compile(generatedCode);
+                this.scriptClass = compile(EngineHolder.createIsolatedEngine(), generatedCode);
                 EngineHolder.notifyIsolatedCompilation();
             } else {
-                this.compiledScript = EngineHolder.getInstance().compile(generatedCode);
+                this.scriptClass = compile(EngineHolder.getInstance(), generatedCode);
                 EngineHolder.notifyCompilation();
             }
         } catch (ScriptException e) {
@@ -80,6 +94,67 @@ public class BulkMappingRunner implements MappingRunner {
                     "Failed to compile mapping script",
                     e);
         }
+    }
+
+    /**
+     * Compiles on the engine's class loader, as {@code engine.compile} does,
+     * and wraps a compilation failure the same way.
+     */
+    private static Class<?> compile(GroovyScriptEngineImpl engine, String code) throws ScriptException {
+        Class<?> compiled;
+        try {
+            compiled = engine.getClassLoader().parseClass(code);
+        } catch (CompilationFailedException e) {
+            throw new ScriptException(e);
+        }
+        if (!Script.class.isAssignableFrom(compiled)) {
+            throw new ScriptException("Mapping code compiled to a class, not a script: " + compiled.getName());
+        }
+        return compiled;
+    }
+
+    /**
+     * Runs the script on a fresh instance bound to {@code bindings}. Any
+     * exception is wrapped in a ScriptException, as JSR-223 eval does, so
+     * callers see the same exception chain.
+     */
+    private Object evaluate(SimpleBindings bindings) throws ScriptException {
+        try {
+            Script script = InvokerHelper.createScript(scriptClass, new Binding(bindings));
+            return script.run();
+        } catch (Exception e) {
+            throw new ScriptException(e);
+        }
+    }
+
+    /**
+     * Runs {@code body} with MappingCategory in scope on the calling thread,
+     * for a runner whose code was generated with
+     * {@code CodeGenerator.withCategoryScope(false)}; every
+     * {@link #runMapping} inside {@code body} then relies on it.
+     *
+     * <p>Entering and leaving a category scope invalidates every Groovy indy
+     * call site in the process. Generated code that enters it per record
+     * keeps all mapping threads relinking their call sites; entering it once
+     * per thread lets them stay linked.
+     *
+     * <p>Any other Groovy code run inside {@code body} also sees the category,
+     * so keep it to mapping work.
+     */
+    public void runInMappingCategory(Runnable body) {
+        Class<?> category;
+        try {
+            category = scriptClass.getClassLoader().loadClass("MappingCategory");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("MappingCategory is not on the mapping class loader", e);
+        }
+        GroovyCategorySupport.use(category, new Closure<Void>(this) {
+            @SuppressWarnings("unused") // called by Groovy
+            public Void doCall() {
+                body.run();
+                return null;
+            }
+        });
     }
 
     @Override
@@ -103,7 +178,7 @@ public class BulkMappingRunner implements MappingRunner {
                     record.getRootNode(),
                     recMapping.getRecDefTree().getRecDef().valueOptLookup);
 
-            Object result = compiledScript.eval(bindings);
+            Object result = evaluate(bindings);
             return Utils.stripEmptyElements(result);
 
         } catch (ScriptException e) {

@@ -52,8 +52,9 @@ import javax.xml.validation.Validator;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Process an input file, mapping it to output records which are validated and
@@ -80,6 +81,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private final Termination termination = new Termination();
     private final Object lock = new Object();
     private RDFFormat rdfFormat;
+    private boolean rdfParseCheck = true;
     private final Date time;
 
     public Feedback getFeedback() {
@@ -132,6 +134,15 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     public void setRdfFormat(RDFFormat rdfFormat) {
         this.rdfFormat = rdfFormat;
+    }
+
+    /**
+     * Whether every record is parsed as RDF/XML with Jena before it is
+     * accepted (on by default). The DOM checks for a top-level subject and
+     * relative URIs run either way.
+     */
+    public void setRdfParseCheck(boolean rdfParseCheck) {
+        this.rdfParseCheck = rdfParseCheck;
     }
 
     private void info(String message) {
@@ -238,12 +249,19 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             int engineCount = (int) Math.round(Runtime.getRuntime().availableProcessors() * 1.1);
             info(String.format("Processing with %d engines", engineCount));
 
-            String code = new CodeGenerator(recMapping).withEditPath(null).withTrace(false).toRecordMappingCode();
-            MappingRunner MappingRunner = new BulkMappingRunner(recMapping, code);
+            // Each engine thread enters MappingCategory once instead of the
+            // generated code entering it per record: every use(...) invalidates
+            // all of Groovy's call sites, process-wide. Assertion scripts run on
+            // the engine threads too and must not see the category, so with XSD
+            // validation (which runs them) the code keeps its own scope.
+            boolean categoryPerThread = !enableXSDValidation;
+            String code = new CodeGenerator(recMapping).withEditPath(null).withTrace(false)
+                    .withCategoryScope(!categoryPerThread).toRecordMappingCode();
+            BulkMappingRunner MappingRunner = new BulkMappingRunner(recMapping, code);
             List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(),
                     groovyCodeResource);
 
-            MetadataParserRunner metadataParserRunner = new MetadataParserRunner(parser);
+            MetadataParserRunner metadataParserRunner = new MetadataParserRunner(parser, engineCount);
             metadataParserRunner.start();
             for (int walk = 0; walk < engineCount; walk++) {
                 Validator validator = null;
@@ -263,7 +281,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         recDef().getNamespaceMap(),
                         reportWriter,
                         assertionTests,
-                        MappingRunner);
+                        MappingRunner,
+                        categoryPerThread);
                 consumer.register(engine);
                 engine.start();
             }
@@ -321,13 +340,15 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
     private class MappingOutput {
         final MetadataRecord metadataRecord;
         final MappingResult mappingResult;
+        final ByteArrayOutputStream xml;
         final Exception exception;
         final List<String> events;
 
-        private MappingOutput(MetadataRecord metadataRecord, MappingResult mappingResult, Exception exception,
-                List<String> events) {
+        private MappingOutput(MetadataRecord metadataRecord, MappingResult mappingResult, ByteArrayOutputStream xml,
+                Exception exception, List<String> events) {
             this.metadataRecord = metadataRecord;
             this.mappingResult = mappingResult;
+            this.xml = xml;
             this.exception = exception;
             this.events = events;
         }
@@ -339,7 +360,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         if (!events.isEmpty()) {
                             reportWriter.warn(metadataRecord, mappingResult, events, recMapping.getFacts());
                         }
-                        mappingResult.toByteArrayOutputStream(recMapping.getFacts()).writeTo(outputStream);
+                        xml.writeTo(outputStream);
                         return true;
                     }
                 } else if (exception instanceof DiscardRecordException) {
@@ -367,12 +388,18 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     private class MetadataParserRunner implements Runnable {
 
-        final BlockingQueue<MetadataRecord> outputQueue = new LinkedBlockingDeque<>();
+        // Bounded: the parser blocks once this many records wait for an engine,
+        // and wakes as soon as an engine takes one.
+        static final int QUEUE_CAPACITY = 1000;
+        final BlockingQueue<MetadataRecord> outputQueue = new ArrayBlockingQueue<>(QUEUE_CAPACITY);
         final Thread thread = new Thread(this);
         final MetadataParser metadataParser;
+        // one poison pill per engine: an engine without one blocks in take() forever
+        final int engineCount;
 
-        private MetadataParserRunner(MetadataParser metadataParser) {
+        private MetadataParserRunner(MetadataParser metadataParser, int engineCount) {
             this.metadataParser = metadataParser;
+            this.engineCount = engineCount;
             thread.setName(getClass().getName());
         }
 
@@ -388,10 +415,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     try {
                         if (!((record = metadataParser.nextRecord()) != null))
                             break;
-                        outputQueue.add(record);
-                        while (outputQueue.size() > 1000) {
-                            Thread.sleep(1000);
-                        }
+                        if (!enqueue(record))
+                            break;
                     } catch (CancelException e) {
                         termination.dueToCancellation();
                         break;
@@ -401,10 +426,29 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     }
                 }
             } finally {
-                for (int i = 0; i < 100; i++) {
-                    outputQueue.add(MetadataRecord.poisonPill());
+                try {
+                    for (int i = 0; i < engineCount; i++) {
+                        if (!enqueue(MetadataRecord.poisonPill()))
+                            break;
+                    }
+                } catch (InterruptedException e) {
+                    termination.dueToException(e);
                 }
             }
+        }
+
+        /**
+         * Waits for room in the queue. Gives up (returns false) once processing
+         * has terminated: the engines then stop taking records, so a full queue
+         * would never drain. An engine blocked in take() means the queue is
+         * empty, so this never strands one.
+         */
+        private boolean enqueue(MetadataRecord record) throws InterruptedException {
+            while (!outputQueue.offer(record, 100, TimeUnit.MILLISECONDS)) {
+                if (termination.isIncomplete())
+                    return false;
+            }
+            return true;
         }
 
         public void start() {
@@ -557,7 +601,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         final Map<String, RecDef.Namespace> namespaceMap;
         final ReportWriter reportWriter;
         final List<AssertionTest> assertionTests;
-        final MappingRunner MappingRunner;
+        final BulkMappingRunner MappingRunner;
+        final boolean categoryPerThread;
 
         private MappingEngine(int index,
                 MetadataParserRunner metadataParserRunner,
@@ -569,7 +614,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 Map<String, RecDef.Namespace> namespaceMap,
                 ReportWriter reportWriter,
                 List<AssertionTest> assertionTests,
-                MappingRunner MappingRunner) {
+                BulkMappingRunner MappingRunner,
+                boolean categoryPerThread) {
             this.metadataParserRunner = metadataParserRunner;
             this.validator = validator;
             this.shape = shape;
@@ -581,6 +627,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             this.reportWriter = reportWriter;
             this.assertionTests = assertionTests;
             this.MappingRunner = MappingRunner;
+            this.categoryPerThread = categoryPerThread;
             this.thread = new Thread(this);
             this.thread.setName("MappingEngine" + index);
         }
@@ -591,8 +638,17 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         public void accept(MetadataRecord metadataRecord, MappingResult mappingResult, Exception exception,
                 List<String> events) {
+            accept(metadataRecord, mappingResult, null, exception, events);
+        }
+
+        /**
+         * @param xml the record's serialization, written as the output when
+         *            there is no exception
+         */
+        public void accept(MetadataRecord metadataRecord, MappingResult mappingResult, ByteArrayOutputStream xml,
+                Exception exception, List<String> events) {
             //try {
-            MappingOutput mappingOutput = new MappingOutput(metadataRecord, mappingResult, exception, events);
+            MappingOutput mappingOutput = new MappingOutput(metadataRecord, mappingResult, xml, exception, events);
             recordCount++;
             if (rdfFormat == RDFFormat.RDFXML) {
                 if (mappingOutput.record(reportWriter, outputStream)) {
@@ -615,6 +671,19 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         @Override
         public void run() {
+            if (!categoryPerThread) {
+                runLoop();
+                return;
+            }
+            try {
+                MappingRunner.runInMappingCategory(this::runLoop);
+            } catch (Throwable t) { // runLoop handles its own; this is entering the scope
+                termination.dueToException(asException(t));
+                isDone = true;
+            }
+        }
+
+        private void runLoop() {
             try {
                 while (termination.notYet()) {
                     MetadataRecord record = metadataParserRunner.nextRecord();
@@ -636,7 +705,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         // MappingRunner.getRecDefTree());
                         result = new MappingResult(serializer, record.getId(), node,
                                 MappingRunner.getRecDefTree(), recMapping.getFacts());
-                        validateRDF(result, shape, events);
+                        // Serialized once: checked as RDF and, if accepted, written as is.
+                        ByteArrayOutputStream xml = serialize(result);
+                        // the string is only read by the Jena parse check
+                        String xmlText = rdfParseCheck ? xml.toString(StandardCharsets.UTF_8) : null;
+                        validateRDF(result, xmlText, shape, events);
                         List<String> uriErrors = result.getUriErrors();
                         try {
                             if (!uriErrors.isEmpty()) {
@@ -647,7 +720,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                                 throw new Exception("URI Errors\n" + uriErrorsString);
                             }
                             if (validator == null) {
-                                accept(record, result, null, events);
+                                accept(record, result, xml, null, events);
                             } else {
                                 try {
                                     Source source = new DOMSource(node);
@@ -657,7 +730,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                                         if (violation != null)
                                             throw new AssertionException(violation);
                                     }
-                                    accept(record, result, null, events);
+                                    accept(record, result, xml, null, events);
                                 } catch (Exception e) {
                                     accept(record, result, e, events);
                                     if (!allowInvalid) {
@@ -686,16 +759,36 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         }
                     }
                 }
-            } catch (Exception e) {
-                termination.dueToException(e);
+            } catch (Throwable t) {
+                // An Error too (StackOverflowError in mapping code, OutOfMemoryError):
+                // this engine stops, so the run must fail rather than finish
+                // without its records, and the parser must stop waiting for room.
+                termination.dueToException(asException(t));
             } finally {
                 isDone = true;
             }
         }
     }
 
-    private void validateRDF(MappingResult result, Graph shape, List<String> events) throws MappingException {
-        List<String> rdfErrors = result.getRDFErrors();
+    private static Exception asException(Throwable t) {
+        return t instanceof Exception ? (Exception) t : new Exception(t.toString(), t);
+    }
+
+    /**
+     * The record as written to the output. An IOException cannot happen on
+     * a byte array; it is rethrown unchecked, as MappingResult.toXml does.
+     */
+    private ByteArrayOutputStream serialize(MappingResult result) {
+        try {
+            return result.toByteArrayOutputStream(recMapping.getFacts());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void validateRDF(MappingResult result, String xml, Graph shape, List<String> events)
+            throws MappingException {
+        List<String> rdfErrors = result.getRDFErrors(xml, rdfParseCheck);
         if (!rdfErrors.isEmpty()) {
             for (String rdfError : rdfErrors) {
                 events.add(rdfError);

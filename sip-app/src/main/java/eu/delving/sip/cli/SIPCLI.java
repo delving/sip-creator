@@ -116,6 +116,12 @@ class ProcessCommand implements Callable<Integer> {
     @Option(names = { "--validate-shacl" }, description = "Enable SHACL validation")
     private boolean validateShacl = false;
 
+    @Option(names = { "--skip-rdf-parse-check" },
+            description = "Do not parse every record with Jena to check it is valid RDF/XML (checked by default). "
+                    + "Records Jena would reject (E201 and the like) are then written to the output as invalid "
+                    + "RDF/XML instead of being left out and counted as errors")
+    private boolean skipRdfParseCheck = false;
+
     @Option(names = {
             "--uri-base" }, description = "Base URI for generation", defaultValue = "http://delving.org/narthex")
     private String uriBase;
@@ -368,7 +374,7 @@ class ProcessCommand implements Callable<Integer> {
 
         recMapping.getFacts().clear();
         recMapping.getFacts().putAll(sourceXML.getDataSetFacts());
-        return new FileProcessor(
+        FileProcessor processor = new FileProcessor(
                 new CLIFeedback(),
                 validateXsd,
                 validateShacl,
@@ -379,6 +385,8 @@ class ProcessCommand implements Callable<Integer> {
                 uriGenerator,
                 new CLIProcessorListener(),
                 RDFFormat.RDFXML);
+        processor.setRdfParseCheck(!skipRdfParseCheck);
+        return processor;
     }
 
     private RecMapping getRecMapping(Path mappingFile, Path recDefFile) throws IOException {

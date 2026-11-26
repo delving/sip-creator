@@ -114,12 +114,37 @@ public class MappingResult {
         collectMissingTopLevelSubjectErrors(root, errors);
         collectRelativeUriErrors(root, errors);
         if (recDefTree != null) {
-            String error = MappingResult.hasRDFError(toRDF());
-            if (error.length() > 0) {
-                errors.add(error);
-            }
+            addRDFParseError(toRDF(), errors);
         }
         return errors;
+    }
+
+    /**
+     * As {@link #getRDFErrors()}, but for a caller that has already
+     * serialized this result with {@link #toXml()} (or the bytes of
+     * {@link #toByteArrayOutputStream}), so the record is not serialized a
+     * second time.
+     *
+     * @param xml            this result's own serialization
+     * @param rdfParseCheck  whether to parse the record as RDF/XML with Jena
+     *                       to catch what the DOM checks cannot (E201 and the
+     *                       like); this is the costly part of the check
+     */
+    public List<String> getRDFErrors(String xml, boolean rdfParseCheck) {
+        List<String> errors = new ArrayList<String>();
+        collectMissingTopLevelSubjectErrors(root, errors);
+        collectRelativeUriErrors(root, errors);
+        if (recDefTree != null && rdfParseCheck) {
+            addRDFParseError(toRDF(xml), errors);
+        }
+        return errors;
+    }
+
+    private static void addRDFParseError(String rdf, List<String> errors) {
+        String error = MappingResult.hasRDFError(rdf);
+        if (error.length() > 0) {
+            errors.add(error);
+        }
     }
 
     private static final String RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
@@ -246,6 +271,10 @@ public class MappingResult {
 
     public String toRDF() {
         return MappingResult.toJenaCompliantRDF(recDefTree.getRoot().getDefaultPrefix(), toString());
+    }
+
+    private String toRDF(String xml) {
+        return MappingResult.toJenaCompliantRDF(recDefTree.getRoot().getDefaultPrefix(), Utils.stripNonPrinting(xml));
     }
 
     public String toString() {

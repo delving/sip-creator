@@ -50,7 +50,12 @@ public class RecDefTree implements RecDefNodeListener {
     private RecDef recDef;
     private RecDefNode root;
     private RecDefNodeListener listener;
-    private Map<String, XPathExpression> uriCheckPaths = new TreeMap<String, XPathExpression>();
+    private final List<String> uriCheckPathStrings = new ArrayList<String>();
+    // A compiled XPathExpression is not promised to be thread-safe (JAXP), and
+    // one tree is shared by every mapping engine thread, so each thread
+    // compiles its own.
+    private final ThreadLocal<Map<String, XPathExpression>> uriCheckPaths =
+            ThreadLocal.withInitial(this::compileUriCheckPathsUnchecked);
 
     public static RecDefTree create(RecDef recDef) {
         RecDefTree tree = new RecDefTree(recDef);
@@ -81,8 +86,30 @@ public class RecDefTree implements RecDefNodeListener {
         return root;
     }
 
+    /**
+     * The compiled URI-check expressions, keyed by path, for the calling
+     * thread only.
+     */
     public Map<String, XPathExpression> getUriCheckPaths() {
-        return uriCheckPaths;
+        return uriCheckPaths.get();
+    }
+
+    private Map<String, XPathExpression> compileUriCheckPaths() throws XPathExpressionException {
+        Map<String, XPathExpression> compiled = new TreeMap<String, XPathExpression>();
+        XPath xpath = createPath();
+        for (String path : uriCheckPathStrings) {
+            compiled.put(path, xpath.compile(path));
+        }
+        return compiled;
+    }
+
+    private Map<String, XPathExpression> compileUriCheckPathsUnchecked() {
+        try {
+            return compileUriCheckPaths();
+        }
+        catch (XPathExpressionException e) {
+            throw new RuntimeException("XPath problem: " + e.toString(), e);
+        }
     }
 
     public RecDefNode getRecDefNode(Path path) {
@@ -144,13 +171,15 @@ public class RecDefTree implements RecDefNodeListener {
             String path = uriCheckPath.toString();
             if(path.endsWith("@rdf:resource") || path.endsWith("@rdf:about"))
                 continue;
-            uriCheckPaths.put(path, createPath().compile(path));
+            uriCheckPathStrings.add(path);
         }
+        // compile once here so a bad path still fails at create time
+        uriCheckPaths.set(compileUriCheckPaths());
         root.checkPopulated();
     }
 
     private XPath createPath() {
-        return XMLToolFactory.xpath(pathContext);
+        return XMLToolFactory.saxonXpath(pathContext);
     }
 
     public interface SourceTree {
