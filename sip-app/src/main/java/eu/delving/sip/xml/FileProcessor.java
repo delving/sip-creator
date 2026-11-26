@@ -52,8 +52,9 @@ import javax.xml.validation.Validator;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Process an input file, mapping it to output records which are validated and
@@ -367,7 +368,11 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
     private class MetadataParserRunner implements Runnable {
 
-        final BlockingQueue<MetadataRecord> outputQueue = new LinkedBlockingDeque<>();
+        // Bounded: the parser blocks once this many records wait for an engine,
+        // and wakes as soon as an engine takes one.
+        static final int QUEUE_CAPACITY = 1000;
+        static final int POISON_PILLS = 100;
+        final BlockingQueue<MetadataRecord> outputQueue = new ArrayBlockingQueue<>(QUEUE_CAPACITY);
         final Thread thread = new Thread(this);
         final MetadataParser metadataParser;
 
@@ -388,10 +393,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     try {
                         if (!((record = metadataParser.nextRecord()) != null))
                             break;
-                        outputQueue.add(record);
-                        while (outputQueue.size() > 1000) {
-                            Thread.sleep(1000);
-                        }
+                        if (!enqueue(record))
+                            break;
                     } catch (CancelException e) {
                         termination.dueToCancellation();
                         break;
@@ -401,10 +404,29 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                     }
                 }
             } finally {
-                for (int i = 0; i < 100; i++) {
-                    outputQueue.add(MetadataRecord.poisonPill());
+                try {
+                    for (int i = 0; i < POISON_PILLS; i++) {
+                        if (!enqueue(MetadataRecord.poisonPill()))
+                            break;
+                    }
+                } catch (InterruptedException e) {
+                    termination.dueToException(e);
                 }
             }
+        }
+
+        /**
+         * Waits for room in the queue. Gives up (returns false) once processing
+         * has terminated: the engines then stop taking records, so a full queue
+         * would never drain. An engine blocked in take() means the queue is
+         * empty, so this never strands one.
+         */
+        private boolean enqueue(MetadataRecord record) throws InterruptedException {
+            while (!outputQueue.offer(record, 100, TimeUnit.MILLISECONDS)) {
+                if (termination.isIncomplete())
+                    return false;
+            }
+            return true;
         }
 
         public void start() {
