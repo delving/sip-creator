@@ -179,7 +179,7 @@ public class RecDefTree implements RecDefNodeListener {
     }
 
     private XPath createPath() {
-        return XMLToolFactory.xpath(pathContext);
+        return XMLToolFactory.saxonXpath(pathContext);
     }
 
     public interface SourceTree {

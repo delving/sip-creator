@@ -137,6 +137,25 @@ public class TestAssertions {
         Assertions.assertTrue(tests.get(4).getViolation(modsDoc).contains("empty!"));
     }
 
+    /**
+     * Assertions are XPath 1.0 (the JDK engine): a comparison against
+     * non-numeric text or a string function over a repeated element selects
+     * nothing instead of failing, as XPath 2.0 (Saxon) would.
+     */
+    @Test
+    public void testAssertionXPathIsVersionOne() throws Exception {
+        Document doc = XMLToolFactory.documentBuilderFactory().newDocumentBuilder().parse(
+                new ByteArrayInputStream("<a:x xmlns:a=\"urn:a\"><a:y>abc</a:y><a:r><a:t>a</a:t><a:t>b</a:t></a:r></a:x>".getBytes("UTF-8")));
+        AssertionTest.Factory factory = new AssertionTest.Factory(new DocContext(doc), groovyCodeResource);
+        for (String xpath : new String[]{"//a:y[. > 3]/text()", "//a:r[contains(a:t,'b')]/a:t/text()"}) {
+            Assertion assertion = new Assertion();
+            assertion.xpath = xpath;
+            assertion.condition = "false";
+            assertion.onFail = "matched";
+            Assertions.assertNull(factory.create(assertion).getViolation(doc), xpath);
+        }
+    }
+
     private static XStream getStream() {
         return XStreamFactory.getStreamFor(Assertion.AssertionList.class);
     }

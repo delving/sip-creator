@@ -43,14 +43,16 @@ public class XMLToolFactory {
 
     private static Logger LOG = LoggerFactory.getLogger(XMLToolFactory.class);
     private static XPathFactory XPATH_FACTORY;
+    private static XPathFactory SAXON_XPATH_FACTORY;
 
     static {
         try {
-            // Constructed directly: XPathFactoryImpl.newInstance() is the static
-            // XPathFactory.newInstance(), which ignores the class it is called
-            // through and returns the JDK default (Xalan). Saxon 9.6 registers
-            // no XPath service, so that is what this line had been getting.
-            XPATH_FACTORY = new net.sf.saxon.xpath.XPathFactoryImpl();
+            // The JDK default (XPath 1.0). Assertion and structure tests are
+            // written against its semantics, so they stay on it.
+            XPATH_FACTORY = XPathFactory.newInstance();
+            // Saxon (XPath 2.0), constructed directly: XPathFactoryImpl.newInstance()
+            // is the static XPathFactory.newInstance() and returns the JDK default.
+            SAXON_XPATH_FACTORY = new net.sf.saxon.xpath.XPathFactoryImpl();
         }
         catch (Exception e) {
             LOG.error("Error initializing Xpath? ", e);
@@ -66,6 +68,18 @@ public class XMLToolFactory {
 
     public static XPath xpath(NamespaceContext pathContext) {
         XPath path = XPATH_FACTORY.newXPath();
+        path.setNamespaceContext(pathContext);
+        return path;
+    }
+
+    /**
+     * An XPath from Saxon rather than the JDK. Only for pure location paths,
+     * where XPath 1.0 and 2.0 select the same nodes (RecDefTree's URI checks):
+     * predicates and functions can behave differently, so anything else uses
+     * {@link #xpath(NamespaceContext)}.
+     */
+    public static XPath saxonXpath(NamespaceContext pathContext) {
+        XPath path = SAXON_XPATH_FACTORY.newXPath();
         path.setNamespaceContext(pathContext);
         return path;
     }
