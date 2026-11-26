@@ -676,14 +676,17 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         @Override
         public void run() {
-            if (!categoryPerThread) {
-                runLoop();
-                return;
-            }
             try {
+                if (!categoryPerThread) {
+                    runLoop();
+                    return;
+                }
                 MappingRunner.runInMappingCategory(this::runLoop);
             } catch (Throwable t) { // runLoop handles its own; this is entering the scope
                 termination.dueToException(asException(t));
+            } finally {
+                // Always: the progress loop joins this thread until isDone, so a
+                // thread that died with isDone unset would make it spin.
                 isDone = true;
             }
         }
