@@ -18,6 +18,7 @@
 import eu.delving.groovy.GroovyNode
 import eu.delving.groovy.PatternCache
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.typehandling.DefaultTypeTransformation
 
 import java.util.regex.Pattern
 
@@ -166,7 +167,7 @@ public class MappingCategory {
         for (Object child : a) {
             Object returnValue = closure.call(child)
 
-            if (returnValue) {
+            if (isTrue(returnValue)) {
                 if (returnValue instanceof Object[]) {
                     output.addAll(returnValue)
                 }
@@ -182,6 +183,17 @@ public class MappingCategory {
             }
         }
         return output
+    }
+
+    // Groovy truth of a closure's result, as a plain `if (value)` gives it
+    // inside the category, but without that dynamic call: with a category in
+    // scope Groovy never links a call site, so every call goes through the
+    // site's synchronized cache, and this one is shared by all mapping threads.
+    private static boolean isTrue(Object value) {
+        if (value == null) return false
+        if (value instanceof String) return !((String) value).isEmpty()
+        if (value instanceof List) return asBoolean((List) value)
+        return DefaultTypeTransformation.castToBoolean(value) // asBoolean(), category included
     }
 
     // keepRunning the closure once for the concatenated values

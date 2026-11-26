@@ -58,6 +58,23 @@ public class TestMappingCategory {
         assertEquals("c:lvd:94", evalSanitizeURI("c:lvd:94"));
     }
 
+    @Test
+    public void multiplyKeepsGroovyTruthOfClosureResults() throws Exception {
+        // multiply decides truth without a dynamic call; it must agree with
+        // the dynamic `value ? ...` inside the category for every kind of result
+        String[] values = {
+                "null", "''", "'x'", "[]", "[[]]", "[[[]]]", "[[1]]", "[1]", "[[], 1]",
+                "0", "1", "0.0", "true", "false", "[:]", "[a: 1]",
+                "new Object[0]", "['a'] as Object[]", "new StringBuilder()", "new StringBuilder('x')",
+                "new eu.delving.groovy.GroovyNode(null, 'n', 'text')",
+        };
+        for (String value : values) {
+            Object dynamicTruth = runUnderCategory("def v = " + value + "; v ? true : false", null);
+            Object kept = runUnderCategory("def v = " + value + "; !([1] * { v }).isEmpty()", null);
+            assertEquals(dynamicTruth, kept, value);
+        }
+    }
+
     private String evalSanitizeURN(String input) throws Exception {
         return (String) runUnderCategory("input.sanitizeURN()", input);
     }
