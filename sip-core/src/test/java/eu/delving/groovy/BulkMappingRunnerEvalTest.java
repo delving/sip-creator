@@ -99,4 +99,23 @@ class BulkMappingRunnerEvalTest {
         runner.runMapping(record);
         assertNotNull(runner.runMapping(record));
     }
+
+    @Test
+    void categoryMethodsNeedTheScopeTheCallerOpens() throws MappingException {
+        // List * Closure is MappingCategory's; the code here does not enter it itself
+        BulkMappingRunner runner = new BulkMappingRunner(recMapping,
+                "assert (['a', 'b'] * { it.toUpperCase() }) == ['A', 'B']\n" + RETURN_NODE);
+        assertThrows(MappingException.class, () -> runner.runMapping(record));
+        Node[] result = new Node[2];
+        runner.runInMappingCategory(() -> {
+            try {
+                result[0] = runner.runMapping(record);
+                result[1] = runner.runMapping(record);
+            } catch (MappingException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        assertNotNull(result[0]);
+        assertNotNull(result[1]);
+    }
 }

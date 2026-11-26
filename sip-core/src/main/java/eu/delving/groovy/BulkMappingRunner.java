@@ -20,9 +20,11 @@ package eu.delving.groovy;
 import eu.delving.metadata.RecDefTree;
 import eu.delving.metadata.RecMapping;
 import groovy.lang.Binding;
+import groovy.lang.Closure;
 import groovy.lang.Script;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl;
+import org.codehaus.groovy.runtime.GroovyCategorySupport;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,6 +125,36 @@ public class BulkMappingRunner implements MappingRunner {
         } catch (Exception e) {
             throw new ScriptException(e);
         }
+    }
+
+    /**
+     * Runs {@code body} with MappingCategory in scope on the calling thread,
+     * for a runner whose code was generated with
+     * {@code CodeGenerator.withCategoryScope(false)}; every
+     * {@link #runMapping} inside {@code body} then relies on it.
+     *
+     * <p>Entering and leaving a category scope invalidates every Groovy indy
+     * call site in the process. Generated code that enters it per record
+     * keeps all mapping threads relinking their call sites; entering it once
+     * per thread lets them stay linked.
+     *
+     * <p>Any other Groovy code run inside {@code body} also sees the category,
+     * so keep it to mapping work.
+     */
+    public void runInMappingCategory(Runnable body) {
+        Class<?> category;
+        try {
+            category = scriptClass.getClassLoader().loadClass("MappingCategory");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("MappingCategory is not on the mapping class loader", e);
+        }
+        GroovyCategorySupport.use(category, new Closure<Void>(this) {
+            @SuppressWarnings("unused") // called by Groovy
+            public Void doCall() {
+                body.run();
+                return null;
+            }
+        });
     }
 
     @Override

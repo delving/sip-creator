@@ -249,8 +249,15 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             int engineCount = (int) Math.round(Runtime.getRuntime().availableProcessors() * 1.1);
             info(String.format("Processing with %d engines", engineCount));
 
-            String code = new CodeGenerator(recMapping).withEditPath(null).withTrace(false).toRecordMappingCode();
-            MappingRunner MappingRunner = new BulkMappingRunner(recMapping, code);
+            // Each engine thread enters MappingCategory once instead of the
+            // generated code entering it per record: every use(...) invalidates
+            // all of Groovy's call sites, process-wide. Assertion scripts run on
+            // the engine threads too and must not see the category, so with XSD
+            // validation (which runs them) the code keeps its own scope.
+            boolean categoryPerThread = !enableXSDValidation;
+            String code = new CodeGenerator(recMapping).withEditPath(null).withTrace(false)
+                    .withCategoryScope(!categoryPerThread).toRecordMappingCode();
+            BulkMappingRunner MappingRunner = new BulkMappingRunner(recMapping, code);
             List<AssertionTest> assertionTests = AssertionTest.listFrom(recMapping.getRecDefTree().getRecDef(),
                     groovyCodeResource);
 
@@ -274,7 +281,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         recDef().getNamespaceMap(),
                         reportWriter,
                         assertionTests,
-                        MappingRunner);
+                        MappingRunner,
+                        categoryPerThread);
                 consumer.register(engine);
                 engine.start();
             }
@@ -591,7 +599,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
         final Map<String, RecDef.Namespace> namespaceMap;
         final ReportWriter reportWriter;
         final List<AssertionTest> assertionTests;
-        final MappingRunner MappingRunner;
+        final BulkMappingRunner MappingRunner;
+        final boolean categoryPerThread;
 
         private MappingEngine(int index,
                 MetadataParserRunner metadataParserRunner,
@@ -603,7 +612,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                 Map<String, RecDef.Namespace> namespaceMap,
                 ReportWriter reportWriter,
                 List<AssertionTest> assertionTests,
-                MappingRunner MappingRunner) {
+                BulkMappingRunner MappingRunner,
+                boolean categoryPerThread) {
             this.metadataParserRunner = metadataParserRunner;
             this.validator = validator;
             this.shape = shape;
@@ -615,6 +625,7 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             this.reportWriter = reportWriter;
             this.assertionTests = assertionTests;
             this.MappingRunner = MappingRunner;
+            this.categoryPerThread = categoryPerThread;
             this.thread = new Thread(this);
             this.thread.setName("MappingEngine" + index);
         }
@@ -658,6 +669,19 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
 
         @Override
         public void run() {
+            if (!categoryPerThread) {
+                runLoop();
+                return;
+            }
+            try {
+                MappingRunner.runInMappingCategory(this::runLoop);
+            } catch (RuntimeException e) { // runLoop handles its own; this is entering the scope
+                termination.dueToException(e);
+                isDone = true;
+            }
+        }
+
+        private void runLoop() {
             try {
                 while (termination.notYet()) {
                     MetadataRecord record = metadataParserRunner.nextRecord();

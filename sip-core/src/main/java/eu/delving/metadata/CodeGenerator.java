@@ -32,6 +32,7 @@ public class CodeGenerator {
     private CodeOut codeOut = new CodeOut();
     private String prefixFirstBuilder = "outputNode = WORLD.output.";
     private boolean trace;
+    private boolean categoryScope = true;
     private RecDefNode autoRdfAboutTarget;
 
     public CodeGenerator(RecMapping recMapping) {
@@ -45,6 +46,17 @@ public class CodeGenerator {
 
     public CodeGenerator withTrace(boolean trace) {
         this.trace = trace;
+        return this;
+    }
+
+    /**
+     * Whether the generated code enters {@code use (MappingCategory)} itself
+     * (the default). Without it the same body runs as a plain closure, and
+     * the caller must run the script with MappingCategory already in scope,
+     * as {@link eu.delving.groovy.BulkMappingRunner#runInMappingCategory} does.
+     */
+    public CodeGenerator withCategoryScope(boolean categoryScope) {
+        this.categoryScope = categoryScope;
         return this;
     }
 
@@ -258,7 +270,7 @@ public class CodeGenerator {
         codeOut.line("// DSL Category wraps Builder call:");
         codeOut.line("boolean _absent_ = true");
         codeOut.line("def outputNode");
-        codeOut.line_("use (MappingCategory) {");
+        codeOut.line_(categoryScope ? "use (MappingCategory) {" : "def _mappingBody = { ->");
         codeOut.line_("WORLD.input * { _input ->");
         codeOut.line("_uniqueIdentifier = _input['@id'][0].toString()");
         if (recDefTree.getRoot().isPopulated()) {
@@ -270,6 +282,9 @@ public class CodeGenerator {
         codeOut._line("}");
         codeOut.line("outputNode");
         codeOut._line("}");
+        if (!categoryScope) {
+            codeOut.line("_mappingBody()");
+        }
         codeOut.line("// ----------------------------------");
     }
 
