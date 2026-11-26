@@ -677,8 +677,8 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
             }
             try {
                 MappingRunner.runInMappingCategory(this::runLoop);
-            } catch (RuntimeException e) { // runLoop handles its own; this is entering the scope
-                termination.dueToException(e);
+            } catch (Throwable t) { // runLoop handles its own; this is entering the scope
+                termination.dueToException(asException(t));
                 isDone = true;
             }
         }
@@ -757,12 +757,19 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                         }
                     }
                 }
-            } catch (Exception e) {
-                termination.dueToException(e);
+            } catch (Throwable t) {
+                // An Error too (StackOverflowError in mapping code, OutOfMemoryError):
+                // this engine stops, so the run must fail rather than finish
+                // without its records, and the parser must stop waiting for room.
+                termination.dueToException(asException(t));
             } finally {
                 isDone = true;
             }
         }
+    }
+
+    private static Exception asException(Throwable t) {
+        return t instanceof Exception ? (Exception) t : new Exception(t.toString(), t);
     }
 
     /**

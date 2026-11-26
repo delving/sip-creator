@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * FileProcessor end to end on a small mapping (the nationaal-gevangenismuseum
@@ -76,6 +77,27 @@ public class FileProcessorTest {
         Run run = run(mapping, MANY, false, true);
         assertEquals("failed", run.outcome);
         assertEquals("cancelled", run.processedOutput);
+    }
+
+    @Test
+    public void errorInMappingFailsTheRun() throws Exception {
+        // an Error, not an Exception: allowInvalid must not let it through either
+        String mapping = mapping().replaceFirst(Pattern.quote(IS_SHOWN_BY),
+                "throw new StackOverflowError(&quot;deep&quot;)");
+        Run run = run(mapping, MANY, true, true);
+        assertEquals("failed", run.outcome);
+        assertEquals("cancelled", run.processedOutput);
+        assertParserStops();
+    }
+
+    /** The parser gives up on a full queue once the run has failed, instead of polling forever. */
+    private static void assertParserStops() throws InterruptedException {
+        String name = FileProcessor.class.getName() + "$MetadataParserRunner";
+        long deadline = System.currentTimeMillis() + 10_000;
+        while (Thread.getAllStackTraces().keySet().stream().anyMatch(t -> t.getName().equals(name))) {
+            if (System.currentTimeMillis() > deadline) fail("parser thread still running");
+            Thread.sleep(50);
+        }
     }
 
     @Test
