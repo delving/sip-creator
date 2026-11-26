@@ -250,3 +250,6 @@ ADR-0001 and this plan first. Flip ADR-0001 to Accepted when Step 1 merges.
 - `013ceba0` 2026-09-08 21:27: docs: record EDT ownership decision and sip-app threading hardening plan ( 2 files changed, 341 insertions(+))
 - `94fc0ad2` 2026-09-08 21:29: docs: point ADR-0001 and threading plan at the rewritten commit hashes ( 2 files changed, 21 insertions(+), 18 deletions(-))
 - `b6b470b7` 2026-09-09 16:48: fix(sip-core,sip-app): keep the missing-input-path red marking current ( 6 files changed, 74 insertions(+), 9 deletions(-))
+- `3bdd1127` 2026-10-04 17:12: docs: accept ADR-0001 and record Step 1 merge in the threading plan ( 2 files changed, 3 insertions(+), 4 deletions(-))
+- `9bdf5001` 2026-10-04 17:22: build: bump managed log4j-core and log4j-slf4j2-impl to 2.25.4 ( 1 file changed, 2 insertions(+), 2 deletions(-))
+- `0df6077b` 2026-10-04 17:25: build: drop unused managed log4j dependencies ( 1 file changed, 10 deletions(-))
