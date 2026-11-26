@@ -117,7 +117,9 @@ class ProcessCommand implements Callable<Integer> {
     private boolean validateShacl = false;
 
     @Option(names = { "--skip-rdf-parse-check" },
-            description = "Do not parse every record with Jena to check it is valid RDF/XML (checked by default)")
+            description = "Do not parse every record with Jena to check it is valid RDF/XML (checked by default). "
+                    + "Records Jena would reject (E201 and the like) are then written to the output as invalid "
+                    + "RDF/XML instead of being left out and counted as errors")
     private boolean skipRdfParseCheck = false;
 
     @Option(names = {

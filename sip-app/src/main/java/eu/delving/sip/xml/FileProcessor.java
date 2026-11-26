@@ -707,7 +707,9 @@ public class FileProcessor implements Work.DataSetPrefixWork, Work.LongTermWork 
                                 MappingRunner.getRecDefTree(), recMapping.getFacts());
                         // Serialized once: checked as RDF and, if accepted, written as is.
                         ByteArrayOutputStream xml = serialize(result);
-                        validateRDF(result, xml.toString(StandardCharsets.UTF_8), shape, events);
+                        // the string is only read by the Jena parse check
+                        String xmlText = rdfParseCheck ? xml.toString(StandardCharsets.UTF_8) : null;
+                        validateRDF(result, xmlText, shape, events);
                         List<String> uriErrors = result.getUriErrors();
                         try {
                             if (!uriErrors.isEmpty()) {
