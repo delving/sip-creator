@@ -116,7 +116,7 @@ public class GoldenCapture {
      * {@link MetadataRecord#getId()} and the {@code GroovyNode} tree that
      * backs {@code _input} in generated mapping code.
      */
-    private static MetadataRecord parseRecord(Path recordFile) throws Exception {
+    static MetadataRecord parseRecord(Path recordFile) throws Exception {
         String pocketXml = Files.readString(recordFile, StandardCharsets.UTF_8).trim();
         String wrapped = "<pockets>" + pocketXml + "</pockets>";
         InputStream in = new ByteArrayInputStream(wrapped.getBytes(StandardCharsets.UTF_8));
